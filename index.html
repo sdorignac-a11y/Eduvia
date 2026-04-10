@@ -3,32 +3,46 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Lumora</title>
+  <title>Lumora | Clases instantáneas con IA</title>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  />
 
   <style>
     :root{
-      --bg:#f6f7fb;
+      --bg:#f7f8fc;
+      --bg-soft:#f2f5ff;
       --surface:#ffffff;
-      --surface-2:#f9fafc;
-      --text:#111318;
-      --muted:#6b7280;
-      --line:#e7eaf0;
-      --primary:#4f46e5;
+      --surface-2:#fbfcff;
+      --text:#16181d;
+      --muted:#687184;
+      --line:#e7ebf3;
+
+      --primary:#5b61f6;
+      --primary-2:#8790ff;
       --primary-soft:#eef0ff;
-      --shadow:0 10px 30px rgba(17,19,24,.05);
-      --radius:24px;
-      --radius-sm:16px;
+      --accent:#e9edff;
+
+      --shadow-sm:0 8px 24px rgba(18, 24, 40, .05);
+      --shadow-md:0 18px 50px rgba(18, 24, 40, .08);
+      --shadow-lg:0 28px 80px rgba(18, 24, 40, .10);
+
+      --radius-xl:34px;
+      --radius-lg:26px;
+      --radius-md:18px;
+
       --container:1120px;
+      --transition:.28s cubic-bezier(.22,.61,.36,1);
     }
 
     *{
-      box-sizing:border-box;
       margin:0;
       padding:0;
+      box-sizing:border-box;
     }
 
     html{
@@ -36,10 +50,14 @@
     }
 
     body{
-      font-family:"Inter",sans-serif;
-      background:var(--bg);
+      font-family:"Inter", sans-serif;
       color:var(--text);
+      background:
+        radial-gradient(circle at 12% 12%, rgba(91,97,246,.10), transparent 22%),
+        radial-gradient(circle at 88% 10%, rgba(135,144,255,.10), transparent 18%),
+        linear-gradient(180deg, #fbfcff 0%, var(--bg) 100%);
       line-height:1.5;
+      overflow-x:hidden;
     }
 
     a{
@@ -47,22 +65,74 @@
       text-decoration:none;
     }
 
+    img{
+      max-width:100%;
+      display:block;
+    }
+
     .container{
-      width:min(var(--container), calc(100% - 32px));
+      width:min(var(--container), calc(100% - 28px));
       margin:0 auto;
+    }
+
+    .section{
+      padding:76px 0;
+    }
+
+    .section-head{
+      max-width:650px;
+      margin-bottom:26px;
+    }
+
+    .section-kicker{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 12px;
+      border-radius:999px;
+      background:rgba(255,255,255,.78);
+      border:1px solid rgba(231,235,243,.95);
+      color:var(--primary);
+      font-size:.84rem;
+      font-weight:600;
+      margin-bottom:14px;
+      box-shadow:var(--shadow-sm);
+      backdrop-filter:blur(10px);
+    }
+
+    .section-kicker::before{
+      content:"";
+      width:7px;
+      height:7px;
+      border-radius:50%;
+      background:var(--primary);
+      display:block;
+    }
+
+    .section-head h2{
+      font-size:clamp(1.5rem, 3vw, 2.1rem);
+      line-height:1.08;
+      letter-spacing:-.04em;
+      margin-bottom:10px;
+      font-weight:700;
+    }
+
+    .section-head p{
+      color:var(--muted);
+      font-size:.98rem;
     }
 
     .header{
       position:sticky;
       top:0;
-      z-index:20;
-      background:rgba(246,247,251,.86);
-      backdrop-filter:blur(10px);
-      border-bottom:1px solid rgba(231,234,240,.7);
+      z-index:40;
+      backdrop-filter:blur(14px);
+      background:rgba(247,248,252,.78);
+      border-bottom:1px solid rgba(231,235,243,.75);
     }
 
     .nav{
-      height:74px;
+      min-height:76px;
       display:flex;
       align-items:center;
       justify-content:space-between;
@@ -73,21 +143,21 @@
       display:flex;
       align-items:center;
       gap:12px;
-      font-weight:600;
-      font-size:.96rem;
-      letter-spacing:-0.02em;
+      font-weight:700;
+      letter-spacing:-.03em;
+      font-size:.98rem;
     }
 
     .brand-mark{
-      width:34px;
-      height:34px;
-      border-radius:12px;
+      width:38px;
+      height:38px;
+      border-radius:14px;
       display:grid;
       place-items:center;
-      background:var(--text);
       color:#fff;
-      font-size:.9rem;
-      font-weight:700;
+      font-weight:800;
+      background:linear-gradient(135deg, var(--primary), var(--primary-2));
+      box-shadow:0 12px 26px rgba(91,97,246,.24);
     }
 
     .nav-links{
@@ -95,74 +165,126 @@
       align-items:center;
       gap:24px;
       color:var(--muted);
-      font-size:.94rem;
+      font-size:.95rem;
+      font-weight:500;
+    }
+
+    .nav-links a{
+      position:relative;
+      transition:var(--transition);
+    }
+
+    .nav-links a::after{
+      content:"";
+      position:absolute;
+      left:0;
+      bottom:-6px;
+      width:0;
+      height:2px;
+      border-radius:999px;
+      background:var(--primary);
+      transition:var(--transition);
     }
 
     .nav-links a:hover{
       color:var(--text);
     }
 
+    .nav-links a:hover::after{
+      width:100%;
+    }
+
     .nav-actions{
       display:flex;
-      gap:10px;
       align-items:center;
+      gap:10px;
     }
 
     .btn{
       display:inline-flex;
       align-items:center;
       justify-content:center;
-      border:none;
-      cursor:pointer;
-      border-radius:999px;
+      gap:10px;
       padding:12px 18px;
+      border:none;
+      border-radius:999px;
+      cursor:pointer;
       font-size:.94rem;
       font-weight:600;
-      transition:.18s ease;
+      transition:var(--transition);
+      white-space:nowrap;
     }
 
     .btn:hover{
-      transform:translateY(-1px);
+      transform:translateY(-2px);
     }
 
     .btn-primary{
-      background:var(--text);
       color:#fff;
+      background:linear-gradient(135deg, var(--primary), var(--primary-2));
+      box-shadow:0 14px 30px rgba(91,97,246,.22);
+    }
+
+    .btn-primary:hover{
+      box-shadow:0 18px 36px rgba(91,97,246,.28);
     }
 
     .btn-secondary{
-      background:#fff;
       color:var(--text);
+      background:rgba(255,255,255,.86);
       border:1px solid var(--line);
+      box-shadow:var(--shadow-sm);
+    }
+
+    .btn-secondary:hover{
+      border-color:#d8deeb;
+      background:#fff;
     }
 
     .hero{
-      padding:84px 0 48px;
+      padding:72px 0 46px;
     }
 
     .hero-inner{
-      max-width:760px;
+      max-width:780px;
       margin:0 auto;
       text-align:center;
     }
 
-    .kicker{
-      display:inline-block;
+    .hero-kicker{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
       padding:8px 12px;
-      border:1px solid var(--line);
-      background:#fff;
       border-radius:999px;
-      color:var(--muted);
-      font-size:.82rem;
+      background:rgba(255,255,255,.85);
+      border:1px solid var(--line);
+      color:var(--primary);
+      font-size:.84rem;
+      font-weight:600;
       margin-bottom:18px;
+      box-shadow:var(--shadow-sm);
+    }
+
+    .hero-kicker::before{
+      content:"";
+      width:7px;
+      height:7px;
+      border-radius:50%;
+      background:var(--primary);
+      display:block;
     }
 
     .hero h1{
-      font-size:clamp(2rem, 4vw, 3rem);
-      line-height:1.04;
-      letter-spacing:-0.05em;
-      font-weight:600;
+      font-size:clamp(2rem, 4vw, 3.1rem);
+      line-height:1.03;
+      letter-spacing:-.055em;
+      font-weight:700;
       margin-bottom:14px;
+    }
+
+    .hero h1 span{
+      color:var(--primary);
     }
 
     .hero p{
@@ -176,30 +298,100 @@
       margin-top:24px;
       display:flex;
       justify-content:center;
-      gap:12px;
       flex-wrap:wrap;
+      gap:12px;
+    }
+
+    .hero-meta{
+      margin-top:22px;
+      display:flex;
+      justify-content:center;
+      flex-wrap:wrap;
+      gap:10px;
+    }
+
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:10px 13px;
+      border-radius:999px;
+      background:rgba(255,255,255,.84);
+      border:1px solid var(--line);
+      font-size:.88rem;
+      color:#4b5565;
+      box-shadow:var(--shadow-sm);
+      transition:var(--transition);
+    }
+
+    .pill:hover{
+      transform:translateY(-2px);
+      box-shadow:0 12px 26px rgba(18,24,40,.07);
+    }
+
+    .pill::before{
+      content:"";
+      width:6px;
+      height:6px;
+      border-radius:50%;
+      background:var(--primary);
+      display:block;
     }
 
     .hero-card-wrap{
-      margin-top:42px;
+      margin-top:38px;
+      position:relative;
+    }
+
+    .hero-glow{
+      position:absolute;
+      inset:auto;
+      width:240px;
+      height:240px;
+      border-radius:50%;
+      filter:blur(50px);
+      opacity:.5;
+      pointer-events:none;
+    }
+
+    .hero-glow.glow-1{
+      left:-50px;
+      top:-30px;
+      background:rgba(91,97,246,.14);
+    }
+
+    .hero-glow.glow-2{
+      right:-40px;
+      bottom:-20px;
+      background:rgba(135,144,255,.14);
     }
 
     .hero-card{
-      background:var(--surface);
-      border:1px solid var(--line);
+      position:relative;
+      z-index:1;
+      background:linear-gradient(180deg, rgba(255,255,255,.86), rgba(255,255,255,.72));
+      border:1px solid rgba(231,235,243,.95);
       border-radius:32px;
-      box-shadow:var(--shadow);
-      overflow:hidden;
+      padding:14px;
+      box-shadow:var(--shadow-lg);
+      backdrop-filter:blur(14px);
     }
 
-    .hero-top{
-      height:54px;
-      border-bottom:1px solid var(--line);
+    .hero-screen{
+      border-radius:24px;
+      overflow:hidden;
+      background:#fff;
+      border:1px solid #edf0f6;
+    }
+
+    .hero-screen-top{
+      height:56px;
       display:flex;
       align-items:center;
       justify-content:space-between;
       padding:0 16px;
-      background:rgba(255,255,255,.85);
+      border-bottom:1px solid #edf0f6;
+      background:rgba(255,255,255,.88);
     }
 
     .dots{
@@ -210,56 +402,66 @@
     .dots span{
       width:8px;
       height:8px;
-      border-radius:999px;
-      background:#d7dbe4;
+      border-radius:50%;
+      background:#d8dce7;
     }
 
-    .code{
+    .class-code{
+      padding:8px 11px;
+      border-radius:999px;
+      background:var(--primary-soft);
+      border:1px solid #e1e6ff;
+      color:var(--primary);
       font-size:.82rem;
-      color:var(--muted);
-      padding:7px 10px;
-      border-radius:999px;
-      background:var(--surface-2);
-      border:1px solid var(--line);
+      font-weight:700;
+      letter-spacing:.02em;
     }
 
-    .hero-body{
+    .hero-screen-body{
       display:grid;
-      grid-template-columns:1.15fr .85fr;
-      min-height:420px;
+      grid-template-columns:1.16fr .84fr;
+      min-height:430px;
     }
 
-    .class-side{
-      padding:22px;
-      border-right:1px solid var(--line);
-      background:#fff;
+    .class-panel{
+      padding:20px;
+      border-right:1px solid #edf0f6;
+      background:linear-gradient(180deg, #ffffff 0%, #fbfcff 100%);
     }
 
     .teacher-box{
-      border:1px solid var(--line);
-      border-radius:22px;
-      padding:18px;
       display:flex;
-      gap:14px;
       align-items:center;
+      gap:14px;
+      padding:18px;
+      border-radius:22px;
+      background:linear-gradient(135deg, #f3f5ff 0%, #fbfcff 100%);
+      border:1px solid #e9edff;
+      box-shadow:0 12px 28px rgba(91,97,246,.08);
       margin-bottom:16px;
-      background:var(--surface-2);
+      transition:var(--transition);
+    }
+
+    .teacher-box:hover{
+      transform:translateY(-2px);
+      box-shadow:0 16px 32px rgba(91,97,246,.11);
     }
 
     .avatar{
-      width:64px;
-      height:64px;
+      width:66px;
+      height:66px;
       border-radius:20px;
-      background:#dfe3ff;
       flex-shrink:0;
+      background:linear-gradient(135deg, #dfe4ff, #f0f3ff);
       position:relative;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.8);
     }
 
     .avatar::before,
     .avatar::after{
       content:"";
       position:absolute;
-      background:#4f46e5;
+      background:var(--primary);
       border-radius:999px;
     }
 
@@ -268,57 +470,64 @@
       height:8px;
       top:20px;
       left:17px;
-      box-shadow:22px 0 0 #4f46e5;
+      box-shadow:22px 0 0 var(--primary);
     }
 
     .avatar::after{
       width:24px;
       height:6px;
-      bottom:16px;
-      left:20px;
+      left:21px;
+      bottom:17px;
     }
 
     .teacher-box h3{
-      font-size:.96rem;
-      font-weight:600;
+      font-size:.97rem;
+      font-weight:700;
       margin-bottom:4px;
     }
 
     .teacher-box p{
-      font-size:.9rem;
       color:var(--muted);
+      font-size:.9rem;
     }
 
     .board{
-      border:1px solid var(--line);
+      min-height:225px;
       border-radius:22px;
+      border:1px solid var(--line);
+      background:#fff;
       padding:18px;
-      min-height:220px;
       display:flex;
       flex-direction:column;
       justify-content:center;
       gap:14px;
-      background:#fff;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.8);
+      transition:var(--transition);
+    }
+
+    .board:hover{
+      transform:translateY(-2px);
+      box-shadow:0 14px 28px rgba(18,24,40,.06);
     }
 
     .line{
       height:14px;
       border-radius:999px;
-      background:linear-gradient(90deg, rgba(79,70,229,.14), rgba(79,70,229,.04));
+      background:linear-gradient(90deg, rgba(91,97,246,.18), rgba(91,97,246,.05));
     }
 
-    .line.w1{ width:82%; }
-    .line.w2{ width:60%; }
-    .line.w3{ width:44%; }
+    .line.w1{ width:84%; }
+    .line.w2{ width:62%; }
+    .line.w3{ width:46%; }
 
     .board small{
       color:var(--muted);
       font-size:.88rem;
     }
 
-    .chat-side{
+    .chat-panel{
       padding:18px;
-      background:#fbfbfd;
+      background:#fcfcff;
       display:flex;
       flex-direction:column;
       gap:12px;
@@ -329,49 +538,40 @@
       padding:13px 14px;
       border-radius:16px;
       font-size:.9rem;
+      transition:var(--transition);
     }
 
-    .user{
+    .bubble:hover{
+      transform:translateY(-1px);
+    }
+
+    .bubble.user{
       align-self:flex-end;
-      background:#f1f3f7;
-      color:#2c3440;
+      background:#f2f4f8;
+      color:#303846;
     }
 
-    .ai{
+    .bubble.ai{
       align-self:flex-start;
-      background:var(--primary-soft);
-      color:#38329a;
+      background:linear-gradient(135deg, #eef0ff, #f5f6ff);
+      color:#3833a5;
     }
 
-    .input{
+    .chat-input{
       margin-top:auto;
-      border:1px solid var(--line);
-      border-radius:16px;
       padding:12px 14px;
-      color:var(--muted);
+      border-radius:16px;
+      border:1px solid var(--line);
       background:#fff;
-      font-size:.9rem;
-    }
-
-    .section{
-      padding:52px 0;
-    }
-
-    .section-head{
-      max-width:620px;
-      margin-bottom:24px;
-    }
-
-    .section-head h2{
-      font-size:1.4rem;
-      font-weight:600;
-      letter-spacing:-0.03em;
-      margin-bottom:8px;
-    }
-
-    .section-head p{
       color:var(--muted);
-      font-size:.96rem;
+      font-size:.9rem;
+      box-shadow:var(--shadow-sm);
+      transition:var(--transition);
+    }
+
+    .chat-input:hover{
+      border-color:#d7ddec;
+      box-shadow:0 12px 26px rgba(18,24,40,.06);
     }
 
     .grid-3{
@@ -387,87 +587,108 @@
     }
 
     .card{
-      background:var(--surface);
-      border:1px solid var(--line);
+      background:rgba(255,255,255,.78);
+      border:1px solid rgba(231,235,243,.95);
       border-radius:24px;
       padding:20px;
-      box-shadow:var(--shadow);
+      box-shadow:var(--shadow-sm);
+      transition:var(--transition);
+      backdrop-filter:blur(10px);
+    }
+
+    .card:hover{
+      transform:translateY(-4px);
+      border-color:#dbe1ef;
+      box-shadow:var(--shadow-md);
     }
 
     .card-number{
-      width:34px;
-      height:34px;
+      width:36px;
+      height:36px;
       border-radius:12px;
       display:grid;
       place-items:center;
-      background:var(--surface-2);
-      border:1px solid var(--line);
       font-size:.88rem;
-      font-weight:600;
+      font-weight:700;
+      color:var(--primary);
+      background:linear-gradient(135deg, var(--primary-soft), #f8f9ff);
+      border:1px solid #e1e6ff;
       margin-bottom:14px;
     }
 
     .card h3{
       font-size:.98rem;
-      font-weight:600;
+      font-weight:700;
       margin-bottom:6px;
+      letter-spacing:-.02em;
     }
 
     .card p{
-      font-size:.92rem;
       color:var(--muted);
+      font-size:.92rem;
     }
 
-    .simple-panel{
-      background:var(--surface);
-      border:1px solid var(--line);
-      border-radius:28px;
-      box-shadow:var(--shadow);
-      padding:20px;
+    .platform-panel{
+      background:linear-gradient(180deg, rgba(255,255,255,.82), rgba(255,255,255,.72));
+      border:1px solid rgba(231,235,243,.95);
+      border-radius:30px;
+      padding:18px;
+      box-shadow:var(--shadow-md);
+      backdrop-filter:blur(12px);
     }
 
-    .simple-grid{
+    .platform-grid{
       display:grid;
       grid-template-columns:1fr 1fr;
       gap:16px;
     }
 
     .mini-box{
-      border:1px solid var(--line);
-      border-radius:20px;
-      padding:16px;
-      background:var(--surface-2);
+      border:1px solid rgba(231,235,243,.95);
+      border-radius:22px;
+      padding:18px;
+      background:linear-gradient(180deg, #ffffff, #fbfcff);
+      box-shadow:var(--shadow-sm);
+      transition:var(--transition);
+    }
+
+    .mini-box:hover{
+      transform:translateY(-3px);
+      box-shadow:var(--shadow-md);
     }
 
     .mini-box h4{
       font-size:.95rem;
-      margin-bottom:5px;
-      font-weight:600;
+      font-weight:700;
+      margin-bottom:6px;
+      letter-spacing:-.02em;
     }
 
     .mini-box p{
-      font-size:.9rem;
       color:var(--muted);
+      font-size:.9rem;
     }
 
     .cta{
-      margin-top:18px;
+      margin-top:20px;
       display:flex;
-      justify-content:space-between;
       align-items:center;
+      justify-content:space-between;
       gap:16px;
       flex-wrap:wrap;
       padding:22px;
-      background:var(--surface);
-      border:1px solid var(--line);
       border-radius:28px;
-      box-shadow:var(--shadow);
+      background:linear-gradient(135deg, rgba(255,255,255,.84), rgba(245,247,255,.82));
+      border:1px solid rgba(231,235,243,.95);
+      box-shadow:var(--shadow-md);
+      backdrop-filter:blur(12px);
     }
 
     .cta h3{
-      font-size:1.05rem;
-      font-weight:600;
+      font-size:1.04rem;
+      font-weight:700;
       margin-bottom:4px;
+      letter-spacing:-.03em;
     }
 
     .cta p{
@@ -477,7 +698,7 @@
     }
 
     footer{
-      padding:26px 0 40px;
+      padding:28px 0 40px;
       color:var(--muted);
       font-size:.9rem;
     }
@@ -491,17 +712,28 @@
       flex-wrap:wrap;
     }
 
+    .reveal{
+      opacity:0;
+      transform:translateY(24px);
+      transition:opacity .75s ease, transform .75s ease;
+    }
+
+    .reveal.visible{
+      opacity:1;
+      transform:translateY(0);
+    }
+
     @media (max-width: 980px){
-      .hero-body,
+      .hero-screen-body,
       .grid-3,
       .grid-4,
-      .simple-grid{
+      .platform-grid{
         grid-template-columns:1fr;
       }
 
-      .class-side{
+      .class-panel{
         border-right:none;
-        border-bottom:1px solid var(--line);
+        border-bottom:1px solid #edf0f6;
       }
     }
 
@@ -511,11 +743,11 @@
       }
 
       .hero{
-        padding-top:56px;
+        padding-top:54px;
       }
 
       .hero h1{
-        font-size:clamp(1.8rem, 8vw, 2.5rem);
+        font-size:clamp(1.85rem, 7vw, 2.55rem);
       }
 
       .nav-actions{
@@ -525,11 +757,40 @@
       .btn{
         padding:11px 15px;
       }
+
+      .section{
+        padding:64px 0;
+      }
+    }
+
+    @media (max-width: 540px){
+      .container{
+        width:min(var(--container), calc(100% - 20px));
+      }
+
+      .hero-card{
+        padding:10px;
+        border-radius:24px;
+      }
+
+      .hero-screen{
+        border-radius:18px;
+      }
+
+      .class-panel,
+      .chat-panel,
+      .card,
+      .mini-box{
+        padding:16px;
+      }
+
+      .cta{
+        padding:18px;
+      }
     }
   </style>
 </head>
 <body>
-
   <header class="header">
     <div class="container">
       <nav class="nav">
@@ -539,7 +800,7 @@
         </a>
 
         <div class="nav-links">
-          <a href="#como">Cómo funciona</a>
+          <a href="#como-funciona">Cómo funciona</a>
           <a href="#plataforma">Plataforma</a>
           <a href="#beneficios">Beneficios</a>
         </div>
@@ -555,10 +816,10 @@
   <main>
     <section class="hero">
       <div class="container">
-        <div class="hero-inner">
-          <div class="kicker">Clases instantáneas con avatar de IA</div>
+        <div class="hero-inner reveal visible">
+          <div class="hero-kicker">Clases instantáneas con avatar de IA</div>
 
-          <h1>Creá una clase cuando la necesites.</h1>
+          <h1>Creá una clase <span>cuando la necesites</span>.</h1>
 
           <p>
             Elegí la materia, indicá el tema y entrá a una explicación clara, visual y personalizada.
@@ -567,42 +828,53 @@
 
           <div class="hero-actions">
             <a href="#" class="btn btn-primary">Empezar</a>
-            <a href="#como" class="btn btn-secondary">Ver más</a>
+            <a href="#como-funciona" class="btn btn-secondary">Ver más</a>
+          </div>
+
+          <div class="hero-meta">
+            <div class="pill">Clase al instante</div>
+            <div class="pill">Código único</div>
+            <div class="pill">Explicación visual</div>
           </div>
         </div>
 
-        <div class="hero-card-wrap">
-          <div class="hero-card">
-            <div class="hero-top">
-              <div class="dots">
-                <span></span><span></span><span></span>
-              </div>
-              <div class="code">Código MAT-4821</div>
-            </div>
+        <div class="hero-card-wrap reveal">
+          <div class="hero-glow glow-1"></div>
+          <div class="hero-glow glow-2"></div>
 
-            <div class="hero-body">
-              <div class="class-side">
-                <div class="teacher-box">
-                  <div class="avatar"></div>
-                  <div>
-                    <h3>Profesor-avatar</h3>
-                    <p>Explicación guiada paso a paso con apoyo visual.</p>
+          <div class="hero-card">
+            <div class="hero-screen">
+              <div class="hero-screen-top">
+                <div class="dots">
+                  <span></span><span></span><span></span>
+                </div>
+                <div class="class-code">Código MAT-4821</div>
+              </div>
+
+              <div class="hero-screen-body">
+                <div class="class-panel">
+                  <div class="teacher-box">
+                    <div class="avatar"></div>
+                    <div>
+                      <h3>Profesor-avatar</h3>
+                      <p>Explicación guiada paso a paso con apoyo visual.</p>
+                    </div>
+                  </div>
+
+                  <div class="board">
+                    <div class="line w1"></div>
+                    <div class="line w2"></div>
+                    <div class="line w3"></div>
+                    <small>La clase acompaña la explicación con una pizarra simple y ordenada.</small>
                   </div>
                 </div>
 
-                <div class="board">
-                  <div class="line w1"></div>
-                  <div class="line w2"></div>
-                  <div class="line w3"></div>
-                  <small>La clase acompaña la explicación con una pizarra simple y ordenada.</small>
+                <div class="chat-panel">
+                  <div class="bubble user">No entendí ese paso.</div>
+                  <div class="bubble ai">Lo hacemos de nuevo, más simple.</div>
+                  <div class="bubble user">Ahora sí.</div>
+                  <div class="chat-input">Escribí tu duda…</div>
                 </div>
-              </div>
-
-              <div class="chat-side">
-                <div class="bubble user">No entiendo ese paso.</div>
-                <div class="bubble ai">Lo hacemos de nuevo, más simple.</div>
-                <div class="bubble user">Ahora sí.</div>
-                <div class="input">Escribí tu duda…</div>
               </div>
             </div>
           </div>
@@ -610,27 +882,28 @@
       </div>
     </section>
 
-    <section class="section" id="como">
+    <section class="section" id="como-funciona">
       <div class="container">
-        <div class="section-head">
-          <h2>Cómo funciona</h2>
-          <p>La idea es que entrar a estudiar sea rápido y simple.</p>
+        <div class="section-head reveal">
+          <div class="section-kicker">Cómo funciona</div>
+          <h2>Entrar a estudiar debería ser simple.</h2>
+          <p>La idea es que el alumno pueda empezar rápido, sin depender de horarios ni organización previa.</p>
         </div>
 
         <div class="grid-3">
-          <article class="card">
+          <article class="card reveal">
             <div class="card-number">1</div>
             <h3>Elegí la materia</h3>
-            <p>Seleccionás qué querés estudiar y marcás el tema que necesitás ver.</p>
+            <p>Seleccionás qué querés estudiar y marcás el tema puntual que necesitás ver.</p>
           </article>
 
-          <article class="card">
+          <article class="card reveal">
             <div class="card-number">2</div>
             <h3>Creá la clase</h3>
-            <p>La plataforma genera una sala al instante y muestra un código para ingresar.</p>
+            <p>La plataforma genera una sala en el momento y muestra un código para ingresar.</p>
           </article>
 
-          <article class="card">
+          <article class="card reveal">
             <div class="card-number">3</div>
             <h3>Entrá y aprendé</h3>
             <p>El avatar explica con voz, pizarra y respuestas en tiempo real.</p>
@@ -641,16 +914,17 @@
 
     <section class="section" id="plataforma">
       <div class="container">
-        <div class="section-head">
-          <h2>La plataforma</h2>
-          <p>Diseñada para que el foco esté en entender, no en perder tiempo.</p>
+        <div class="section-head reveal">
+          <div class="section-kicker">La plataforma</div>
+          <h2>Diseñada para enfocarse en entender.</h2>
+          <p>Una experiencia clara, liviana y visual para que aprender se sienta más natural.</p>
         </div>
 
-        <div class="simple-panel">
-          <div class="simple-grid">
+        <div class="platform-panel reveal">
+          <div class="platform-grid">
             <div class="mini-box">
               <h4>Clase inmediata</h4>
-              <p>No depende de horarios ni de organizar una sesión con anticipación.</p>
+              <p>No depende de agendas ni de coordinar una sesión con anticipación.</p>
             </div>
 
             <div class="mini-box">
@@ -674,34 +948,35 @@
 
     <section class="section" id="beneficios">
       <div class="container">
-        <div class="section-head">
-          <h2>Por qué sirve</h2>
-          <p>La propuesta no es solo usar IA, sino hacer más fácil el momento real de estudio.</p>
+        <div class="section-head reveal">
+          <div class="section-kicker">Por qué sirve</div>
+          <h2>Una propuesta hecha para el momento real de estudio.</h2>
+          <p>No se trata solo de usar IA, sino de facilitar el instante en que el alumno necesita entender algo.</p>
         </div>
 
         <div class="grid-4">
-          <article class="card">
+          <article class="card reveal">
             <h3>Sin horarios fijos</h3>
             <p>Estudiás cuando realmente lo necesitás.</p>
           </article>
 
-          <article class="card">
+          <article class="card reveal">
             <h3>Más claridad</h3>
             <p>La explicación acompaña cada paso de forma visual.</p>
           </article>
 
-          <article class="card">
+          <article class="card reveal">
             <h3>Menos fricción</h3>
             <p>No hace falta coordinar con nadie para empezar.</p>
           </article>
 
-          <article class="card">
+          <article class="card reveal">
             <h3>Más libertad</h3>
             <p>Cada clase se crea en el momento según la necesidad del alumno.</p>
           </article>
         </div>
 
-        <div class="cta">
+        <div class="cta reveal">
           <div>
             <h3>Una forma más simple de aprender</h3>
             <p>Clases creadas en el momento, con una experiencia clara y enfocada.</p>
@@ -732,6 +1007,20 @@
           target.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
       });
+    });
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, {
+      threshold: 0.12
+    });
+
+    document.querySelectorAll('.reveal').forEach(el => {
+      observer.observe(el);
     });
   </script>
 </body>
