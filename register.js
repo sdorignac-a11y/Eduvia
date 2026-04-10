@@ -1,7 +1,11 @@
 import { auth, db } from "./firebase.js";
 import {
   createUserWithEmailAndPassword,
-  deleteUser
+  deleteUser,
+  GoogleAuthProvider,
+  signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import {
   doc,
@@ -9,10 +13,33 @@ import {
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-console.log("REGISTER OK CARGADO");
+console.log("REGISTER LIMPIO CARGADO");
 
 const form = document.getElementById("register-form");
+const googleBtn = document.getElementById("google-register-btn");
+const provider = new GoogleAuthProvider();
 
+function esMobile() {
+  return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+}
+
+async function guardarUsuarioEnFirestore(user, datosExtra = {}) {
+  await setDoc(
+    doc(db, "users", user.uid),
+    {
+      uid: user.uid,
+      email: user.email || "",
+      nombre: datosExtra.nombre || user.displayName?.split(" ")[0] || "",
+      apellido: datosExtra.apellido || user.displayName?.split(" ").slice(1).join(" ") || "",
+      foto: user.photoURL || "",
+      provider: datosExtra.provider || "email",
+      creadoEn: serverTimestamp()
+    },
+    { merge: true }
+  );
+}
+
+// ---------- REGISTRO CON EMAIL ----------
 form?.addEventListener("submit", async (e) => {
   e.preventDefault();
 
@@ -57,25 +84,22 @@ form?.addEventListener("submit", async (e) => {
 
     await user.getIdToken(true);
 
-    await setDoc(doc(db, "users", user.uid), {
-      uid: user.uid,
+    await guardarUsuarioEnFirestore(user, {
       nombre,
       apellido,
-      email,
-      creadoEn: serverTimestamp()
+      provider: "email"
     });
 
     alert("Cuenta creada con éxito");
     window.location.href = "panel.html";
-
   } catch (error) {
-    console.error("ERROR REAL:", error);
+    console.error("ERROR EMAIL:", error);
 
     if (user) {
       try {
         await deleteUser(user);
       } catch (e) {
-        console.error("No se pudo borrar el usuario creado en Auth:", e);
+        console.error("No se pudo borrar el usuario de Auth:", e);
       }
     }
 
@@ -88,41 +112,7 @@ form?.addEventListener("submit", async (e) => {
   }
 });
 
-import { auth, db } from "./firebase.js";
-import {
-  GoogleAuthProvider,
-  signInWithPopup,
-  signInWithRedirect,
-  getRedirectResult
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import {
-  doc,
-  setDoc,
-  serverTimestamp
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-const googleBtn = document.getElementById("google-register-btn");
-const provider = new GoogleAuthProvider();
-
-function esMobile() {
-  return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-}
-
-async function guardarUsuarioEnFirestore(user) {
-  await setDoc(
-    doc(db, "users", user.uid),
-    {
-      uid: user.uid,
-      nombre: user.displayName || "",
-      email: user.email || "",
-      foto: user.photoURL || "",
-      provider: "google",
-      creadoEn: serverTimestamp()
-    },
-    { merge: true }
-  );
-}
-
+// ---------- REGISTRO / LOGIN CON GOOGLE ----------
 googleBtn?.addEventListener("click", async () => {
   try {
     googleBtn.disabled = true;
@@ -134,11 +124,11 @@ googleBtn?.addEventListener("click", async () => {
     }
 
     const result = await signInWithPopup(auth, provider);
-    await guardarUsuarioEnFirestore(result.user);
+    await guardarUsuarioEnFirestore(result.user, { provider: "google" });
     window.location.href = "panel.html";
   } catch (error) {
     console.error("ERROR GOOGLE:", error);
-    alert("Error con Google: " + error.message);
+    alert("Error con Google: " + error.code + " | " + error.message);
     googleBtn.disabled = false;
     googleBtn.textContent = "Continuar con Google";
   }
@@ -147,12 +137,13 @@ googleBtn?.addEventListener("click", async () => {
 getRedirectResult(auth)
   .then(async (result) => {
     if (!result?.user) return;
-    await guardarUsuarioEnFirestore(result.user);
+    await guardarUsuarioEnFirestore(result.user, { provider: "google" });
     window.location.href = "panel.html";
   })
   .catch((error) => {
     console.error("ERROR REDIRECT:", error);
-    alert("Error con Google Redirect: " + error.message);
+    alert("Error con Google Redirect: " + error.code + " | " + error.message);
+
     if (googleBtn) {
       googleBtn.disabled = false;
       googleBtn.textContent = "Continuar con Google";
