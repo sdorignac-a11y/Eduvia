@@ -1,4 +1,4 @@
-import { auth, db } from "./firebase.js";
+import { auth, db } from "./firebase.js?v=3";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
@@ -9,6 +9,8 @@ onAuthStateChanged(auth, async (user) => {
   }
 
   try {
+    await user.getIdToken(true);
+
     const nombre = localStorage.getItem("registroNombre") || "";
     const apellido = localStorage.getItem("registroApellido") || "";
 
