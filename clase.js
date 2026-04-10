@@ -1,51 +1,52 @@
 import { auth, db } from "./firebase.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-const loading = document.getElementById("loading");
-const contenido = document.getElementById("contenido");
+const form = document.getElementById("clase-form");
+let currentUser = null;
 
-const materiaEl = document.getElementById("materia");
-const temaEl = document.getElementById("tema");
-const nivelEl = document.getElementById("nivel");
-const tituloClaseEl = document.getElementById("titulo-clase");
-
-const params = new URLSearchParams(window.location.search);
-const claseId = params.get("id");
-
-if (!claseId) {
-  alert("No se encontró el ID de la clase.");
-  window.location.href = "panel.html";
-}
-
-onAuthStateChanged(auth, async (user) => {
+onAuthStateChanged(auth, (user) => {
   if (!user) {
     window.location.href = "login.html";
     return;
   }
 
+  currentUser = user;
+  console.log("Usuario logueado:", user.uid);
+});
+
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  if (!currentUser) {
+    alert("Todavía no cargó el usuario. Probá de nuevo en un segundo.");
+    return;
+  }
+
+  const materia = document.getElementById("materia").value.trim();
+  const tema = document.getElementById("tema").value.trim();
+  const nivel = document.getElementById("nivel").value;
+
+  if (!materia || !tema || !nivel) {
+    alert("Completá todos los campos.");
+    return;
+  }
+
   try {
-    const claseRef = doc(db, "users", user.uid, "clases", claseId);
-    const claseSnap = await getDoc(claseRef);
+    const docRef = await addDoc(
+      collection(db, "users", currentUser.uid, "clases"),
+      {
+        materia,
+        tema,
+        nivel,
+        creadoEn: serverTimestamp()
+      }
+    );
 
-    if (!claseSnap.exists()) {
-      alert("La clase no existe o no te pertenece.");
-      window.location.href = "panel.html";
-      return;
-    }
-
-    const data = claseSnap.data();
-
-    materiaEl.textContent = data.materia || "-";
-    temaEl.textContent = data.tema || "-";
-    nivelEl.textContent = data.nivel || "-";
-    tituloClaseEl.textContent = data.tema ? `Clase: ${data.tema}` : "Clase";
-
-    loading.style.display = "none";
-    contenido.style.display = "block";
+    console.log("Clase creada:", docRef.id);
+    window.location.href = `clase.html?id=${docRef.id}`;
   } catch (error) {
-    console.error("Error al cargar clase:", error);
-    alert("Hubo un error al cargar la clase.");
-    window.location.href = "panel.html";
+    console.error("Error al crear la clase:", error);
+    alert("Error al crear la clase: " + error.message);
   }
 });
