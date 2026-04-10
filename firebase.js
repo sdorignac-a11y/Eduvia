@@ -1,6 +1,6 @@
-import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBD2r0-IMOKOjc92I75AZx9czBsnUt7wd0",
@@ -8,8 +8,7 @@ const firebaseConfig = {
   projectId: "eduvia-97008",
   storageBucket: "eduvia-97008.firebasestorage.app",
   messagingSenderId: "1052924233848",
-  appId: "1:1052924233848:web:d19b4177fc64890042c58d",
-  measurementId: "G-RGYV89KWD4"
+  appId: "1:1052924233848:web:d19b4177fc64890042c58d"
 };
 
 const app = initializeApp(firebaseConfig);
