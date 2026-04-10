@@ -573,6 +573,79 @@
         grid-template-columns:1fr;
       }
     }
+    .upload-box{
+  position:relative;
+  border:2px dashed #d8cbff;
+  background:linear-gradient(180deg,#fffdf8 0%, #fff8ef 100%);
+  border-radius:20px;
+  padding:18px;
+  overflow:hidden;
+  transition:.2s ease;
+}
+
+.upload-box:hover{
+  border-color:var(--violet);
+  transform:translateY(-1px);
+}
+
+.upload-box input[type="file"]{
+  position:absolute;
+  inset:0;
+  opacity:0;
+  cursor:pointer;
+  z-index:2;
+}
+
+.upload-inner{
+  display:flex;
+  align-items:flex-start;
+  gap:14px;
+  position:relative;
+  z-index:1;
+}
+
+.upload-icon{
+  width:46px;
+  height:46px;
+  border-radius:15px;
+  display:grid;
+  place-items:center;
+  background:#fff;
+  border:2px solid rgba(124,108,242,.14);
+  font-size:1.1rem;
+  box-shadow:0 6px 14px rgba(124,108,242,.08);
+  flex:none;
+}
+
+.upload-inner strong{
+  display:block;
+  font-size:.98rem;
+  margin-bottom:4px;
+  color:#352d43;
+}
+
+.upload-inner p{
+  color:var(--muted);
+  line-height:1.6;
+  font-size:.92rem;
+}
+
+.file-list{
+  display:grid;
+  gap:10px;
+  margin-top:14px;
+}
+
+.file-item{
+  padding:12px 14px;
+  border-radius:16px;
+  background:#fff;
+  border:1px solid rgba(124,108,242,.12);
+  color:#4d566b;
+  font-size:.93rem;
+  font-weight:600;
+  box-shadow:var(--shadow-soft);
+}
   </style>
 </head>
 <body>
@@ -683,6 +756,27 @@
                   <span class="helper">Este campo suma mucho valor porque vuelve la clase más concreta.</span>
                 </div>
               </div>
+
+              <div class="field full">
+  <label for="archivo">Material de estudio</label>
+
+  <div class="upload-box">
+    <input id="archivo" type="file" multiple accept=".pdf,.doc,.docx,.txt,.png,.jpg,.jpeg" />
+    <div class="upload-inner">
+      <div class="upload-icon">📎</div>
+      <div>
+        <strong>Subí archivos para que la IA los use en la clase</strong>
+        <p>Podés agregar apuntes, guías, PDFs, imágenes de ejercicios o resúmenes.</p>
+      </div>
+    </div>
+  </div>
+
+  <span class="helper">
+    Formatos recomendados: PDF, Word, TXT o imágenes. Mientras más claro sea el material, mejor podrá ayudarte la IA.
+  </span>
+
+  <div id="file-list" class="file-list"></div>
+</div>
 
               <div class="form-actions">
                 <button type="submit" class="btn btn-primary">Crear clase</button>
