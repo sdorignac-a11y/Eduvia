@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Lumora | Clases instantáneas con IA</title>
+  <title>Eduvia | Clases instantáneas con IA</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -14,29 +14,32 @@
 
   <style>
     :root{
-      --bg:#f7f8fc;
-      --bg-soft:#f2f5ff;
+      --bg:#f6f8ff;
+      --bg-2:#eef3ff;
       --surface:#ffffff;
       --surface-2:#fbfcff;
-      --text:#16181d;
-      --muted:#687184;
-      --line:#e7ebf3;
+      --text:#12141c;
+      --muted:#697487;
+      --line:#e4eafb;
 
-      --primary:#5b61f6;
-      --primary-2:#8790ff;
+      --primary:#6a5cff;
+      --primary-2:#8fa0ff;
+      --secondary:#42c7ff;
+      --secondary-2:#8ee7ff;
+      --pink:#ff8fd8;
       --primary-soft:#eef0ff;
-      --accent:#e9edff;
+      --secondary-soft:#eaf9ff;
 
-      --shadow-sm:0 8px 24px rgba(18, 24, 40, .05);
-      --shadow-md:0 18px 50px rgba(18, 24, 40, .08);
-      --shadow-lg:0 28px 80px rgba(18, 24, 40, .10);
+      --shadow-sm:0 10px 26px rgba(21, 29, 52, .06);
+      --shadow-md:0 18px 48px rgba(21, 29, 52, .10);
+      --shadow-lg:0 28px 80px rgba(21, 29, 52, .14);
 
       --radius-xl:34px;
-      --radius-lg:26px;
-      --radius-md:18px;
+      --radius-lg:28px;
+      --radius-md:20px;
 
-      --container:1120px;
-      --transition:.28s cubic-bezier(.22,.61,.36,1);
+      --container:1140px;
+      --transition:.3s cubic-bezier(.22,.61,.36,1);
     }
 
     *{
@@ -53,11 +56,29 @@
       font-family:"Inter", sans-serif;
       color:var(--text);
       background:
-        radial-gradient(circle at 12% 12%, rgba(91,97,246,.10), transparent 22%),
-        radial-gradient(circle at 88% 10%, rgba(135,144,255,.10), transparent 18%),
-        linear-gradient(180deg, #fbfcff 0%, var(--bg) 100%);
+        radial-gradient(circle at 8% 8%, rgba(106,92,255,.18), transparent 22%),
+        radial-gradient(circle at 88% 12%, rgba(66,199,255,.18), transparent 22%),
+        radial-gradient(circle at 50% 40%, rgba(255,143,216,.08), transparent 24%),
+        linear-gradient(rgba(106,92,255,.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(106,92,255,.035) 1px, transparent 1px),
+        linear-gradient(180deg, #fbfcff 0%, #f4f7ff 100%);
+      background-size:auto, auto, auto, 34px 34px, 34px 34px, auto;
       line-height:1.5;
       overflow-x:hidden;
+      position:relative;
+    }
+
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      background:
+        radial-gradient(circle at 20% 30%, rgba(255,255,255,.35), transparent 24%),
+        radial-gradient(circle at 82% 66%, rgba(255,255,255,.22), transparent 18%);
+      mix-blend-mode:screen;
+      opacity:.7;
+      z-index:-1;
     }
 
     a{
@@ -76,88 +97,125 @@
     }
 
     .section{
-      padding:76px 0;
+      padding:84px 0;
+      position:relative;
+    }
+
+    .section::before{
+      content:"";
+      position:absolute;
+      inset:20px auto auto 50%;
+      transform:translateX(-50%);
+      width:min(1000px, calc(100% - 40px));
+      height:100%;
+      border-radius:36px;
+      background:linear-gradient(180deg, rgba(255,255,255,.48), rgba(255,255,255,.18));
+      border:1px solid rgba(228,234,251,.72);
+      pointer-events:none;
+      z-index:0;
+      opacity:.8;
+      backdrop-filter:blur(8px);
+    }
+
+    .section > .container{
+      position:relative;
+      z-index:1;
     }
 
     .section-head{
-      max-width:650px;
-      margin-bottom:26px;
+      max-width:720px;
+      margin-bottom:28px;
     }
 
     .section-kicker{
       display:inline-flex;
       align-items:center;
       gap:8px;
-      padding:8px 12px;
+      padding:8px 13px;
       border-radius:999px;
-      background:rgba(255,255,255,.78);
-      border:1px solid rgba(231,235,243,.95);
+      background:rgba(255,255,255,.82);
+      border:1px solid rgba(228,234,251,.95);
       color:var(--primary);
       font-size:.84rem;
-      font-weight:600;
+      font-weight:700;
       margin-bottom:14px;
       box-shadow:var(--shadow-sm);
-      backdrop-filter:blur(10px);
+      backdrop-filter:blur(12px);
     }
 
     .section-kicker::before{
       content:"";
-      width:7px;
-      height:7px;
+      width:8px;
+      height:8px;
       border-radius:50%;
-      background:var(--primary);
+      background:linear-gradient(135deg, var(--primary), var(--secondary));
       display:block;
+      box-shadow:0 0 0 4px rgba(106,92,255,.08);
     }
 
     .section-head h2{
-      font-size:clamp(1.5rem, 3vw, 2.1rem);
-      line-height:1.08;
-      letter-spacing:-.04em;
-      margin-bottom:10px;
-      font-weight:700;
+      font-size:clamp(1.65rem, 3vw, 2.35rem);
+      line-height:1.05;
+      letter-spacing:-.045em;
+      margin-bottom:12px;
+      font-weight:800;
     }
 
     .section-head p{
       color:var(--muted);
-      font-size:.98rem;
+      font-size:1rem;
+      max-width:640px;
     }
 
     .header{
       position:sticky;
       top:0;
-      z-index:40;
-      backdrop-filter:blur(14px);
-      background:rgba(247,248,252,.78);
-      border-bottom:1px solid rgba(231,235,243,.75);
+      z-index:50;
+      backdrop-filter:blur(18px);
+      background:rgba(246,248,255,.75);
+      border-bottom:1px solid rgba(228,234,251,.78);
     }
 
     .nav{
-      min-height:76px;
+      min-height:78px;
       display:flex;
       align-items:center;
       justify-content:space-between;
-      gap:16px;
+      gap:18px;
     }
 
     .brand{
       display:flex;
       align-items:center;
       gap:12px;
-      font-weight:700;
-      letter-spacing:-.03em;
-      font-size:.98rem;
+      font-weight:800;
+      letter-spacing:-.04em;
+      font-size:1rem;
     }
 
     .brand-mark{
-      width:38px;
-      height:38px;
-      border-radius:14px;
+      width:42px;
+      height:42px;
+      border-radius:15px;
       display:grid;
       place-items:center;
       color:#fff;
       font-weight:800;
-      background:linear-gradient(135deg, var(--primary), var(--primary-2));
-      box-shadow:0 12px 26px rgba(91,97,246,.24);
+      background:
+        linear-gradient(135deg, var(--primary), var(--secondary));
+      box-shadow:
+        0 14px 32px rgba(106,92,255,.26),
+        inset 0 1px 0 rgba(255,255,255,.35);
+      position:relative;
+      overflow:hidden;
+    }
+
+    .brand-mark::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:linear-gradient(135deg, rgba(255,255,255,.25), transparent 60%);
+      pointer-events:none;
     }
 
     .nav-links{
@@ -166,7 +224,7 @@
       gap:24px;
       color:var(--muted);
       font-size:.95rem;
-      font-weight:500;
+      font-weight:600;
     }
 
     .nav-links a{
@@ -178,11 +236,11 @@
       content:"";
       position:absolute;
       left:0;
-      bottom:-6px;
+      bottom:-7px;
       width:0;
       height:2px;
       border-radius:999px;
-      background:var(--primary);
+      background:linear-gradient(90deg, var(--primary), var(--secondary));
       transition:var(--transition);
     }
 
@@ -210,7 +268,7 @@
       border-radius:999px;
       cursor:pointer;
       font-size:.94rem;
-      font-weight:600;
+      font-weight:700;
       transition:var(--transition);
       white-space:nowrap;
     }
@@ -221,77 +279,82 @@
 
     .btn-primary{
       color:#fff;
-      background:linear-gradient(135deg, var(--primary), var(--primary-2));
-      box-shadow:0 14px 30px rgba(91,97,246,.22);
+      background:linear-gradient(135deg, var(--primary), var(--secondary));
+      box-shadow:0 14px 30px rgba(106,92,255,.24);
     }
 
     .btn-primary:hover{
-      box-shadow:0 18px 36px rgba(91,97,246,.28);
+      box-shadow:0 18px 36px rgba(106,92,255,.30);
     }
 
     .btn-secondary{
       color:var(--text);
-      background:rgba(255,255,255,.86);
+      background:rgba(255,255,255,.9);
       border:1px solid var(--line);
       box-shadow:var(--shadow-sm);
     }
 
     .btn-secondary:hover{
-      border-color:#d8deeb;
+      border-color:#d5def6;
       background:#fff;
     }
 
     .hero{
-      padding:72px 0 46px;
+      padding:78px 0 54px;
+      position:relative;
     }
 
     .hero-inner{
-      max-width:780px;
+      max-width:840px;
       margin:0 auto;
       text-align:center;
+      position:relative;
     }
 
     .hero-kicker{
       display:inline-flex;
       align-items:center;
       gap:8px;
-      padding:8px 12px;
+      padding:9px 14px;
       border-radius:999px;
-      background:rgba(255,255,255,.85);
+      background:rgba(255,255,255,.86);
       border:1px solid var(--line);
       color:var(--primary);
       font-size:.84rem;
-      font-weight:600;
+      font-weight:700;
       margin-bottom:18px;
       box-shadow:var(--shadow-sm);
     }
 
     .hero-kicker::before{
       content:"";
-      width:7px;
-      height:7px;
+      width:8px;
+      height:8px;
       border-radius:50%;
-      background:var(--primary);
+      background:linear-gradient(135deg, var(--primary), var(--secondary));
       display:block;
     }
 
     .hero h1{
-      font-size:clamp(2rem, 4vw, 3.1rem);
-      line-height:1.03;
-      letter-spacing:-.055em;
-      font-weight:700;
+      font-size:clamp(2.1rem, 5vw, 3.6rem);
+      line-height:1.02;
+      letter-spacing:-.06em;
+      font-weight:800;
       margin-bottom:14px;
     }
 
-    .hero h1 span{
-      color:var(--primary);
+    .hero h1 .gradient{
+      background:linear-gradient(135deg, var(--primary), var(--secondary), var(--pink));
+      -webkit-background-clip:text;
+      background-clip:text;
+      color:transparent;
     }
 
     .hero p{
-      max-width:620px;
+      max-width:680px;
       margin:0 auto;
       color:var(--muted);
-      font-size:1rem;
+      font-size:1.03rem;
     }
 
     .hero-actions{
@@ -303,7 +366,7 @@
     }
 
     .hero-meta{
-      margin-top:22px;
+      margin-top:20px;
       display:flex;
       justify-content:center;
       flex-wrap:wrap;
@@ -314,19 +377,19 @@
       display:inline-flex;
       align-items:center;
       gap:8px;
-      padding:10px 13px;
+      padding:10px 14px;
       border-radius:999px;
-      background:rgba(255,255,255,.84);
+      background:rgba(255,255,255,.86);
       border:1px solid var(--line);
       font-size:.88rem;
-      color:#4b5565;
+      color:#4c5769;
       box-shadow:var(--shadow-sm);
       transition:var(--transition);
     }
 
     .pill:hover{
       transform:translateY(-2px);
-      box-shadow:0 12px 26px rgba(18,24,40,.07);
+      box-shadow:0 14px 28px rgba(18,24,40,.07);
     }
 
     .pill::before{
@@ -334,63 +397,166 @@
       width:6px;
       height:6px;
       border-radius:50%;
-      background:var(--primary);
+      background:linear-gradient(135deg, var(--primary), var(--secondary));
       display:block;
     }
 
+    .hero-tags{
+      margin-top:16px;
+      display:flex;
+      justify-content:center;
+      flex-wrap:wrap;
+      gap:10px;
+    }
+
+    .hero-tags span{
+      padding:9px 13px;
+      border-radius:999px;
+      background:rgba(255,255,255,.92);
+      border:1px solid #dee6fb;
+      color:#536077;
+      font-size:.82rem;
+      font-weight:600;
+      box-shadow:0 10px 22px rgba(18,24,40,.05);
+      transition:var(--transition);
+    }
+
+    .hero-tags span:hover{
+      transform:translateY(-2px);
+      border-color:#cfdcff;
+      color:var(--primary);
+    }
+
     .hero-card-wrap{
-      margin-top:38px;
+      margin-top:40px;
       position:relative;
     }
 
     .hero-glow{
       position:absolute;
-      width:240px;
-      height:240px;
       border-radius:50%;
-      filter:blur(50px);
-      opacity:.5;
+      filter:blur(60px);
+      opacity:.58;
       pointer-events:none;
+      animation:pulseGlow 6s ease-in-out infinite;
     }
 
     .hero-glow.glow-1{
-      left:-50px;
+      width:280px;
+      height:280px;
+      left:-40px;
       top:-30px;
-      background:rgba(91,97,246,.14);
+      background:rgba(106,92,255,.20);
     }
 
     .hero-glow.glow-2{
-      right:-40px;
-      bottom:-20px;
-      background:rgba(135,144,255,.14);
+      width:260px;
+      height:260px;
+      right:-30px;
+      bottom:-10px;
+      background:rgba(66,199,255,.20);
+      animation-delay:1.1s;
+    }
+
+    .hero-glow.glow-3{
+      width:220px;
+      height:220px;
+      left:50%;
+      bottom:-30px;
+      transform:translateX(-50%);
+      background:rgba(255,143,216,.12);
+      animation-delay:2s;
+    }
+
+    .hero-floating{
+      position:absolute;
+      z-index:3;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding:12px 14px;
+      border-radius:18px;
+      background:rgba(255,255,255,.88);
+      border:1px solid rgba(228,234,251,.92);
+      box-shadow:var(--shadow-md);
+      backdrop-filter:blur(14px);
+      animation:floatSoft 5.6s ease-in-out infinite;
+    }
+
+    .hero-floating strong{
+      display:block;
+      font-size:.88rem;
+      line-height:1.15;
+    }
+
+    .hero-floating span{
+      color:var(--muted);
+      font-size:.78rem;
+      display:block;
+    }
+
+    .hero-floating .icon{
+      width:38px;
+      height:38px;
+      border-radius:14px;
+      display:grid;
+      place-items:center;
+      font-size:1rem;
+      flex-shrink:0;
+      color:#fff;
+      background:linear-gradient(135deg, var(--primary), var(--secondary));
+      box-shadow:0 12px 24px rgba(106,92,255,.20);
+    }
+
+    .hero-floating.top{
+      top:26px;
+      right:-12px;
+    }
+
+    .hero-floating.bottom{
+      bottom:28px;
+      left:-14px;
+      animation-delay:1.1s;
     }
 
     .hero-card{
       position:relative;
-      z-index:1;
-      background:linear-gradient(180deg, rgba(255,255,255,.86), rgba(255,255,255,.72));
-      border:1px solid rgba(231,235,243,.95);
-      border-radius:32px;
+      z-index:2;
+      background:linear-gradient(180deg, rgba(255,255,255,.84), rgba(255,255,255,.70));
+      border:1px solid rgba(228,234,251,.95);
+      border-radius:34px;
       padding:14px;
       box-shadow:var(--shadow-lg);
-      backdrop-filter:blur(14px);
+      backdrop-filter:blur(16px);
+      overflow:hidden;
+    }
+
+    .hero-card::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        linear-gradient(135deg, rgba(106,92,255,.07), transparent 34%),
+        linear-gradient(315deg, rgba(66,199,255,.05), transparent 36%);
+      pointer-events:none;
     }
 
     .hero-screen{
-      border-radius:24px;
+      position:relative;
+      border-radius:26px;
       overflow:hidden;
       background:#fff;
-      border:1px solid #edf0f6;
+      border:1px solid #e8edf9;
     }
 
     .hero-screen-top{
-      height:56px;
+      height:58px;
       display:flex;
       align-items:center;
       justify-content:space-between;
       padding:0 16px;
-      border-bottom:1px solid #edf0f6;
-      background:rgba(255,255,255,.88);
+      border-bottom:1px solid #edf1fa;
+      background:rgba(255,255,255,.94);
     }
 
     .dots{
@@ -402,30 +568,32 @@
       width:8px;
       height:8px;
       border-radius:50%;
-      background:#d8dce7;
+      background:#d8deec;
     }
 
     .class-code{
-      padding:8px 11px;
+      padding:8px 12px;
       border-radius:999px;
-      background:var(--primary-soft);
-      border:1px solid #e1e6ff;
+      background:linear-gradient(135deg, #eef0ff, #ebf9ff);
+      border:1px solid #dde8ff;
       color:var(--primary);
       font-size:.82rem;
-      font-weight:700;
+      font-weight:800;
       letter-spacing:.02em;
     }
 
     .hero-screen-body{
       display:grid;
-      grid-template-columns:1.16fr .84fr;
-      min-height:430px;
+      grid-template-columns:1.12fr .88fr;
+      min-height:455px;
     }
 
     .class-panel{
-      padding:20px;
-      border-right:1px solid #edf0f6;
-      background:linear-gradient(180deg, #ffffff 0%, #fbfcff 100%);
+      padding:22px;
+      border-right:1px solid #edf1fa;
+      background:
+        radial-gradient(circle at top right, rgba(106,92,255,.08), transparent 30%),
+        linear-gradient(180deg, #ffffff 0%, #fbfcff 100%);
     }
 
     .teacher-box{
@@ -433,27 +601,33 @@
       align-items:center;
       gap:14px;
       padding:18px;
-      border-radius:22px;
-      background:linear-gradient(135deg, #f3f5ff 0%, #fbfcff 100%);
-      border:1px solid #e9edff;
-      box-shadow:0 12px 28px rgba(91,97,246,.08);
+      border-radius:24px;
+      background:linear-gradient(135deg, #f5f7ff 0%, #fafdff 100%);
+      border:1px solid #e6ecff;
+      box-shadow:0 14px 32px rgba(106,92,255,.09);
       margin-bottom:16px;
       transition:var(--transition);
+      animation:floatSoft 5.2s ease-in-out infinite;
     }
 
     .teacher-box:hover{
       transform:translateY(-2px);
-      box-shadow:0 16px 32px rgba(91,97,246,.11);
+      box-shadow:0 18px 36px rgba(106,92,255,.12);
     }
 
     .avatar{
-      width:66px;
-      height:66px;
-      border-radius:20px;
+      width:68px;
+      height:68px;
+      border-radius:22px;
       flex-shrink:0;
-      background:linear-gradient(135deg, #dfe4ff, #f0f3ff);
+      background:
+        radial-gradient(circle at 30% 30%, rgba(255,255,255,.75), transparent 20%),
+        linear-gradient(135deg, #dfe5ff, #e9fbff);
       position:relative;
-      box-shadow:inset 0 1px 0 rgba(255,255,255,.8);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.82),
+        0 12px 28px rgba(106,92,255,.12);
+      overflow:hidden;
     }
 
     .avatar::before,
@@ -467,57 +641,121 @@
     .avatar::before{
       width:8px;
       height:8px;
-      top:20px;
-      left:17px;
-      box-shadow:22px 0 0 var(--primary);
+      top:21px;
+      left:18px;
+      box-shadow:23px 0 0 var(--primary);
     }
 
     .avatar::after{
-      width:24px;
+      width:26px;
       height:6px;
       left:21px;
       bottom:17px;
+      background:linear-gradient(90deg, var(--primary), var(--secondary));
     }
 
     .teacher-box h3{
-      font-size:.97rem;
-      font-weight:700;
+      font-size:.98rem;
+      font-weight:800;
       margin-bottom:4px;
+      letter-spacing:-.02em;
     }
 
     .teacher-box p{
+      color:var(--muted);
+      font-size:.91rem;
+    }
+
+    .topic-card{
+      margin-bottom:16px;
+      border-radius:22px;
+      border:1px solid #e6ecff;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.96), rgba(248,251,255,.98));
+      padding:16px;
+      box-shadow:var(--shadow-sm);
+    }
+
+    .topic-top{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:10px;
+    }
+
+    .topic-pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 10px;
+      border-radius:999px;
+      background:var(--primary-soft);
+      border:1px solid #e0e5ff;
+      color:var(--primary);
+      font-size:.8rem;
+      font-weight:700;
+    }
+
+    .topic-pill::before{
+      content:"";
+      width:6px;
+      height:6px;
+      border-radius:50%;
+      background:var(--secondary);
+      display:block;
+    }
+
+    .topic-level{
+      font-size:.78rem;
+      color:var(--muted);
+      font-weight:700;
+    }
+
+    .topic-card h4{
+      font-size:1rem;
+      font-weight:800;
+      letter-spacing:-.02em;
+      margin-bottom:6px;
+    }
+
+    .topic-card p{
       color:var(--muted);
       font-size:.9rem;
     }
 
     .board{
-      min-height:225px;
+      min-height:178px;
       border-radius:22px;
       border:1px solid var(--line);
-      background:#fff;
+      background:
+        linear-gradient(rgba(106,92,255,.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(106,92,255,.035) 1px, transparent 1px),
+        linear-gradient(180deg, #ffffff, #fbfdff);
+      background-size:24px 24px, 24px 24px, auto;
       padding:18px;
       display:flex;
       flex-direction:column;
       justify-content:center;
       gap:14px;
-      box-shadow:inset 0 1px 0 rgba(255,255,255,.8);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.82);
       transition:var(--transition);
     }
 
     .board:hover{
       transform:translateY(-2px);
-      box-shadow:0 14px 28px rgba(18,24,40,.06);
+      box-shadow:0 14px 30px rgba(18,24,40,.06);
     }
 
     .line{
       height:14px;
       border-radius:999px;
-      background:linear-gradient(90deg, rgba(91,97,246,.18), rgba(91,97,246,.05));
+      background:linear-gradient(90deg, rgba(106,92,255,.28), rgba(66,199,255,.10));
     }
 
     .line.w1{ width:84%; }
     .line.w2{ width:62%; }
-    .line.w3{ width:46%; }
+    .line.w3{ width:48%; }
 
     .board small{
       color:var(--muted);
@@ -525,20 +763,42 @@
     }
 
     .chat-panel{
+      position:relative;
       padding:18px;
-      background:#fcfcff;
+      background:
+        radial-gradient(circle at top left, rgba(66,199,255,.08), transparent 28%),
+        #fcfdff;
       display:flex;
       flex-direction:column;
       gap:12px;
     }
 
+    .chat-badge{
+      align-self:flex-start;
+      padding:8px 11px;
+      border-radius:999px;
+      background:rgba(255,255,255,.95);
+      border:1px solid #e0e8fb;
+      color:var(--primary);
+      font-size:.78rem;
+      font-weight:800;
+      box-shadow:var(--shadow-sm);
+      margin-bottom:4px;
+    }
+
     .bubble{
       max-width:88%;
       padding:13px 14px;
-      border-radius:16px;
+      border-radius:17px;
       font-size:.9rem;
       transition:var(--transition);
+      box-shadow:0 8px 18px rgba(18,24,40,.04);
+      animation:fadeUp .7s ease both;
     }
+
+    .bubble:nth-child(2){ animation-delay:.08s; }
+    .bubble:nth-child(3){ animation-delay:.16s; }
+    .bubble:nth-child(4){ animation-delay:.24s; }
 
     .bubble:hover{
       transform:translateY(-1px);
@@ -546,15 +806,41 @@
 
     .bubble.user{
       align-self:flex-end;
-      background:#f2f4f8;
-      color:#303846;
+      background:#f2f5fb;
+      color:#313a49;
+      border:1px solid #e7ebf5;
     }
 
     .bubble.ai{
       align-self:flex-start;
-      background:linear-gradient(135deg, #eef0ff, #f5f6ff);
-      color:#3833a5;
+      background:linear-gradient(135deg, #eef0ff, #ebfbff);
+      color:#3c33a8;
+      border:1px solid #dce6ff;
     }
+
+    .typing{
+      align-self:flex-start;
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:12px 14px;
+      border-radius:16px;
+      background:#fff;
+      border:1px solid #e4eafb;
+      box-shadow:var(--shadow-sm);
+      width:max-content;
+    }
+
+    .typing span{
+      width:7px;
+      height:7px;
+      border-radius:50%;
+      background:linear-gradient(135deg, var(--primary), var(--secondary));
+      animation:typingDots 1.1s infinite ease-in-out;
+    }
+
+    .typing span:nth-child(2){ animation-delay:.16s; }
+    .typing span:nth-child(3){ animation-delay:.32s; }
 
     .chat-input{
       margin-top:auto;
@@ -569,7 +855,7 @@
     }
 
     .chat-input:hover{
-      border-color:#d7ddec;
+      border-color:#d5def6;
       box-shadow:0 12px 26px rgba(18,24,40,.06);
     }
 
@@ -586,47 +872,100 @@
     }
 
     .card{
-      background:rgba(255,255,255,.78);
-      border:1px solid rgba(231,235,243,.95);
-      border-radius:24px;
-      padding:20px;
+      position:relative;
+      overflow:hidden;
+      background:rgba(255,255,255,.84);
+      border:1px solid rgba(228,234,251,.95);
+      border-radius:26px;
+      padding:22px;
       box-shadow:var(--shadow-sm);
       transition:var(--transition);
       backdrop-filter:blur(10px);
     }
 
+    .card::before{
+      content:"";
+      position:absolute;
+      top:0;
+      left:0;
+      width:100%;
+      height:4px;
+      background:linear-gradient(90deg, var(--primary), var(--secondary), var(--pink));
+      opacity:.95;
+    }
+
     .card:hover{
-      transform:translateY(-4px);
-      border-color:#dbe1ef;
+      transform:translateY(-5px);
+      border-color:#d7e1f8;
       box-shadow:var(--shadow-md);
     }
 
+    .card-icon{
+      width:48px;
+      height:48px;
+      border-radius:16px;
+      display:grid;
+      place-items:center;
+      font-size:1.1rem;
+      margin-bottom:14px;
+      color:#fff;
+      background:linear-gradient(135deg, var(--primary), var(--secondary));
+      box-shadow:0 12px 26px rgba(106,92,255,.18);
+    }
+
     .card h3{
-      font-size:.98rem;
-      font-weight:700;
-      margin-bottom:6px;
-      letter-spacing:-.02em;
+      font-size:1rem;
+      font-weight:800;
+      margin-bottom:7px;
+      letter-spacing:-.025em;
     }
 
     .card p{
       color:var(--muted);
-      font-size:.92rem;
+      font-size:.93rem;
+    }
+
+    .card.card-alt{
+      background:
+        radial-gradient(circle at top right, rgba(66,199,255,.10), transparent 30%),
+        rgba(255,255,255,.86);
+    }
+
+    .card.card-pink{
+      background:
+        radial-gradient(circle at top right, rgba(255,143,216,.10), transparent 30%),
+        rgba(255,255,255,.86);
     }
 
     .explain-card{
       position:relative;
       overflow:hidden;
       background:
-        linear-gradient(rgba(91,97,246,.035) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(91,97,246,.035) 1px, transparent 1px),
-        linear-gradient(180deg, rgba(255,255,255,.94), rgba(252,253,255,.96));
-      background-size:26px 26px, 26px 26px, auto;
-      border:1px solid rgba(231,235,243,.95);
-      border-radius:28px;
+        radial-gradient(circle at top right, rgba(106,92,255,.12), transparent 28%),
+        linear-gradient(rgba(106,92,255,.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(106,92,255,.04) 1px, transparent 1px),
+        linear-gradient(180deg, rgba(255,255,255,.96), rgba(249,251,255,.98));
+      background-size:auto, 24px 24px, 24px 24px, auto;
+      border:1px solid rgba(228,234,251,.95);
+      border-radius:30px;
       padding:22px;
       box-shadow:var(--shadow-sm);
       transition:var(--transition);
       backdrop-filter:blur(10px);
+    }
+
+    .explain-card.variant-2{
+      background:
+        radial-gradient(circle at 85% 15%, rgba(66,199,255,.12), transparent 28%),
+        linear-gradient(180deg, rgba(255,255,255,.97), rgba(248,252,255,.99));
+      background-size:auto, auto;
+    }
+
+    .explain-card.variant-3{
+      background:
+        radial-gradient(circle at 85% 15%, rgba(255,143,216,.10), transparent 28%),
+        linear-gradient(180deg, rgba(255,255,255,.97), rgba(251,249,255,.99));
+      background-size:auto, auto;
     }
 
     .explain-card::before{
@@ -634,27 +973,27 @@
       position:absolute;
       top:0;
       left:22px;
-      width:64px;
+      width:70px;
       height:3px;
       border-radius:999px;
-      background:linear-gradient(90deg, var(--primary), var(--primary-2));
+      background:linear-gradient(90deg, var(--primary), var(--secondary));
     }
 
     .explain-card::after{
       content:"";
       position:absolute;
-      right:-22px;
-      bottom:-22px;
-      width:110px;
-      height:110px;
-      border-radius:24px;
-      background:radial-gradient(circle, rgba(91,97,246,.10), transparent 70%);
+      right:-20px;
+      bottom:-20px;
+      width:120px;
+      height:120px;
+      border-radius:28px;
+      background:radial-gradient(circle, rgba(106,92,255,.10), transparent 70%);
       pointer-events:none;
     }
 
     .explain-card:hover{
       transform:translateY(-6px);
-      border-color:#dbe1ef;
+      border-color:#d8e2f9;
       box-shadow:var(--shadow-md);
     }
 
@@ -669,32 +1008,32 @@
     }
 
     .explain-number{
-      width:44px;
-      height:44px;
-      border-radius:14px;
+      width:46px;
+      height:46px;
+      border-radius:15px;
       display:grid;
       place-items:center;
-      font-size:.95rem;
-      font-weight:700;
+      font-size:.96rem;
+      font-weight:800;
       color:var(--primary);
-      background:linear-gradient(135deg, #eef0ff, #f8f9ff);
-      border:1px solid #dfe5ff;
-      box-shadow:0 8px 20px rgba(91,97,246,.10);
+      background:linear-gradient(135deg, #eef0ff, #eefaff);
+      border:1px solid #dde5ff;
+      box-shadow:0 8px 20px rgba(106,92,255,.10);
     }
 
     .explain-badge{
       padding:8px 11px;
       border-radius:999px;
       font-size:.78rem;
-      font-weight:600;
-      color:#4f46e5;
-      background:rgba(255,255,255,.75);
-      border:1px solid #e1e6ff;
+      font-weight:700;
+      color:#4c46dd;
+      background:rgba(255,255,255,.78);
+      border:1px solid #e0e7ff;
     }
 
     .explain-card h3{
-      font-size:1rem;
-      font-weight:700;
+      font-size:1.02rem;
+      font-weight:800;
       margin-bottom:8px;
       letter-spacing:-.02em;
       position:relative;
@@ -704,33 +1043,61 @@
     .explain-card p{
       color:var(--muted);
       font-size:.93rem;
-      line-height:1.55;
+      line-height:1.58;
       position:relative;
       z-index:1;
     }
 
     .platform-panel{
-      background:linear-gradient(180deg, rgba(255,255,255,.82), rgba(255,255,255,.72));
-      border:1px solid rgba(231,235,243,.95);
-      border-radius:30px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.82), rgba(255,255,255,.72));
+      border:1px solid rgba(228,234,251,.95);
+      border-radius:34px;
       padding:18px;
       box-shadow:var(--shadow-md);
       backdrop-filter:blur(12px);
+      position:relative;
+      overflow:hidden;
+    }
+
+    .platform-panel::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        radial-gradient(circle at top right, rgba(66,199,255,.10), transparent 24%),
+        radial-gradient(circle at left bottom, rgba(106,92,255,.10), transparent 24%);
+      pointer-events:none;
     }
 
     .platform-grid{
       display:grid;
       grid-template-columns:1fr 1fr;
       gap:16px;
+      position:relative;
+      z-index:1;
     }
 
     .mini-box{
-      border:1px solid rgba(231,235,243,.95);
-      border-radius:22px;
+      border:1px solid rgba(228,234,251,.95);
+      border-radius:24px;
       padding:18px;
-      background:linear-gradient(180deg, #ffffff, #fbfcff);
+      background:linear-gradient(180deg, rgba(255,255,255,.95), rgba(250,252,255,.98));
       box-shadow:var(--shadow-sm);
       transition:var(--transition);
+      position:relative;
+      overflow:hidden;
+    }
+
+    .mini-box::after{
+      content:"";
+      position:absolute;
+      inset:auto -20px -20px auto;
+      width:95px;
+      height:95px;
+      border-radius:24px;
+      background:radial-gradient(circle, rgba(106,92,255,.08), transparent 70%);
+      pointer-events:none;
     }
 
     .mini-box:hover{
@@ -739,47 +1106,78 @@
     }
 
     .mini-box h4{
-      font-size:.95rem;
-      font-weight:700;
+      font-size:.98rem;
+      font-weight:800;
       margin-bottom:6px;
       letter-spacing:-.02em;
     }
 
     .mini-box p{
       color:var(--muted);
-      font-size:.9rem;
+      font-size:.91rem;
+    }
+
+    .mini-icon{
+      width:42px;
+      height:42px;
+      border-radius:14px;
+      display:grid;
+      place-items:center;
+      margin-bottom:12px;
+      color:#fff;
+      font-size:1rem;
+      background:linear-gradient(135deg, var(--primary), var(--secondary));
+      box-shadow:0 10px 24px rgba(106,92,255,.18);
     }
 
     .cta{
-      margin-top:20px;
+      margin-top:22px;
       display:flex;
       align-items:center;
       justify-content:space-between;
-      gap:16px;
+      gap:18px;
       flex-wrap:wrap;
-      padding:22px;
-      border-radius:28px;
-      background:linear-gradient(135deg, rgba(255,255,255,.84), rgba(245,247,255,.82));
-      border:1px solid rgba(231,235,243,.95);
+      padding:24px;
+      border-radius:30px;
+      background:
+        linear-gradient(135deg, rgba(255,255,255,.85), rgba(247,250,255,.82));
+      border:1px solid rgba(228,234,251,.95);
       box-shadow:var(--shadow-md);
       backdrop-filter:blur(12px);
+      position:relative;
+      overflow:hidden;
+    }
+
+    .cta::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        radial-gradient(circle at 15% 20%, rgba(106,92,255,.09), transparent 24%),
+        radial-gradient(circle at 88% 78%, rgba(66,199,255,.09), transparent 20%);
+      pointer-events:none;
+    }
+
+    .cta > *{
+      position:relative;
+      z-index:1;
     }
 
     .cta h3{
-      font-size:1.04rem;
-      font-weight:700;
+      font-size:1.08rem;
+      font-weight:800;
       margin-bottom:4px;
       letter-spacing:-.03em;
     }
 
     .cta p{
       color:var(--muted);
-      font-size:.92rem;
+      font-size:.93rem;
       max-width:560px;
     }
 
     footer{
-      padding:28px 0 40px;
+      padding:30px 0 42px;
       color:var(--muted);
       font-size:.9rem;
     }
@@ -804,6 +1202,58 @@
       transform:translateY(0);
     }
 
+    @keyframes pulseGlow{
+      0%,100%{
+        opacity:.5;
+        transform:scale(1);
+      }
+      50%{
+        opacity:.74;
+        transform:scale(1.08);
+      }
+    }
+
+    @keyframes floatSoft{
+      0%,100%{
+        transform:translateY(0);
+      }
+      50%{
+        transform:translateY(-6px);
+      }
+    }
+
+    @keyframes typingDots{
+      0%, 80%, 100%{
+        transform:translateY(0);
+        opacity:.45;
+      }
+      40%{
+        transform:translateY(-4px);
+        opacity:1;
+      }
+    }
+
+    @keyframes fadeUp{
+      from{
+        opacity:0;
+        transform:translateY(10px);
+      }
+      to{
+        opacity:1;
+        transform:translateY(0);
+      }
+    }
+
+    @media (max-width: 1080px){
+      .hero-floating.top{
+        right:10px;
+      }
+
+      .hero-floating.bottom{
+        left:10px;
+      }
+    }
+
     @media (max-width: 980px){
       .hero-screen-body,
       .grid-3,
@@ -814,7 +1264,11 @@
 
       .class-panel{
         border-right:none;
-        border-bottom:1px solid #edf0f6;
+        border-bottom:1px solid #edf1fa;
+      }
+
+      .hero-floating{
+        display:none;
       }
     }
 
@@ -824,11 +1278,20 @@
       }
 
       .hero{
-        padding-top:54px;
+        padding-top:56px;
       }
 
       .hero h1{
-        font-size:clamp(1.85rem, 7vw, 2.55rem);
+        font-size:clamp(1.95rem, 8vw, 2.75rem);
+      }
+
+      .section{
+        padding:68px 0;
+      }
+
+      .section::before{
+        width:min(1000px, calc(100% - 20px));
+        border-radius:28px;
       }
 
       .nav-actions{
@@ -837,10 +1300,6 @@
 
       .btn{
         padding:11px 15px;
-      }
-
-      .section{
-        padding:64px 0;
       }
     }
 
@@ -869,6 +1328,24 @@
       .cta{
         padding:18px;
       }
+
+      .brand span{
+        font-size:.94rem;
+      }
+
+      .nav-actions .btn{
+        font-size:.88rem;
+      }
+
+      .hero-meta,
+      .hero-tags{
+        gap:8px;
+      }
+
+      .pill,
+      .hero-tags span{
+        font-size:.79rem;
+      }
     }
   </style>
 </head>
@@ -877,8 +1354,8 @@
     <div class="container">
       <nav class="nav">
         <a href="#" class="brand">
-          <div class="brand-mark">L</div>
-          <span>Lumora</span>
+          <div class="brand-mark">E</div>
+          <span>Eduvia</span>
         </a>
 
         <div class="nav-links">
@@ -901,28 +1378,57 @@
         <div class="hero-inner reveal visible">
           <div class="hero-kicker">Clases instantáneas con avatar de IA</div>
 
-          <h1>Creá una clase <span>cuando la necesites</span>.</h1>
+          <h1>
+            Aprendé con una clase
+            <span class="gradient">hecha para vos</span>,
+            en el momento exacto.
+          </h1>
 
           <p>
-            Elegí la materia, indicá el tema y entrá a una explicación clara, visual y personalizada.
-            Sin horarios fijos. Sin coordinación previa.
+            Elegí la materia, escribí el tema y entrá a una explicación clara, visual y personalizada.
+            Sin depender de horarios. Sin esperar. Con una IA que te acompaña paso a paso.
           </p>
 
           <div class="hero-actions">
-            <a href="#" class="btn btn-primary">Empezar</a>
-            <a href="#como-funciona" class="btn btn-secondary">Ver más</a>
+            <a href="#" class="btn btn-primary">Empezar ahora</a>
+            <a href="#como-funciona" class="btn btn-secondary">Ver cómo funciona</a>
           </div>
 
           <div class="hero-meta">
             <div class="pill">Clase al instante</div>
-            <div class="pill">Código único</div>
             <div class="pill">Explicación visual</div>
+            <div class="pill">Preguntas en vivo</div>
+          </div>
+
+          <div class="hero-tags">
+            <span>Matemática</span>
+            <span>Biología</span>
+            <span>Historia</span>
+            <span>Física</span>
+            <span>Paso a paso</span>
           </div>
         </div>
 
         <div class="hero-card-wrap reveal">
           <div class="hero-glow glow-1"></div>
           <div class="hero-glow glow-2"></div>
+          <div class="hero-glow glow-3"></div>
+
+          <div class="hero-floating top">
+            <div class="icon">✦</div>
+            <div>
+              <strong>Clase generada</strong>
+              <span>Matemática • 2 min</span>
+            </div>
+          </div>
+
+          <div class="hero-floating bottom">
+            <div class="icon">↺</div>
+            <div>
+              <strong>Responde dudas en vivo</strong>
+              <span>Más simple cuando lo necesitás</span>
+            </div>
+          </div>
 
           <div class="hero-card">
             <div class="hero-screen">
@@ -930,7 +1436,7 @@
                 <div class="dots">
                   <span></span><span></span><span></span>
                 </div>
-                <div class="class-code">Código MAT-4821</div>
+                <div class="class-code">Código EDU-4821</div>
               </div>
 
               <div class="hero-screen-body">
@@ -939,22 +1445,38 @@
                     <div class="avatar"></div>
                     <div>
                       <h3>Profesor-avatar</h3>
-                      <p>Explicación guiada paso a paso con apoyo visual.</p>
+                      <p>Explicación guiada con voz, pizarra y acompañamiento visual en tiempo real.</p>
                     </div>
+                  </div>
+
+                  <div class="topic-card">
+                    <div class="topic-top">
+                      <div class="topic-pill">Tema actual</div>
+                      <div class="topic-level">Nivel medio</div>
+                    </div>
+                    <h4>Ecuaciones cuadráticas</h4>
+                    <p>La clase adapta la explicación según tu duda y repite los pasos cuando hace falta.</p>
                   </div>
 
                   <div class="board">
                     <div class="line w1"></div>
                     <div class="line w2"></div>
                     <div class="line w3"></div>
-                    <small>La clase acompaña la explicación con una pizarra simple y ordenada.</small>
+                    <small>La pizarra acompaña la explicación con una estructura simple, ordenada y visual.</small>
                   </div>
                 </div>
 
                 <div class="chat-panel">
+                  <div class="chat-badge">IA explicando ahora</div>
                   <div class="bubble user">No entendí ese paso.</div>
-                  <div class="bubble ai">Lo hacemos de nuevo, más simple.</div>
-                  <div class="bubble user">Ahora sí.</div>
+                  <div class="bubble ai">Lo hacemos de nuevo, más simple y con otro ejemplo.</div>
+                  <div class="bubble user">¿Podés mostrarme cómo reemplazar los valores?</div>
+                  <div class="bubble ai">Sí. Primero identificamos a, b y c, y después aplicamos la fórmula.</div>
+
+                  <div class="typing">
+                    <span></span><span></span><span></span>
+                  </div>
+
                   <div class="chat-input">Escribí tu duda…</div>
                 </div>
               </div>
@@ -968,41 +1490,44 @@
       <div class="container">
         <div class="section-head reveal">
           <div class="section-kicker">Cómo funciona</div>
-          <h2>Entrar a estudiar debería ser simple.</h2>
-          <p>La idea es que el alumno pueda empezar rápido, sin depender de horarios ni organización previa.</p>
+          <h2>Entrar a estudiar debería sentirse rápido, simple y natural.</h2>
+          <p>
+            Eduvia está pensada para que un alumno pueda empezar una clase en segundos,
+            enfocarse en entender y avanzar sin fricción.
+          </p>
         </div>
 
         <div class="grid-3">
           <article class="explain-card reveal">
             <div class="explain-top">
               <div class="explain-number">1</div>
-              <div class="explain-badge">Materia</div>
+              <div class="explain-badge">Tema</div>
             </div>
-            <h3>Elegí la materia</h3>
+            <h3>Elegí qué querés estudiar</h3>
             <p>
-              Seleccionás qué querés estudiar y marcás el tema puntual que necesitás ver en ese momento.
+              Seleccionás la materia, escribís el tema puntual y la plataforma prepara una experiencia enfocada en eso que necesitás entender.
             </p>
           </article>
 
-          <article class="explain-card reveal">
+          <article class="explain-card variant-2 reveal">
             <div class="explain-top">
               <div class="explain-number">2</div>
               <div class="explain-badge">Clase</div>
             </div>
-            <h3>Creá la clase</h3>
+            <h3>La clase se crea al instante</h3>
             <p>
-              La plataforma genera una sala al instante y te muestra un código listo para ingresar.
+              Eduvia genera una sala en el momento, con código propio, avatar activo y estructura lista para empezar sin esperar ni coordinar.
             </p>
           </article>
 
-          <article class="explain-card reveal">
+          <article class="explain-card variant-3 reveal">
             <div class="explain-top">
               <div class="explain-number">3</div>
               <div class="explain-badge">Explicación</div>
             </div>
-            <h3>Entrá y aprendé</h3>
+            <h3>Preguntás y seguís hasta entender</h3>
             <p>
-              El avatar explica con voz, pizarra y respuestas en tiempo real para acompañar cada paso.
+              La IA explica con voz, pizarra y respuestas en tiempo real para acompañar cada duda hasta que el tema quede claro.
             </p>
           </article>
         </div>
@@ -1013,30 +1538,36 @@
       <div class="container">
         <div class="section-head reveal">
           <div class="section-kicker">La plataforma</div>
-          <h2>Diseñada para enfocarse en entender.</h2>
-          <p>Una experiencia clara, liviana y visual para que aprender se sienta más natural.</p>
+          <h2>Diseñada para que entender se sienta más claro.</h2>
+          <p>
+            Una experiencia visual, moderna y liviana, donde la tecnología acompaña sin distraer del objetivo principal: aprender.
+          </p>
         </div>
 
         <div class="platform-panel reveal">
           <div class="platform-grid">
             <div class="mini-box">
+              <div class="mini-icon">⚡</div>
               <h4>Clase inmediata</h4>
-              <p>No depende de agendas ni de coordinar una sesión con anticipación.</p>
+              <p>No depende de agendas ni de coordinar una sesión con anticipación. Entrás cuando lo necesitás.</p>
             </div>
 
             <div class="mini-box">
-              <h4>Explicación visual</h4>
-              <p>La clase combina voz, pizarra y preguntas para hacer más claro cada tema.</p>
+              <div class="mini-icon">🧠</div>
+              <h4>Explicación personalizada</h4>
+              <p>La IA adapta el nivel y la forma de explicar según la pregunta y el momento del alumno.</p>
             </div>
 
             <div class="mini-box">
+              <div class="mini-icon">🧾</div>
               <h4>Ingreso con código</h4>
-              <p>Cada clase se crea en el momento y queda identificada con un código propio.</p>
+              <p>Cada clase se crea en el momento y queda identificada con un código propio y claro.</p>
             </div>
 
             <div class="mini-box">
-              <h4>Experiencia simple</h4>
-              <p>Todo está pensado para entrar, estudiar y seguir sin fricción.</p>
+              <div class="mini-icon">🎯</div>
+              <h4>Experiencia enfocada</h4>
+              <p>Todo está pensado para entrar, entender y seguir, sin pasos innecesarios ni distracciones.</p>
             </div>
           </div>
         </div>
@@ -1047,36 +1578,44 @@
       <div class="container">
         <div class="section-head reveal">
           <div class="section-kicker">Por qué sirve</div>
-          <h2>Una propuesta hecha para el momento real de estudio.</h2>
-          <p>No se trata solo de usar IA, sino de facilitar el instante en que el alumno necesita entender algo.</p>
+          <h2>Una propuesta hecha para el momento real en que aparece la duda.</h2>
+          <p>
+            No se trata solo de usar IA, sino de transformar ese instante en el que alguien necesita entender algo y no quiere perder tiempo.
+          </p>
         </div>
 
         <div class="grid-4">
           <article class="card reveal">
+            <div class="card-icon">⏱</div>
             <h3>Sin horarios fijos</h3>
-            <p>Estudiás cuando realmente lo necesitás.</p>
+            <p>La clase aparece cuando realmente la necesitás, no cuando otra persona puede darte turno.</p>
           </article>
 
-          <article class="card reveal">
+          <article class="card card-alt reveal">
+            <div class="card-icon">📘</div>
             <h3>Más claridad</h3>
-            <p>La explicación acompaña cada paso de forma visual.</p>
+            <p>La explicación acompaña cada paso con apoyo visual y respuestas que ordenan mejor la idea.</p>
           </article>
 
           <article class="card reveal">
+            <div class="card-icon">🚀</div>
             <h3>Menos fricción</h3>
-            <p>No hace falta coordinar con nadie para empezar.</p>
+            <p>Entrar, preguntar y avanzar debería ser simple. Eduvia reduce todo lo que te frena.</p>
           </article>
 
-          <article class="card reveal">
+          <article class="card card-pink reveal">
+            <div class="card-icon">✨</div>
             <h3>Más libertad</h3>
-            <p>Cada clase se crea en el momento según la necesidad del alumno.</p>
+            <p>Cada clase se crea según tu necesidad del momento, con más flexibilidad y autonomía para estudiar.</p>
           </article>
         </div>
 
         <div class="cta reveal">
           <div>
-            <h3>Una forma más simple de aprender</h3>
-            <p>Clases creadas en el momento, con una experiencia clara y enfocada.</p>
+            <h3>Aprender mejor también puede sentirse más moderno</h3>
+            <p>
+              Eduvia combina velocidad, claridad y una experiencia visual pensada para estudiar de forma más natural y acompañada.
+            </p>
           </div>
 
           <a href="#" class="btn btn-primary">Crear cuenta</a>
@@ -1088,7 +1627,7 @@
   <footer>
     <div class="container">
       <div class="footer-inner">
-        <span>© 2026 Lumora</span>
+        <span>© 2026 Eduvia</span>
         <span>Clases instantáneas con IA</span>
       </div>
     </div>
