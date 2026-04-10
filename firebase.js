@@ -3,12 +3,12 @@ import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-aut
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "TU_API_KEY",
+  apiKey: "AIzaSyBD2r0-IMOKOjc92I75AZx9czBsnUt7wd0",
   authDomain: "eduvia-97008.firebaseapp.com",
   projectId: "eduvia-97008",
   storageBucket: "eduvia-97008.firebasestorage.app",
   messagingSenderId: "1052924233848",
-  appId: "EL_APP_ID_EXACTO_QUE_TE_DA_FIREBASE"
+  appId: "1:1052924233848:web:6fb822f7cb8143e442c58d"
 };
 
 const app = initializeApp(firebaseConfig);
