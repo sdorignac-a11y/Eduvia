@@ -1,13 +1,23 @@
-<form id="clase-form">
-  <input id="materia" placeholder="Materia" />
-  <input id="tema" placeholder="Tema" />
-  <select id="nivel">
-    <option>Primaria</option>
-    <option>Secundaria</option>
-    <option>Universidad</option>
-  </select>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Crear clase</title>
+</head>
+<body>
+  <form id="clase-form">
+    <input id="materia" placeholder="Materia" />
+    <input id="tema" placeholder="Tema" />
+    <select id="nivel">
+      <option value="Primaria">Primaria</option>
+      <option value="Secundaria">Secundaria</option>
+      <option value="Universidad">Universidad</option>
+    </select>
 
-  <button type="submit">Crear clase</button>
-</form>
+    <button type="submit">Crear clase</button>
+  </form>
 
-<script type="module" src="crear-clase.js"></script>
+  <script type="module" src="crear-clase.js"></script>
+</body>
+</html>
