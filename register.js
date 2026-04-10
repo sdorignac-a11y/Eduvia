@@ -1,6 +1,6 @@
 import { auth, db } from "./firebase.js";
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { doc, setDoc, serverTimestamp } from "firebase/firestore";
+import { createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const form = document.getElementById("register-form");
 
@@ -19,18 +19,13 @@ form.addEventListener("submit", async (e) => {
     return;
   }
 
-  if (password.length < 6) {
-    alert("La contraseña debe tener al menos 6 caracteres.");
-    return;
-  }
-
   if (password !== password2) {
     alert("Las contraseñas no coinciden.");
     return;
   }
 
   if (!terms.checked) {
-    alert("Tenés que aceptar los términos y condiciones.");
+    alert("Tenés que aceptar los términos.");
     return;
   }
 
@@ -46,21 +41,10 @@ form.addEventListener("submit", async (e) => {
       creadoEn: serverTimestamp()
     });
 
-    alert("Cuenta creada con éxito.");
+    alert("Cuenta creada con éxito");
     window.location.href = "panel.html";
   } catch (error) {
-    console.error("Error al crear cuenta:", error);
-
-    let mensaje = "Ocurrió un error al crear la cuenta.";
-
-    if (error.code === "auth/email-already-in-use") {
-      mensaje = "Ese correo ya está en uso.";
-    } else if (error.code === "auth/invalid-email") {
-      mensaje = "El correo no es válido.";
-    } else if (error.code === "auth/weak-password") {
-      mensaje = "La contraseña es demasiado débil.";
-    }
-
-    alert(mensaje);
+    console.error(error);
+    alert("Error al crear cuenta: " + error.message);
   }
 });
