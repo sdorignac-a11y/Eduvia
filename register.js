@@ -4,15 +4,24 @@ import { doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs
 
 const form = document.getElementById("register-form");
 
-form.addEventListener("submit", async (e) => {
-  e.preventDefault();
+console.log("register.js cargado");
 
-  const nombre = document.getElementById("nombre").value.trim();
-  const apellido = document.getElementById("apellido").value.trim();
-  const email = document.getElementById("email").value.trim();
-  const password = document.getElementById("password").value;
-  const password2 = document.getElementById("password2").value;
+if (!form) {
+  console.error("No se encontró el formulario register-form");
+}
+
+form?.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  console.log("Submit de registro detectado");
+
+  const nombre = document.getElementById("nombre")?.value.trim();
+  const apellido = document.getElementById("apellido")?.value.trim();
+  const email = document.getElementById("email")?.value.trim();
+  const password = document.getElementById("password")?.value;
+  const password2 = document.getElementById("password2")?.value;
   const terms = document.querySelector('.terms input[type="checkbox"]');
+
+  console.log({ nombre, apellido, email });
 
   if (!nombre || !apellido || !email || !password || !password2) {
     alert("Completá todos los campos.");
@@ -24,27 +33,29 @@ form.addEventListener("submit", async (e) => {
     return;
   }
 
-  if (!terms.checked) {
-    alert("Tenés que aceptar los términos.");
+  if (!terms?.checked) {
+    alert("Aceptá los términos.");
     return;
   }
 
   try {
+    console.log("Intentando crear usuario en Auth...");
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-    const user = userCredential.user;
 
-    await setDoc(doc(db, "users", user.uid), {
+    console.log("Usuario creado en Auth:", userCredential.user.uid);
+
+    await setDoc(doc(db, "users", userCredential.user.uid), {
       nombre,
       apellido,
       email,
-      plan: "free",
       creadoEn: serverTimestamp()
     });
 
+    console.log("Usuario guardado en Firestore");
     alert("Cuenta creada con éxito");
     window.location.href = "panel.html";
   } catch (error) {
-    console.error(error);
-    alert("Error al crear cuenta: " + error.message);
+    console.error("ERROR COMPLETO:", error);
+    alert(`Error: ${error.code} | ${error.message}`);
   }
 });
