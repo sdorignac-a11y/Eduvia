@@ -1,0 +1,1070 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EduAvatar | Clases instantáneas con IA</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg: #f8fafc;
+      --bg-soft: #f1f5f9;
+      --card: rgba(255,255,255,.88);
+      --card-strong: #ffffff;
+      --text: #111827;
+      --muted: #6b7280;
+      --line: #e5e7eb;
+
+      --primary: #4f46e5;
+      --primary-soft: #eef2ff;
+      --primary-hover: #4338ca;
+
+      --success-soft: #ecfdf5;
+      --success-text: #047857;
+
+      --shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+      --shadow-soft: 0 8px 24px rgba(15, 23, 42, 0.04);
+
+      --radius-xl: 28px;
+      --radius-lg: 22px;
+      --radius-md: 16px;
+
+      --container: 1180px;
+    }
+
+    *{
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html{
+      scroll-behavior: smooth;
+    }
+
+    body{
+      font-family: "Inter", sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(79,70,229,.08), transparent 28%),
+        radial-gradient(circle at 85% 10%, rgba(99,102,241,.08), transparent 22%),
+        var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    a{
+      text-decoration: none;
+      color: inherit;
+    }
+
+    img{
+      max-width: 100%;
+      display: block;
+    }
+
+    .container{
+      width: min(var(--container), calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    .section{
+      padding: 92px 0;
+    }
+
+    .section-title{
+      font-family: "Sora", sans-serif;
+      font-size: clamp(2rem, 4vw, 3rem);
+      line-height: 1.1;
+      letter-spacing: -0.04em;
+      margin-bottom: 14px;
+    }
+
+    .section-subtitle{
+      max-width: 700px;
+      color: var(--muted);
+      font-size: 1.03rem;
+    }
+
+    .eyebrow{
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border: 1px solid rgba(79,70,229,.10);
+      background: rgba(255,255,255,.72);
+      color: var(--primary);
+      border-radius: 999px;
+      font-size: .92rem;
+      font-weight: 600;
+      backdrop-filter: blur(10px);
+      box-shadow: var(--shadow-soft);
+      margin-bottom: 18px;
+    }
+
+    .eyebrow-dot{
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--primary);
+      display: inline-block;
+    }
+
+    .site-header{
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      backdrop-filter: blur(14px);
+      background: rgba(248, 250, 252, 0.8);
+      border-bottom: 1px solid rgba(229,231,235,.75);
+    }
+
+    .nav{
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 78px;
+      gap: 20px;
+    }
+
+    .brand{
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-family: "Sora", sans-serif;
+      font-weight: 700;
+      font-size: 1.05rem;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-mark{
+      width: 38px;
+      height: 38px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, var(--primary), #7c83ff);
+      color: white;
+      box-shadow: 0 12px 24px rgba(79,70,229,.22);
+      font-size: 1rem;
+      font-weight: 800;
+    }
+
+    .nav-links{
+      display: flex;
+      align-items: center;
+      gap: 28px;
+      color: var(--muted);
+      font-weight: 500;
+      font-size: .97rem;
+    }
+
+    .nav-links a:hover{
+      color: var(--text);
+    }
+
+    .nav-actions{
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn{
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      border: none;
+      cursor: pointer;
+      border-radius: 999px;
+      padding: 14px 20px;
+      font-weight: 600;
+      font-size: .98rem;
+      transition: .2s ease;
+      white-space: nowrap;
+    }
+
+    .btn-primary{
+      background: var(--primary);
+      color: white;
+      box-shadow: 0 14px 28px rgba(79,70,229,.18);
+    }
+
+    .btn-primary:hover{
+      background: var(--primary-hover);
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary{
+      background: white;
+      color: var(--text);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .btn-secondary:hover{
+      transform: translateY(-1px);
+      border-color: #d7dce4;
+    }
+
+    .hero{
+      padding: 72px 0 46px;
+    }
+
+    .hero-grid{
+      display: grid;
+      grid-template-columns: 1.05fr .95fr;
+      align-items: center;
+      gap: 42px;
+    }
+
+    .hero-title{
+      font-family: "Sora", sans-serif;
+      font-size: clamp(2.6rem, 5vw, 4.7rem);
+      line-height: .98;
+      letter-spacing: -0.06em;
+      margin-bottom: 18px;
+      max-width: 720px;
+    }
+
+    .hero-title span{
+      color: var(--primary);
+    }
+
+    .hero-desc{
+      font-size: 1.08rem;
+      color: var(--muted);
+      max-width: 620px;
+      margin-bottom: 28px;
+    }
+
+    .hero-actions{
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+
+    .hero-points{
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .chip{
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.86);
+      border: 1px solid var(--line);
+      color: #374151;
+      font-size: .92rem;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .chip-dot{
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--primary);
+      display: inline-block;
+    }
+
+    .hero-visual{
+      position: relative;
+    }
+
+    .hero-card{
+      position: relative;
+      background: linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.84));
+      border: 1px solid rgba(229,231,235,.8);
+      border-radius: 34px;
+      box-shadow: 0 24px 60px rgba(15,23,42,.09);
+      padding: 18px;
+      overflow: hidden;
+    }
+
+    .hero-card::before{
+      content: "";
+      position: absolute;
+      inset: -80px auto auto -60px;
+      width: 220px;
+      height: 220px;
+      border-radius: 50%;
+      background: rgba(79,70,229,.08);
+      filter: blur(18px);
+    }
+
+    .screen{
+      position: relative;
+      z-index: 1;
+      border-radius: 28px;
+      overflow: hidden;
+      background: #fdfdff;
+      border: 1px solid #edf0f4;
+    }
+
+    .screen-top{
+      padding: 14px 16px;
+      border-bottom: 1px solid #eef2f6;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      background: rgba(255,255,255,.95);
+    }
+
+    .dots{
+      display: flex;
+      gap: 6px;
+    }
+
+    .dots span{
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #d1d5db;
+    }
+
+    .class-badge{
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: var(--primary-soft);
+      color: var(--primary);
+      font-size: .84rem;
+      font-weight: 700;
+      letter-spacing: .03em;
+    }
+
+    .screen-body{
+      display: grid;
+      grid-template-columns: 1.2fr .8fr;
+      min-height: 450px;
+    }
+
+    .board-area{
+      padding: 20px;
+      background: linear-gradient(180deg, #ffffff, #fbfcff);
+      border-right: 1px solid #eef2f6;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .avatar-panel{
+      background: linear-gradient(135deg, #eef2ff, #ffffff);
+      border: 1px solid #e9ebff;
+      border-radius: 24px;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      min-height: 140px;
+    }
+
+    .avatar-circle{
+      width: 78px;
+      height: 78px;
+      border-radius: 24px;
+      background: linear-gradient(135deg, var(--primary), #8b8fff);
+      box-shadow: 0 16px 30px rgba(79,70,229,.18);
+      flex-shrink: 0;
+      position: relative;
+    }
+
+    .avatar-circle::before,
+    .avatar-circle::after{
+      content: "";
+      position: absolute;
+      background: rgba(255,255,255,.95);
+      border-radius: 999px;
+    }
+
+    .avatar-circle::before{
+      width: 11px;
+      height: 11px;
+      top: 24px;
+      left: 21px;
+      box-shadow: 24px 0 0 rgba(255,255,255,.95);
+    }
+
+    .avatar-circle::after{
+      width: 28px;
+      height: 8px;
+      bottom: 20px;
+      left: 25px;
+    }
+
+    .avatar-copy h3{
+      font-size: 1rem;
+      margin-bottom: 6px;
+    }
+
+    .avatar-copy p{
+      color: var(--muted);
+      font-size: .94rem;
+      max-width: 360px;
+    }
+
+    .board{
+      background: #ffffff;
+      border: 1px solid #edf1f5;
+      border-radius: 24px;
+      padding: 20px;
+      min-height: 215px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 14px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.7);
+    }
+
+    .math-line{
+      height: 16px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(79,70,229,.18), rgba(79,70,229,.06));
+    }
+
+    .math-line.sm{ width: 42%; }
+    .math-line.md{ width: 68%; }
+    .math-line.lg{ width: 84%; }
+
+    .board-note{
+      font-size: .94rem;
+      color: var(--muted);
+    }
+
+    .chat-area{
+      padding: 18px;
+      background: #fcfdff;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .chat-bubble{
+      border-radius: 18px;
+      padding: 14px 16px;
+      font-size: .93rem;
+      max-width: 92%;
+      line-height: 1.45;
+    }
+
+    .bubble-user{
+      align-self: flex-end;
+      background: #f3f4f6;
+      color: #374151;
+    }
+
+    .bubble-ai{
+      align-self: flex-start;
+      background: var(--primary-soft);
+      color: #312e81;
+    }
+
+    .chat-input{
+      margin-top: auto;
+      border: 1px solid #e8edf3;
+      background: white;
+      border-radius: 18px;
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      color: var(--muted);
+      font-size: .92rem;
+    }
+
+    .floating-tag{
+      position: absolute;
+      background: rgba(255,255,255,.92);
+      border: 1px solid rgba(229,231,235,.92);
+      box-shadow: var(--shadow);
+      border-radius: 18px;
+      padding: 14px 16px;
+      backdrop-filter: blur(10px);
+    }
+
+    .tag-top{
+      top: 24px;
+      right: -22px;
+    }
+
+    .tag-bottom{
+      bottom: 28px;
+      left: -26px;
+    }
+
+    .floating-tag strong{
+      display: block;
+      font-size: .93rem;
+      margin-bottom: 4px;
+    }
+
+    .floating-tag span{
+      color: var(--muted);
+      font-size: .85rem;
+    }
+
+    .how-grid,
+    .benefit-grid{
+      display: grid;
+      gap: 18px;
+      margin-top: 34px;
+    }
+
+    .how-grid{
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .benefit-grid{
+      grid-template-columns: repeat(4, 1fr);
+    }
+
+    .card{
+      background: var(--card-strong);
+      border: 1px solid rgba(229,231,235,.9);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .step-card,
+    .benefit-card{
+      padding: 24px;
+    }
+
+    .step-number,
+    .icon-box{
+      width: 46px;
+      height: 46px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      background: var(--primary-soft);
+      color: var(--primary);
+      font-weight: 800;
+      margin-bottom: 18px;
+    }
+
+    .step-card h3,
+    .benefit-card h3{
+      font-size: 1.02rem;
+      margin-bottom: 8px;
+    }
+
+    .step-card p,
+    .benefit-card p{
+      color: var(--muted);
+      font-size: .95rem;
+    }
+
+    .showcase-wrap{
+      margin-top: 38px;
+      padding: 22px;
+      border-radius: 34px;
+      background: linear-gradient(180deg, rgba(255,255,255,.88), rgba(255,255,255,.75));
+      border: 1px solid rgba(229,231,235,.9);
+      box-shadow: var(--shadow);
+    }
+
+    .showcase-grid{
+      display: grid;
+      grid-template-columns: 1fr .9fr;
+      gap: 18px;
+    }
+
+    .panel{
+      background: white;
+      border: 1px solid #edf1f5;
+      border-radius: 28px;
+      padding: 22px;
+    }
+
+    .panel-title{
+      font-size: 1.02rem;
+      font-weight: 700;
+      margin-bottom: 14px;
+    }
+
+    .mini-list{
+      display: grid;
+      gap: 12px;
+    }
+
+    .mini-item{
+      padding: 14px;
+      border-radius: 18px;
+      border: 1px solid #eef2f6;
+      background: #fbfcff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .mini-item strong{
+      display: block;
+      font-size: .95rem;
+    }
+
+    .mini-item span{
+      font-size: .85rem;
+      color: var(--muted);
+    }
+
+    .pill{
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: var(--success-soft);
+      color: var(--success-text);
+      font-size: .79rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .cta-box{
+      margin-top: 42px;
+      padding: 34px;
+      border-radius: 34px;
+      background: linear-gradient(135deg, #ffffff, #f5f7ff);
+      border: 1px solid rgba(229,231,235,.92);
+      box-shadow: var(--shadow);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+
+    .cta-box h3{
+      font-family: "Sora", sans-serif;
+      font-size: clamp(1.5rem, 3vw, 2.2rem);
+      letter-spacing: -0.04em;
+      margin-bottom: 8px;
+    }
+
+    .cta-box p{
+      color: var(--muted);
+      max-width: 660px;
+    }
+
+    .site-footer{
+      padding: 28px 0 44px;
+      color: var(--muted);
+      font-size: .93rem;
+    }
+
+    .footer-row{
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      border-top: 1px solid rgba(229,231,235,.8);
+      padding-top: 22px;
+      flex-wrap: wrap;
+    }
+
+    @media (max-width: 1080px){
+      .hero-grid,
+      .showcase-grid,
+      .screen-body{
+        grid-template-columns: 1fr;
+      }
+
+      .benefit-grid{
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .how-grid{
+        grid-template-columns: 1fr;
+      }
+
+      .tag-top,
+      .tag-bottom{
+        position: static;
+        margin-top: 14px;
+      }
+    }
+
+    @media (max-width: 760px){
+      .nav-links{
+        display: none;
+      }
+
+      .hero{
+        padding-top: 40px;
+      }
+
+      .section{
+        padding: 72px 0;
+      }
+
+      .hero-title{
+        font-size: clamp(2.3rem, 11vw, 3.3rem);
+      }
+
+      .benefit-grid{
+        grid-template-columns: 1fr;
+      }
+
+      .hero-actions,
+      .nav-actions{
+        width: 100%;
+      }
+
+      .hero-actions .btn,
+      .nav-actions .btn{
+        flex: 1;
+      }
+
+      .avatar-panel{
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .cta-box{
+        padding: 26px 20px;
+      }
+    }
+
+    @media (max-width: 540px){
+      .container{
+        width: min(var(--container), calc(100% - 20px));
+      }
+
+      .nav{
+        min-height: 72px;
+      }
+
+      .btn{
+        padding: 13px 16px;
+        font-size: .95rem;
+      }
+
+      .hero-card{
+        padding: 12px;
+        border-radius: 26px;
+      }
+
+      .screen{
+        border-radius: 22px;
+      }
+
+      .panel,
+      .step-card,
+      .benefit-card{
+        padding: 18px;
+      }
+
+      .screen-top{
+        padding: 12px;
+      }
+
+      .board-area,
+      .chat-area{
+        padding: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="container">
+      <nav class="nav">
+        <a href="#" class="brand">
+          <div class="brand-mark">E</div>
+          <span>EduAvatar</span>
+        </a>
+
+        <div class="nav-links">
+          <a href="#como-funciona">Cómo funciona</a>
+          <a href="#demo">Demo</a>
+          <a href="#beneficios">Beneficios</a>
+        </div>
+
+        <div class="nav-actions">
+          <a href="#" class="btn btn-secondary">Iniciar sesión</a>
+          <a href="#" class="btn btn-primary">Crear cuenta</a>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="container">
+        <div class="hero-grid">
+          <div>
+            <div class="eyebrow">
+              <span class="eyebrow-dot"></span>
+              Clases instantáneas con profesor-avatar de IA
+            </div>
+
+            <h1 class="hero-title">
+              Tu clase con IA, <span>en el momento</span> que la necesites
+            </h1>
+
+            <p class="hero-desc">
+              Elegí la materia, definí el tema y generá una clase en segundos.
+              Aprendé con un avatar que explica paso a paso, sin horarios fijos y con una experiencia clara, visual y personalizada.
+            </p>
+
+            <div class="hero-actions">
+              <a href="#" class="btn btn-primary">Empezar ahora</a>
+              <a href="#demo" class="btn btn-secondary">Ver cómo funciona</a>
+            </div>
+
+            <div class="hero-points">
+              <div class="chip"><span class="chip-dot"></span> Sin horarios fijos</div>
+              <div class="chip"><span class="chip-dot"></span> Código de clase al instante</div>
+              <div class="chip"><span class="chip-dot"></span> Explicación visual paso a paso</div>
+            </div>
+          </div>
+
+          <div class="hero-visual">
+            <div class="hero-card">
+              <div class="screen">
+                <div class="screen-top">
+                  <div class="dots">
+                    <span></span><span></span><span></span>
+                  </div>
+                  <div class="class-badge">Código: MAT-4821</div>
+                </div>
+
+                <div class="screen-body">
+                  <div class="board-area">
+                    <div class="avatar-panel">
+                      <div class="avatar-circle"></div>
+                      <div class="avatar-copy">
+                        <h3>Profesor-avatar activo</h3>
+                        <p>
+                          “Vamos a resolver ecuaciones paso a paso. Primero aislamos la variable y después verificamos el resultado.”
+                        </p>
+                      </div>
+                    </div>
+
+                    <div class="board">
+                      <div class="math-line lg"></div>
+                      <div class="math-line md"></div>
+                      <div class="math-line sm"></div>
+                      <p class="board-note">La pizarra acompaña cada explicación con una secuencia simple y visual.</p>
+                    </div>
+                  </div>
+
+                  <div class="chat-area">
+                    <div class="chat-bubble bubble-user">
+                      No entiendo cómo pasar el 3 al otro lado.
+                    </div>
+                    <div class="chat-bubble bubble-ai">
+                      Cuando cambia de lado, cambia el signo. Te lo muestro en el siguiente paso para que quede claro.
+                    </div>
+                    <div class="chat-bubble bubble-user">
+                      Ahí sí, seguí.
+                    </div>
+
+                    <div class="chat-input">
+                      <span>Escribí tu duda...</span>
+                      <strong>Enviar</strong>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="floating-tag tag-top">
+              <strong>Clase generada en segundos</strong>
+              <span>Elegís materia, tema y entrás al instante.</span>
+            </div>
+
+            <div class="floating-tag tag-bottom">
+              <strong>Aprendé cuando lo necesites</strong>
+              <span>Sin reservas ni horarios prearmados.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="como-funciona">
+      <div class="container">
+        <div class="eyebrow">
+          <span class="eyebrow-dot"></span>
+          Cómo funciona
+        </div>
+        <h2 class="section-title">Una experiencia simple, inmediata y enfocada en aprender</h2>
+        <p class="section-subtitle">
+          Todo está pensado para que el alumno no pierda tiempo. Entra, crea su clase y empieza a entender el tema sin depender de horarios fijos.
+        </p>
+
+        <div class="how-grid">
+          <article class="card step-card">
+            <div class="step-number">1</div>
+            <h3>Elegí la materia</h3>
+            <p>Seleccioná qué querés estudiar y marcá el tema exacto que necesitás reforzar.</p>
+          </article>
+
+          <article class="card step-card">
+            <div class="step-number">2</div>
+            <h3>Creá tu clase</h3>
+            <p>La plataforma genera una sala en el momento y te muestra un código listo para ingresar.</p>
+          </article>
+
+          <article class="card step-card">
+            <div class="step-number">3</div>
+            <h3>Entrá y aprendé</h3>
+            <p>El avatar explica con apoyo visual, responde dudas y acompaña el proceso paso a paso.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="demo">
+      <div class="container">
+        <div class="eyebrow">
+          <span class="eyebrow-dot"></span>
+          Vista de la plataforma
+        </div>
+        <h2 class="section-title">Diseñada para que aprender se sienta claro</h2>
+        <p class="section-subtitle">
+          Una interfaz limpia, ordenada y visual. El alumno siempre sabe dónde está, qué está viendo y cuál es el siguiente paso.
+        </p>
+
+        <div class="showcase-wrap">
+          <div class="showcase-grid">
+            <div class="panel">
+              <div class="panel-title">Sala de clase</div>
+              <div class="mini-list">
+                <div class="mini-item">
+                  <div>
+                    <strong>Profesor-avatar en vivo</strong>
+                    <span>Explicaciones con voz y guía paso a paso</span>
+                  </div>
+                  <span class="pill">Activo</span>
+                </div>
+                <div class="mini-item">
+                  <div>
+                    <strong>Pizarra visual</strong>
+                    <span>Resolución clara de ejercicios y temas</span>
+                  </div>
+                  <span class="pill">Visual</span>
+                </div>
+                <div class="mini-item">
+                  <div>
+                    <strong>Chat y preguntas</strong>
+                    <span>El alumno puede interrumpir, preguntar o subir ejercicios</span>
+                  </div>
+                  <span class="pill">Flexible</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="panel">
+              <div class="panel-title">Ventaja principal</div>
+              <div class="mini-list">
+                <div class="mini-item">
+                  <div>
+                    <strong>Sin horarios fijos</strong>
+                    <span>Estudiá cuando realmente lo necesites</span>
+                  </div>
+                </div>
+                <div class="mini-item">
+                  <div>
+                    <strong>Clase creada en el momento</strong>
+                    <span>No depende de coordinación previa ni reservas</span>
+                  </div>
+                </div>
+                <div class="mini-item">
+                  <div>
+                    <strong>Experiencia personalizada</strong>
+                    <span>La explicación se adapta al tema y a la duda puntual</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="beneficios">
+      <div class="container">
+        <div class="eyebrow">
+          <span class="eyebrow-dot"></span>
+          Beneficios
+        </div>
+        <h2 class="section-title">Una plataforma educativa pensada para el momento real de estudio</h2>
+        <p class="section-subtitle">
+          No se trata solo de hablar con una IA, sino de entrar a una clase clara, inmediata y útil cuando aparece la necesidad.
+        </p>
+
+        <div class="benefit-grid">
+          <article class="card benefit-card">
+            <div class="icon-box">⌁</div>
+            <h3>Disponibilidad inmediata</h3>
+            <p>El alumno puede empezar en el momento, sin depender de agendas externas.</p>
+          </article>
+
+          <article class="card benefit-card">
+            <div class="icon-box">◎</div>
+            <h3>Explicación visual</h3>
+            <p>La pizarra y la estructura de clase ayudan a entender mejor los temas complejos.</p>
+          </article>
+
+          <article class="card benefit-card">
+            <div class="icon-box">◌</div>
+            <h3>Experiencia ordenada</h3>
+            <p>Todo está diseñado para que el foco esté en aprender, no en perderse dentro de la app.</p>
+          </article>
+
+          <article class="card benefit-card">
+            <div class="icon-box">✦</div>
+            <h3>Más libertad</h3>
+            <p>Si un día no estudiás, no pasa nada. La clase se crea cuando vos la necesitás.</p>
+          </article>
+        </div>
+
+        <div class="cta-box">
+          <div>
+            <h3>Empezá a construir una nueva forma de aprender</h3>
+            <p>
+              Una experiencia educativa minimalista, premium y disponible al instante.
+              Menos fricción, más claridad y una clase lista cuando el alumno la necesita.
+            </p>
+          </div>
+
+          <a href="#" class="btn btn-primary">Crear cuenta</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-row">
+        <span>© 2026 EduAvatar. Plataforma de clases instantáneas con IA.</span>
+        <span>Diseño minimalista premium</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    document.querySelectorAll('a[href^="#"]').forEach(link => {
+      link.addEventListener("click", e => {
+        const targetId = link.getAttribute("href");
+        const target = document.querySelector(targetId);
+        if(target){
+          e.preventDefault();
+          target.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      });
+    });
+  </script>
+</body>
+</html>
