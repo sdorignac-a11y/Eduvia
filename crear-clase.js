@@ -6,7 +6,6 @@ const form = document.getElementById("clase-form");
 
 let currentUser = null;
 
-// asegurar que esté logueado
 onAuthStateChanged(auth, (user) => {
   if (!user) {
     window.location.href = "login.html";
@@ -35,7 +34,6 @@ form.addEventListener("submit", async (e) => {
 
     console.log("Clase creada:", docRef.id);
 
-    // redirigir a la clase
     window.location.href = `clase.html?id=${docRef.id}`;
 
   } catch (error) {
@@ -43,3 +41,20 @@ form.addEventListener("submit", async (e) => {
     alert("Error al crear la clase");
   }
 });
+const archivoInput = document.getElementById("archivo");
+const fileList = document.getElementById("file-list");
+
+if (archivoInput && fileList) {
+  archivoInput.addEventListener("change", () => {
+    fileList.innerHTML = "";
+
+    const files = Array.from(archivoInput.files || []);
+
+    files.forEach(file => {
+      const item = document.createElement("div");
+      item.className = "file-item";
+      item.textContent = `📄 ${file.name}`;
+      fileList.appendChild(item);
+    });
+  });
+}
