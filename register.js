@@ -9,10 +9,13 @@ import {
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
+console.log("register.js cargado");
+
 const form = document.getElementById("register-form");
 
 form?.addEventListener("submit", async (e) => {
   e.preventDefault();
+  console.log("submit detectado");
 
   const nombre = document.getElementById("nombre")?.value.trim();
   const apellido = document.getElementById("apellido")?.value.trim();
@@ -48,10 +51,18 @@ form?.addEventListener("submit", async (e) => {
       submitBtn.textContent = "Creando cuenta...";
     }
 
+    console.log("Antes de Auth");
+
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
 
-    await setDoc(doc(db, "usuarios", user.uid), {
+    console.log("Auth OK:", user.uid);
+    console.log("Antes de Firestore");
+
+    const ref = doc(db, "usuarios", user.uid);
+    console.log("Referencia creada:", ref.path);
+
+    await setDoc(ref, {
       uid: user.uid,
       nombre,
       apellido,
@@ -59,14 +70,16 @@ form?.addEventListener("submit", async (e) => {
       creadoEn: serverTimestamp()
     });
 
+    console.log("Firestore OK");
+
     localStorage.setItem("registroNombre", nombre);
     localStorage.setItem("registroApellido", apellido);
 
-    console.log("Usuario guardado en Firestore:", user.uid);
-
     window.location.href = "panel.html";
   } catch (error) {
-    console.error("ERROR REGISTER:", error);
+    console.error("ERROR REGISTER COMPLETO:", error);
+    console.error("CODE:", error.code);
+    console.error("MESSAGE:", error.message);
     alert("Error: " + error.code + " | " + error.message);
   } finally {
     if (submitBtn) {
