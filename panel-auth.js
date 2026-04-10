@@ -13,13 +13,13 @@ onAuthStateChanged(auth, async (user) => {
     const apellido = localStorage.getItem("registroApellido") || "";
 
     await setDoc(
-      doc(db, "users", user.uid),
+      doc(db, "usuarios", user.uid),
       {
         uid: user.uid,
         email: user.email || "",
         nombre,
         apellido,
-        creadoEn: serverTimestamp()
+        actualizadoEn: serverTimestamp()
       },
       { merge: true }
     );
