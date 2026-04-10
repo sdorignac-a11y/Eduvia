@@ -6,7 +6,7 @@ import {
 import {
   doc,
   setDoc,
-  getDoc
+  serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 console.log("register.js cargado");
@@ -51,48 +51,28 @@ form?.addEventListener("submit", async (e) => {
       submitBtn.textContent = "Creando cuenta...";
     }
 
-    console.log("Proyecto Auth:", auth.app.options.projectId);
-    console.log("Proyecto DB:", db.app.options.projectId);
-
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
 
     console.log("Auth OK:", user.uid);
 
-    // fuerza a que el token quede listo
-    await user.getIdToken(true);
-
-    const ref = doc(db, "usuarios", user.uid);
-    console.log("Antes de guardar en Firestore:", ref.path);
-
-    await setDoc(ref, {
+    await setDoc(doc(db, "usuarios", user.uid), {
       uid: user.uid,
       nombre,
       apellido,
       email,
-      creadoEn: new Date().toISOString()
+      creadoEn: serverTimestamp()
     });
 
-    console.log("setDoc OK");
-
-    const snap = await getDoc(ref);
-    console.log("Documento existe:", snap.exists());
-    console.log("Data:", snap.data());
-
-    if (!snap.exists()) {
-      throw new Error("Se intentó guardar, pero el documento no apareció en Firestore.");
-    }
+    console.log("Firestore OK");
 
     localStorage.setItem("registroNombre", nombre);
     localStorage.setItem("registroApellido", apellido);
 
-    alert("Cuenta creada y guardada en Firestore.");
     window.location.href = "panel.html";
 
   } catch (error) {
     console.error("ERROR REGISTER COMPLETO:", error);
-    console.error("CODE:", error.code);
-    console.error("MESSAGE:", error.message);
     alert((error.code || "sin-code") + " | " + error.message);
   } finally {
     if (submitBtn) {
