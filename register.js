@@ -9,6 +9,8 @@ import {
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
+console.log("REGISTER NUEVO CARGADO");
+
 const form = document.getElementById("register-form");
 
 form?.addEventListener("submit", async (e) => {
@@ -20,6 +22,7 @@ form?.addEventListener("submit", async (e) => {
   const password = document.getElementById("password")?.value;
   const password2 = document.getElementById("password2")?.value;
   const terms = document.querySelector('.terms input[type="checkbox"]');
+  const submitBtn = form.querySelector('button[type="submit"]');
 
   if (!nombre || !apellido || !email || !password || !password2) {
     alert("Completá todos los campos.");
@@ -39,13 +42,18 @@ form?.addEventListener("submit", async (e) => {
   let user = null;
 
   try {
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Creando cuenta...";
+    }
+
     console.log("1. Creando usuario en Authentication...");
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     user = userCredential.user;
 
     console.log("2. Usuario creado en Auth:", user.uid);
 
-    // Fuerza a que el token esté listo antes de escribir en Firestore
+    // Fuerza a que el token esté listo
     await user.getIdToken(true);
 
     console.log("3. Guardando usuario en Firestore...");
@@ -66,11 +74,11 @@ form?.addEventListener("submit", async (e) => {
     console.error("ERROR CODE:", error.code);
     console.error("ERROR MESSAGE:", error.message);
 
-    // Si Auth funcionó pero Firestore falló, borra el usuario para no dejarlo a medias
-    if (user && auth.currentUser) {
+    // Si Auth sí creó el usuario pero Firestore falló, lo borramos
+    if (user) {
       try {
         await deleteUser(user);
-        console.log("Usuario eliminado de Auth porque Firestore falló.");
+        console.log("Usuario eliminado de Authentication porque Firestore falló.");
       } catch (deleteError) {
         console.error("No se pudo borrar el usuario de Auth:", deleteError);
       }
@@ -78,10 +86,18 @@ form?.addEventListener("submit", async (e) => {
 
     if (error.code === "auth/email-already-in-use") {
       alert("Ese correo ya está registrado.");
-    } else if (error.code === "permission-denied" || error.code === "firestore/permission-denied") {
+    } else if (
+      error.code === "permission-denied" ||
+      error.code === "firestore/permission-denied"
+    ) {
       alert("Firestore bloqueó el guardado por permisos.");
     } else {
-      alert("Ocurrió un error: " + error.message);
+      alert("Error al crear la cuenta: " + error.message);
+    }
+  } finally {
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Crear mi cuenta";
     }
   }
 });
