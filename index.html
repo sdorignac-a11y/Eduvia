@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>EduAvatar | Clases instantáneas con IA</title>
+  <title>Lumora | Clases instantáneas con IA</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -11,764 +11,852 @@
 
   <style>
     :root{
-      --bg: #f8fafc;
-      --bg-soft: #f1f5f9;
-      --card: rgba(255,255,255,.88);
-      --card-strong: #ffffff;
-      --text: #111827;
-      --muted: #6b7280;
-      --line: #e5e7eb;
+      --bg:#f7f8fc;
+      --bg-soft:#f1f5f9;
+      --card:#ffffff;
+      --card-soft:rgba(255,255,255,.78);
+      --text:#111827;
+      --muted:#6b7280;
+      --line:#e5e7eb;
 
-      --primary: #4f46e5;
-      --primary-soft: #eef2ff;
-      --primary-hover: #4338ca;
+      --primary:#4f46e5;
+      --primary-2:#7c83ff;
+      --primary-soft:#eef2ff;
+      --primary-soft-2:#f5f3ff;
+      --success:#047857;
+      --success-soft:#ecfdf5;
 
-      --success-soft: #ecfdf5;
-      --success-text: #047857;
+      --shadow:0 20px 50px rgba(15,23,42,.08);
+      --shadow-soft:0 10px 30px rgba(15,23,42,.05);
 
-      --shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
-      --shadow-soft: 0 8px 24px rgba(15, 23, 42, 0.04);
+      --radius-xl:34px;
+      --radius-lg:26px;
+      --radius-md:18px;
 
-      --radius-xl: 28px;
-      --radius-lg: 22px;
-      --radius-md: 16px;
-
-      --container: 1180px;
+      --container:1180px;
     }
 
     *{
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
+      box-sizing:border-box;
+      margin:0;
+      padding:0;
     }
 
     html{
-      scroll-behavior: smooth;
+      scroll-behavior:smooth;
     }
 
     body{
-      font-family: "Inter", sans-serif;
+      font-family:"Inter",sans-serif;
+      color:var(--text);
       background:
-        radial-gradient(circle at top left, rgba(79,70,229,.08), transparent 28%),
-        radial-gradient(circle at 85% 10%, rgba(99,102,241,.08), transparent 22%),
+        radial-gradient(circle at top center, rgba(79,70,229,.10), transparent 26%),
+        radial-gradient(circle at 10% 20%, rgba(99,102,241,.06), transparent 20%),
+        radial-gradient(circle at 90% 10%, rgba(167,139,250,.08), transparent 18%),
         var(--bg);
-      color: var(--text);
-      line-height: 1.5;
+      line-height:1.5;
     }
 
     a{
-      text-decoration: none;
-      color: inherit;
-    }
-
-    img{
-      max-width: 100%;
-      display: block;
+      text-decoration:none;
+      color:inherit;
     }
 
     .container{
-      width: min(var(--container), calc(100% - 32px));
-      margin: 0 auto;
+      width:min(var(--container), calc(100% - 28px));
+      margin:0 auto;
     }
 
     .section{
-      padding: 92px 0;
-    }
-
-    .section-title{
-      font-family: "Sora", sans-serif;
-      font-size: clamp(2rem, 4vw, 3rem);
-      line-height: 1.1;
-      letter-spacing: -0.04em;
-      margin-bottom: 14px;
-    }
-
-    .section-subtitle{
-      max-width: 700px;
-      color: var(--muted);
-      font-size: 1.03rem;
-    }
-
-    .eyebrow{
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      padding: 10px 14px;
-      border: 1px solid rgba(79,70,229,.10);
-      background: rgba(255,255,255,.72);
-      color: var(--primary);
-      border-radius: 999px;
-      font-size: .92rem;
-      font-weight: 600;
-      backdrop-filter: blur(10px);
-      box-shadow: var(--shadow-soft);
-      margin-bottom: 18px;
-    }
-
-    .eyebrow-dot{
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--primary);
-      display: inline-block;
+      padding:92px 0;
     }
 
     .site-header{
-      position: sticky;
-      top: 0;
-      z-index: 40;
-      backdrop-filter: blur(14px);
-      background: rgba(248, 250, 252, 0.8);
-      border-bottom: 1px solid rgba(229,231,235,.75);
+      position:sticky;
+      top:0;
+      z-index:50;
+      backdrop-filter:blur(16px);
+      background:rgba(247,248,252,.8);
+      border-bottom:1px solid rgba(229,231,235,.7);
     }
 
     .nav{
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      min-height: 78px;
-      gap: 20px;
+      min-height:78px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:18px;
     }
 
     .brand{
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      font-family: "Sora", sans-serif;
-      font-weight: 700;
-      font-size: 1.05rem;
-      letter-spacing: -0.02em;
+      display:flex;
+      align-items:center;
+      gap:12px;
+      font-family:"Sora",sans-serif;
+      font-weight:700;
+      letter-spacing:-.03em;
     }
 
     .brand-mark{
-      width: 38px;
-      height: 38px;
-      border-radius: 14px;
-      display: grid;
-      place-items: center;
-      background: linear-gradient(135deg, var(--primary), #7c83ff);
-      color: white;
-      box-shadow: 0 12px 24px rgba(79,70,229,.22);
-      font-size: 1rem;
-      font-weight: 800;
+      width:40px;
+      height:40px;
+      border-radius:14px;
+      display:grid;
+      place-items:center;
+      color:#fff;
+      font-weight:800;
+      background:linear-gradient(135deg,var(--primary),var(--primary-2));
+      box-shadow:0 16px 28px rgba(79,70,229,.22);
     }
 
     .nav-links{
-      display: flex;
-      align-items: center;
-      gap: 28px;
-      color: var(--muted);
-      font-weight: 500;
-      font-size: .97rem;
+      display:flex;
+      align-items:center;
+      gap:26px;
+      color:var(--muted);
+      font-size:.96rem;
+      font-weight:500;
     }
 
     .nav-links a:hover{
-      color: var(--text);
+      color:var(--text);
     }
 
     .nav-actions{
-      display: flex;
-      align-items: center;
-      gap: 12px;
+      display:flex;
+      align-items:center;
+      gap:12px;
     }
 
     .btn{
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      border: none;
-      cursor: pointer;
-      border-radius: 999px;
-      padding: 14px 20px;
-      font-weight: 600;
-      font-size: .98rem;
-      transition: .2s ease;
-      white-space: nowrap;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      border:none;
+      cursor:pointer;
+      border-radius:999px;
+      padding:14px 20px;
+      font-weight:600;
+      font-size:.97rem;
+      transition:.22s ease;
+      white-space:nowrap;
+    }
+
+    .btn:hover{
+      transform:translateY(-1px);
     }
 
     .btn-primary{
-      background: var(--primary);
-      color: white;
-      box-shadow: 0 14px 28px rgba(79,70,229,.18);
+      color:#fff;
+      background:linear-gradient(135deg,var(--primary),#6366f1);
+      box-shadow:0 16px 30px rgba(79,70,229,.18);
     }
 
     .btn-primary:hover{
-      background: var(--primary-hover);
-      transform: translateY(-1px);
+      filter:brightness(.98);
     }
 
     .btn-secondary{
-      background: white;
-      color: var(--text);
-      border: 1px solid var(--line);
-      box-shadow: var(--shadow-soft);
-    }
-
-    .btn-secondary:hover{
-      transform: translateY(-1px);
-      border-color: #d7dce4;
+      color:var(--text);
+      background:rgba(255,255,255,.86);
+      border:1px solid var(--line);
+      box-shadow:var(--shadow-soft);
     }
 
     .hero{
-      padding: 72px 0 46px;
+      padding:78px 0 54px;
     }
 
-    .hero-grid{
-      display: grid;
-      grid-template-columns: 1.05fr .95fr;
-      align-items: center;
-      gap: 42px;
+    .hero-wrap{
+      text-align:center;
+      max-width:980px;
+      margin:0 auto;
+    }
+
+    .eyebrow{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      padding:10px 16px;
+      border-radius:999px;
+      background:rgba(255,255,255,.78);
+      border:1px solid rgba(79,70,229,.10);
+      color:var(--primary);
+      font-size:.92rem;
+      font-weight:700;
+      box-shadow:var(--shadow-soft);
+      margin-bottom:22px;
+      backdrop-filter:blur(10px);
+    }
+
+    .eyebrow-dot{
+      width:8px;
+      height:8px;
+      border-radius:50%;
+      background:var(--primary);
     }
 
     .hero-title{
-      font-family: "Sora", sans-serif;
-      font-size: clamp(2.6rem, 5vw, 4.7rem);
-      line-height: .98;
-      letter-spacing: -0.06em;
-      margin-bottom: 18px;
-      max-width: 720px;
+      font-family:"Sora",sans-serif;
+      font-size:clamp(2.8rem, 7vw, 5.6rem);
+      line-height:.96;
+      letter-spacing:-.065em;
+      max-width:900px;
+      margin:0 auto 20px;
     }
 
     .hero-title span{
-      color: var(--primary);
+      background:linear-gradient(135deg,var(--primary),#7c83ff);
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+      background-clip:text;
+      color:transparent;
     }
 
     .hero-desc{
-      font-size: 1.08rem;
-      color: var(--muted);
-      max-width: 620px;
-      margin-bottom: 28px;
+      max-width:760px;
+      margin:0 auto 30px;
+      font-size:1.08rem;
+      color:var(--muted);
     }
 
     .hero-actions{
-      display: flex;
-      flex-wrap: wrap;
-      gap: 14px;
-      margin-bottom: 24px;
+      display:flex;
+      justify-content:center;
+      flex-wrap:wrap;
+      gap:14px;
+      margin-bottom:24px;
     }
 
     .hero-points{
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
+      display:flex;
+      justify-content:center;
+      flex-wrap:wrap;
+      gap:12px;
+      margin-bottom:34px;
     }
 
     .chip{
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 11px 14px;
-      border-radius: 999px;
-      background: rgba(255,255,255,.86);
-      border: 1px solid var(--line);
-      color: #374151;
-      font-size: .92rem;
-      box-shadow: var(--shadow-soft);
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:11px 15px;
+      border-radius:999px;
+      background:rgba(255,255,255,.9);
+      border:1px solid rgba(229,231,235,.9);
+      color:#374151;
+      font-size:.92rem;
+      box-shadow:var(--shadow-soft);
     }
 
     .chip-dot{
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: var(--primary);
-      display: inline-block;
+      width:7px;
+      height:7px;
+      border-radius:50%;
+      background:var(--primary);
     }
 
-    .hero-visual{
-      position: relative;
+    .hero-mockup-shell{
+      position:relative;
+      margin-top:8px;
+      padding:18px;
+      border-radius:36px;
+      background:linear-gradient(180deg, rgba(255,255,255,.88), rgba(255,255,255,.74));
+      border:1px solid rgba(229,231,235,.9);
+      box-shadow:0 30px 70px rgba(15,23,42,.10);
+      overflow:hidden;
     }
 
-    .hero-card{
-      position: relative;
-      background: linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.84));
-      border: 1px solid rgba(229,231,235,.8);
-      border-radius: 34px;
-      box-shadow: 0 24px 60px rgba(15,23,42,.09);
-      padding: 18px;
-      overflow: hidden;
+    .hero-mockup-shell::before{
+      content:"";
+      position:absolute;
+      width:260px;
+      height:260px;
+      border-radius:50%;
+      background:rgba(79,70,229,.10);
+      filter:blur(12px);
+      top:-80px;
+      left:-50px;
     }
 
-    .hero-card::before{
-      content: "";
-      position: absolute;
-      inset: -80px auto auto -60px;
-      width: 220px;
-      height: 220px;
-      border-radius: 50%;
-      background: rgba(79,70,229,.08);
-      filter: blur(18px);
+    .hero-mockup-shell::after{
+      content:"";
+      position:absolute;
+      width:240px;
+      height:240px;
+      border-radius:50%;
+      background:rgba(124,131,255,.08);
+      filter:blur(12px);
+      right:-70px;
+      bottom:-90px;
     }
 
     .screen{
-      position: relative;
-      z-index: 1;
-      border-radius: 28px;
-      overflow: hidden;
-      background: #fdfdff;
-      border: 1px solid #edf0f4;
+      position:relative;
+      z-index:2;
+      border-radius:28px;
+      overflow:hidden;
+      background:#fdfdff;
+      border:1px solid #edf0f4;
     }
 
     .screen-top{
-      padding: 14px 16px;
-      border-bottom: 1px solid #eef2f6;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      background: rgba(255,255,255,.95);
+      padding:14px 16px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      background:rgba(255,255,255,.96);
+      border-bottom:1px solid #edf1f5;
     }
 
     .dots{
-      display: flex;
-      gap: 6px;
+      display:flex;
+      gap:6px;
     }
 
     .dots span{
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: #d1d5db;
+      width:8px;
+      height:8px;
+      border-radius:50%;
+      background:#d1d5db;
     }
 
     .class-badge{
-      padding: 8px 12px;
-      border-radius: 999px;
-      background: var(--primary-soft);
-      color: var(--primary);
-      font-size: .84rem;
-      font-weight: 700;
-      letter-spacing: .03em;
+      padding:9px 13px;
+      border-radius:999px;
+      background:var(--primary-soft);
+      color:var(--primary);
+      font-size:.83rem;
+      font-weight:800;
+      letter-spacing:.03em;
     }
 
     .screen-body{
-      display: grid;
-      grid-template-columns: 1.2fr .8fr;
-      min-height: 450px;
+      display:grid;
+      grid-template-columns:1.2fr .8fr;
+      min-height:450px;
     }
 
     .board-area{
-      padding: 20px;
-      background: linear-gradient(180deg, #ffffff, #fbfcff);
-      border-right: 1px solid #eef2f6;
-      display: flex;
-      flex-direction: column;
-      gap: 18px;
+      padding:20px;
+      border-right:1px solid #edf1f5;
+      display:flex;
+      flex-direction:column;
+      gap:18px;
+      background:linear-gradient(180deg,#ffffff,#fbfcff);
     }
 
     .avatar-panel{
-      background: linear-gradient(135deg, #eef2ff, #ffffff);
-      border: 1px solid #e9ebff;
-      border-radius: 24px;
-      padding: 20px;
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      min-height: 140px;
+      display:flex;
+      align-items:center;
+      gap:16px;
+      padding:22px;
+      min-height:144px;
+      border-radius:24px;
+      background:linear-gradient(135deg,#eef2ff,#ffffff);
+      border:1px solid #e7ebff;
     }
 
     .avatar-circle{
-      width: 78px;
-      height: 78px;
-      border-radius: 24px;
-      background: linear-gradient(135deg, var(--primary), #8b8fff);
-      box-shadow: 0 16px 30px rgba(79,70,229,.18);
-      flex-shrink: 0;
-      position: relative;
+      width:78px;
+      height:78px;
+      border-radius:24px;
+      background:linear-gradient(135deg,var(--primary),var(--primary-2));
+      position:relative;
+      flex-shrink:0;
+      box-shadow:0 18px 30px rgba(79,70,229,.18);
     }
 
     .avatar-circle::before,
     .avatar-circle::after{
-      content: "";
-      position: absolute;
-      background: rgba(255,255,255,.95);
-      border-radius: 999px;
+      content:"";
+      position:absolute;
+      background:#fff;
+      border-radius:999px;
     }
 
     .avatar-circle::before{
-      width: 11px;
-      height: 11px;
-      top: 24px;
-      left: 21px;
-      box-shadow: 24px 0 0 rgba(255,255,255,.95);
+      width:10px;
+      height:10px;
+      top:23px;
+      left:21px;
+      box-shadow:25px 0 0 #fff;
     }
 
     .avatar-circle::after{
-      width: 28px;
-      height: 8px;
-      bottom: 20px;
-      left: 25px;
+      width:28px;
+      height:7px;
+      left:25px;
+      bottom:20px;
     }
 
     .avatar-copy h3{
-      font-size: 1rem;
-      margin-bottom: 6px;
+      font-size:1rem;
+      margin-bottom:6px;
     }
 
     .avatar-copy p{
-      color: var(--muted);
-      font-size: .94rem;
-      max-width: 360px;
+      color:var(--muted);
+      font-size:.94rem;
+      max-width:420px;
     }
 
     .board{
-      background: #ffffff;
-      border: 1px solid #edf1f5;
-      border-radius: 24px;
-      padding: 20px;
-      min-height: 215px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      gap: 14px;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.7);
+      min-height:220px;
+      border-radius:24px;
+      border:1px solid #edf1f5;
+      background:#fff;
+      padding:22px;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      gap:14px;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.7);
     }
 
     .math-line{
-      height: 16px;
-      border-radius: 999px;
-      background: linear-gradient(90deg, rgba(79,70,229,.18), rgba(79,70,229,.06));
+      height:16px;
+      border-radius:999px;
+      background:linear-gradient(90deg, rgba(79,70,229,.18), rgba(79,70,229,.05));
     }
 
-    .math-line.sm{ width: 42%; }
-    .math-line.md{ width: 68%; }
-    .math-line.lg{ width: 84%; }
+    .math-line.lg{width:84%;}
+    .math-line.md{width:67%;}
+    .math-line.sm{width:44%;}
 
     .board-note{
-      font-size: .94rem;
-      color: var(--muted);
+      color:var(--muted);
+      font-size:.94rem;
     }
 
     .chat-area{
-      padding: 18px;
-      background: #fcfdff;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
+      padding:18px;
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+      background:#fcfdff;
     }
 
     .chat-bubble{
-      border-radius: 18px;
-      padding: 14px 16px;
-      font-size: .93rem;
-      max-width: 92%;
-      line-height: 1.45;
+      max-width:92%;
+      padding:14px 16px;
+      border-radius:18px;
+      font-size:.93rem;
+      line-height:1.45;
     }
 
     .bubble-user{
-      align-self: flex-end;
-      background: #f3f4f6;
-      color: #374151;
+      align-self:flex-end;
+      background:#f3f4f6;
+      color:#374151;
     }
 
     .bubble-ai{
-      align-self: flex-start;
-      background: var(--primary-soft);
-      color: #312e81;
+      align-self:flex-start;
+      background:var(--primary-soft);
+      color:#312e81;
     }
 
     .chat-input{
-      margin-top: auto;
-      border: 1px solid #e8edf3;
-      background: white;
-      border-radius: 18px;
-      padding: 12px 14px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      color: var(--muted);
-      font-size: .92rem;
+      margin-top:auto;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      padding:12px 14px;
+      border-radius:18px;
+      border:1px solid #e8edf3;
+      background:#fff;
+      color:var(--muted);
+      font-size:.92rem;
     }
 
-    .floating-tag{
-      position: absolute;
-      background: rgba(255,255,255,.92);
-      border: 1px solid rgba(229,231,235,.92);
-      box-shadow: var(--shadow);
-      border-radius: 18px;
-      padding: 14px 16px;
-      backdrop-filter: blur(10px);
+    .floating-card{
+      position:absolute;
+      z-index:3;
+      padding:14px 16px;
+      border-radius:18px;
+      border:1px solid rgba(229,231,235,.92);
+      background:rgba(255,255,255,.92);
+      box-shadow:var(--shadow-soft);
+      backdrop-filter:blur(10px);
+      text-align:left;
     }
 
-    .tag-top{
-      top: 24px;
-      right: -22px;
+    .floating-card strong{
+      display:block;
+      font-size:.92rem;
+      margin-bottom:4px;
     }
 
-    .tag-bottom{
-      bottom: 28px;
-      left: -26px;
+    .floating-card span{
+      color:var(--muted);
+      font-size:.84rem;
     }
 
-    .floating-tag strong{
-      display: block;
-      font-size: .93rem;
-      margin-bottom: 4px;
+    .float-1{
+      top:24px;
+      right:20px;
     }
 
-    .floating-tag span{
-      color: var(--muted);
-      font-size: .85rem;
+    .float-2{
+      left:20px;
+      bottom:24px;
     }
 
-    .how-grid,
-    .benefit-grid{
-      display: grid;
-      gap: 18px;
-      margin-top: 34px;
+    .section-head{
+      text-align:center;
+      max-width:760px;
+      margin:0 auto 34px;
+    }
+
+    .section-title{
+      font-family:"Sora",sans-serif;
+      font-size:clamp(2rem,4vw,3.1rem);
+      line-height:1.06;
+      letter-spacing:-.05em;
+      margin-bottom:14px;
+    }
+
+    .section-subtitle{
+      color:var(--muted);
+      font-size:1.02rem;
     }
 
     .how-grid{
-      grid-template-columns: repeat(3, 1fr);
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:20px;
     }
 
-    .benefit-grid{
-      grid-template-columns: repeat(4, 1fr);
+    .step-card{
+      position:relative;
+      padding:28px 24px 24px;
+      border-radius:28px;
+      background:linear-gradient(180deg, rgba(255,255,255,1), rgba(248,250,255,1));
+      border:1px solid rgba(229,231,235,.92);
+      box-shadow:var(--shadow-soft);
+      overflow:hidden;
+      transition:.25s ease;
     }
 
-    .card{
-      background: var(--card-strong);
-      border: 1px solid rgba(229,231,235,.9);
-      border-radius: var(--radius-lg);
-      box-shadow: var(--shadow-soft);
+    .step-card:hover,
+    .benefit-card:hover,
+    .feature-panel:hover{
+      transform:translateY(-4px);
+      box-shadow:0 18px 40px rgba(15,23,42,.08);
     }
 
-    .step-card,
-    .benefit-card{
-      padding: 24px;
+    .step-card::before{
+      content:"";
+      position:absolute;
+      inset:auto auto -70px -40px;
+      width:160px;
+      height:160px;
+      border-radius:50%;
+      background:rgba(79,70,229,.08);
+      filter:blur(2px);
     }
 
-    .step-number,
-    .icon-box{
-      width: 46px;
-      height: 46px;
-      border-radius: 14px;
-      display: grid;
-      place-items: center;
-      background: var(--primary-soft);
-      color: var(--primary);
-      font-weight: 800;
-      margin-bottom: 18px;
+    .step-top{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:18px;
+      position:relative;
+      z-index:2;
     }
 
-    .step-card h3,
-    .benefit-card h3{
-      font-size: 1.02rem;
-      margin-bottom: 8px;
+    .step-number{
+      width:48px;
+      height:48px;
+      border-radius:16px;
+      display:grid;
+      place-items:center;
+      background:linear-gradient(135deg,var(--primary-soft),#f5f3ff);
+      color:var(--primary);
+      font-weight:800;
+      font-size:1rem;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.8);
     }
 
-    .step-card p,
-    .benefit-card p{
-      color: var(--muted);
-      font-size: .95rem;
+    .step-tag{
+      padding:8px 11px;
+      border-radius:999px;
+      font-size:.78rem;
+      font-weight:700;
+      color:#4338ca;
+      background:#eef2ff;
+      border:1px solid #e0e7ff;
     }
 
-    .showcase-wrap{
-      margin-top: 38px;
-      padding: 22px;
-      border-radius: 34px;
-      background: linear-gradient(180deg, rgba(255,255,255,.88), rgba(255,255,255,.75));
-      border: 1px solid rgba(229,231,235,.9);
-      box-shadow: var(--shadow);
+    .step-card h3{
+      font-size:1.05rem;
+      margin-bottom:9px;
+      position:relative;
+      z-index:2;
     }
 
-    .showcase-grid{
-      display: grid;
-      grid-template-columns: 1fr .9fr;
-      gap: 18px;
+    .step-card p{
+      color:var(--muted);
+      font-size:.95rem;
+      position:relative;
+      z-index:2;
     }
 
-    .panel{
-      background: white;
-      border: 1px solid #edf1f5;
-      border-radius: 28px;
-      padding: 22px;
+    .feature-showcase{
+      margin-top:38px;
+      padding:22px;
+      border-radius:34px;
+      background:linear-gradient(180deg, rgba(255,255,255,.88), rgba(255,255,255,.74));
+      border:1px solid rgba(229,231,235,.92);
+      box-shadow:var(--shadow);
+    }
+
+    .feature-grid{
+      display:grid;
+      grid-template-columns:1fr .95fr;
+      gap:18px;
+    }
+
+    .feature-panel{
+      padding:24px;
+      border-radius:28px;
+      border:1px solid #edf1f5;
+      background:#fff;
+      transition:.25s ease;
     }
 
     .panel-title{
-      font-size: 1.02rem;
-      font-weight: 700;
-      margin-bottom: 14px;
+      font-size:1.04rem;
+      font-weight:700;
+      margin-bottom:16px;
     }
 
     .mini-list{
-      display: grid;
-      gap: 12px;
+      display:grid;
+      gap:12px;
     }
 
     .mini-item{
-      padding: 14px;
-      border-radius: 18px;
-      border: 1px solid #eef2f6;
-      background: #fbfcff;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+      padding:14px;
+      border-radius:18px;
+      background:linear-gradient(180deg,#fbfcff,#f8faff);
+      border:1px solid #edf1f5;
     }
 
     .mini-item strong{
-      display: block;
-      font-size: .95rem;
+      display:block;
+      font-size:.95rem;
+      margin-bottom:3px;
     }
 
     .mini-item span{
-      font-size: .85rem;
-      color: var(--muted);
+      font-size:.85rem;
+      color:var(--muted);
     }
 
     .pill{
-      padding: 7px 10px;
-      border-radius: 999px;
-      background: var(--success-soft);
-      color: var(--success-text);
-      font-size: .79rem;
-      font-weight: 700;
-      white-space: nowrap;
+      padding:7px 10px;
+      border-radius:999px;
+      background:var(--success-soft);
+      color:var(--success);
+      font-size:.78rem;
+      font-weight:800;
+      white-space:nowrap;
+    }
+
+    .benefit-grid{
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:18px;
+      margin-top:34px;
+    }
+
+    .benefit-card{
+      position:relative;
+      padding:24px;
+      border-radius:28px;
+      background:linear-gradient(180deg,#ffffff,#fbfcff);
+      border:1px solid rgba(229,231,235,.92);
+      box-shadow:var(--shadow-soft);
+      overflow:hidden;
+      transition:.25s ease;
+    }
+
+    .benefit-card::before{
+      content:"";
+      position:absolute;
+      top:-30px;
+      right:-30px;
+      width:100px;
+      height:100px;
+      border-radius:26px;
+      background:linear-gradient(135deg, rgba(79,70,229,.08), rgba(124,131,255,.03));
+      transform:rotate(20deg);
+    }
+
+    .icon-box{
+      width:50px;
+      height:50px;
+      border-radius:16px;
+      display:grid;
+      place-items:center;
+      background:linear-gradient(135deg,var(--primary-soft),#f5f3ff);
+      color:var(--primary);
+      font-size:1.05rem;
+      font-weight:800;
+      margin-bottom:16px;
+      position:relative;
+      z-index:2;
+    }
+
+    .benefit-card h3{
+      font-size:1.03rem;
+      margin-bottom:8px;
+      position:relative;
+      z-index:2;
+    }
+
+    .benefit-card p{
+      color:var(--muted);
+      font-size:.94rem;
+      position:relative;
+      z-index:2;
     }
 
     .cta-box{
-      margin-top: 42px;
-      padding: 34px;
-      border-radius: 34px;
-      background: linear-gradient(135deg, #ffffff, #f5f7ff);
-      border: 1px solid rgba(229,231,235,.92);
-      box-shadow: var(--shadow);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 24px;
-      flex-wrap: wrap;
+      margin-top:42px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      flex-wrap:wrap;
+      gap:22px;
+      padding:34px;
+      border-radius:34px;
+      background:
+        radial-gradient(circle at left top, rgba(79,70,229,.10), transparent 28%),
+        linear-gradient(135deg,#ffffff,#f6f7ff);
+      border:1px solid rgba(229,231,235,.92);
+      box-shadow:var(--shadow);
     }
 
     .cta-box h3{
-      font-family: "Sora", sans-serif;
-      font-size: clamp(1.5rem, 3vw, 2.2rem);
-      letter-spacing: -0.04em;
-      margin-bottom: 8px;
+      font-family:"Sora",sans-serif;
+      font-size:clamp(1.45rem, 3vw, 2.1rem);
+      line-height:1.08;
+      letter-spacing:-.04em;
+      margin-bottom:8px;
     }
 
     .cta-box p{
-      color: var(--muted);
-      max-width: 660px;
+      max-width:650px;
+      color:var(--muted);
     }
 
     .site-footer{
-      padding: 28px 0 44px;
-      color: var(--muted);
-      font-size: .93rem;
+      padding:28px 0 42px;
+      color:var(--muted);
+      font-size:.92rem;
     }
 
     .footer-row{
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      border-top: 1px solid rgba(229,231,235,.8);
-      padding-top: 22px;
-      flex-wrap: wrap;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:14px;
+      flex-wrap:wrap;
+      padding-top:22px;
+      border-top:1px solid rgba(229,231,235,.85);
     }
 
     @media (max-width: 1080px){
-      .hero-grid,
-      .showcase-grid,
-      .screen-body{
-        grid-template-columns: 1fr;
-      }
-
-      .benefit-grid{
-        grid-template-columns: repeat(2, 1fr);
-      }
-
+      .screen-body,
+      .feature-grid,
+      .benefit-grid,
       .how-grid{
-        grid-template-columns: 1fr;
+        grid-template-columns:1fr;
       }
 
-      .tag-top,
-      .tag-bottom{
-        position: static;
-        margin-top: 14px;
+      .float-1,
+      .float-2{
+        position:static;
+        margin-top:14px;
       }
     }
 
     @media (max-width: 760px){
       .nav-links{
-        display: none;
+        display:none;
       }
 
       .hero{
-        padding-top: 40px;
+        padding-top:46px;
       }
 
       .section{
-        padding: 72px 0;
-      }
-
-      .hero-title{
-        font-size: clamp(2.3rem, 11vw, 3.3rem);
-      }
-
-      .benefit-grid{
-        grid-template-columns: 1fr;
+        padding:74px 0;
       }
 
       .hero-actions,
       .nav-actions{
-        width: 100%;
+        width:100%;
       }
 
       .hero-actions .btn,
       .nav-actions .btn{
-        flex: 1;
+        flex:1;
+      }
+
+      .hero-title{
+        font-size:clamp(2.4rem, 12vw, 4rem);
       }
 
       .avatar-panel{
-        flex-direction: column;
-        align-items: flex-start;
-      }
-
-      .cta-box{
-        padding: 26px 20px;
+        flex-direction:column;
+        align-items:flex-start;
       }
     }
 
     @media (max-width: 540px){
       .container{
-        width: min(var(--container), calc(100% - 20px));
+        width:min(var(--container), calc(100% - 20px));
       }
 
       .nav{
-        min-height: 72px;
+        min-height:72px;
       }
 
       .btn{
-        padding: 13px 16px;
-        font-size: .95rem;
+        padding:13px 16px;
       }
 
-      .hero-card{
-        padding: 12px;
-        border-radius: 26px;
+      .hero-mockup-shell{
+        padding:12px;
+        border-radius:28px;
       }
 
       .screen{
-        border-radius: 22px;
-      }
-
-      .panel,
-      .step-card,
-      .benefit-card{
-        padding: 18px;
-      }
-
-      .screen-top{
-        padding: 12px;
+        border-radius:22px;
       }
 
       .board-area,
-      .chat-area{
-        padding: 14px;
+      .chat-area,
+      .feature-panel,
+      .step-card,
+      .benefit-card{
+        padding:18px;
+      }
+
+      .cta-box{
+        padding:26px 20px;
       }
     }
   </style>
@@ -779,13 +867,13 @@
     <div class="container">
       <nav class="nav">
         <a href="#" class="brand">
-          <div class="brand-mark">E</div>
-          <span>EduAvatar</span>
+          <div class="brand-mark">L</div>
+          <span>Lumora</span>
         </a>
 
         <div class="nav-links">
           <a href="#como-funciona">Cómo funciona</a>
-          <a href="#demo">Demo</a>
+          <a href="#demo">Plataforma</a>
           <a href="#beneficios">Beneficios</a>
         </div>
 
@@ -800,92 +888,87 @@
   <main>
     <section class="hero">
       <div class="container">
-        <div class="hero-grid">
-          <div>
-            <div class="eyebrow">
-              <span class="eyebrow-dot"></span>
-              Clases instantáneas con profesor-avatar de IA
-            </div>
-
-            <h1 class="hero-title">
-              Tu clase con IA, <span>en el momento</span> que la necesites
-            </h1>
-
-            <p class="hero-desc">
-              Elegí la materia, definí el tema y generá una clase en segundos.
-              Aprendé con un avatar que explica paso a paso, sin horarios fijos y con una experiencia clara, visual y personalizada.
-            </p>
-
-            <div class="hero-actions">
-              <a href="#" class="btn btn-primary">Empezar ahora</a>
-              <a href="#demo" class="btn btn-secondary">Ver cómo funciona</a>
-            </div>
-
-            <div class="hero-points">
-              <div class="chip"><span class="chip-dot"></span> Sin horarios fijos</div>
-              <div class="chip"><span class="chip-dot"></span> Código de clase al instante</div>
-              <div class="chip"><span class="chip-dot"></span> Explicación visual paso a paso</div>
-            </div>
+        <div class="hero-wrap">
+          <div class="eyebrow">
+            <span class="eyebrow-dot"></span>
+            Clases instantáneas con profesor-avatar de IA
           </div>
 
-          <div class="hero-visual">
-            <div class="hero-card">
-              <div class="screen">
-                <div class="screen-top">
-                  <div class="dots">
-                    <span></span><span></span><span></span>
+          <h1 class="hero-title">
+            Aprendé con una clase creada <span>en el momento</span>, sin horarios fijos
+          </h1>
+
+          <p class="hero-desc">
+            Elegí la materia, definí el tema y generá una clase en segundos. Lumora te conecta con una experiencia clara, visual y personalizada para aprender justo cuando lo necesitás.
+          </p>
+
+          <div class="hero-actions">
+            <a href="#" class="btn btn-primary">Empezar ahora</a>
+            <a href="#como-funciona" class="btn btn-secondary">Ver cómo funciona</a>
+          </div>
+
+          <div class="hero-points">
+            <div class="chip"><span class="chip-dot"></span> Sin reservas previas</div>
+            <div class="chip"><span class="chip-dot"></span> Código de clase al instante</div>
+            <div class="chip"><span class="chip-dot"></span> Explicación visual paso a paso</div>
+          </div>
+
+          <div class="hero-mockup-shell">
+            <div class="screen">
+              <div class="screen-top">
+                <div class="dots">
+                  <span></span><span></span><span></span>
+                </div>
+                <div class="class-badge">Código: MAT-4821</div>
+              </div>
+
+              <div class="screen-body">
+                <div class="board-area">
+                  <div class="avatar-panel">
+                    <div class="avatar-circle"></div>
+                    <div class="avatar-copy">
+                      <h3>Profesor-avatar activo</h3>
+                      <p>“Vamos a resolver ecuaciones paso a paso. Primero aislamos la variable y después verificamos el resultado.”</p>
+                    </div>
                   </div>
-                  <div class="class-badge">Código: MAT-4821</div>
+
+                  <div class="board">
+                    <div class="math-line lg"></div>
+                    <div class="math-line md"></div>
+                    <div class="math-line sm"></div>
+                    <p class="board-note">La pizarra acompaña cada explicación con una secuencia clara y visual.</p>
+                  </div>
                 </div>
 
-                <div class="screen-body">
-                  <div class="board-area">
-                    <div class="avatar-panel">
-                      <div class="avatar-circle"></div>
-                      <div class="avatar-copy">
-                        <h3>Profesor-avatar activo</h3>
-                        <p>
-                          “Vamos a resolver ecuaciones paso a paso. Primero aislamos la variable y después verificamos el resultado.”
-                        </p>
-                      </div>
-                    </div>
-
-                    <div class="board">
-                      <div class="math-line lg"></div>
-                      <div class="math-line md"></div>
-                      <div class="math-line sm"></div>
-                      <p class="board-note">La pizarra acompaña cada explicación con una secuencia simple y visual.</p>
-                    </div>
+                <div class="chat-area">
+                  <div class="chat-bubble bubble-user">
+                    No entiendo cómo pasar el 3 al otro lado.
                   </div>
 
-                  <div class="chat-area">
-                    <div class="chat-bubble bubble-user">
-                      No entiendo cómo pasar el 3 al otro lado.
-                    </div>
-                    <div class="chat-bubble bubble-ai">
-                      Cuando cambia de lado, cambia el signo. Te lo muestro en el siguiente paso para que quede claro.
-                    </div>
-                    <div class="chat-bubble bubble-user">
-                      Ahí sí, seguí.
-                    </div>
+                  <div class="chat-bubble bubble-ai">
+                    Cuando cambia de lado, cambia el signo. Te lo muestro en el siguiente paso para que quede claro.
+                  </div>
 
-                    <div class="chat-input">
-                      <span>Escribí tu duda...</span>
-                      <strong>Enviar</strong>
-                    </div>
+                  <div class="chat-bubble bubble-user">
+                    Ahí sí, seguí.
+                  </div>
+
+                  <div class="chat-input">
+                    <span>Escribí tu duda...</span>
+                    <strong>Enviar</strong>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div class="floating-tag tag-top">
+            <div class="floating-card float-1">
               <strong>Clase generada en segundos</strong>
               <span>Elegís materia, tema y entrás al instante.</span>
             </div>
 
-            <div class="floating-tag tag-bottom">
-              <strong>Aprendé cuando lo necesites</strong>
-              <span>Sin reservas ni horarios prearmados.</span>
+            <div class="floating-card float-2">
+              <strong>Más libertad para estudiar</strong>
+              <span>Aprendé cuando lo necesites, sin depender de horarios.</span>
             </div>
           </div>
         </div>
@@ -894,32 +977,43 @@
 
     <section class="section" id="como-funciona">
       <div class="container">
-        <div class="eyebrow">
-          <span class="eyebrow-dot"></span>
-          Cómo funciona
+        <div class="section-head">
+          <div class="eyebrow">
+            <span class="eyebrow-dot"></span>
+            Cómo funciona
+          </div>
+          <h2 class="section-title">Una experiencia simple, clara y con más presencia visual</h2>
+          <p class="section-subtitle">
+            Todo está pensado para que el alumno entre, genere su clase y empiece a entender el tema sin fricción.
+          </p>
         </div>
-        <h2 class="section-title">Una experiencia simple, inmediata y enfocada en aprender</h2>
-        <p class="section-subtitle">
-          Todo está pensado para que el alumno no pierda tiempo. Entra, crea su clase y empieza a entender el tema sin depender de horarios fijos.
-        </p>
 
         <div class="how-grid">
-          <article class="card step-card">
-            <div class="step-number">1</div>
-            <h3>Elegí la materia</h3>
-            <p>Seleccioná qué querés estudiar y marcá el tema exacto que necesitás reforzar.</p>
+          <article class="step-card">
+            <div class="step-top">
+              <div class="step-number">1</div>
+              <div class="step-tag">Elegí</div>
+            </div>
+            <h3>Seleccioná la materia</h3>
+            <p>Elegís qué querés estudiar y marcás el tema puntual que necesitás reforzar en ese momento.</p>
           </article>
 
-          <article class="card step-card">
-            <div class="step-number">2</div>
-            <h3>Creá tu clase</h3>
-            <p>La plataforma genera una sala en el momento y te muestra un código listo para ingresar.</p>
+          <article class="step-card">
+            <div class="step-top">
+              <div class="step-number">2</div>
+              <div class="step-tag">Creá</div>
+            </div>
+            <h3>Generá tu clase</h3>
+            <p>La plataforma arma una sala al instante, crea el código y deja todo listo para ingresar.</p>
           </article>
 
-          <article class="card step-card">
-            <div class="step-number">3</div>
-            <h3>Entrá y aprendé</h3>
-            <p>El avatar explica con apoyo visual, responde dudas y acompaña el proceso paso a paso.</p>
+          <article class="step-card">
+            <div class="step-top">
+              <div class="step-number">3</div>
+              <div class="step-tag">Aprendé</div>
+            </div>
+            <h3>Entrá y resolvé</h3>
+            <p>El avatar explica paso a paso, responde dudas y acompaña la clase con apoyo visual.</p>
           </article>
         </div>
       </div>
@@ -927,19 +1021,21 @@
 
     <section class="section" id="demo">
       <div class="container">
-        <div class="eyebrow">
-          <span class="eyebrow-dot"></span>
-          Vista de la plataforma
+        <div class="section-head">
+          <div class="eyebrow">
+            <span class="eyebrow-dot"></span>
+            Plataforma
+          </div>
+          <h2 class="section-title">Diseñada para que aprender se sienta claro</h2>
+          <p class="section-subtitle">
+            Una interfaz limpia, ordenada y visual. Cada parte de la experiencia está pensada para que el foco esté en entender.
+          </p>
         </div>
-        <h2 class="section-title">Diseñada para que aprender se sienta claro</h2>
-        <p class="section-subtitle">
-          Una interfaz limpia, ordenada y visual. El alumno siempre sabe dónde está, qué está viendo y cuál es el siguiente paso.
-        </p>
 
-        <div class="showcase-wrap">
-          <div class="showcase-grid">
-            <div class="panel">
-              <div class="panel-title">Sala de clase</div>
+        <div class="feature-showcase">
+          <div class="feature-grid">
+            <div class="feature-panel">
+              <div class="panel-title">Dentro de la clase</div>
               <div class="mini-list">
                 <div class="mini-item">
                   <div>
@@ -948,24 +1044,26 @@
                   </div>
                   <span class="pill">Activo</span>
                 </div>
+
                 <div class="mini-item">
                   <div>
                     <strong>Pizarra visual</strong>
-                    <span>Resolución clara de ejercicios y temas</span>
+                    <span>Resolución clara de ejercicios y temas complejos</span>
                   </div>
                   <span class="pill">Visual</span>
                 </div>
+
                 <div class="mini-item">
                   <div>
                     <strong>Chat y preguntas</strong>
-                    <span>El alumno puede interrumpir, preguntar o subir ejercicios</span>
+                    <span>El alumno puede interrumpir, escribir o subir ejercicios</span>
                   </div>
                   <span class="pill">Flexible</span>
                 </div>
               </div>
             </div>
 
-            <div class="panel">
+            <div class="feature-panel">
               <div class="panel-title">Ventaja principal</div>
               <div class="mini-list">
                 <div class="mini-item">
@@ -974,16 +1072,18 @@
                     <span>Estudiá cuando realmente lo necesites</span>
                   </div>
                 </div>
+
                 <div class="mini-item">
                   <div>
                     <strong>Clase creada en el momento</strong>
                     <span>No depende de coordinación previa ni reservas</span>
                   </div>
                 </div>
+
                 <div class="mini-item">
                   <div>
                     <strong>Experiencia personalizada</strong>
-                    <span>La explicación se adapta al tema y a la duda puntual</span>
+                    <span>La clase se adapta al tema y a la duda puntual del alumno</span>
                   </div>
                 </div>
               </div>
@@ -995,47 +1095,48 @@
 
     <section class="section" id="beneficios">
       <div class="container">
-        <div class="eyebrow">
-          <span class="eyebrow-dot"></span>
-          Beneficios
+        <div class="section-head">
+          <div class="eyebrow">
+            <span class="eyebrow-dot"></span>
+            Beneficios
+          </div>
+          <h2 class="section-title">Una plataforma hecha para el momento real de estudio</h2>
+          <p class="section-subtitle">
+            No se trata solo de hablar con una IA, sino de entrar a una clase útil, clara e inmediata cuando aparece la necesidad.
+          </p>
         </div>
-        <h2 class="section-title">Una plataforma educativa pensada para el momento real de estudio</h2>
-        <p class="section-subtitle">
-          No se trata solo de hablar con una IA, sino de entrar a una clase clara, inmediata y útil cuando aparece la necesidad.
-        </p>
 
         <div class="benefit-grid">
-          <article class="card benefit-card">
+          <article class="benefit-card">
             <div class="icon-box">⌁</div>
             <h3>Disponibilidad inmediata</h3>
             <p>El alumno puede empezar en el momento, sin depender de agendas externas.</p>
           </article>
 
-          <article class="card benefit-card">
+          <article class="benefit-card">
             <div class="icon-box">◎</div>
             <h3>Explicación visual</h3>
-            <p>La pizarra y la estructura de clase ayudan a entender mejor los temas complejos.</p>
+            <p>La pizarra y la estructura de clase ayudan a entender mejor los temas difíciles.</p>
           </article>
 
-          <article class="card benefit-card">
+          <article class="benefit-card">
             <div class="icon-box">◌</div>
             <h3>Experiencia ordenada</h3>
-            <p>Todo está diseñado para que el foco esté en aprender, no en perderse dentro de la app.</p>
+            <p>Todo está diseñado para que el foco esté en aprender y no en perderse dentro de la plataforma.</p>
           </article>
 
-          <article class="card benefit-card">
+          <article class="benefit-card">
             <div class="icon-box">✦</div>
             <h3>Más libertad</h3>
-            <p>Si un día no estudiás, no pasa nada. La clase se crea cuando vos la necesitás.</p>
+            <p>Si un día no estudiás, no pasa nada. La clase se crea solamente cuando vos la necesitás.</p>
           </article>
         </div>
 
         <div class="cta-box">
           <div>
-            <h3>Empezá a construir una nueva forma de aprender</h3>
+            <h3>Una nueva forma de aprender, más simple y más flexible</h3>
             <p>
-              Una experiencia educativa minimalista, premium y disponible al instante.
-              Menos fricción, más claridad y una clase lista cuando el alumno la necesita.
+              Menos fricción, más claridad y una clase lista justo en el momento en que el alumno la necesita.
             </p>
           </div>
 
@@ -1048,7 +1149,7 @@
   <footer class="site-footer">
     <div class="container">
       <div class="footer-row">
-        <span>© 2026 EduAvatar. Plataforma de clases instantáneas con IA.</span>
+        <span>© 2026 Lumora. Clases instantáneas con IA.</span>
         <span>Diseño minimalista premium</span>
       </div>
     </div>
@@ -1057,9 +1158,9 @@
   <script>
     document.querySelectorAll('a[href^="#"]').forEach(link => {
       link.addEventListener("click", e => {
-        const targetId = link.getAttribute("href");
-        const target = document.querySelector(targetId);
-        if(target){
+        const id = link.getAttribute("href");
+        const target = document.querySelector(id);
+        if (target) {
           e.preventDefault();
           target.scrollIntoView({ behavior: "smooth", block: "start" });
         }
