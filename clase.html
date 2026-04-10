@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Eduvia | Clase</title>
+  <style>
+    body{
+      font-family: Arial, sans-serif;
+      background:#f5f7ff;
+      margin:0;
+      padding:40px 20px;
+      color:#111827;
+    }
+
+    .card{
+      max-width:800px;
+      margin:0 auto;
+      background:#fff;
+      border-radius:20px;
+      padding:30px;
+      box-shadow:0 10px 30px rgba(0,0,0,.08);
+    }
+
+    h1{
+      margin-top:0;
+      font-size:2rem;
+    }
+
+    .dato{
+      margin:14px 0;
+      font-size:1.05rem;
+    }
+
+    .label{
+      font-weight:700;
+    }
+
+    .loading{
+      text-align:center;
+      font-size:1.1rem;
+      color:#6b7280;
+    }
+
+    .actions{
+      margin-top:30px;
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+
+    .btn{
+      display:inline-block;
+      padding:12px 18px;
+      border-radius:12px;
+      text-decoration:none;
+      background:#6a5cff;
+      color:white;
+      font-weight:700;
+    }
+
+    .btn.secondary{
+      background:#e5e7eb;
+      color:#111827;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div id="loading" class="loading">Cargando clase...</div>
+
+    <div id="contenido" style="display:none;">
+      <h1 id="titulo-clase">Clase</h1>
+
+      <div class="dato">
+        <span class="label">Materia:</span>
+        <span id="materia"></span>
+      </div>
+
+      <div class="dato">
+        <span class="label">Tema:</span>
+        <span id="tema"></span>
+      </div>
+
+      <div class="dato">
+        <span class="label">Nivel:</span>
+        <span id="nivel"></span>
+      </div>
+
+      <div class="actions">
+        <a href="panel.html" class="btn secondary">Volver al panel</a>
+        <a href="#" class="btn">Empezar clase</a>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="clase.js"></script>
+</body>
+</html>
