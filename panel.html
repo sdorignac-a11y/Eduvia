@@ -148,6 +148,32 @@
       box-shadow:var(--shadow-soft);
     }
 
+    .menu button{
+  width:100%;
+  border:none;
+  background:transparent;
+  text-align:left;
+  color:#4b425a;
+  padding:13px 14px;
+  border-radius:15px;
+  font-weight:700;
+  font-family:inherit;
+  font-size:1rem;
+  cursor:pointer;
+  transition:.2s ease;
+}
+
+.menu button:hover{
+  background:#f7efff;
+  color:#6b5ee8;
+  transform:translateX(4px);
+}
+
+.menu button:focus{
+  outline:none;
+  box-shadow:0 0 0 4px rgba(124,108,242,.08);
+}
+
     .sidebar-note{
       margin-top:auto;
       background:linear-gradient(180deg, #fff1ad, #ffe291);
@@ -836,15 +862,15 @@
         </div>
       </div>
 
-      <nav class="menu">
-        <a href="#" class="active">Inicio</a>
-        <a href="crear-clase.html">Crear nueva clase</a>
-        <a href="#guia">Cómo funciona</a>
-        <a href="#">Mis clases</a>
-        <a href="#">Historial</a>
-        <a href="#">Ajustes</a>
-        <button id="logout">Cerrar sesión</button>
-      </nav>
+   <nav class="menu">
+  <a href="#" class="active">Inicio</a>
+  <a href="crear-clase.html">Crear nueva clase</a>
+  <a href="#guia">Cómo funciona</a>
+  <a href="#">Mis clases</a>
+  <a href="#">Historial</a>
+  <a href="#">Ajustes</a>
+  <button id="logout" type="button">Cerrar sesión</button>
+</nav>
 
       <div class="sidebar-note">
         <strong>Idea principal</strong>
