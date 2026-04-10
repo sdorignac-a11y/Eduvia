@@ -4,15 +4,8 @@ import { doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs
 
 const form = document.getElementById("register-form");
 
-console.log("register.js cargado");
-
-if (!form) {
-  console.error("No se encontró el formulario register-form");
-}
-
 form?.addEventListener("submit", async (e) => {
   e.preventDefault();
-  console.log("Submit de registro detectado");
 
   const nombre = document.getElementById("nombre")?.value.trim();
   const apellido = document.getElementById("apellido")?.value.trim();
@@ -20,8 +13,6 @@ form?.addEventListener("submit", async (e) => {
   const password = document.getElementById("password")?.value;
   const password2 = document.getElementById("password2")?.value;
   const terms = document.querySelector('.terms input[type="checkbox"]');
-
-  console.log({ nombre, apellido, email });
 
   if (!nombre || !apellido || !email || !password || !password2) {
     alert("Completá todos los campos.");
@@ -39,23 +30,31 @@ form?.addEventListener("submit", async (e) => {
   }
 
   try {
-    console.log("Intentando crear usuario en Auth...");
+    console.log("1. Creando usuario en Authentication...");
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
 
-    console.log("Usuario creado en Auth:", userCredential.user.uid);
+    console.log("2. Usuario creado en Auth:", user.uid);
 
-    await setDoc(doc(db, "users", userCredential.user.uid), {
-      nombre,
-      apellido,
-      email,
-      creadoEn: serverTimestamp()
-    });
+    try {
+      console.log("3. Guardando usuario en Firestore...");
+      await setDoc(doc(db, "users", user.uid), {
+        nombre,
+        apellido,
+        email,
+        creadoEn: serverTimestamp()
+      });
 
-    console.log("Usuario guardado en Firestore");
-    alert("Cuenta creada con éxito");
-    window.location.href = "panel.html";
-  } catch (error) {
-    console.error("ERROR COMPLETO:", error);
-    alert(`Error: ${error.code} | ${error.message}`);
+      console.log("4. Usuario guardado en Firestore");
+      alert("Cuenta creada con éxito");
+      window.location.href = "panel.html";
+    } catch (firestoreError) {
+      console.error("ERROR FIRESTORE:", firestoreError);
+      alert("El usuario se creó en Authentication, pero falló Firestore: " + firestoreError.message);
+    }
+
+  } catch (authError) {
+    console.error("ERROR AUTH:", authError);
+    alert("Falló Authentication: " + authError.message);
   }
 });
