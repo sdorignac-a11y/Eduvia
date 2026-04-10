@@ -8,7 +8,7 @@ const firebaseConfig = {
   projectId: "eduvia-97008",
   storageBucket: "eduvia-97008.firebasestorage.app",
   messagingSenderId: "1052924233848",
-  appId: "1:1052924233848:web:6fb822f7cb8143e442c58d"
+  appId: "1:1052924233848:web:d19b4177fc64890042c58d"
 };
 
 const app = initializeApp(firebaseConfig);
