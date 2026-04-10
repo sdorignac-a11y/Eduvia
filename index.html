@@ -345,7 +345,6 @@
 
     .hero-glow{
       position:absolute;
-      inset:auto;
       width:240px;
       height:240px;
       border-radius:50%;
@@ -577,7 +576,7 @@
     .grid-3{
       display:grid;
       grid-template-columns:repeat(3,1fr);
-      gap:16px;
+      gap:18px;
     }
 
     .grid-4{
@@ -602,20 +601,6 @@
       box-shadow:var(--shadow-md);
     }
 
-    .card-number{
-      width:36px;
-      height:36px;
-      border-radius:12px;
-      display:grid;
-      place-items:center;
-      font-size:.88rem;
-      font-weight:700;
-      color:var(--primary);
-      background:linear-gradient(135deg, var(--primary-soft), #f8f9ff);
-      border:1px solid #e1e6ff;
-      margin-bottom:14px;
-    }
-
     .card h3{
       font-size:.98rem;
       font-weight:700;
@@ -626,6 +611,102 @@
     .card p{
       color:var(--muted);
       font-size:.92rem;
+    }
+
+    .explain-card{
+      position:relative;
+      overflow:hidden;
+      background:
+        linear-gradient(rgba(91,97,246,.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(91,97,246,.035) 1px, transparent 1px),
+        linear-gradient(180deg, rgba(255,255,255,.94), rgba(252,253,255,.96));
+      background-size:26px 26px, 26px 26px, auto;
+      border:1px solid rgba(231,235,243,.95);
+      border-radius:28px;
+      padding:22px;
+      box-shadow:var(--shadow-sm);
+      transition:var(--transition);
+      backdrop-filter:blur(10px);
+    }
+
+    .explain-card::before{
+      content:"";
+      position:absolute;
+      top:0;
+      left:22px;
+      width:64px;
+      height:3px;
+      border-radius:999px;
+      background:linear-gradient(90deg, var(--primary), var(--primary-2));
+    }
+
+    .explain-card::after{
+      content:"";
+      position:absolute;
+      right:-22px;
+      bottom:-22px;
+      width:110px;
+      height:110px;
+      border-radius:24px;
+      background:radial-gradient(circle, rgba(91,97,246,.10), transparent 70%);
+      pointer-events:none;
+    }
+
+    .explain-card:hover{
+      transform:translateY(-6px);
+      border-color:#dbe1ef;
+      box-shadow:var(--shadow-md);
+    }
+
+    .explain-top{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:18px;
+      position:relative;
+      z-index:1;
+    }
+
+    .explain-number{
+      width:44px;
+      height:44px;
+      border-radius:14px;
+      display:grid;
+      place-items:center;
+      font-size:.95rem;
+      font-weight:700;
+      color:var(--primary);
+      background:linear-gradient(135deg, #eef0ff, #f8f9ff);
+      border:1px solid #dfe5ff;
+      box-shadow:0 8px 20px rgba(91,97,246,.10);
+    }
+
+    .explain-badge{
+      padding:8px 11px;
+      border-radius:999px;
+      font-size:.78rem;
+      font-weight:600;
+      color:#4f46e5;
+      background:rgba(255,255,255,.75);
+      border:1px solid #e1e6ff;
+    }
+
+    .explain-card h3{
+      font-size:1rem;
+      font-weight:700;
+      margin-bottom:8px;
+      letter-spacing:-.02em;
+      position:relative;
+      z-index:1;
+    }
+
+    .explain-card p{
+      color:var(--muted);
+      font-size:.93rem;
+      line-height:1.55;
+      position:relative;
+      z-index:1;
     }
 
     .platform-panel{
@@ -780,7 +861,8 @@
       .class-panel,
       .chat-panel,
       .card,
-      .mini-box{
+      .mini-box,
+      .explain-card{
         padding:16px;
       }
 
@@ -891,22 +973,37 @@
         </div>
 
         <div class="grid-3">
-          <article class="card reveal">
-            <div class="card-number">1</div>
+          <article class="explain-card reveal">
+            <div class="explain-top">
+              <div class="explain-number">1</div>
+              <div class="explain-badge">Materia</div>
+            </div>
             <h3>Elegí la materia</h3>
-            <p>Seleccionás qué querés estudiar y marcás el tema puntual que necesitás ver.</p>
+            <p>
+              Seleccionás qué querés estudiar y marcás el tema puntual que necesitás ver en ese momento.
+            </p>
           </article>
 
-          <article class="card reveal">
-            <div class="card-number">2</div>
+          <article class="explain-card reveal">
+            <div class="explain-top">
+              <div class="explain-number">2</div>
+              <div class="explain-badge">Clase</div>
+            </div>
             <h3>Creá la clase</h3>
-            <p>La plataforma genera una sala en el momento y muestra un código para ingresar.</p>
+            <p>
+              La plataforma genera una sala al instante y te muestra un código listo para ingresar.
+            </p>
           </article>
 
-          <article class="card reveal">
-            <div class="card-number">3</div>
+          <article class="explain-card reveal">
+            <div class="explain-top">
+              <div class="explain-number">3</div>
+              <div class="explain-badge">Explicación</div>
+            </div>
             <h3>Entrá y aprendé</h3>
-            <p>El avatar explica con voz, pizarra y respuestas en tiempo real.</p>
+            <p>
+              El avatar explica con voz, pizarra y respuestas en tiempo real para acompañar cada paso.
+            </p>
           </article>
         </div>
       </div>
