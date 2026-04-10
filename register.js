@@ -87,3 +87,74 @@ form?.addEventListener("submit", async (e) => {
     }
   }
 });
+
+import { auth, db } from "./firebase.js";
+import {
+  GoogleAuthProvider,
+  signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {
+  doc,
+  setDoc,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const googleBtn = document.getElementById("google-register-btn");
+const provider = new GoogleAuthProvider();
+
+function esMobile() {
+  return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+}
+
+async function guardarUsuarioEnFirestore(user) {
+  await setDoc(
+    doc(db, "users", user.uid),
+    {
+      uid: user.uid,
+      nombre: user.displayName || "",
+      email: user.email || "",
+      foto: user.photoURL || "",
+      provider: "google",
+      creadoEn: serverTimestamp()
+    },
+    { merge: true }
+  );
+}
+
+googleBtn?.addEventListener("click", async () => {
+  try {
+    googleBtn.disabled = true;
+    googleBtn.textContent = "Entrando con Google...";
+
+    if (esMobile()) {
+      await signInWithRedirect(auth, provider);
+      return;
+    }
+
+    const result = await signInWithPopup(auth, provider);
+    await guardarUsuarioEnFirestore(result.user);
+    window.location.href = "panel.html";
+  } catch (error) {
+    console.error("ERROR GOOGLE:", error);
+    alert("Error con Google: " + error.message);
+    googleBtn.disabled = false;
+    googleBtn.textContent = "Continuar con Google";
+  }
+});
+
+getRedirectResult(auth)
+  .then(async (result) => {
+    if (!result?.user) return;
+    await guardarUsuarioEnFirestore(result.user);
+    window.location.href = "panel.html";
+  })
+  .catch((error) => {
+    console.error("ERROR REDIRECT:", error);
+    alert("Error con Google Redirect: " + error.message);
+    if (googleBtn) {
+      googleBtn.disabled = false;
+      googleBtn.textContent = "Continuar con Google";
+    }
+  });
