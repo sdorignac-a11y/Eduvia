@@ -3,6 +3,7 @@ import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/f
 import { collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const form = document.getElementById("clase-form");
+
 let currentUser = null;
 
 onAuthStateChanged(auth, (user) => {
@@ -21,8 +22,8 @@ form.addEventListener("submit", async (e) => {
     return;
   }
 
-  const materia = document.getElementById("materia").value.trim();
-  const tema = document.getElementById("tema").value.trim();
+  const materia = document.getElementById("materia").value;
+  const tema = document.getElementById("tema").value;
   const nivel = document.getElementById("nivel").value;
 
   try {
@@ -38,6 +39,7 @@ form.addEventListener("submit", async (e) => {
 
     console.log("Clase creada:", docRef.id);
     window.location.href = `clase.html?id=${docRef.id}`;
+
   } catch (error) {
     console.error(error);
     alert("Error al crear la clase: " + error.message);
@@ -50,6 +52,7 @@ const fileList = document.getElementById("file-list");
 if (archivoInput && fileList) {
   archivoInput.addEventListener("change", () => {
     fileList.innerHTML = "";
+
     const files = Array.from(archivoInput.files || []);
 
     files.forEach(file => {
