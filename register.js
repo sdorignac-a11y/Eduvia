@@ -1,7 +1,13 @@
-import { auth } from "./firebase.js";
+import { auth, db } from "./firebase.js";
 import {
   createUserWithEmailAndPassword
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+import {
+  doc,
+  setDoc,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const form = document.getElementById("register-form");
 
@@ -42,10 +48,21 @@ form?.addEventListener("submit", async (e) => {
       submitBtn.textContent = "Creando cuenta...";
     }
 
-    await createUserWithEmailAndPassword(auth, email, password);
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
+
+    await setDoc(doc(db, "usuarios", user.uid), {
+      uid: user.uid,
+      nombre,
+      apellido,
+      email,
+      creadoEn: serverTimestamp()
+    });
 
     localStorage.setItem("registroNombre", nombre);
     localStorage.setItem("registroApellido", apellido);
+
+    console.log("Usuario guardado en Firestore:", user.uid);
 
     window.location.href = "panel.html";
   } catch (error) {
