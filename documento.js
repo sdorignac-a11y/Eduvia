@@ -42,6 +42,7 @@ const claseIdFromUrl = params.get("id") || params.get("doc");
 const ownerUidFromUrl = params.get("owner");
 
 const SHARED_DOC_KEY = "eduvia_shared_doc_access";
+const SUPPORT_PANEL_ID = "document-support-panel";
 
 let currentUser = null;
 let currentClaseId = claseIdFromUrl || null;
@@ -144,12 +145,201 @@ function stripObjectivePrefix(value = "") {
     .trim();
 }
 
+function limpiarTexto(value = "") {
+  return String(value || "").trim();
+}
+
+function sanitizeUrl(value = "") {
+  try {
+    const url = new URL(String(value), window.location.origin);
+    if (url.protocol === "http:" || url.protocol === "https:") {
+      return url.href;
+    }
+    return "";
+  } catch {
+    return "";
+  }
+}
+
 function getDocumentoTitle(clase = {}) {
   return clase.tituloDocumento || clase.tema || "Documento sin título";
 }
 
 function getDocumentoObjective(clase = {}) {
   return clase.objetivoDocumento || clase.objetivo || "";
+}
+
+function getInvestigacionDocumento(clase = {}) {
+  return limpiarTexto(
+    clase.investigacion ||
+      clase.research ||
+      clase.baseInvestigada ||
+      clase.resumenInvestigacion ||
+      ""
+  );
+}
+
+function getFuentesDocumento(clase = {}) {
+  const raw =
+    clase.fuentes ||
+    clase.sources ||
+    clase.webSources ||
+    clase.fuentesUsadas ||
+    [];
+
+  if (!Array.isArray(raw)) return [];
+
+  const seen = new Set();
+
+  return raw
+    .map((item) => {
+      if (!item || typeof item !== "object") return null;
+
+      const title = limpiarTexto(item.title || item.titulo || item.name || "Fuente");
+      const url = sanitizeUrl(item.url || item.link || "");
+      const key = `${title}|${url}`;
+
+      if (!title && !url) return null;
+      if (seen.has(key)) return null;
+
+      seen.add(key);
+
+      return {
+        title: title || "Fuente",
+        url
+      };
+    })
+    .filter(Boolean)
+    .slice(0, 10);
+}
+
+function splitResearchParagraphs(text = "") {
+  const clean = limpiarTexto(text);
+  if (!clean) return [];
+
+  const blocks = clean
+    .split(/\n{2,}/)
+    .map((item) => item.trim())
+    .filter(Boolean);
+
+  if (blocks.length > 1) return blocks;
+
+  return clean
+    .split(/\.\s+(?=[A-ZÁÉÍÓÚÑ])/)
+    .map((item) => item.trim())
+    .filter(Boolean)
+    .reduce((acc, sentence, index) => {
+      const value = sentence.endsWith(".") ? sentence : `${sentence}.`;
+      const bucket = Math.floor(index / 2);
+
+      if (!acc[bucket]) acc[bucket] = value;
+      else acc[bucket] += ` ${value}`;
+
+      return acc;
+    }, [])
+    .filter(Boolean);
+}
+
+function ensureSupportPanel() {
+  if (!docContent || !docContent.parentNode) return null;
+
+  let panel = document.getElementById(SUPPORT_PANEL_ID);
+  if (panel) return panel;
+
+  panel = document.createElement("section");
+  panel.id = SUPPORT_PANEL_ID;
+  panel.setAttribute("contenteditable", "false");
+  panel.style.marginTop = "26px";
+  panel.style.padding = "18px";
+  panel.style.borderRadius = "22px";
+  panel.style.background = "linear-gradient(180deg, #f8fbff 0%, #f3f8ff 100%)";
+  panel.style.border = "1px solid rgba(53, 93, 149, .12)";
+  panel.style.boxShadow = "0 10px 28px rgba(0,0,0,.05)";
+  panel.style.display = "none";
+
+  docContent.parentNode.insertBefore(panel, docContent.nextSibling);
+  return panel;
+}
+
+function clearSupportPanel() {
+  const panel = document.getElementById(SUPPORT_PANEL_ID);
+  if (!panel) return;
+  panel.innerHTML = "";
+  panel.style.display = "none";
+}
+
+function renderSupportPanel(clase = {}) {
+  const panel = ensureSupportPanel();
+  if (!panel) return;
+
+  const investigacion = getInvestigacionDocumento(clase);
+  const fuentes = getFuentesDocumento(clase);
+  const paragraphs = splitResearchParagraphs(investigacion);
+
+  if (!paragraphs.length && !fuentes.length) {
+    clearSupportPanel();
+    return;
+  }
+
+  const researchHtml = paragraphs.length
+    ? `
+      <div style="margin-bottom:${fuentes.length ? "20px" : "0"};">
+        <div style="display:inline-flex;align-items:center;gap:8px;padding:7px 12px;border-radius:999px;background:#eaf3ff;color:#2d4f76;font-size:.82rem;font-weight:800;margin-bottom:12px;">
+          Base investigada por Eduvia
+        </div>
+        <h3 style="margin:0 0 10px;color:#2d4f76;font-size:1.08rem;font-weight:800;">Investigación previa</h3>
+        <div style="display:grid;gap:10px;">
+          ${paragraphs
+            .map(
+              (item) => `
+                <p style="margin:0;line-height:1.7;color:#30414f;font-size:.98rem;">
+                  ${escapeHtml(item)}
+                </p>
+              `
+            )
+            .join("")}
+        </div>
+      </div>
+    `
+    : "";
+
+  const fuentesHtml = fuentes.length
+    ? `
+      <div>
+        <h3 style="margin:0 0 10px;color:#2d4f76;font-size:1.08rem;font-weight:800;">Fuentes consultadas</h3>
+        <div style="display:grid;gap:10px;">
+          ${fuentes
+            .map((fuente, index) => {
+              const title = escapeHtml(fuente.title || `Fuente ${index + 1}`);
+              const safeUrl = sanitizeUrl(fuente.url || "");
+              const visibleUrl = safeUrl
+                ? escapeHtml(safeUrl.replace(/^https?:\/\//, ""))
+                : "URL no disponible";
+
+              return `
+                <article style="padding:12px 14px;border-radius:16px;background:#ffffff;border:1px solid rgba(53,93,149,.10);">
+                  <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:8px;">
+                    <strong style="color:#2d4f76;font-size:.95rem;line-height:1.4;">${title}</strong>
+                    <span style="flex-shrink:0;padding:4px 9px;border-radius:999px;background:#eef5ff;color:#355d95;font-size:.74rem;font-weight:800;">
+                      Fuente ${index + 1}
+                    </span>
+                  </div>
+                  ${
+                    safeUrl
+                      ? `<a href="${safeUrl}" target="_blank" rel="noopener noreferrer" style="color:#5e6c78;font-size:.86rem;line-height:1.45;text-decoration:none;word-break:break-word;">${visibleUrl}</a>`
+                      : `<span style="color:#5e6c78;font-size:.86rem;line-height:1.45;">${visibleUrl}</span>`
+                  }
+                </article>
+              `;
+            })
+            .join("")}
+        </div>
+      </div>
+    `
+    : "";
+
+  panel.innerHTML = researchHtml + fuentesHtml;
+  panel.style.display = "";
 }
 
 function setBasicMeta(clase = {}) {
@@ -178,6 +368,8 @@ function setBasicMeta(clase = {}) {
 }
 
 function renderError(message) {
+  clearSupportPanel();
+
   if (!docContent) return;
 
   docContent.innerHTML = `
@@ -202,6 +394,9 @@ function renderGeneratedStructure(clase = {}) {
   const objetivo = escapeHtml(
     getDocumentoObjective(clase) || "comprender mejor el contenido trabajado"
   );
+
+  const investigacion = getInvestigacionDocumento(clase);
+  const researchParagraphs = splitResearchParagraphs(investigacion);
 
   docContent.innerHTML = `
     <h2>Resumen</h2>
@@ -228,6 +423,18 @@ function renderGeneratedStructure(clase = {}) {
       Según la materia y el nivel, acá después pueden aparecer fórmulas, conceptos,
       definiciones, reglas, vocabulario, fechas importantes, procesos, ejemplos o análisis.
     </p>
+
+    ${
+      researchParagraphs.length
+        ? `
+          <h2>Base investigada</h2>
+          ${researchParagraphs
+            .slice(0, 3)
+            .map((item) => `<p>${escapeHtml(item)}</p>`)
+            .join("")}
+        `
+        : ""
+    }
 
     <h2>Puntos clave</h2>
     <ul>
@@ -371,11 +578,23 @@ function renderPlainTextDocumento(clase = {}) {
 function renderClase(clase = {}) {
   setBasicMeta(clase);
 
-  if (renderRichHtmlDocumento(clase)) return;
-  if (renderStructuredDocumento(clase)) return;
-  if (renderPlainTextDocumento(clase)) return;
+  if (renderRichHtmlDocumento(clase)) {
+    renderSupportPanel(clase);
+    return;
+  }
+
+  if (renderStructuredDocumento(clase)) {
+    renderSupportPanel(clase);
+    return;
+  }
+
+  if (renderPlainTextDocumento(clase)) {
+    renderSupportPanel(clase);
+    return;
+  }
 
   renderGeneratedStructure(clase);
+  renderSupportPanel(clase);
 }
 
 function setEditableState(element, editable) {
@@ -471,374 +690,4 @@ function getCurrentDocumentPayload() {
   const titulo = docTitle?.textContent?.trim() || "Documento sin título";
   const objetivoRaw = docObjective?.textContent?.trim() || "";
   const objetivo = stripObjectivePrefix(objetivoRaw);
-  const contenidoHtml = docContent?.innerHTML || "";
-
-  return {
-    tituloDocumento: titulo,
-    objetivoDocumento: objetivo,
-    contenidoHtml,
-    ultimoEditorUid: currentUser?.uid || "",
-    ultimoEditorEmail: normalizeEmail(currentUser?.email || ""),
-    updatedAt: serverTimestamp()
-  };
-}
-
-function scheduleSave() {
-  if (!currentClaseRef || !canEdit()) return;
-
-  clearTimeout(saveTimer);
-  saveTimer = setTimeout(() => {
-    saveDocumentEdits();
-  }, 700);
-}
-
-async function saveDocumentEdits(force = false) {
-  if (!currentClaseRef || !canEdit()) return;
-  if (saveInFlight && !force) return;
-
-  saveInFlight = true;
-
-  try {
-    const payload = getCurrentDocumentPayload();
-
-    await updateDoc(currentClaseRef, payload);
-
-    currentClaseData = {
-      ...(currentClaseData || {}),
-      ...payload,
-      updatedAt: new Date().toISOString()
-    };
-
-    writeClaseToLocalStorage(currentClaseData, currentOwnerUid, currentClaseId);
-  } catch (error) {
-    console.error("Error guardando documento:", error);
-
-    try {
-      const payload = getCurrentDocumentPayload();
-      await setDoc(currentClaseRef, payload, { merge: true });
-
-      currentClaseData = {
-        ...(currentClaseData || {}),
-        ...payload,
-        updatedAt: new Date().toISOString()
-      };
-
-      writeClaseToLocalStorage(currentClaseData, currentOwnerUid, currentClaseId);
-    } catch (secondError) {
-      console.error("Error secundario guardando documento:", secondError);
-    }
-  } finally {
-    saveInFlight = false;
-  }
-}
-
-function attachAutosaveListeners() {
-  const onInput = () => {
-    updateTopbarTitleFromEditor();
-    scheduleSave();
-  };
-
-  docTitle?.addEventListener("input", onInput);
-  docObjective?.addEventListener("input", onInput);
-  docContent?.addEventListener("input", onInput);
-
-  document.addEventListener("visibilitychange", () => {
-    if (document.hidden) {
-      clearTimeout(saveTimer);
-      saveDocumentEdits(true);
-    }
-  });
-}
-
-function getShareUrl() {
-  if (!currentClaseId || !currentOwnerUid) return window.location.href;
-
-  const url = new URL(window.location.href);
-  url.searchParams.set("id", currentClaseId);
-  url.searchParams.set("owner", currentOwnerUid);
-  return url.toString();
-}
-
-function replaceElementToClearOldListeners(id) {
-  const oldEl = document.getElementById(id);
-  if (!oldEl || !oldEl.parentNode) return oldEl;
-  const clone = oldEl.cloneNode(true);
-  oldEl.parentNode.replaceChild(clone, oldEl);
-  return clone;
-}
-
-function setupShareUi() {
-  if (!shareModal || shareUiInitialized) return;
-  shareUiInitialized = true;
-
-  const openShareBtn = replaceElementToClearOldListeners("open-share-btn");
-  const closeShareBtn = replaceElementToClearOldListeners("close-share-btn");
-  const copyLinkBtn = replaceElementToClearOldListeners("copy-link-btn");
-  const sendShareBtn = replaceElementToClearOldListeners("send-share-btn");
-
-  if (docLinkInput) {
-    docLinkInput.value = getShareUrl();
-  }
-
-  openShareBtn?.addEventListener("click", () => {
-    if (docLinkInput) docLinkInput.value = getShareUrl();
-    if (shareStatus) shareStatus.textContent = "";
-    shareModal.classList.add("show");
-  });
-
-  closeShareBtn?.addEventListener("click", () => {
-    shareModal.classList.remove("show");
-  });
-
-  shareModal.addEventListener("click", (e) => {
-    if (e.target === shareModal) {
-      shareModal.classList.remove("show");
-    }
-  });
-
-  copyLinkBtn?.addEventListener("click", async () => {
-    try {
-      const url = getShareUrl();
-      await navigator.clipboard.writeText(url);
-      if (docLinkInput) docLinkInput.value = url;
-      if (shareStatus) shareStatus.textContent = "Link copiado.";
-    } catch {
-      if (shareStatus) shareStatus.textContent = "No se pudo copiar el link.";
-    }
-  });
-
-  sendShareBtn?.addEventListener("click", async () => {
-    if (currentRole !== "owner") {
-      if (shareStatus) {
-        shareStatus.textContent = "Solo el dueño del documento puede compartirlo.";
-      }
-      return;
-    }
-
-    const email = normalizeEmail(shareEmailInput?.value || "");
-    const role = normalizeRole(shareRoleSelect?.value || "viewer");
-
-    if (!email) {
-      if (shareStatus) shareStatus.textContent = "Escribí un email válido.";
-      return;
-    }
-
-    if (!currentClaseRef || !currentClaseId || !currentOwnerUid) {
-      if (shareStatus) {
-        shareStatus.textContent = "Todavía no se pudo identificar este documento.";
-      }
-      return;
-    }
-
-    if (email === normalizeEmail(currentUser?.email || "")) {
-      if (shareStatus) {
-        shareStatus.textContent = "Ese email ya es el dueño del documento.";
-      }
-      return;
-    }
-
-    try {
-      const sharedUserKey = `sharedUsers.${emailToKey(email)}`;
-
-      const updates = {
-        sharedWithEmails: arrayUnion(email),
-        [sharedUserKey]: {
-          email,
-          role,
-          invitedBy: normalizeEmail(currentUser?.email || ""),
-          invitedAt: new Date().toISOString()
-        },
-        updatedAt: serverTimestamp()
-      };
-
-      if (role === "editor") {
-        updates.sharedEditorEmails = arrayUnion(email);
-        updates.sharedViewerEmails = arrayRemove(email);
-      } else {
-        updates.sharedViewerEmails = arrayUnion(email);
-        updates.sharedEditorEmails = arrayRemove(email);
-      }
-
-      await updateDoc(currentClaseRef, updates);
-
-      currentClaseData = {
-        ...(currentClaseData || {}),
-        sharedWithEmails: Array.isArray(currentClaseData?.sharedWithEmails)
-          ? Array.from(new Set([...currentClaseData.sharedWithEmails, email]))
-          : [email]
-      };
-
-      writeClaseToLocalStorage(currentClaseData, currentOwnerUid, currentClaseId);
-
-      const shareUrl = getShareUrl();
-      if (docLinkInput) docLinkInput.value = shareUrl;
-
-      const subject = encodeURIComponent("Te compartieron un documento de Eduvia");
-      const body = encodeURIComponent(
-        `Hola.\n\n` +
-          `Te compartieron este documento de Eduvia:\n` +
-          `${shareUrl}\n\n` +
-          `Permiso: ${role === "editor" ? "Puede editar" : "Solo ver"}\n\n` +
-          `Ese enlace te da acceso únicamente a este documento.`
-      );
-
-      const gmailUrl =
-        `https://mail.google.com/mail/?view=cm&fs=1` +
-        `&to=${encodeURIComponent(email)}` +
-        `&su=${subject}` +
-        `&body=${body}`;
-
-      window.open(gmailUrl, "_blank");
-
-      if (shareStatus) {
-        shareStatus.textContent = "Permiso guardado y Gmail abierto con la invitación.";
-      }
-
-      if (shareEmailInput) shareEmailInput.value = "";
-      if (shareRoleSelect) shareRoleSelect.value = "viewer";
-    } catch (error) {
-      console.error("Error compartiendo documento:", error);
-      if (shareStatus) {
-        shareStatus.textContent = "No se pudo compartir el documento.";
-      }
-    }
-  });
-}
-
-async function loadClase(user) {
-  const fallbackOwner = ownerUidFromUrl || user.uid;
-  const localClase = readClaseFromLocalStorage(fallbackOwner, claseIdFromUrl);
-
-  if (!currentClaseId && localClase?.id) {
-    currentClaseId = localClase.id;
-  }
-
-  if (!currentOwnerUid) {
-    currentOwnerUid = ownerUidFromUrl || localClase?.ownerUid || user.uid;
-  }
-
-  if (!currentClaseId) {
-    if (localClase) {
-      currentClaseData = localClase;
-      currentRole = currentOwnerUid === user.uid ? "owner" : "viewer";
-
-      if (currentRole === "owner") {
-        clearSharedDocSession();
-      } else {
-        setSharedDocSession(
-          currentRole,
-          user,
-          currentOwnerUid,
-          localClase.id || currentClaseId
-        );
-      }
-
-      if (currentClaseId && currentOwnerUid) {
-        currentClaseRef = doc(db, "usuarios", currentOwnerUid, "clases", currentClaseId);
-      }
-
-      renderClase(localClase);
-      applyRoleUi(currentRole);
-      showDocument();
-      setupShareUi();
-      return;
-    }
-
-    renderError("No se encontró el identificador de la clase.");
-    showDocument();
-    return;
-  }
-
-  try {
-    const claseRef = doc(db, "usuarios", currentOwnerUid, "clases", currentClaseId);
-    const claseSnap = await getDoc(claseRef);
-
-    if (!claseSnap.exists()) {
-      if (localClase) {
-        currentClaseData = localClase;
-        currentRole = currentOwnerUid === user.uid ? "owner" : "viewer";
-
-        if (currentRole === "owner") {
-          clearSharedDocSession();
-        } else {
-          setSharedDocSession(currentRole, user, currentOwnerUid, currentClaseId);
-        }
-
-        currentClaseRef = claseRef;
-        renderClase(localClase);
-        applyRoleUi(currentRole);
-        showDocument();
-        setupShareUi();
-        return;
-      }
-
-      renderError("La clase no existe o no se pudo encontrar en Firestore.");
-      showDocument();
-      return;
-    }
-
-    const claseData = {
-      id: claseSnap.id,
-      ownerUid: currentOwnerUid,
-      ...claseSnap.data()
-    };
-
-    const role = resolveUserRole(claseData, user, currentOwnerUid);
-
-    if (!role) {
-      showDenied();
-      return;
-    }
-
-    setSharedDocSession(role, user, currentOwnerUid, currentClaseId);
-
-    currentClaseRef = claseRef;
-    currentClaseData = claseData;
-    currentRole = role;
-
-    writeClaseToLocalStorage(claseData, currentOwnerUid, currentClaseId);
-    renderClase(claseData);
-    applyRoleUi(role);
-    showDocument();
-    setupShareUi();
-  } catch (error) {
-    console.error("Error al cargar la clase:", error);
-
-    if (localClase) {
-      currentClaseData = localClase;
-      currentRole = currentOwnerUid === user.uid ? "owner" : "viewer";
-
-      if (currentRole === "owner") {
-        clearSharedDocSession();
-      } else {
-        setSharedDocSession(currentRole, user, currentOwnerUid, currentClaseId);
-      }
-
-      if (currentClaseId && currentOwnerUid) {
-        currentClaseRef = doc(db, "usuarios", currentOwnerUid, "clases", currentClaseId);
-      }
-
-      renderClase(localClase);
-      applyRoleUi(currentRole);
-      showDocument();
-      setupShareUi();
-      return;
-    }
-
-    renderError(error.message || "Hubo un problema al cargar la clase.");
-    showDocument();
-  }
-}
-
-attachAutosaveListeners();
-
-onAuthStateChanged(auth, async (user) => {
-  if (!user) {
-    clearSharedDocSession();
-    window.location.href = "login.html";
-    return;
-  }
-
-  currentUser = user;
-  await loadClase(user);
-});
+  const contenidoHtml = doc
