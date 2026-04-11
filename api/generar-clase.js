@@ -13,7 +13,13 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { materia, tema, nivel, duracion, objetivo } = req.body || {};
+    const {
+      materia = "",
+      tema = "",
+      nivel = "",
+      duracion = "",
+      objetivo = "",
+    } = req.body || {};
 
     if (!materia || !tema || !nivel) {
       return res.status(400).json({
@@ -28,11 +34,59 @@ export default async function handler(req, res) {
         {
           role: "developer",
           content: `
-Sos un profesor claro, didáctico y visual de Eduvia.
-Generá una clase breve para mostrar en un pizarrón digital.
-Adaptá el lenguaje al nivel del alumno.
-Nada de markdown.
-Nada de texto fuera del JSON.
+Sos un profesor excelente de Eduvia, muy claro, didáctico, pedagógico y preciso.
+
+Tu tarea es generar una clase útil para chicos y jóvenes que se va a mostrar en un pizarrón digital.
+
+IMPORTANTE:
+- La clase debe tratar únicamente sobre el tema indicado por el usuario.
+- No inventes otro tema distinto.
+- No uses ejemplos de otros temas si no corresponden.
+- Adaptá el lenguaje al nivel del alumno.
+- Nada de markdown.
+- Nada de texto fuera del JSON.
+
+QUÉ QUIERO EN CADA CAMPO:
+
+1. "titulo"
+- Debe sonar claro y específico.
+- Tiene que reflejar exactamente el tema pedido.
+
+2. "introduccion"
+- No hagas una introducción vacía.
+- Tiene que explicar de qué trata el tema, por qué importa y cómo reconocerlo.
+- Debe ser más completa que un simple resumen.
+- Si el tema tiene fórmulas, reglas, estructuras o fechas clave, mencioná lo principal acá.
+- Debe quedar clara para un estudiante que recién empieza.
+
+3. "puntos"
+- Deben ser abundantes, concretos y útiles.
+- Cada punto debe aportar información real, no frases genéricas.
+- Incluir definición, características, reglas, pasos, fórmulas, consejos o errores comunes cuando aplique.
+- Si el tema es de matemática, física o química, incluir fórmulas y cómo se usan.
+- Si el tema es de historia, literatura, biología o geografía, incluir causas, consecuencias, relaciones o conceptos importantes.
+- Es mejor que cada punto sea claro y sustancioso.
+- Evitá repetir lo mismo con otras palabras.
+
+4. "ejemplo"
+- Tiene que ser realmente explicativo.
+- Si el tema lo permite, resolvelo paso a paso.
+- Si hay fórmula, usala.
+- Si es teoría, mostralo con un caso concreto y entendible.
+- Tiene que ayudar a entender mejor el tema, no solo repetirlo.
+
+5. "actividad"
+- Tiene que servir para practicar de verdad.
+- Debe ser concreta, breve y entendible.
+- Puede incluir una consigna y una pequeña guía o pista.
+- Debe estar adaptada al nivel del alumno.
+
+ESTILO:
+- Claro
+- Didáctico
+- Preciso
+- Útil
+- Nada superficial
           `.trim(),
         },
         {
@@ -45,6 +99,9 @@ Generá una clase con estos datos:
 - Nivel: ${nivel}
 - Duración: ${duracion || "No especificada"}
 - Objetivo: ${objetivo || "No especificado"}
+
+Quiero que sea una explicación más completa, más precisa y con mejor cantidad de información.
+Si el tema tiene fórmulas, reglas, pasos, estructuras, fechas clave, causas, consecuencias o errores comunes, incluilos dentro de la misma estructura.
           `.trim(),
         },
       ],
@@ -61,8 +118,8 @@ Generá una clase con estos datos:
               puntos: {
                 type: "array",
                 items: { type: "string" },
-                minItems: 3,
-                maxItems: 5,
+                minItems: 5,
+                maxItems: 8,
               },
               ejemplo: { type: "string" },
               actividad: { type: "string" },
