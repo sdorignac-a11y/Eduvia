@@ -4,7 +4,19 @@ if (!board) {
   throw new Error('No se encontró el contenedor #board-content en aula.html');
 }
 
+const chatPanel = document.getElementById("chat-panel");
+const toggleChatBtn = document.getElementById("toggle-chat-btn");
+const closeChatBtn = document.getElementById("chat-close-btn");
+const chatForm = document.getElementById("chat-form");
+const chatInput = document.getElementById("chat-input");
+const chatStatus = document.getElementById("chat-status");
+const chatSendBtn = document.getElementById("chat-send-btn");
+
 const FETCH_TIMEOUT_MS = 30000;
+
+let claseGuardadaActual = null;
+let claseGeneradaActual = null;
+let ultimaRespuestaChat = null;
 
 function escapeHtml(value = "") {
   return String(value)
@@ -21,6 +33,12 @@ function renderError(message) {
       ${escapeHtml(message)}
     </div>
   `;
+}
+
+function updateChatStatus(message) {
+  if (chatStatus) {
+    chatStatus.textContent = String(message || "");
+  }
 }
 
 function wait(ms) {
@@ -135,9 +153,9 @@ function construirPasos(clase = {}) {
   const puntos = normalizarLista(clase.puntos);
   if (puntos.length >= 3) {
     return [
-      `Leé con atención qué se está pidiendo.`,
-      `Identificá la regla o idea principal del tema.`,
-      `Comprobá la respuesta usando el ejemplo o los puntos clave.`,
+      "Leé con atención qué se está pidiendo.",
+      "Identificá la regla o idea principal del tema.",
+      "Comprobá la respuesta usando el ejemplo o los puntos clave.",
     ];
   }
 
@@ -377,8 +395,13 @@ async function animarClase() {
 }
 
 function renderClase(claseRaw, meta = {}) {
+  delete board.dataset.animando;
+
   const clase = normalizarClase(claseRaw);
   const panelesVisuales = crearPanelesVisuales(clase);
+
+  claseGeneradaActual = clase;
+  ultimaRespuestaChat = null;
 
   board.innerHTML = `
     <div class="board-lesson">
@@ -447,6 +470,283 @@ function renderClase(claseRaw, meta = {}) {
   });
 }
 
+function normalizarRespuestaChat(raw, pregunta = "") {
+  if (typeof raw === "string") {
+    return {
+      subtitulo: "Duda respondida",
+      clase: normalizarClase({
+        titulo: "Respuesta de la IA",
+        introduccion: raw,
+        ideaPrincipal: raw,
+        puntos: [raw],
+        formulas: [],
+        pasos: [],
+        tips: [],
+        errores: [],
+        ejemplo: "",
+        actividad: "Podés hacer otra pregunta desde el chat para seguir profundizando.",
+      }),
+    };
+  }
+
+  const data = raw && typeof raw === "object" ? raw : {};
+
+  const titulo = String(
+    data.titulo || `Respuesta sobre: ${pregunta || "tu duda"}`
+  ).trim();
+
+  const subtitulo = String(
+    data.subtitulo || "Duda respondida"
+  ).trim();
+
+  const introduccion = String(
+    data.introduccion || data.explicacion || data.respuestaBreve || data.ideaPrincipal || ""
+  ).trim();
+
+  const ideaPrincipal = String(
+    data.ideaPrincipal || data.explicacion || data.resumen || introduccion || "Esta es la idea más importante de la respuesta."
+  ).trim();
+
+  const puntos = dedupeLista(
+    normalizarLista(data.puntos || data.conceptos || data.claves)
+  );
+
+  const formulas = normalizarFormulas(
+    data.formulas || data.formulasClave
+  );
+
+  const pasos = dedupeLista(
+    normalizarLista(data.pasos || data.procedimiento)
+  );
+
+  const tips = dedupeLista(
+    normalizarLista(data.tips || data.consejos)
+  );
+
+  const errores = dedupeLista(
+    normalizarLista(data.errores || data.erroresComunes)
+  );
+
+  const ejemplo = String(
+    data.ejemplo || data.ejemploResuelto || ""
+  ).trim();
+
+  const actividad = String(
+    data.actividad || data.cierre || data.resumen || "Podés hacer otra pregunta desde el chat para seguir profundizando."
+  ).trim();
+
+  return {
+    subtitulo,
+    clase: normalizarClase({
+      titulo,
+      introduccion,
+      ideaPrincipal,
+      puntos,
+      formulas,
+      pasos,
+      tips,
+      errores,
+      ejemplo,
+      actividad,
+    }),
+  };
+}
+
+function renderRespuestaChat(respuestaRaw, pregunta) {
+  delete board.dataset.animando;
+
+  const { subtitulo, clase } = normalizarRespuestaChat(respuestaRaw, pregunta);
+  const panelesVisuales = crearPanelesVisuales(clase);
+
+  const materiaActual = claseGuardadaActual?.materia || "Eduvia";
+  const nivelActual = claseGuardadaActual?.nivel || "Clase";
+  const temaActual = claseGuardadaActual?.tema || "";
+
+  board.innerHTML = `
+    <div class="board-lesson">
+      <div class="board-layout">
+        <div class="board-main">
+          <div class="board-head">
+            <h1 class="board-title">${escapeHtml(clase.titulo)}</h1>
+            <div class="board-badge">${escapeHtml(subtitulo || `${materiaActual} · ${nivelActual}`)}</div>
+          </div>
+
+          <section class="board-section">
+            <h2>Pregunta del alumno</h2>
+            <p>${escapeHtml(pregunta || "Sin pregunta registrada.")}</p>
+          </section>
+
+          <section class="board-section">
+            <h2>Respuesta clara</h2>
+            <p>${escapeHtml(clase.introduccion || "No disponible.")}</p>
+          </section>
+
+          <section class="board-section">
+            <h2>Idea principal</h2>
+            <p>${escapeHtml(clase.ideaPrincipal || "No disponible.")}</p>
+          </section>
+
+          <section class="board-section">
+            <h2>Fórmulas clave</h2>
+            ${renderFormulas(clase.formulas)}
+          </section>
+
+          <section class="board-section">
+            <h2>Cómo pensarlo</h2>
+            ${renderLista(clase.pasos, "No se cargaron pasos para esta respuesta.")}
+          </section>
+
+          <section class="board-section">
+            <h2>Puntos clave</h2>
+            ${renderLista(clase.puntos, "No se cargaron puntos clave en esta respuesta.")}
+          </section>
+
+          <section class="board-section">
+            <h2>Tips rápidos</h2>
+            ${renderLista(clase.tips, "No se cargaron tips en esta respuesta.")}
+          </section>
+
+          <section class="board-section">
+            <h2>Errores comunes</h2>
+            ${renderLista(clase.errores, "No se cargaron errores comunes en esta respuesta.")}
+          </section>
+
+          <section class="board-section">
+            <h2>Ejemplo</h2>
+            <p>${escapeHtml(clase.ejemplo || "No disponible.")}</p>
+          </section>
+
+          <section class="board-section">
+            <h2>Próximo paso</h2>
+            <p>${escapeHtml(clase.actividad || "Podés hacer otra pregunta desde el chat.")}</p>
+          </section>
+
+          ${
+            temaActual
+              ? `
+                <section class="board-section">
+                  <h2>Conectado con la clase actual</h2>
+                  <p>Esta respuesta se relaciona con el tema: ${escapeHtml(temaActual)}.</p>
+                </section>
+              `
+              : ""
+          }
+        </div>
+
+        <aside class="board-side">
+          ${panelesVisuales.map(renderPanelVisual).join("")}
+        </aside>
+      </div>
+    </div>
+  `;
+
+  ultimaRespuestaChat = clase;
+
+  animarClase().catch((error) => {
+    console.error("Error animando la respuesta del chat:", error);
+  });
+}
+
+function abrirChat() {
+  if (!chatPanel) return;
+  chatPanel.classList.add("is-open");
+  chatPanel.setAttribute("aria-hidden", "false");
+  setTimeout(() => {
+    chatInput?.focus();
+  }, 50);
+}
+
+function cerrarChat() {
+  if (!chatPanel) return;
+  chatPanel.classList.remove("is-open");
+  chatPanel.setAttribute("aria-hidden", "true");
+}
+
+async function preguntarEnChat(pregunta) {
+  let response;
+
+  try {
+    response = await fetchConTimeout("/api/preguntar-clase", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        pregunta,
+        claseGuardada: claseGuardadaActual,
+        claseGenerada: claseGeneradaActual,
+        ultimaRespuesta: ultimaRespuestaChat,
+      }),
+    });
+  } catch (error) {
+    if (error.name === "AbortError") {
+      throw new Error("La respuesta tardó demasiado. Probá de nuevo.");
+    }
+    throw error;
+  }
+
+  let data;
+  try {
+    data = await response.json();
+  } catch {
+    throw new Error("El servidor respondió con un formato inválido.");
+  }
+
+  if (!response.ok || !data?.ok) {
+    throw new Error(data?.error || "Hubo un error al responder la pregunta.");
+  }
+
+  return data.respuesta;
+}
+
+async function manejarPreguntaChat(event) {
+  event.preventDefault();
+
+  const pregunta = String(chatInput?.value || "").trim();
+
+  if (!pregunta) {
+    updateChatStatus("Escribí una pregunta primero.");
+    chatInput?.focus();
+    return;
+  }
+
+  if (!claseGuardadaActual && !claseGeneradaActual) {
+    updateChatStatus("Primero cargá una clase.");
+    return;
+  }
+
+  if (chatSendBtn) chatSendBtn.disabled = true;
+  if (chatInput) chatInput.disabled = true;
+
+  updateChatStatus("Pensando...");
+  board.innerHTML = `<div class="board-loading">Respondiendo tu duda...</div>`;
+  delete board.dataset.animando;
+
+  try {
+    const respuesta = await preguntarEnChat(pregunta);
+    renderRespuestaChat(respuesta, pregunta);
+    if (chatInput) chatInput.value = "";
+    updateChatStatus("Pregunta enviada.");
+    cerrarChat();
+  } catch (error) {
+    console.error("Error respondiendo pregunta del chat:", error);
+    updateChatStatus(error.message || "Error al responder.");
+    if (claseGeneradaActual) {
+      renderClase(claseGeneradaActual, {
+        materia: claseGuardadaActual?.materia || "",
+        nivel: claseGuardadaActual?.nivel || "",
+        tema: claseGuardadaActual?.tema || "",
+        objetivo: claseGuardadaActual?.objetivo || "",
+      });
+    } else {
+      renderError(error.message || "Error al responder la pregunta.");
+    }
+  } finally {
+    if (chatSendBtn) chatSendBtn.disabled = false;
+    if (chatInput) chatInput.disabled = false;
+  }
+}
+
 async function cargarClaseEnPizarron() {
   try {
     board.innerHTML = `<div class="board-loading">Generando clase...</div>`;
@@ -455,6 +755,7 @@ async function cargarClaseEnPizarron() {
     const raw = localStorage.getItem("claseActual");
     if (!raw) {
       renderError("No se encontró la clase actual en el navegador.");
+      updateChatStatus("No hay clase cargada.");
       return;
     }
 
@@ -463,8 +764,11 @@ async function cargarClaseEnPizarron() {
       claseGuardada = JSON.parse(raw);
     } catch {
       renderError("La clase guardada está dañada o tiene un formato inválido.");
+      updateChatStatus("Clase inválida.");
       return;
     }
+
+    claseGuardadaActual = claseGuardada;
 
     const {
       materia = "",
@@ -476,6 +780,7 @@ async function cargarClaseEnPizarron() {
 
     if (!materia || !tema || !nivel) {
       renderError("Faltan datos clave de la clase: materia, tema o nivel.");
+      updateChatStatus("Faltan datos de la clase.");
       return;
     }
 
@@ -497,6 +802,7 @@ async function cargarClaseEnPizarron() {
     } catch (error) {
       if (error.name === "AbortError") {
         renderError("La generación de la clase tardó demasiado. Probá de nuevo.");
+        updateChatStatus("La clase tardó demasiado.");
         return;
       }
 
@@ -508,19 +814,48 @@ async function cargarClaseEnPizarron() {
       data = await response.json();
     } catch {
       renderError("El servidor respondió con un formato inválido.");
+      updateChatStatus("Error del servidor.");
       return;
     }
 
     if (!response.ok || !data?.ok || !data?.clase) {
       renderError(data?.error || "Hubo un error al generar la clase.");
+      updateChatStatus("No se pudo generar la clase.");
       return;
     }
 
     renderClase(data.clase, { materia, nivel, tema, objetivo });
+    updateChatStatus("Listo para preguntar.");
   } catch (err) {
     console.error("Error cargando clase:", err);
     renderError("Error al cargar la clase en el pizarrón.");
+    updateChatStatus("Error al cargar.");
   }
 }
+
+toggleChatBtn?.addEventListener("click", () => {
+  if (chatPanel?.classList.contains("is-open")) {
+    cerrarChat();
+  } else {
+    abrirChat();
+  }
+});
+
+closeChatBtn?.addEventListener("click", cerrarChat);
+
+chatForm?.addEventListener("submit", manejarPreguntaChat);
+
+chatInput?.addEventListener("keydown", (event) => {
+  if ((event.ctrlKey || event.metaKey) && event.key === "Enter") {
+    event.preventDefault();
+    chatForm?.requestSubmit();
+  }
+});
+
+window.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") {
+    cerrarChat();
+  }
+});
 
 cargarClaseEnPizarron();
