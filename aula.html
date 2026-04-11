@@ -23,11 +23,17 @@
       --wall-bottom:#cfd7c7;
       --frame:#c9975f;
       --board:#f8f8f8;
+
       --ink:#2f3a44;
+      --ink-soft:#536271;
       --muted:#5e6c78;
       --line:rgba(46, 66, 84, .12);
+
       --green:#2f7d55;
       --blue:#355d95;
+      --red:#9b4f5d;
+      --yellow-mark:rgba(255, 224, 130, .52);
+
       --soft:#f6f8fb;
     }
 
@@ -35,7 +41,7 @@
       min-height:100vh;
       font-family:'Inter', sans-serif;
       background:
-        radial-gradient(circle at top left, rgba(255,255,255,0.7), transparent 30%),
+        radial-gradient(circle at top left, rgba(255,255,255,.7), transparent 30%),
         linear-gradient(180deg, #efe9df 0%, #e9e2d8 100%);
       display:flex;
       align-items:center;
@@ -50,8 +56,8 @@
       background:var(--card);
       border-radius:30px;
       box-shadow:
-        0 25px 80px rgba(0,0,0,0.10),
-        inset 0 1px 0 rgba(255,255,255,0.7);
+        0 25px 80px rgba(0,0,0,.10),
+        inset 0 1px 0 rgba(255,255,255,.7);
       position:relative;
       overflow:hidden;
     }
@@ -91,13 +97,13 @@
       background:
         linear-gradient(
           115deg,
-          rgba(0,0,0,0.10) 0 12%,
+          rgba(0,0,0,.10) 0 12%,
           transparent 12% 25%,
-          rgba(0,0,0,0.10) 25% 37%,
+          rgba(0,0,0,.10) 25% 37%,
           transparent 37% 50%,
-          rgba(0,0,0,0.10) 50% 62%,
+          rgba(0,0,0,.10) 50% 62%,
           transparent 62% 75%,
-          rgba(0,0,0,0.10) 75% 87%,
+          rgba(0,0,0,.10) 75% 87%,
           transparent 87% 100%
         );
       opacity:.23;
@@ -124,9 +130,9 @@
       border-bottom-width:18px;
       border-radius:4px;
       box-shadow:
-        inset 0 0 0 2px rgba(255,255,255,0.75),
-        inset 0 0 26px rgba(0,0,0,0.05),
-        0 18px 45px rgba(0,0,0,0.12);
+        inset 0 0 0 2px rgba(255,255,255,.75),
+        inset 0 0 26px rgba(0,0,0,.05),
+        0 18px 45px rgba(0,0,0,.12);
       overflow:hidden;
     }
 
@@ -135,7 +141,7 @@
       position:absolute;
       inset:0;
       background:
-        linear-gradient(115deg, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0.08) 28%, transparent 50%);
+        linear-gradient(115deg, rgba(255,255,255,.7) 0%, rgba(255,255,255,.08) 28%, transparent 50%);
       pointer-events:none;
     }
 
@@ -143,7 +149,7 @@
       content:"";
       position:absolute;
       inset:0;
-      box-shadow: inset 0 -12px 24px rgba(0,0,0,0.04);
+      box-shadow: inset 0 -12px 24px rgba(0,0,0,.04);
       pointer-events:none;
     }
 
@@ -162,7 +168,7 @@
       height:24px;
       background:linear-gradient(180deg, #3f454c 0%, #2d3136 100%);
       border-radius:5px;
-      box-shadow:0 6px 12px rgba(0,0,0,0.18);
+      box-shadow:0 6px 12px rgba(0,0,0,.18);
     }
 
     .clip.left{ left:84px; }
@@ -191,9 +197,9 @@
       font-weight:700;
       color:#22303a;
       box-shadow:
-        0 8px 18px rgba(0,0,0,0.10),
-        inset 0 -2px 0 rgba(0,0,0,0.08),
-        inset 0 1px 0 rgba(255,255,255,0.45);
+        0 8px 18px rgba(0,0,0,.10),
+        inset 0 -2px 0 rgba(0,0,0,.08),
+        inset 0 1px 0 rgba(255,255,255,.45);
       transition:transform .18s ease, box-shadow .18s ease, filter .18s ease;
       position:relative;
     }
@@ -201,9 +207,9 @@
     .marker-btn:hover{
       transform:translateY(-2px) scale(1.03);
       box-shadow:
-        0 12px 20px rgba(0,0,0,0.14),
-        inset 0 -2px 0 rgba(0,0,0,0.08),
-        inset 0 1px 0 rgba(255,255,255,0.45);
+        0 12px 20px rgba(0,0,0,.14),
+        inset 0 -2px 0 rgba(0,0,0,.08),
+        inset 0 1px 0 rgba(255,255,255,.45);
     }
 
     .marker-btn:active{
@@ -232,7 +238,7 @@
       inset:82px 28px 32px 28px;
       border-radius:12px;
       z-index:2;
-      padding:12px 14px 12px 12px;
+      padding:14px 14px 18px 12px;
       overflow:auto;
       scrollbar-width:thin;
       scrollbar-color:rgba(74,96,118,.35) transparent;
@@ -256,14 +262,37 @@
     }
 
     .board-loading{
+      min-height:100%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
       font-family:'Kalam', cursive;
       font-size:1.9rem;
       color:#4a6276;
-      opacity:.72;
+      opacity:.78;
+      text-align:center;
+      position:relative;
+    }
+
+    .board-loading::after{
+      content:"";
+      position:absolute;
+      bottom:38%;
+      width:150px;
+      height:3px;
+      border-radius:999px;
+      background:linear-gradient(90deg, transparent, rgba(53,93,149,.4), transparent);
+      animation:cargaMarker 1.3s linear infinite;
+    }
+
+    @keyframes cargaMarker{
+      0%{ transform:translateX(-30px); opacity:.35; }
+      50%{ transform:translateX(30px); opacity:1; }
+      100%{ transform:translateX(-30px); opacity:.35; }
     }
 
     .board-error{
-      max-width:680px;
+      max-width:760px;
       padding:20px 22px;
       border-radius:18px;
       background:rgba(244, 170, 165, .18);
@@ -271,6 +300,8 @@
       color:#6a2d28;
       font-weight:700;
       line-height:1.6;
+      font-family:'Kalam', cursive;
+      font-size:1.2rem;
     }
 
     .board-lesson{
@@ -281,6 +312,18 @@
       display:flex;
       flex-direction:column;
       gap:18px;
+      position:relative;
+    }
+
+    .board-lesson::before{
+      content:"";
+      position:absolute;
+      top:0;
+      bottom:0;
+      left:18px;
+      width:2px;
+      background:rgba(255, 112, 144, .15);
+      pointer-events:none;
     }
 
     .board-head{
@@ -290,51 +333,74 @@
       gap:16px;
       flex-wrap:wrap;
       border-bottom:2px dashed rgba(53,93,149,.18);
-      padding-bottom:10px;
+      padding:0 0 10px 34px;
+      position:relative;
     }
 
     .board-title{
       font-family:'Kalam', cursive;
-      font-size:2.2rem;
+      font-size:clamp(2rem, 4vw, 3rem);
       line-height:1.05;
       color:#2d4f76;
       margin:0;
+      position:relative;
+      display:inline-block;
+      text-shadow:.6px .6px 0 rgba(255,255,255,.7);
+    }
+
+    .board-title::after{
+      content:"";
+      position:absolute;
+      left:-8px;
+      right:-8px;
+      bottom:5px;
+      height:14px;
+      background:var(--yellow-mark);
+      border-radius:999px;
+      transform:rotate(-1deg);
+      z-index:-1;
     }
 
     .board-badge{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
+      display:inline-block;
       padding:8px 14px;
       border-radius:999px;
       background:#eef5ff;
       border:1px solid rgba(53,93,149,.12);
       color:#2d4f76;
-      font-weight:800;
-      font-size:.85rem;
+      font-family:'Kalam', cursive;
+      font-weight:700;
+      font-size:1rem;
+      transform:rotate(-1deg);
     }
 
     .board-section{
-      background:rgba(255,255,255,.72);
+      background:rgba(255,255,255,.76);
       border:1px solid var(--line);
-      border-radius:18px;
+      border-radius:20px;
       padding:16px 18px;
       box-shadow:0 8px 18px rgba(0,0,0,.04);
+      margin-left:34px;
     }
 
     .board-section h2{
       margin:0 0 10px;
-      font-size:1rem;
-      font-weight:800;
-      color:#2f7d55;
+      font-family:'Kalam', cursive;
+      font-size:1.45rem;
+      font-weight:700;
+      color:var(--green);
       letter-spacing:.01em;
+      transform:rotate(-.6deg);
+      display:inline-block;
     }
 
     .board-section p{
       margin:0;
-      line-height:1.75;
-      color:#364754;
-      font-size:1rem;
+      line-height:1.8;
+      color:var(--ink);
+      font-size:1.12rem;
+      font-family:'Kalam', cursive;
+      font-weight:700;
     }
 
     .board-list{
@@ -350,9 +416,11 @@
       border-radius:14px;
       background:var(--soft);
       border:1px solid rgba(53,93,149,.08);
-      line-height:1.65;
-      color:#33414d;
-      font-weight:600;
+      line-height:1.7;
+      color:var(--ink);
+      font-weight:700;
+      font-size:1.08rem;
+      font-family:'Kalam', cursive;
     }
 
     .board-list li::before{
@@ -365,25 +433,34 @@
       display:grid;
       grid-template-columns:1fr 1fr;
       gap:14px;
+      margin-left:34px;
     }
 
     .board-card{
-      background:rgba(255,255,255,.78);
+      background:rgba(255,255,255,.8);
       border:1px solid var(--line);
-      border-radius:18px;
+      border-radius:20px;
       padding:16px 18px;
+      box-shadow:0 8px 18px rgba(0,0,0,.04);
     }
 
     .board-card h3{
       margin:0 0 8px;
-      font-size:1rem;
-      color:#2d4f76;
+      font-family:'Kalam', cursive;
+      font-size:1.35rem;
+      color:var(--red);
+      font-weight:700;
+      transform:rotate(-.8deg);
+      display:inline-block;
     }
 
     .board-card p{
       margin:0;
-      line-height:1.7;
-      color:#394955;
+      line-height:1.78;
+      color:var(--ink);
+      font-family:'Kalam', cursive;
+      font-size:1.08rem;
+      font-weight:700;
     }
 
     .tray{
@@ -400,14 +477,45 @@
       width:32px;
       height:7px;
       border-radius:999px;
-      box-shadow:0 2px 5px rgba(0,0,0,0.12);
+      box-shadow:0 2px 5px rgba(0,0,0,.12);
     }
 
     .marker.green{ background:#5ca46c; }
     .marker.blue{ background:#355d95; }
-    .marker.white{ background:#ececec; border:1px solid rgba(0,0,0,0.08); }
+    .marker.white{ background:#ececec; border:1px solid rgba(0,0,0,.08); }
     .marker.red{ background:#d9534f; }
     .marker.black{ background:#26313a; }
+
+    .board-title,
+    .board-badge,
+    .board-section,
+    .board-card,
+    .board-list li{
+      opacity:0;
+      transform:translateY(10px);
+      filter:blur(2px);
+    }
+
+    .is-visible{
+      opacity:1 !important;
+      transform:translateY(0) !important;
+      filter:blur(0) !important;
+      transition:
+        opacity .45s ease,
+        transform .45s ease,
+        filter .45s ease;
+    }
+
+    .is-typing{
+      border-right:3px solid rgba(47, 53, 66, .45);
+      animation:blinkCursor .7s step-end infinite;
+    }
+
+    @keyframes blinkCursor{
+      50%{
+        border-color:transparent;
+      }
+    }
 
     @media (max-width: 900px){
       .scene{
@@ -477,6 +585,15 @@
         font-size:1.4rem;
       }
 
+      .board-head{
+        padding-left:14px;
+      }
+
+      .board-section,
+      .board-grid{
+        margin-left:14px;
+      }
+
       .board-grid{
         grid-template-columns:1fr;
       }
@@ -494,6 +611,10 @@
 
       .clip.left{ left:22px; }
       .clip.right{ right:22px; }
+
+      .board-lesson::before{
+        left:6px;
+      }
     }
   </style>
 </head>
