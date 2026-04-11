@@ -147,107 +147,122 @@
       position:sticky;
       top:64px;
       z-index:35;
-      background:var(--bg-soft);
+      background:rgba(255,255,255,.92);
+      backdrop-filter:blur(10px);
       border-bottom:1px solid var(--line);
       padding:10px 18px;
       display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
       flex-wrap:wrap;
+    }
+
+    .subbar-left,
+    .subbar-tools{
+      display:flex;
+      align-items:center;
       gap:10px;
+      flex-wrap:wrap;
     }
 
     .chip{
       display:inline-flex;
       align-items:center;
       gap:8px;
-      padding:8px 12px;
+      padding:9px 14px;
       border-radius:999px;
-      background:#fff;
-      border:1px solid var(--line-soft);
+      background:linear-gradient(180deg,#ffffff 0%, #f7f9fc 100%);
+      border:1px solid #e6eaef;
       color:#3c4043;
-      font-size:.86rem;
-      font-weight:600;
+      font-size:.85rem;
+      font-weight:700;
+      box-shadow:0 1px 2px rgba(60,64,67,.08);
     }
 
-    .toolbar-wrap{
-      position:sticky;
-      top:121px;
-      z-index:30;
-      background:var(--bg);
-      padding:14px 14px 0;
-    }
-
-    .toolbar{
-      max-width:980px;
-      margin:0 auto;
-      background:#fff;
-      border:1px solid var(--line);
-      border-radius:16px;
-      box-shadow:var(--shadow);
-      padding:10px;
-      display:flex;
-      flex-wrap:wrap;
-      gap:8px;
-      align-items:center;
-    }
-
-    .tool-group{
-      display:flex;
-      align-items:center;
-      gap:6px;
-      padding-right:8px;
-      margin-right:4px;
-      border-right:1px solid #edf0f2;
-    }
-
-    .tool-group:last-child{
-      border-right:none;
-      margin-right:0;
-      padding-right:0;
+    .mini-divider{
+      width:1px;
+      height:28px;
+      background:#e6eaef;
+      border-radius:999px;
     }
 
     .tool-btn{
-      min-width:38px;
-      height:38px;
+      min-width:40px;
+      height:40px;
       border:none;
-      border-radius:10px;
-      background:#fff;
+      border-radius:12px;
+      background:linear-gradient(180deg,#ffffff 0%, #f6f8fb 100%);
       color:#202124;
       font-weight:700;
       cursor:pointer;
       transition:.16s ease;
-      padding:0 10px;
+      padding:0 12px;
       display:inline-flex;
       align-items:center;
       justify-content:center;
+      gap:6px;
+      border:1px solid #e6eaef;
+      box-shadow:0 1px 2px rgba(60,64,67,.08);
     }
 
     .tool-btn:hover{
-      background:#f1f3f4;
+      background:#eef3fd;
+      border-color:#d7e3fd;
+      transform:translateY(-1px);
+    }
+
+    .tool-btn:active{
+      transform:translateY(0);
     }
 
     .tool-btn.is-active{
       background:#e8f0fe;
       color:var(--blue);
+      border-color:#d7e3fd;
     }
 
     .tool-select{
-      height:38px;
-      border:1px solid var(--line);
-      border-radius:10px;
-      background:#fff;
-      padding:0 12px;
+      height:40px;
+      border:1px solid #e6eaef;
+      border-radius:12px;
+      background:linear-gradient(180deg,#ffffff 0%, #f6f8fb 100%);
+      padding:0 14px;
       color:#202124;
-      min-width:150px;
+      min-width:170px;
       outline:none;
+      font-weight:600;
+      box-shadow:0 1px 2px rgba(60,64,67,.08);
+    }
+
+    .tool-select:focus{
+      border-color:#c7dafc;
+      box-shadow:0 0 0 4px rgba(26,115,232,.10);
+    }
+
+    .color-pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      height:40px;
+      padding:0 10px 0 12px;
+      border-radius:12px;
+      background:linear-gradient(180deg,#ffffff 0%, #f6f8fb 100%);
+      border:1px solid #e6eaef;
+      box-shadow:0 1px 2px rgba(60,64,67,.08);
+      font-size:.82rem;
+      font-weight:700;
+      color:#3c4043;
+      cursor:pointer;
     }
 
     .color-wrap{
       position:relative;
       overflow:hidden;
-      width:38px;
-      height:38px;
-      border-radius:10px;
-      border:1px solid var(--line);
+      width:26px;
+      height:26px;
+      border-radius:8px;
+      border:1px solid #d7dce2;
       background:#fff;
       flex:none;
     }
@@ -530,10 +545,6 @@
       .doc-title{
         font-size:1.8rem;
       }
-
-      .toolbar-wrap{
-        top:121px;
-      }
     }
 
     @media (max-width: 720px){
@@ -543,30 +554,38 @@
         flex-direction:column;
       }
 
-      .subbar{
-        position:static;
-        padding:10px 14px;
-      }
-
-      .toolbar-wrap{
-        position:static;
-        padding:12px 14px 0;
-      }
-
-      .toolbar{
-        gap:10px;
-      }
-
-      .tool-group{
-        border-right:none;
-        padding-right:0;
-        margin-right:0;
-        flex-wrap:wrap;
-      }
-
       .topbar-actions{
         width:100%;
         justify-content:flex-start;
+      }
+
+      .subbar{
+        position:static;
+        padding:10px 14px;
+        align-items:flex-start;
+      }
+
+      .subbar-left,
+      .subbar-tools{
+        width:100%;
+      }
+
+      .subbar-tools{
+        padding-top:4px;
+      }
+
+      .chip{
+        width:auto;
+        justify-content:flex-start;
+      }
+
+      .tool-select{
+        min-width:100%;
+      }
+
+      .color-pill{
+        flex:1 1 140px;
+        justify-content:space-between;
       }
 
       .workspace{
@@ -588,11 +607,6 @@
       .doc-meta{
         flex-direction:column;
         gap:8px;
-      }
-
-      .chip{
-        width:100%;
-        justify-content:flex-start;
       }
 
       .share-row{
@@ -630,53 +644,58 @@
     </header>
 
     <div class="subbar">
-      <div class="chip" id="chip-materia">Materia: —</div>
-      <div class="chip" id="chip-nivel">Nivel: —</div>
-      <div class="chip" id="chip-duracion">Duración: —</div>
-      <div class="chip">Formato: Documento</div>
-    </div>
+      <div class="subbar-left">
+        <div class="chip" id="chip-materia">Materia: —</div>
+        <div class="chip" id="chip-nivel">Nivel: —</div>
+        <div class="chip" id="chip-duracion">Duración: —</div>
+        <div class="chip">Formato: Documento</div>
+      </div>
 
-    <div class="toolbar-wrap">
-      <div class="toolbar">
-        <div class="tool-group">
-          <select class="tool-select" id="format-block">
-            <option value="p">Texto normal</option>
-            <option value="h2">Título grande</option>
-            <option value="h3">Subtítulo</option>
-            <option value="blockquote">Cita</option>
-          </select>
-        </div>
+      <div class="subbar-tools">
+        <select class="tool-select" id="format-block">
+          <option value="p">Texto normal</option>
+          <option value="h2">Título grande</option>
+          <option value="h3">Subtítulo</option>
+          <option value="blockquote">Cita</option>
+        </select>
 
-        <div class="tool-group">
-          <button type="button" class="tool-btn" data-command="bold" title="Negrita"><strong>B</strong></button>
-          <button type="button" class="tool-btn" data-command="italic" title="Cursiva"><em>I</em></button>
-          <button type="button" class="tool-btn" data-command="underline" title="Subrayado"><u>U</u></button>
-        </div>
+        <div class="mini-divider"></div>
 
-        <div class="tool-group">
-          <label class="color-wrap" title="Color de texto">
+        <button type="button" class="tool-btn" data-command="bold" title="Negrita"><strong>B</strong></button>
+        <button type="button" class="tool-btn" data-command="italic" title="Cursiva"><em>I</em></button>
+        <button type="button" class="tool-btn" data-command="underline" title="Subrayado"><u>U</u></button>
+
+        <div class="mini-divider"></div>
+
+        <label class="color-pill" title="Color de texto">
+          Texto
+          <span class="color-wrap">
             <input type="color" id="text-color" value="#202124">
-          </label>
-          <label class="color-wrap" title="Resaltado">
+          </span>
+        </label>
+
+        <label class="color-pill" title="Resaltado">
+          Fondo
+          <span class="color-wrap">
             <input type="color" id="highlight-color" value="#fff59d">
-          </label>
-        </div>
+          </span>
+        </label>
 
-        <div class="tool-group">
-          <button type="button" class="tool-btn" data-command="insertUnorderedList" title="Lista">• Lista</button>
-          <button type="button" class="tool-btn" data-command="insertOrderedList" title="Lista numerada">1. Lista</button>
-        </div>
+        <div class="mini-divider"></div>
 
-        <div class="tool-group">
-          <button type="button" class="tool-btn" data-command="justifyLeft" title="Alinear izquierda">⬅</button>
-          <button type="button" class="tool-btn" data-command="justifyCenter" title="Centrar">⬌</button>
-          <button type="button" class="tool-btn" data-command="justifyRight" title="Alinear derecha">➡</button>
-        </div>
+        <button type="button" class="tool-btn" data-command="insertUnorderedList" title="Lista">•</button>
+        <button type="button" class="tool-btn" data-command="insertOrderedList" title="Lista numerada">1.</button>
 
-        <div class="tool-group">
-          <button type="button" class="tool-btn" data-command="undo" title="Deshacer">↶</button>
-          <button type="button" class="tool-btn" data-command="redo" title="Rehacer">↷</button>
-        </div>
+        <div class="mini-divider"></div>
+
+        <button type="button" class="tool-btn" data-command="justifyLeft" title="Alinear izquierda">⬅</button>
+        <button type="button" class="tool-btn" data-command="justifyCenter" title="Centrar">⬌</button>
+        <button type="button" class="tool-btn" data-command="justifyRight" title="Alinear derecha">➡</button>
+
+        <div class="mini-divider"></div>
+
+        <button type="button" class="tool-btn" data-command="undo" title="Deshacer">↶</button>
+        <button type="button" class="tool-btn" data-command="redo" title="Rehacer">↷</button>
       </div>
     </div>
 
