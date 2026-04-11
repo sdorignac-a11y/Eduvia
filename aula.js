@@ -13,6 +13,15 @@ function escapeHtml(value = "") {
     .replaceAll("'", "&#039;");
 }
 
+function escapeSvg(value = "") {
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&apos;");
+}
+
 function renderError(message) {
   board.innerHTML = `
     <div class="board-error">
@@ -50,123 +59,200 @@ function svgToDataUri(svg) {
   return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
 }
 
-function crearVisuales(meta = {}, clase = {}) {
-  const materia = `${meta.materia || ""}`.toLowerCase();
-  const tema = `${clase.titulo || ""} ${clase.introduccion || ""}`.toLowerCase();
+function partirTextoEnLineas(texto = "", max = 26) {
+  const palabras = String(texto).split(/\s+/).filter(Boolean);
+  const lineas = [];
+  let actual = "";
 
-  const esMatematica =
-    materia.includes("mat") ||
-    tema.includes("suces") ||
-    tema.includes("aritm") ||
-    tema.includes("geom") ||
-    tema.includes("cuadrát") ||
-    tema.includes("cuadrat");
-
-  if (esMatematica) {
-    return [
-      {
-        alt: "Patrón numérico",
-        caption: "Patrones que crecen paso a paso",
-        src: svgToDataUri(`
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 420">
-            <rect width="600" height="420" rx="28" fill="#F4F8FF"/>
-            <circle cx="110" cy="210" r="56" fill="#BFE0FF"/>
-            <circle cx="250" cy="210" r="56" fill="#CDECBF"/>
-            <circle cx="390" cy="210" r="56" fill="#FFE49D"/>
-            <circle cx="530" cy="210" r="56" fill="#F9B7B0"/>
-            <text x="110" y="226" text-anchor="middle" font-size="44" font-family="Arial" font-weight="700" fill="#2D4F76">2</text>
-            <text x="250" y="226" text-anchor="middle" font-size="44" font-family="Arial" font-weight="700" fill="#2D4F76">4</text>
-            <text x="390" y="226" text-anchor="middle" font-size="44" font-family="Arial" font-weight="700" fill="#2D4F76">8</text>
-            <text x="530" y="226" text-anchor="middle" font-size="44" font-family="Arial" font-weight="700" fill="#2D4F76">16</text>
-            <path d="M166 210 L194 210" stroke="#355D95" stroke-width="8" stroke-linecap="round"/>
-            <path d="M306 210 L334 210" stroke="#355D95" stroke-width="8" stroke-linecap="round"/>
-            <path d="M446 210 L474 210" stroke="#355D95" stroke-width="8" stroke-linecap="round"/>
-            <text x="178" y="184" text-anchor="middle" font-size="26" font-family="Arial" fill="#355D95">x2</text>
-            <text x="318" y="184" text-anchor="middle" font-size="26" font-family="Arial" fill="#355D95">x2</text>
-            <text x="458" y="184" text-anchor="middle" font-size="26" font-family="Arial" fill="#355D95">x2</text>
-          </svg>
-        `)
-      },
-      {
-        alt: "Gráfico de sucesión",
-        caption: "Ver el dibujo ayuda a entender mejor",
-        src: svgToDataUri(`
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 420">
-            <rect width="600" height="420" rx="28" fill="#FFFDF6"/>
-            <line x1="90" y1="330" x2="530" y2="330" stroke="#33414D" stroke-width="6" stroke-linecap="round"/>
-            <line x1="100" y1="340" x2="100" y2="80" stroke="#33414D" stroke-width="6" stroke-linecap="round"/>
-            <path d="M120 300 C180 260 220 220 280 180 C340 140 400 120 500 100" fill="none" stroke="#355D95" stroke-width="10" stroke-linecap="round"/>
-            <circle cx="150" cy="286" r="10" fill="#2F7D55"/>
-            <circle cx="220" cy="236" r="10" fill="#2F7D55"/>
-            <circle cx="300" cy="170" r="10" fill="#2F7D55"/>
-            <circle cx="390" cy="128" r="10" fill="#2F7D55"/>
-            <circle cx="490" cy="104" r="10" fill="#2F7D55"/>
-            <text x="440" y="60" font-size="30" font-family="Arial" font-weight="700" fill="#9B4F5D">Sube cada vez más</text>
-          </svg>
-        `)
-      },
-      {
-        alt: "Elementos matemáticos",
-        caption: "Números, formas y reglas",
-        src: svgToDataUri(`
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 420">
-            <rect width="600" height="420" rx="28" fill="#F8F7FF"/>
-            <rect x="70" y="70" width="170" height="110" rx="18" fill="#BFE0FF"/>
-            <rect x="260" y="70" width="110" height="110" rx="18" fill="#CDECBF"/>
-            <circle cx="470" cy="125" r="55" fill="#FFE49D"/>
-            <path d="M130 280 L220 210 L310 280 L220 350 Z" fill="#F9B7B0"/>
-            <text x="155" y="138" text-anchor="middle" font-size="44" font-family="Arial" font-weight="700" fill="#2D4F76">+3</text>
-            <text x="315" y="138" text-anchor="middle" font-size="44" font-family="Arial" font-weight="700" fill="#2F7D55">x2</text>
-            <text x="470" y="140" text-anchor="middle" font-size="42" font-family="Arial" font-weight="700" fill="#7A5A0E">n²</text>
-            <text x="220" y="390" text-anchor="middle" font-size="28" font-family="Arial" font-weight="700" fill="#9B4F5D">cada regla cambia la sucesión</text>
-          </svg>
-        `)
-      }
-    ];
+  for (const palabra of palabras) {
+    const candidato = actual ? `${actual} ${palabra}` : palabra;
+    if (candidato.length <= max) {
+      actual = candidato;
+    } else {
+      if (actual) lineas.push(actual);
+      actual = palabra;
+    }
   }
 
-  return [
-    {
-      alt: "Libro y estrella",
-      caption: "Aprender también entra por los ojos",
-      src: svgToDataUri(`
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 420">
-          <rect width="600" height="420" rx="28" fill="#F4F8FF"/>
-          <rect x="110" y="110" width="160" height="180" rx="18" fill="#BFE0FF"/>
-          <rect x="290" y="110" width="160" height="180" rx="18" fill="#FFE49D"/>
-          <line x1="280" y1="120" x2="280" y2="280" stroke="#355D95" stroke-width="6"/>
-          <text x="190" y="210" text-anchor="middle" font-size="40" font-family="Arial" font-weight="700" fill="#2D4F76">A</text>
-          <text x="370" y="210" text-anchor="middle" font-size="40" font-family="Arial" font-weight="700" fill="#7A5A0E">★</text>
-        </svg>
-      `)
-    },
-    {
-      alt: "Idea visual",
-      caption: "Explicar con dibujos ayuda más",
-      src: svgToDataUri(`
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 420">
-          <rect width="600" height="420" rx="28" fill="#FFFDF6"/>
-          <circle cx="170" cy="210" r="72" fill="#CDECBF"/>
-          <circle cx="320" cy="180" r="56" fill="#BFE0FF"/>
-          <circle cx="430" cy="245" r="62" fill="#F9B7B0"/>
-          <text x="300" y="90" text-anchor="middle" font-size="32" font-family="Arial" font-weight="700" fill="#355D95">Idea + imagen</text>
-        </svg>
-      `)
-    },
-    {
-      alt: "Aprendizaje",
-      caption: "Texto corto y apoyo visual",
-      src: svgToDataUri(`
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 420">
-          <rect width="600" height="420" rx="28" fill="#F8F7FF"/>
-          <rect x="120" y="110" width="360" height="200" rx="26" fill="#FFFFFF"/>
-          <line x1="160" y1="170" x2="430" y2="170" stroke="#355D95" stroke-width="10" stroke-linecap="round"/>
-          <line x1="160" y1="215" x2="390" y2="215" stroke="#2F7D55" stroke-width="10" stroke-linecap="round"/>
-          <line x1="160" y1="260" x2="350" y2="260" stroke="#9B4F5D" stroke-width="10" stroke-linecap="round"/>
-        </svg>
-      `)
-    }
-  ];
+  if (actual) lineas.push(actual);
+  return lineas.slice(0, 4);
+}
+
+function crearNotaVisual({ titulo = "", lineas = [], color = "blue" }) {
+  const paletas = {
+    blue: { bg: "#EEF5FF", accent: "#355D95", chip: "#B9D9FF" },
+    green: { bg: "#F2FAF4", accent: "#2F7D55", chip: "#B9E7B0" },
+    yellow: { bg: "#FFFBEA", accent: "#9B7A17", chip: "#F5E89C" },
+    red: { bg: "#FFF3F2", accent: "#9B4F5D", chip: "#F4AAA5" }
+  };
+
+  const p = paletas[color] || paletas.blue;
+  const safeTitulo = escapeSvg(titulo);
+  const safeLineas = lineas.map((l) => escapeSvg(l));
+
+  const textoSvg = safeLineas
+    .map((linea, i) => {
+      const y = 130 + i * 54;
+      return `<text x="40" y="${y}" font-size="30" font-family="Arial" font-weight="700" fill="#2F3A44">${linea}</text>`;
+    })
+    .join("");
+
+  const svg = `
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 420">
+      <rect width="600" height="420" rx="30" fill="${p.bg}"/>
+      <rect x="30" y="26" width="210" height="54" rx="27" fill="${p.chip}"/>
+      <text x="135" y="61" text-anchor="middle" font-size="28" font-family="Arial" font-weight="700" fill="${p.accent}">
+        ${safeTitulo}
+      </text>
+      <line x1="40" y1="105" x2="560" y2="105" stroke="${p.accent}" stroke-width="8" stroke-linecap="round" opacity=".28"/>
+      ${textoSvg}
+    </svg>
+  `;
+
+  return svgToDataUri(svg);
+}
+
+function normalizarLista(value) {
+  return Array.isArray(value) ? value.filter(Boolean) : [];
+}
+
+function normalizarClase(clase = {}) {
+  return {
+    titulo: clase?.titulo || "Clase generada",
+    introduccion: clase?.introduccion || "",
+    ideaPrincipal: clase?.ideaPrincipal || "",
+    puntos: normalizarLista(clase?.puntos),
+    formulas: Array.isArray(clase?.formulas) ? clase.formulas.filter(Boolean) : [],
+    pasos: normalizarLista(clase?.pasos),
+    tips: normalizarLista(clase?.tips),
+    errores: normalizarLista(clase?.errores),
+    ejemplo: clase?.ejemplo || "",
+    actividad: clase?.actividad || "",
+    visuales: Array.isArray(clase?.visuales) ? clase.visuales.filter(Boolean) : []
+  };
+}
+
+function crearVisualesDesdeClase(clase, meta = {}) {
+  const visualesBackend = Array.isArray(clase.visuales) ? clase.visuales : [];
+
+  if (visualesBackend.length) {
+    return visualesBackend.slice(0, 3).map((visual, index) => {
+      const color =
+        visual?.color === "green" || visual?.color === "yellow" || visual?.color === "red"
+          ? visual.color
+          : index === 0
+            ? "blue"
+            : index === 1
+              ? "green"
+              : "yellow";
+
+      const lineas = Array.isArray(visual?.lineas)
+        ? visual.lineas.slice(0, 4)
+        : partirTextoEnLineas(visual?.texto || "", 24);
+
+      return {
+        alt: visual?.titulo || `Visual ${index + 1}`,
+        caption: visual?.caption || visual?.titulo || `Visual ${index + 1}`,
+        src: crearNotaVisual({
+          titulo: visual?.titulo || `Visual ${index + 1}`,
+          lineas,
+          color
+        })
+      };
+    });
+  }
+
+  const formulasTexto = clase.formulas.slice(0, 3).map((f) => {
+    if (typeof f === "string") return f;
+    const nombre = f?.nombre ? `${f.nombre}: ` : "";
+    return `${nombre}${f?.formula || ""}`.trim();
+  });
+
+  const tipsTexto = clase.tips.slice(0, 3);
+  const pasosTexto = clase.pasos.slice(0, 3);
+
+  const materia = meta?.materia || "Clase";
+  const visuales = [];
+
+  if (formulasTexto.length) {
+    visuales.push({
+      alt: "Fórmulas clave",
+      caption: "Fórmulas importantes del tema",
+      src: crearNotaVisual({
+        titulo: "Fórmulas",
+        lineas: formulasTexto.length ? formulasTexto : ["No aplica"],
+        color: "blue"
+      })
+    });
+  }
+
+  if (pasosTexto.length) {
+    visuales.push({
+      alt: "Cómo reconocerlo",
+      caption: "Pasos para identificarlo",
+      src: crearNotaVisual({
+        titulo: "Cómo reconocer",
+        lineas: pasosTexto,
+        color: "green"
+      })
+    });
+  }
+
+  if (tipsTexto.length) {
+    visuales.push({
+      alt: "Tips rápidos",
+      caption: "Tips para recordarlo mejor",
+      src: crearNotaVisual({
+        titulo: "Tips",
+        lineas: tipsTexto,
+        color: "yellow"
+      })
+    });
+  }
+
+  while (visuales.length < 3) {
+    visuales.push({
+      alt: materia,
+      caption: `Apoyo visual de ${materia}`,
+      src: crearNotaVisual({
+        titulo: materia,
+        lineas: partirTextoEnLineas(clase.titulo || "Tema principal", 24),
+        color: visuales.length === 0 ? "blue" : visuales.length === 1 ? "green" : "yellow"
+      })
+    });
+  }
+
+  return visuales.slice(0, 3);
+}
+
+function renderLista(items = []) {
+  if (!items.length) return `<p>No disponible en esta clase.</p>`;
+  return `
+    <ul class="board-list">
+      ${items.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}
+    </ul>
+  `;
+}
+
+function renderFormulas(formulas = []) {
+  if (!formulas.length) {
+    return `<p>En este tema no se cargaron fórmulas específicas.</p>`;
+  }
+
+  return `
+    <ul class="board-list">
+      ${formulas.map((formula) => {
+        if (typeof formula === "string") {
+          return `<li>${escapeHtml(formula)}</li>`;
+        }
+
+        const nombre = formula?.nombre ? `<strong>${escapeHtml(formula.nombre)}:</strong> ` : "";
+        const formulaTxt = formula?.formula ? `${escapeHtml(formula.formula)} ` : "";
+        const exp = formula?.explicacion ? `— ${escapeHtml(formula.explicacion)}` : "";
+        return `<li>${nombre}${formulaTxt}${exp}</li>`;
+      }).join("")}
+    </ul>
+  `;
 }
 
 async function animarClase() {
@@ -177,25 +263,12 @@ async function animarClase() {
   const badge = board.querySelector(".board-badge");
 
   const sections = board.querySelectorAll(".board-section");
-  const introSection = sections[0];
-  const puntosSection = sections[1];
-  const ejemploSection = sections[2];
-  const actividadSection = sections[3];
-
-  const introText = introSection?.querySelector("p");
-  const puntosItems = puntosSection?.querySelectorAll("li") || [];
-  const puntosTextoVacio =
-    puntosItems.length === 0 ? puntosSection?.querySelector("p") : null;
-
-  const ejemploText = ejemploSection?.querySelector("p");
-  const actividadText = actividadSection?.querySelector("p");
-
   const visuales = board.querySelectorAll(".visual-box");
 
   if (title) {
     const text = title.textContent;
     await mostrarBloque(title, 120);
-    await escribirTexto(title, text, 24);
+    await escribirTexto(title, text, 22);
   }
 
   if (badge) {
@@ -204,100 +277,89 @@ async function animarClase() {
     await escribirTexto(badge, text, 10);
   }
 
-  if (visuales[0]) {
-    await mostrarBloque(visuales[0], 150);
-  }
+  if (visuales[0]) await mostrarBloque(visuales[0], 120);
 
-  if (introSection) {
-    await mostrarBloque(introSection, 120);
-  }
+  for (let i = 0; i < sections.length; i++) {
+    const section = sections[i];
+    await mostrarBloque(section, 110);
 
-  if (introText) {
-    const text = introText.textContent;
-    await escribirTexto(introText, text, 14);
-  }
+    const parrafos = section.querySelectorAll("p");
+    const items = section.querySelectorAll("li");
 
-  if (visuales[1]) {
-    await mostrarBloque(visuales[1], 140);
-  }
+    for (const p of parrafos) {
+      const text = p.textContent;
+      await escribirTexto(p, text, 14);
+    }
 
-  if (puntosSection) {
-    await mostrarBloque(puntosSection, 120);
-  }
-
-  if (puntosItems.length) {
-    for (const item of puntosItems) {
+    for (const item of items) {
       const text = item.textContent;
       item.textContent = "";
       item.classList.add("is-visible");
-      await escribirTexto(item, text, 12);
-      await wait(90);
+      await escribirTexto(item, text, 11);
+      await wait(80);
     }
-  } else if (puntosTextoVacio) {
-    const text = puntosTextoVacio.textContent;
-    await escribirTexto(puntosTextoVacio, text, 14);
-  }
 
-  if (ejemploSection) {
-    await mostrarBloque(ejemploSection, 120);
-  }
-
-  if (ejemploText) {
-    const text = ejemploText.textContent;
-    await escribirTexto(ejemploText, text, 14);
-  }
-
-  if (visuales[2]) {
-    await mostrarBloque(visuales[2], 140);
-  }
-
-  if (actividadSection) {
-    await mostrarBloque(actividadSection, 120);
-  }
-
-  if (actividadText) {
-    const text = actividadText.textContent;
-    await escribirTexto(actividadText, text, 14);
+    if (i === 1 && visuales[1]) await mostrarBloque(visuales[1], 130);
+    if (i === 3 && visuales[2]) await mostrarBloque(visuales[2], 130);
   }
 }
 
-function renderClase(clase, meta = {}) {
-  const puntos = Array.isArray(clase?.puntos) ? clase.puntos : [];
-  const visuales = crearVisuales(meta, clase);
+function renderClase(claseRaw, meta = {}) {
+  const clase = normalizarClase(claseRaw);
+  const visuales = crearVisualesDesdeClase(clase, meta);
 
   board.innerHTML = `
     <div class="board-lesson">
       <div class="board-layout">
         <div class="board-main">
           <div class="board-head">
-            <h1 class="board-title">${escapeHtml(clase?.titulo || "Clase generada")}</h1>
+            <h1 class="board-title">${escapeHtml(clase.titulo)}</h1>
             <div class="board-badge">${escapeHtml(meta.materia || "Eduvia")} · ${escapeHtml(meta.nivel || "Clase")}</div>
           </div>
 
           <section class="board-section">
             <h2>Introducción</h2>
-            <p>${escapeHtml(clase?.introduccion || "")}</p>
+            <p>${escapeHtml(clase.introduccion || "No disponible.")}</p>
+          </section>
+
+          <section class="board-section">
+            <h2>Idea principal</h2>
+            <p>${escapeHtml(clase.ideaPrincipal || "No disponible.")}</p>
+          </section>
+
+          <section class="board-section">
+            <h2>Fórmulas clave</h2>
+            ${renderFormulas(clase.formulas)}
+          </section>
+
+          <section class="board-section">
+            <h2>Cómo identificar este tema</h2>
+            ${renderLista(clase.pasos)}
           </section>
 
           <section class="board-section">
             <h2>Puntos clave</h2>
-            ${
-              puntos.length
-                ? `<ul class="board-list">
-                    ${puntos.map((p) => `<li>${escapeHtml(p)}</li>`).join("")}
-                  </ul>`
-                : `<p>No se recibieron puntos clave para esta clase.</p>`
-            }
+            ${renderLista(clase.puntos)}
+          </section>
+
+          <section class="board-section">
+            <h2>Tips rápidos</h2>
+            ${renderLista(clase.tips)}
+          </section>
+
+          <section class="board-section">
+            <h2>Errores comunes</h2>
+            ${renderLista(clase.errores)}
           </section>
 
           <section class="board-section">
             <h2>Ejemplo</h2>
-            <p>${escapeHtml(clase?.ejemplo || "")}</p>
+            <p>${escapeHtml(clase.ejemplo || "No disponible.")}</p>
           </section>
 
           <section class="board-section">
             <h2>Actividad</h2>
-            <p>${escapeHtml(clase?.actividad || "")}</p>
+            <p>${escapeHtml(clase.actividad || "No disponible.")}</p>
           </section>
         </div>
 
