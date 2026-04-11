@@ -143,20 +143,21 @@
       color:var(--danger);
     }
 
-    .subbar{
-      position:sticky;
-      top:64px;
-      z-index:35;
-      background:rgba(255,255,255,.92);
-      backdrop-filter:blur(10px);
-      border-bottom:1px solid var(--line);
-      padding:10px 18px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:14px;
-      flex-wrap:wrap;
-    }
+.subbar{
+  position:sticky;
+  top:64px;
+  z-index:35;
+  background:rgba(255,255,255,.92);
+  backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line);
+  padding:10px 18px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  flex-wrap:nowrap;
+  overflow-x:auto;
+}
 
     .subbar-left,
     .subbar-tools{
@@ -565,10 +566,14 @@
         align-items:flex-start;
       }
 
-      .subbar-left,
-      .subbar-tools{
-        width:100%;
-      }
+.subbar-left,
+.subbar-tools{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex-wrap:nowrap;
+  flex:none;
+}
 
       .subbar-tools{
         padding-top:4px;
@@ -613,6 +618,22 @@
         grid-template-columns:1fr;
       }
     }
+    .subbar::-webkit-scrollbar{
+  height:8px;
+}
+
+.subbar::-webkit-scrollbar-thumb{
+  background:#d7dce2;
+  border-radius:999px;
+}
+
+.chip,
+.tool-btn,
+.tool-select,
+.color-pill,
+.mini-divider{
+  flex:none;
+}
   </style>
 </head>
 <body>
