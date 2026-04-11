@@ -4,105 +4,522 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Eduvia | Clase</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap" rel="stylesheet">
+
   <style>
-    body{
-      font-family: Arial, sans-serif;
-      background:#f5f7ff;
-      margin:0;
-      padding:40px 20px;
-      color:#111827;
+    :root{
+      --bg:#f6f0e4;
+      --bg-2:#efe5d3;
+      --paper:#fffdf8;
+      --paper-2:#fff8eb;
+      --folder:#f4dca6;
+      --folder-dark:#e7c97f;
+      --folder-tab:#ffd36e;
+      --ink:#2f2a3a;
+      --muted:#6f6879;
+      --line:rgba(100, 82, 146, .14);
+      --violet:#7c67d9;
+      --violet-2:#6a56c8;
+      --sky:#cfe8ff;
+      --green:#cdeccf;
+      --shadow:0 18px 50px rgba(59, 38, 98, .14);
+      --shadow-soft:0 10px 24px rgba(59, 38, 98, .10);
+      --radius-xl:30px;
+      --radius-lg:22px;
+      --radius-md:16px;
     }
 
-    .card{
-      max-width:800px;
+    *{
+      box-sizing:border-box;
+    }
+
+    body{
+      margin:0;
+      min-height:100vh;
+      font-family:'Inter', sans-serif;
+      color:var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(255,255,255,.72), transparent 32%),
+        radial-gradient(circle at bottom right, rgba(255,255,255,.55), transparent 28%),
+        linear-gradient(180deg, var(--bg) 0%, var(--bg-2) 100%);
+      padding:42px 18px;
+      position:relative;
+      overflow-x:hidden;
+    }
+
+    body::before,
+    body::after{
+      content:"";
+      position:fixed;
+      z-index:0;
+      border-radius:999px;
+      filter:blur(6px);
+      opacity:.35;
+      pointer-events:none;
+    }
+
+    body::before{
+      width:220px;
+      height:220px;
+      background:rgba(124,103,217,.16);
+      top:-60px;
+      left:-50px;
+    }
+
+    body::after{
+      width:260px;
+      height:260px;
+      background:rgba(255,211,110,.20);
+      bottom:-80px;
+      right:-60px;
+    }
+
+    .stage{
+      position:relative;
+      z-index:1;
+      max-width:980px;
       margin:0 auto;
-      background:#fff;
-      border-radius:20px;
-      padding:30px;
-      box-shadow:0 10px 30px rgba(0,0,0,.08);
+    }
+
+    .folder-shell{
+      position:relative;
+      max-width:860px;
+      margin:0 auto;
+      padding-top:34px;
+    }
+
+    .folder-tab{
+      position:absolute;
+      top:0;
+      left:42px;
+      height:54px;
+      min-width:200px;
+      padding:0 24px;
+      border-radius:18px 18px 0 0;
+      background:linear-gradient(180deg, #ffe08b 0%, var(--folder-tab) 100%);
+      display:flex;
+      align-items:center;
+      gap:10px;
+      font-family:'Sora', sans-serif;
+      font-weight:700;
+      color:#5e4820;
+      box-shadow:0 8px 20px rgba(131, 96, 22, .12);
+      border:1px solid rgba(135, 101, 32, .08);
+    }
+
+    .folder{
+      background:linear-gradient(180deg, var(--folder) 0%, var(--folder-dark) 100%);
+      border-radius:28px;
+      box-shadow:var(--shadow);
+      padding:24px;
+      border:1px solid rgba(123, 94, 28, .10);
+      position:relative;
+      overflow:hidden;
+    }
+
+    .folder::before{
+      content:"";
+      position:absolute;
+      inset:14px;
+      border-radius:22px;
+      border:1px dashed rgba(123, 94, 28, .14);
+      pointer-events:none;
+    }
+
+    .book{
+      position:relative;
+      background:linear-gradient(180deg, #fffdf9 0%, #fff7ec 100%);
+      border-radius:24px;
+      min-height:560px;
+      box-shadow:var(--shadow-soft);
+      overflow:hidden;
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      border:1px solid rgba(109, 86, 45, .08);
+    }
+
+    .book::before{
+      content:"";
+      position:absolute;
+      top:0;
+      bottom:0;
+      left:50%;
+      width:18px;
+      transform:translateX(-50%);
+      background:
+        linear-gradient(180deg, rgba(126,103,190,.12), rgba(126,103,190,.06)),
+        linear-gradient(90deg, rgba(0,0,0,.03), rgba(255,255,255,.5), rgba(0,0,0,.03));
+      box-shadow:
+        inset 1px 0 0 rgba(255,255,255,.75),
+        inset -1px 0 0 rgba(0,0,0,.04);
+      z-index:2;
+    }
+
+    .page{
+      position:relative;
+      padding:38px 34px 34px;
+      background:
+        repeating-linear-gradient(
+          to bottom,
+          transparent 0,
+          transparent 34px,
+          rgba(124,103,217,.10) 35px
+        );
+    }
+
+    .page.left{
+      border-right:1px solid rgba(100, 82, 146, .08);
+    }
+
+    .page::before{
+      content:"";
+      position:absolute;
+      top:0;
+      bottom:0;
+      left:26px;
+      width:2px;
+      background:rgba(255, 110, 110, .18);
+    }
+
+    .page-content{
+      position:relative;
+      z-index:3;
+      padding-left:18px;
+    }
+
+    .eyebrow{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 14px;
+      border-radius:999px;
+      background:rgba(124,103,217,.10);
+      border:1px solid rgba(124,103,217,.12);
+      color:var(--violet-2);
+      font-size:.82rem;
+      font-weight:700;
+      letter-spacing:.02em;
+      margin-bottom:18px;
     }
 
     h1{
-      margin-top:0;
-      font-size:2rem;
+      margin:0 0 14px;
+      font-family:'Sora', sans-serif;
+      font-size:clamp(2rem, 4vw, 2.9rem);
+      line-height:1.08;
+      letter-spacing:-.03em;
+      color:#2e2642;
+    }
+
+    .sub{
+      margin:0;
+      font-size:1rem;
+      line-height:1.7;
+      color:var(--muted);
+      max-width:34ch;
+    }
+
+    .center-card{
+      margin-top:28px;
+      background:linear-gradient(180deg, #ffffff 0%, #fff9ef 100%);
+      border:1px solid rgba(124,103,217,.12);
+      border-radius:24px;
+      padding:24px 20px;
+      box-shadow:0 12px 24px rgba(80, 60, 120, .08);
+      text-align:center;
+      position:relative;
+    }
+
+    .center-card::before,
+    .center-card::after{
+      content:"";
+      position:absolute;
+      top:14px;
+      width:22px;
+      height:22px;
+      border-radius:50%;
+      background:#ffefc0;
+      border:1px solid rgba(172, 134, 47, .18);
+      box-shadow:inset 0 2px 3px rgba(255,255,255,.7);
+    }
+
+    .center-card::before{ left:14px; }
+    .center-card::after{ right:14px; }
+
+    .center-card .mini{
+      font-size:.78rem;
+      font-weight:800;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      color:#8b77da;
+      margin-bottom:10px;
+    }
+
+    .center-card .topic{
+      font-family:'Sora', sans-serif;
+      font-size:1.6rem;
+      line-height:1.25;
+      font-weight:800;
+      color:#2b2434;
+      word-break:break-word;
+    }
+
+    .info-grid{
+      display:grid;
+      gap:14px;
+      padding-top:4px;
     }
 
     .dato{
-      margin:14px 0;
-      font-size:1.05rem;
+      background:rgba(255,255,255,.78);
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:14px 16px;
+      box-shadow:0 8px 18px rgba(78, 57, 119, .05);
+      backdrop-filter:blur(4px);
     }
 
     .label{
-      font-weight:700;
+      display:block;
+      font-size:.76rem;
+      font-weight:800;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      color:#7b6ca0;
+      margin-bottom:6px;
     }
 
-    .loading{
-      text-align:center;
-      font-size:1.1rem;
-      color:#6b7280;
+    .value{
+      display:block;
+      font-size:1.02rem;
+      line-height:1.55;
+      color:#2f2a3a;
+      font-weight:600;
+      word-break:break-word;
+    }
+
+    .note{
+      margin-top:18px;
+      background:linear-gradient(180deg, #eef8ff 0%, #f7fcff 100%);
+      border:1px solid rgba(89, 151, 226, .14);
+      border-radius:18px;
+      padding:14px 16px;
+      color:#43607e;
+      font-size:.95rem;
+      line-height:1.6;
     }
 
     .actions{
-      margin-top:30px;
+      margin-top:24px;
       display:flex;
       gap:12px;
       flex-wrap:wrap;
     }
 
     .btn{
-      display:inline-block;
-      padding:12px 18px;
-      border-radius:12px;
+      appearance:none;
+      border:none;
       text-decoration:none;
-      background:#6a5cff;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      min-height:52px;
+      padding:0 20px;
+      border-radius:16px;
+      font-weight:800;
+      font-size:.98rem;
+      transition:.22s ease;
+      cursor:pointer;
+    }
+
+    .btn:hover{
+      transform:translateY(-2px);
+    }
+
+    .btn.primary{
+      background:linear-gradient(180deg, var(--violet) 0%, var(--violet-2) 100%);
       color:white;
-      font-weight:700;
+      box-shadow:0 14px 24px rgba(106, 86, 200, .24);
     }
 
     .btn.secondary{
-      background:#e5e7eb;
-      color:#111827;
+      background:rgba(255,255,255,.72);
+      color:#372f4c;
+      border:1px solid rgba(124,103,217,.14);
+      box-shadow:0 8px 18px rgba(68, 48, 104, .06);
+    }
+
+    .loading{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      min-height:420px;
+      text-align:center;
+      font-size:1.06rem;
+      color:#6f6879;
+      font-weight:700;
+      padding:20px;
+    }
+
+    .loading-box{
+      background:rgba(255,255,255,.72);
+      border:1px solid rgba(124,103,217,.12);
+      border-radius:20px;
+      padding:22px 20px;
+      box-shadow:0 10px 24px rgba(68, 48, 104, .08);
+      min-width:min(100%, 320px);
+    }
+
+    .spinner{
+      width:38px;
+      height:38px;
+      margin:0 auto 14px;
+      border-radius:50%;
+      border:4px solid rgba(124,103,217,.16);
+      border-top-color:var(--violet);
+      animation:spin .85s linear infinite;
+    }
+
+    @keyframes spin{
+      to{ transform:rotate(360deg); }
+    }
+
+    @media (max-width: 860px){
+      .book{
+        grid-template-columns:1fr;
+      }
+
+      .book::before{
+        display:none;
+      }
+
+      .page.left{
+        border-right:none;
+        border-bottom:1px solid rgba(100, 82, 146, .08);
+      }
+
+      .folder-tab{
+        left:24px;
+      }
+    }
+
+    @media (max-width: 560px){
+      body{
+        padding:24px 12px;
+      }
+
+      .folder{
+        padding:14px;
+        border-radius:22px;
+      }
+
+      .folder-tab{
+        left:16px;
+        min-width:unset;
+        height:48px;
+        padding:0 16px;
+        font-size:.92rem;
+      }
+
+      .page{
+        padding:26px 20px 24px;
+      }
+
+      .page::before{
+        left:18px;
+      }
+
+      .page-content{
+        padding-left:12px;
+      }
+
+      .center-card .topic{
+        font-size:1.32rem;
+      }
+
+      .actions{
+        flex-direction:column;
+      }
+
+      .btn{
+        width:100%;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="card">
-    <div id="loading" class="loading">Cargando clase...</div>
+  <main class="stage">
+    <section class="folder-shell">
+      <div class="folder-tab">📘 Mi clase</div>
 
-<div id="contenido" style="display:none;">
-  <h1 id="titulo-clase">Clase</h1>
+      <div class="folder">
+        <div class="book">
+          <div id="loading" class="loading">
+            <div class="loading-box">
+              <div class="spinner"></div>
+              Cargando clase...
+            </div>
+          </div>
 
-  <div class="dato">
-    <span class="label">Materia:</span>
-    <span id="materia"></span>
-  </div>
+          <div id="contenido" style="display:none; grid-column:1 / -1;">
+            <div class="page left">
+              <div class="page-content">
+                <div class="eyebrow">✨ Preparado para aprender</div>
+                <h1 id="titulo-clase">Clase</h1>
+                <p class="sub">
+                  Acá vas a ver de forma clara el contenido de la clase antes de empezar.
+                </p>
 
-  <div class="dato">
-    <span class="label">Tema:</span>
-    <span id="tema"></span>
-  </div>
+                <div class="center-card">
+                  <div class="mini">Tema central</div>
+                  <div class="topic" id="tema"></div>
+                </div>
 
-  <div class="dato">
-    <span class="label">Nivel:</span>
-    <span id="nivel"></span>
-  </div>
+                <div class="actions">
+                  <a href="panel.html" class="btn secondary">← Volver al panel</a>
+                  <a id="btn-empezar-clase" href="#" class="btn primary">Empezar clase →</a>
+                </div>
+              </div>
+            </div>
 
-  <div class="dato">
-    <span class="label">Duración:</span>
-    <span id="duracion"></span>
-  </div>
+            <div class="page right">
+              <div class="page-content">
+                <div class="info-grid">
+                  <div class="dato">
+                    <span class="label">Materia</span>
+                    <span class="value" id="materia"></span>
+                  </div>
 
-  <div class="dato">
-    <span class="label">Objetivo:</span>
-    <span id="objetivo"></span>
-  </div>
+                  <div class="dato">
+                    <span class="label">Nivel</span>
+                    <span class="value" id="nivel"></span>
+                  </div>
 
-  <div class="actions">
-    <a href="panel.html" class="btn secondary">Volver al panel</a>
-    <a id="btn-empezar-clase" href="#" class="btn">Empezar clase</a>
-  </div>
-</div>
-  </div>
+                  <div class="dato">
+                    <span class="label">Duración</span>
+                    <span class="value" id="duracion"></span>
+                  </div>
+
+                  <div class="dato">
+                    <span class="label">Objetivo</span>
+                    <span class="value" id="objetivo"></span>
+                  </div>
+                </div>
+
+                <div class="note">
+                  Esta clase fue preparada para que tengas el tema bien ordenado antes de entrar al aula interactiva.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
 
   <script type="module" src="clase.js"></script>
 </body>
