@@ -7,28 +7,32 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
 
   <style>
     :root{
-      --bg:#eef2f7;
-      --bg-2:#dde6f1;
-      --text:#1f2937;
-      --muted:#6b7280;
-      --line:#d7dee8;
-      --white:#ffffff;
+      --bg1:#eef3fb;
+      --bg2:#dde6f4;
+      --board:#ffffff;
+      --line:#d8e0ec;
+      --text:#162033;
+      --muted:#64748b;
 
-      --primary:#6d5dfc;
-      --primary-soft:#ece9ff;
-      --danger:#ef4444;
-      --danger-soft:#fee2e2;
-      --success:#16a34a;
-      --success-soft:#dcfce7;
+      --purple:#6d5dfc;
+      --purple-soft:#ece9ff;
 
-      --shadow:0 20px 50px rgba(15, 23, 42, .10);
-      --shadow-soft:0 10px 26px rgba(15, 23, 42, .08);
+      --green:#16a34a;
+      --green-soft:#dcfce7;
+
+      --red:#e11d48;
+      --red-soft:#ffe4ea;
+
+      --panel:#f8fafc;
+      --panel-2:#f2f5f9;
+
+      --shadow:0 24px 60px rgba(15,23,42,.10);
+      --shadow-soft:0 10px 25px rgba(15,23,42,.06);
       --radius:26px;
-      --board-radius:22px;
     }
 
     *{
@@ -37,568 +41,378 @@
       padding:0;
     }
 
-    html, body{
-      width:100%;
+    html,body{
       min-height:100%;
     }
 
     body{
-      font-family:"Inter", sans-serif;
+      font-family:"Inter",sans-serif;
       color:var(--text);
       background:
-        radial-gradient(circle at top left, rgba(109,93,252,.08), transparent 24%),
-        radial-gradient(circle at bottom right, rgba(56,189,248,.10), transparent 24%),
-        linear-gradient(180deg, var(--bg), var(--bg-2));
+        radial-gradient(circle at top left, rgba(109,93,252,.08), transparent 20%),
+        radial-gradient(circle at bottom right, rgba(96,165,250,.10), transparent 22%),
+        linear-gradient(180deg, var(--bg1), var(--bg2));
       min-height:100vh;
-      overflow-x:hidden;
     }
 
     .page{
       min-height:100vh;
+      padding:28px;
       display:flex;
       flex-direction:column;
-      padding:26px;
-      gap:18px;
+      gap:22px;
     }
 
-    .top-mini{
+    .page-top{
       display:flex;
+      align-items:flex-start;
       justify-content:space-between;
-      align-items:center;
-      gap:14px;
+      gap:18px;
       flex-wrap:wrap;
     }
 
     .brand{
       display:flex;
       align-items:center;
-      gap:12px;
+      gap:14px;
     }
 
     .brand-mark{
-      width:42px;
-      height:42px;
-      border-radius:14px;
+      width:50px;
+      height:50px;
+      border-radius:16px;
       display:grid;
       place-items:center;
+      background:linear-gradient(135deg,#7c6cf2,#6d5dfc);
       color:#fff;
-      font-family:"Sora", sans-serif;
+      font-family:"Sora",sans-serif;
       font-weight:800;
-      background:linear-gradient(135deg, #6d5dfc, #8b5cf6);
-      box-shadow:0 12px 24px rgba(109,93,252,.22);
+      font-size:1.3rem;
+      box-shadow:0 14px 28px rgba(109,93,252,.18);
+      flex:none;
     }
 
     .brand-text strong{
       display:block;
-      font-family:"Sora", sans-serif;
-      font-size:1rem;
-      letter-spacing:-.03em;
+      font-size:1.9rem;
+      line-height:1;
+      letter-spacing:-.04em;
+      font-family:"Sora",sans-serif;
     }
 
     .brand-text span{
+      display:block;
+      margin-top:5px;
       color:var(--muted);
-      font-size:.9rem;
+      font-size:1.05rem;
+      font-weight:600;
     }
 
-    .top-actions{
+    .page-actions{
       display:flex;
-      align-items:center;
-      gap:10px;
+      gap:12px;
       flex-wrap:wrap;
     }
 
-    .ghost-btn,
-    .danger-btn,
-    .primary-btn{
+    .page-btn{
+      text-decoration:none;
       border:none;
       cursor:pointer;
-      text-decoration:none;
-      font-family:inherit;
-      font-weight:700;
-      border-radius:999px;
-      padding:12px 16px;
-      transition:.18s ease;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      gap:8px;
-    }
-
-    .ghost-btn{
-      background:rgba(255,255,255,.78);
-      color:#334155;
-      box-shadow:var(--shadow-soft);
-    }
-
-    .ghost-btn:hover{
-      transform:translateY(-1px);
-      background:#fff;
-    }
-
-    .primary-btn{
-      background:linear-gradient(135deg, #6d5dfc, #8b5cf6);
-      color:#fff;
-      box-shadow:0 14px 28px rgba(109,93,252,.18);
-    }
-
-    .primary-btn:hover{
-      transform:translateY(-1px);
-    }
-
-    .danger-btn{
-      background:var(--danger-soft);
-      color:#b91c1c;
-    }
-
-    .danger-btn:hover{
-      transform:translateY(-1px);
-      background:#fecaca;
-    }
-
-    .classroom{
-      flex:1;
-      display:grid;
-      grid-template-columns:220px minmax(0, 1fr);
-      gap:18px;
-      align-items:stretch;
-      min-height:0;
-    }
-
-    .teacher-side{
-      display:flex;
-      flex-direction:column;
-      justify-content:flex-end;
-      gap:14px;
-      min-height:100%;
-    }
-
-    .teacher-card{
       background:rgba(255,255,255,.72);
-      backdrop-filter:blur(10px);
-      border:1px solid rgba(255,255,255,.7);
-      border-radius:28px;
-      padding:18px;
-      box-shadow:var(--shadow-soft);
-    }
-
-    .teacher-label{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding:8px 12px;
+      color:#334155;
+      padding:16px 22px;
       border-radius:999px;
-      background:var(--primary-soft);
-      color:#5b4ce0;
-      font-size:.86rem;
       font-weight:800;
-      margin-bottom:12px;
-    }
-
-    .teacher-avatar-wrap{
-      display:flex;
-      align-items:flex-end;
-      justify-content:center;
-      min-height:280px;
-      position:relative;
-    }
-
-    .teacher-shadow{
-      position:absolute;
-      bottom:8px;
-      width:120px;
-      height:18px;
-      background:rgba(15,23,42,.12);
-      filter:blur(10px);
-      border-radius:999px;
-    }
-
-    .teacher-avatar{
-      position:relative;
-      width:150px;
-      height:240px;
-      animation:floatTeacher 3.2s ease-in-out infinite;
-    }
-
-    .head{
-      position:absolute;
-      top:0;
-      left:43px;
-      width:64px;
-      height:64px;
-      border-radius:50%;
-      background:linear-gradient(180deg, #ffd8b5, #efb88c);
-      z-index:2;
-    }
-
-    .hair{
-      position:absolute;
-      top:-3px;
-      left:35px;
-      width:80px;
-      height:42px;
-      border-radius:38px 38px 22px 22px;
-      background:#2f2a39;
-      z-index:3;
-    }
-
-    .body-shape{
-      position:absolute;
-      top:58px;
-      left:26px;
-      width:98px;
-      height:110px;
-      border-radius:28px;
-      background:linear-gradient(180deg, #6d5dfc, #5b4ce0);
-      box-shadow:0 14px 26px rgba(109,93,252,.18);
-    }
-
-    .arm-left,
-    .arm-right{
-      position:absolute;
-      border-radius:999px;
-    }
-
-    .arm-left{
-      top:76px;
-      left:8px;
-      width:34px;
-      height:92px;
-      background:linear-gradient(180deg, #6d5dfc, #4f46e5);
-      transform:rotate(18deg);
-    }
-
-    .arm-right{
-      top:70px;
-      right:8px;
-      width:22px;
-      height:102px;
-      background:linear-gradient(180deg, #efbe94, #e3a679);
-      transform-origin:top center;
-      animation:writeArm 1.8s ease-in-out infinite;
-    }
-
-    .hand{
-      position:absolute;
-      bottom:-6px;
-      left:-4px;
-      width:28px;
-      height:28px;
-      border-radius:50%;
-      background:linear-gradient(180deg, #ffd8b5, #eab083);
-    }
-
-    .marker{
-      position:absolute;
-      bottom:-10px;
-      left:12px;
-      width:30px;
-      height:6px;
-      border-radius:999px;
-      background:linear-gradient(90deg, #111827, #6d5dfc);
-      transform:rotate(-18deg);
-    }
-
-    .legs{
-      position:absolute;
-      top:156px;
-      left:46px;
-      width:58px;
-      height:74px;
-    }
-
-    .leg{
-      position:absolute;
-      top:0;
-      width:22px;
-      height:68px;
-      border-radius:999px;
-      background:#2b2f3a;
-    }
-
-    .leg.right{ right:0; }
-    .leg.left{ left:0; }
-
-    .teacher-bubble{
-      background:#fff;
-      border:1px solid #edf1f6;
-      border-radius:20px;
-      padding:14px 15px;
-      line-height:1.65;
-      color:#475569;
+      font-size:1rem;
       box-shadow:var(--shadow-soft);
-      min-height:104px;
+      transition:.18s ease;
+      backdrop-filter:blur(8px);
     }
 
-    .teacher-bubble strong{
-      display:block;
-      margin-bottom:6px;
-      color:#1f2937;
+    .page-btn:hover{
+      transform:translateY(-1px);
+      background:#fff;
     }
 
-    .board-shell{
-      min-width:0;
-      display:flex;
-      flex-direction:column;
-      gap:14px;
-    }
-
-    .board-window{
-      position:relative;
+    .board-wrap{
       flex:1;
-      min-height:680px;
-      background:var(--white);
-      border-radius:var(--board-radius);
+      display:flex;
+      align-items:flex-start;
+      justify-content:center;
+    }
+
+    .board{
+      width:min(1280px, 100%);
+      min-height:720px;
+      background:var(--board);
+      border:1.5px solid rgba(200,210,225,.95);
+      border-radius:30px;
       box-shadow:var(--shadow);
-      border:1px solid rgba(203,213,225,.9);
       overflow:hidden;
       display:grid;
-      grid-template-rows:58px 1fr;
+      grid-template-rows:64px 1fr;
     }
 
-    .board-toolbar{
+    .board-bar{
       display:flex;
       align-items:center;
       justify-content:space-between;
-      gap:12px;
+      gap:14px;
       padding:0 16px;
-      background:linear-gradient(180deg, #f8fafc, #eef2f7);
-      border-bottom:1px solid #e5e7eb;
+      background:linear-gradient(180deg,#fafbfd,#f2f5f9);
+      border-bottom:1px solid var(--line);
     }
 
-    .toolbar-left,
-    .toolbar-right{
+    .bar-left,
+    .bar-right{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      min-width:0;
+      flex-wrap:wrap;
+    }
+
+    .dots{
+      display:flex;
+      gap:8px;
+      align-items:center;
+      flex:none;
+    }
+
+    .dots span{
+      width:11px;
+      height:11px;
+      border-radius:50%;
+      display:block;
+    }
+
+    .dots span:nth-child(1){ background:#f87171; }
+    .dots span:nth-child(2){ background:#facc15; }
+    .dots span:nth-child(3){ background:#4ade80; }
+
+    .class-pill{
       display:flex;
       align-items:center;
       gap:10px;
       min-width:0;
-    }
-
-    .toolbar-dots{
-      display:flex;
-      align-items:center;
-      gap:7px;
-      margin-right:4px;
-    }
-
-    .toolbar-dots span{
-      width:10px;
-      height:10px;
-      border-radius:50%;
-      display:block;
-    }
-
-    .toolbar-dots span:nth-child(1){ background:#f87171; }
-    .toolbar-dots span:nth-child(2){ background:#facc15; }
-    .toolbar-dots span:nth-child(3){ background:#4ade80; }
-
-    .class-chip{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      max-width:100%;
-      min-width:0;
-      padding:9px 12px;
+      padding:12px 16px;
       border-radius:999px;
       background:#fff;
-      border:1px solid #e5e7eb;
-      font-size:.92rem;
-      font-weight:700;
-      color:#334155;
+      border:1px solid var(--line);
       box-shadow:0 4px 10px rgba(15,23,42,.04);
+      font-weight:800;
+      color:#334155;
+      font-size:1rem;
     }
 
-    .class-chip span:last-child{
+    .class-pill span:last-child{
       white-space:nowrap;
       overflow:hidden;
       text-overflow:ellipsis;
     }
 
-    .status-chip{
-      display:inline-flex;
+    .status-pill{
+      display:flex;
       align-items:center;
-      gap:8px;
-      padding:9px 12px;
+      gap:10px;
+      padding:12px 16px;
       border-radius:999px;
-      background:var(--success-soft);
+      background:var(--green-soft);
       color:#166534;
-      font-size:.88rem;
       font-weight:800;
+      font-size:1rem;
       white-space:nowrap;
     }
 
     .status-dot{
-      width:8px;
-      height:8px;
+      width:9px;
+      height:9px;
       border-radius:50%;
-      background:#22c55e;
+      background:var(--green);
       animation:pulse 1.2s infinite;
     }
 
-    .toolbar-btn{
+    .bar-btn{
       border:none;
       cursor:pointer;
-      background:#fff;
-      color:#334155;
-      font-weight:700;
-      padding:10px 14px;
+      padding:12px 18px;
       border-radius:999px;
-      border:1px solid #e5e7eb;
-      transition:.18s ease;
-    }
-
-    .toolbar-btn:hover{
-      transform:translateY(-1px);
       background:#f8fafc;
-    }
-
-    .toolbar-btn.leave{
-      background:#fff1f2;
-      color:#be123c;
-      border-color:#fecdd3;
-    }
-
-    .board-content{
-      position:relative;
-      padding:28px;
-      display:grid;
-      grid-template-rows:auto 1fr auto;
-      gap:22px;
-      background:
-        linear-gradient(180deg, rgba(255,255,255,.96), rgba(255,255,255,.98)),
-        repeating-linear-gradient(
-          to bottom,
-          transparent 0px,
-          transparent 34px,
-          #edf2f7 35px
-        );
-    }
-
-    .board-header{
-      display:flex;
-      justify-content:space-between;
-      align-items:flex-start;
-      gap:18px;
-      flex-wrap:wrap;
-    }
-
-    .board-title-wrap h1{
-      font-family:"Sora", sans-serif;
-      font-size:2rem;
-      line-height:1.05;
-      letter-spacing:-.05em;
-      margin-bottom:8px;
-      color:#111827;
-    }
-
-    .board-title-wrap p{
-      color:#64748b;
-      line-height:1.7;
-      max-width:780px;
-      font-size:1rem;
-    }
-
-    .writing-chip{
-      display:inline-flex;
-      align-items:center;
-      gap:10px;
-      padding:12px 14px;
-      border-radius:999px;
-      background:var(--primary-soft);
-      color:#5648da;
+      color:#334155;
+      border:1px solid var(--line);
       font-weight:800;
+      font-size:.98rem;
+      transition:.18s ease;
       white-space:nowrap;
     }
 
-    .writing-chip .pen-dot{
+    .bar-btn:hover{
+      transform:translateY(-1px);
+      background:#fff;
+    }
+
+    .bar-btn.leave{
+      background:var(--red-soft);
+      color:var(--red);
+      border-color:#f8b4c4;
+    }
+
+    .board-body{
+      padding:30px;
+      display:grid;
+      grid-template-rows:auto 1fr;
+      gap:24px;
+      background:#fff;
+    }
+
+    .hero{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:20px;
+      flex-wrap:wrap;
+    }
+
+    .hero-left h1{
+      font-family:"Sora",sans-serif;
+      font-size:3.2rem;
+      line-height:1.02;
+      letter-spacing:-.07em;
+      margin-bottom:14px;
+      color:#0f172a;
+    }
+
+    .hero-left p{
+      max-width:760px;
+      color:#64748b;
+      font-size:1.1rem;
+      line-height:1.75;
+      font-weight:600;
+    }
+
+    .writing-pill{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding:14px 18px;
+      border-radius:999px;
+      background:var(--purple-soft);
+      color:#5b4ce0;
+      font-weight:800;
+      font-size:1rem;
+      white-space:nowrap;
+    }
+
+    .writing-dot{
       width:10px;
       height:10px;
       border-radius:50%;
-      background:#6d5dfc;
+      background:var(--purple);
       animation:pulse 1.2s infinite;
     }
 
-    .board-main{
+    .content{
       display:grid;
-      grid-template-columns:1.1fr .9fr;
+      grid-template-columns:1.15fr .9fr;
       gap:18px;
       min-height:0;
     }
 
-    .board-col{
-      display:flex;
-      flex-direction:column;
-      gap:16px;
+    .left-col,
+    .right-col{
+      display:grid;
+      gap:18px;
       min-width:0;
     }
 
-    .board-card{
-      background:rgba(255,255,255,.72);
-      border:1px solid #e5e7eb;
-      border-radius:20px;
-      padding:18px;
-      box-shadow:0 8px 18px rgba(15,23,42,.05);
+    .left-col{
+      grid-template-rows:1fr auto;
     }
 
-    .board-card h3{
-      font-family:"Sora", sans-serif;
-      font-size:1rem;
-      margin-bottom:12px;
-      letter-spacing:-.03em;
+    .right-col{
+      grid-template-rows:auto auto 1fr;
+    }
+
+    .card{
+      background:#fff;
+      border:1.5px solid #e3e8f1;
+      border-radius:28px;
+      box-shadow:0 6px 16px rgba(15,23,42,.04);
+      overflow:hidden;
+    }
+
+    .card-inner{
+      padding:22px 22px 20px 22px;
+    }
+
+    .card h3{
+      font-family:"Sora",sans-serif;
+      font-size:1.05rem;
+      letter-spacing:-.04em;
+      margin-bottom:14px;
       color:#111827;
+    }
+
+    .card p{
+      color:#475569;
+      font-size:1rem;
+      line-height:1.75;
+      font-weight:600;
+    }
+
+    .explanation-box{
+      min-height:360px;
+      display:flex;
+      flex-direction:column;
     }
 
     .typed-lines{
       display:flex;
       flex-direction:column;
       gap:10px;
-      min-height:260px;
+      flex:1;
+      min-height:240px;
     }
 
     .typed-line{
-      min-height:44px;
-      padding:11px 14px;
-      border-radius:14px;
-      background:#ffffff;
-      border:1px solid #e8edf4;
+      min-height:46px;
+      border-radius:16px;
+      padding:12px 14px;
+      background:#fbfcfe;
+      border:1px solid #e9eef5;
       color:#334155;
       line-height:1.65;
-      font-weight:600;
+      font-weight:700;
       opacity:0;
-      transform:translateY(8px);
-      animation:fadeUp .35s ease forwards;
+      transform:translateY(6px);
+      animation:showLine .25s ease forwards;
     }
 
-    .typed-line.show:nth-child(1){ animation-delay:0s; }
-    .typed-line.show:nth-child(2){ animation-delay:.08s; }
-    .typed-line.show:nth-child(3){ animation-delay:.16s; }
-    .typed-line.show:nth-child(4){ animation-delay:.24s; }
-    .typed-line.show:nth-child(5){ animation-delay:.32s; }
-    .typed-line.show:nth-child(6){ animation-delay:.40s; }
+    .example-card p{
+      font-size:1rem;
+      line-height:1.85;
+    }
 
-    .example-box,
-    .goal-box,
+    .objective-card p{
+      font-size:1rem;
+      line-height:1.85;
+    }
+
     .exercise-box{
-      line-height:1.75;
+      background:var(--panel);
+      border-radius:18px;
+      padding:18px;
+      border:1px solid #edf1f6;
       color:#475569;
-      font-weight:600;
-      min-height:110px;
-    }
-
-    .exercise-box{
-      background:#f8fafc;
-      border-radius:16px;
-      padding:14px;
-    }
-
-    .board-footer{
-      display:grid;
-      gap:12px;
+      line-height:1.8;
+      font-weight:700;
     }
 
     .quick-actions{
       display:flex;
       flex-wrap:wrap;
       gap:10px;
+      margin-top:4px;
     }
 
     .quick-btn{
@@ -607,132 +421,89 @@
       padding:11px 14px;
       border-radius:999px;
       background:#fff;
-      color:#4f46e5;
-      border:1px solid #dfe5ee;
+      color:#5b4ce0;
+      border:1px solid #dde4ef;
       font-weight:800;
+      font-size:.95rem;
       transition:.18s ease;
     }
 
     .quick-btn:hover{
       transform:translateY(-1px);
-      background:#f7f7ff;
+      background:#faf8ff;
     }
 
-    .input-wrap{
+    .question-row{
       display:grid;
       grid-template-columns:1fr auto;
       gap:10px;
+      margin-top:14px;
     }
 
-    .input-wrap input{
+    .question-row input{
       width:100%;
       height:56px;
-      border-radius:16px;
-      border:1.5px solid #dce3ec;
-      background:#fff;
+      border-radius:18px;
+      border:1.5px solid #dbe3ee;
       padding:0 16px;
-      outline:none;
-      font-size:1rem;
       font-family:inherit;
+      font-size:1rem;
+      color:#111827;
       font-weight:600;
-      color:#1f2937;
+      outline:none;
+      background:#fff;
     }
 
-    .input-wrap input:focus{
+    .question-row input:focus{
       border-color:#6d5dfc;
       box-shadow:0 0 0 4px rgba(109,93,252,.08);
     }
 
     .send-btn{
-      min-width:132px;
+      border:none;
+      cursor:pointer;
+      min-width:130px;
+      border-radius:18px;
+      background:linear-gradient(135deg,#6d5dfc,#7c6cf2);
+      color:#fff;
+      font-weight:800;
+      font-size:1rem;
+      padding:0 18px;
+      transition:.18s ease;
     }
 
-    .board-cursor{
-      position:absolute;
-      top:176px;
-      right:42%;
-      width:22px;
-      height:22px;
-      pointer-events:none;
-      animation:moveCursor 2.2s ease-in-out infinite;
-    }
-
-    .board-cursor::before{
-      content:"";
-      position:absolute;
-      top:8px;
-      left:2px;
-      width:18px;
-      height:6px;
-      border-radius:999px;
-      background:linear-gradient(90deg, #111827, #6d5dfc);
-      transform:rotate(-18deg);
-      box-shadow:0 4px 10px rgba(15,23,42,.12);
-    }
-
-    .board-cursor::after{
-      content:"";
-      position:absolute;
-      top:13px;
-      left:13px;
-      width:6px;
-      height:6px;
-      border-radius:50%;
-      background:rgba(109,93,252,.16);
-      filter:blur(1px);
+    .send-btn:hover{
+      transform:translateY(-1px);
     }
 
     @keyframes pulse{
       0%,100%{ transform:scale(1); opacity:1; }
-      50%{ transform:scale(1.25); opacity:.7; }
+      50%{ transform:scale(1.25); opacity:.72; }
     }
 
-    @keyframes floatTeacher{
-      0%,100%{ transform:translateY(0); }
-      50%{ transform:translateY(-8px); }
-    }
-
-    @keyframes writeArm{
-      0%,100%{ transform:rotate(-35deg); }
-      50%{ transform:rotate(-24deg); }
-    }
-
-    @keyframes moveCursor{
-      0%,100%{ transform:translate(0,0) rotate(-5deg); }
-      25%{ transform:translate(18px,8px) rotate(3deg); }
-      50%{ transform:translate(-8px,24px) rotate(-9deg); }
-      75%{ transform:translate(16px,38px) rotate(2deg); }
-    }
-
-    @keyframes fadeUp{
-      from{
-        opacity:0;
-        transform:translateY(8px);
-      }
+    @keyframes showLine{
       to{
         opacity:1;
         transform:translateY(0);
       }
     }
 
-    @media (max-width: 1100px){
-      .classroom{
+    @media (max-width: 1180px){
+      .hero-left h1{
+        font-size:2.6rem;
+      }
+
+      .content{
         grid-template-columns:1fr;
       }
 
-      .teacher-side{
-        order:2;
+      .left-col,
+      .right-col{
+        grid-template-rows:auto;
       }
 
-      .teacher-card{
-        display:grid;
-        grid-template-columns:180px 1fr;
-        gap:16px;
-        align-items:center;
-      }
-
-      .teacher-avatar-wrap{
-        min-height:220px;
+      .explanation-box{
+        min-height:300px;
       }
     }
 
@@ -741,76 +512,61 @@
         padding:16px;
       }
 
-      .board-window{
+      .brand-text strong{
+        font-size:1.5rem;
+      }
+
+      .board{
         min-height:unset;
       }
 
-      .board-toolbar{
-        min-height:58px;
+      .board-bar{
         height:auto;
-        padding:12px;
+        padding:14px;
         align-items:flex-start;
-        flex-direction:column;
       }
 
-      .toolbar-left,
-      .toolbar-right{
+      .bar-left,
+      .bar-right{
         width:100%;
-        justify-content:space-between;
-        flex-wrap:wrap;
       }
 
-      .board-content{
-        padding:18px;
+      .hero-left h1{
+        font-size:2rem;
       }
 
-      .board-main{
-        grid-template-columns:1fr;
+      .board-body{
+        padding:20px;
       }
 
-      .board-title-wrap h1{
-        font-size:1.55rem;
-      }
-
-      .input-wrap{
+      .question-row{
         grid-template-columns:1fr;
       }
 
       .send-btn{
-        width:100%;
-      }
-
-      .teacher-card{
-        grid-template-columns:1fr;
+        height:52px;
       }
     }
 
     @media (max-width: 560px){
-      .top-mini{
-        align-items:flex-start;
-      }
-
-      .top-actions{
+      .page-actions{
         width:100%;
       }
 
-      .top-actions a,
-      .top-actions button{
+      .page-btn{
         flex:1;
+        text-align:center;
       }
 
-      .class-chip,
-      .status-chip{
+      .hero{
+        gap:14px;
+      }
+
+      .writing-pill,
+      .status-pill,
+      .class-pill{
         width:100%;
         justify-content:center;
-      }
-
-      .toolbar-right{
-        gap:8px;
-      }
-
-      .toolbar-btn{
-        flex:1;
       }
 
       .quick-actions{
@@ -822,7 +578,7 @@
 </head>
 <body>
   <div class="page">
-    <div class="top-mini">
+    <header class="page-top">
       <div class="brand">
         <div class="brand-mark">E</div>
         <div class="brand-text">
@@ -831,146 +587,118 @@
         </div>
       </div>
 
-      <div class="top-actions">
-        <a href="mis-clases.html" class="ghost-btn">Mis clases</a>
-        <a href="panel.html" class="ghost-btn">Volver al panel</a>
+      <div class="page-actions">
+        <a href="mis-clases.html" class="page-btn">Mis clases</a>
+        <a href="panel.html" class="page-btn">Volver al panel</a>
       </div>
-    </div>
+    </header>
 
-    <section class="classroom">
-      <aside class="teacher-side">
-        <div class="teacher-card">
-          <div class="teacher-avatar-wrap">
-            <div class="teacher-shadow"></div>
+    <div class="board-wrap">
+      <section class="board">
+        <div class="board-bar">
+          <div class="bar-left">
+            <div class="dots">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
 
-            <div class="teacher-avatar">
-              <div class="hair"></div>
-              <div class="head"></div>
-              <div class="body-shape"></div>
-
-              <div class="arm-left"></div>
-
-              <div class="arm-right">
-                <div class="hand"></div>
-                <div class="marker"></div>
-              </div>
-
-              <div class="legs">
-                <div class="leg left"></div>
-                <div class="leg right"></div>
-              </div>
+            <div class="class-pill">
+              <span>📘</span>
+              <span id="class-name">Clase de Matemática • Fracciones</span>
             </div>
           </div>
 
-          <div>
-            <div class="teacher-label">Profesor IA</div>
+          <div class="bar-right">
+            <div class="status-pill">
+              <span class="status-dot"></span>
+              <span id="class-status">Clase en curso</span>
+            </div>
 
-            <div class="teacher-bubble" id="teacher-bubble">
-              <strong>Vamos paso a paso.</strong>
-              Primero entendemos la idea, después vemos un ejemplo y recién al final practicamos.
+            <button id="fullscreen-btn" class="bar-btn" type="button">Pantalla completa</button>
+            <a href="panel.html" class="bar-btn leave">Abandonar clase</a>
+          </div>
+        </div>
+
+        <div class="board-body">
+          <div class="hero">
+            <div class="hero-left">
+              <h1 id="board-title">Entendamos las fracciones</h1>
+              <p id="board-subtitle">
+                Vamos a verlo de una forma clara, visual y fácil de seguir, como si el profesor lo estuviera escribiendo en el pizarrón.
+              </p>
+            </div>
+
+            <div class="writing-pill">
+              <span class="writing-dot"></span>
+              <span id="writing-label">Escribiendo en el pizarrón</span>
+            </div>
+          </div>
+
+          <div class="content">
+            <div class="left-col">
+              <article class="card explanation-box">
+                <div class="card-inner">
+                  <h3>Explicación paso a paso</h3>
+                  <div id="typed-lines" class="typed-lines"></div>
+                </div>
+              </article>
+
+              <article class="card example-card">
+                <div class="card-inner">
+                  <h3 id="example-title">Ejemplo guiado</h3>
+                  <p id="example-text">
+                    1/2 + 1/4. Primero buscamos el mismo denominador. 1/2 es igual a 2/4. Entonces 2/4 + 1/4 = 3/4.
+                  </p>
+                </div>
+              </article>
+            </div>
+
+            <div class="right-col">
+              <article class="card objective-card">
+                <div class="card-inner">
+                  <h3>Objetivo de la clase</h3>
+                  <p id="goal-text">
+                    Que el alumno entienda cómo leer, interpretar y operar fracciones simples sin memorizar mecánicamente.
+                  </p>
+                </div>
+              </article>
+
+              <article class="card">
+                <div class="card-inner">
+                  <h3 id="exercise-title">Mini ejercicio</h3>
+                  <div id="exercise-text" class="exercise-box">
+                    Calculá 3/4 - 1/4 y explicá por qué el denominador no cambia.
+                  </div>
+                </div>
+              </article>
+
+              <article class="card">
+                <div class="card-inner">
+                  <h3>Acciones rápidas</h3>
+
+                  <div class="quick-actions">
+                    <button class="quick-btn" data-action="facil">Explicalo fácil</button>
+                    <button class="quick-btn" data-action="ejemplo">Dame otro ejemplo</button>
+                    <button class="quick-btn" data-action="resumen">Resumilo</button>
+                    <button class="quick-btn" data-action="ejercicio">Otro ejercicio</button>
+                  </div>
+
+                  <div class="question-row">
+                    <input
+                      id="question-input"
+                      type="text"
+                      placeholder="Escribí algo como: explicamelo más fácil o dame otro ejemplo"
+                    />
+                    <button id="send-btn" class="send-btn" type="button">Enviar</button>
+                  </div>
+                </div>
+              </article>
             </div>
           </div>
         </div>
-      </aside>
-
-      <div class="board-shell">
-        <section class="board-window">
-          <div class="board-toolbar">
-            <div class="toolbar-left">
-              <div class="toolbar-dots">
-                <span></span>
-                <span></span>
-                <span></span>
-              </div>
-
-              <div class="class-chip">
-                <span>📘</span>
-                <span id="toolbar-class-name">Clase de Matemática • Fracciones</span>
-              </div>
-            </div>
-
-            <div class="toolbar-right">
-              <div class="status-chip">
-                <span class="status-dot"></span>
-                <span id="toolbar-status">Clase en curso</span>
-              </div>
-
-              <button id="btn-fullscreen" class="toolbar-btn" type="button">Pantalla completa</button>
-              <a href="panel.html" class="toolbar-btn leave">Abandonar clase</a>
-            </div>
-          </div>
-
-          <div class="board-content">
-            <div class="board-cursor"></div>
-
-            <div class="board-header">
-              <div class="board-title-wrap">
-                <h1 id="board-title">Entendamos las fracciones</h1>
-                <p id="board-subtitle">
-                  Vamos a verlo de una forma clara, visual y fácil de seguir, como si el profesor lo estuviera escribiendo en el pizarrón.
-                </p>
-              </div>
-
-              <div class="writing-chip">
-                <span class="pen-dot"></span>
-                <span id="writing-state">Escribiendo en el pizarrón</span>
-              </div>
-            </div>
-
-            <div class="board-main">
-              <div class="board-col">
-                <article class="board-card">
-                  <h3>Explicación paso a paso</h3>
-                  <div class="typed-lines" id="typed-lines"></div>
-                </article>
-
-                <article class="board-card">
-                  <h3 id="example-title">Ejemplo guiado</h3>
-                  <div class="example-box" id="example-box">
-                    1/2 + 1/4. Primero buscamos el mismo denominador. 1/2 es igual a 2/4. Entonces 2/4 + 1/4 = 3/4.
-                  </div>
-                </article>
-              </div>
-
-              <div class="board-col">
-                <article class="board-card">
-                  <h3>Objetivo de la clase</h3>
-                  <div class="goal-box" id="goal-box">
-                    Que el alumno entienda cómo leer, interpretar y operar fracciones simples sin memorizar mecánicamente.
-                  </div>
-                </article>
-
-                <article class="board-card">
-                  <h3 id="exercise-title">Mini ejercicio</h3>
-                  <div class="exercise-box" id="exercise-box">
-                    Calculá 3/4 - 1/4 y explicá por qué el denominador no cambia.
-                  </div>
-                </article>
-              </div>
-            </div>
-
-            <div class="board-footer">
-              <div class="quick-actions">
-                <button class="quick-btn" data-action="facil">Explicalo fácil</button>
-                <button class="quick-btn" data-action="ejemplo">Dame otro ejemplo</button>
-                <button class="quick-btn" data-action="pregunta">Tomame una pregunta</button>
-                <button class="quick-btn" data-action="resumen">Resumí la clase</button>
-                <button class="quick-btn" data-action="ejercicio">Dame un ejercicio</button>
-              </div>
-
-              <div class="input-wrap">
-                <input
-                  id="chat-input"
-                  type="text"
-                  placeholder="Escribí algo como: explicamelo más fácil, dame otro ejemplo, no entendí esta parte..."
-                />
-                <button id="send-btn" class="primary-btn send-btn" type="button">Enviar</button>
-              </div>
-            </div>
-          </div>
-        </section>
-      </div>
-    </section>
+      </section>
+    </div>
   </div>
 
   <script type="module" src="aula.js"></script>
