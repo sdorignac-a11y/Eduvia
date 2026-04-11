@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Eduvia | Clase</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg:#f7f2e8;
+      --bg-2:#efe6d6;
+      --paper:#fffdf8;
+      --paper-2:#fff8ef;
+      --text:#2f2738;
+      --muted:#72677d;
+      --line:rgba(111, 89, 163, .14);
+
+      --violet:#7c67d9;
+      --violet-2:#6d58cb;
+      --violet-soft:#efeaff;
+
+      --yellow:#ffd977;
+      --yellow-2:#ffc94d;
+
+      --green:#dff2df;
+      --blue:#ddefff;
+      --pink:#ffe2eb;
+
+      --shadow:0 24px 60px rgba(74, 49, 120, .14);
+      --shadow-soft:0 10px 24px rgba(74, 49, 120, .08);
+
+      --radius-xl:30px;
+      --radius-lg:22px;
+      --radius-md:16px;
+    }
+
+    *{
+      box-sizing:border-box;
+    }
+
+    html, body{
+      margin:0;
+      min-height:100%;
+    }
+
+    body{
+      font-family:'Inter', sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(255,255,255,.72), transparent 25%),
+        radial-gradient(circle at bottom right, rgba(255,255,255,.5), transparent 28%),
+        linear-gradient(180deg, var(--bg) 0%, var(--bg-2) 100%);
+      padding:36px 16px;
+      overflow-x:hidden;
+      position:relative;
+    }
+
+    body::before,
+    body::after{
+      content:"";
+      position:fixed;
+      border-radius:999px;
+      pointer-events:none;
+      z-index:0;
+      opacity:.45;
+      filter:blur(4px);
+    }
+
+    body::before{
+      width:220px;
+      height:220px;
+      background:rgba(124,103,217,.14);
+      top:-70px;
+      left:-60px;
+    }
+
+    body::after{
+      width:260px;
+      height:260px;
+      background:rgba(255,210,102,.18);
+      right:-80px;
+      bottom:-90px;
+    }
+
+    .page-wrap{
+      position:relative;
+      z-index:1;
+      max-width:980px;
+      margin:0 auto;
+    }
+
+    .sheet-frame{
+      position:relative;
+      max-width:860px;
+      margin:0 auto;
+      padding-top:34px;
+    }
+
+    .folder-tab{
+      position:absolute;
+      top:0;
+      left:34px;
+      min-height:58px;
+      padding:14px 24px;
+      border-radius:20px 20px 0 0;
+      background:linear-gradient(180deg, #ffe291 0%, var(--yellow) 100%);
+      border:1px solid rgba(137, 101, 15, .10);
+      box-shadow:0 12px 24px rgba(126, 89, 10, .12);
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      font-family:'Sora', sans-serif;
+      font-weight:700;
+      color:#6c5213;
+      letter-spacing:-.01em;
+    }
+
+    .sheet{
+      position:relative;
+      background:
+        linear-gradient(180deg, var(--paper) 0%, var(--paper-2) 100%);
+      border-radius:28px;
+      box-shadow:var(--shadow);
+      padding:34px;
+      border:1px solid rgba(109, 88, 61, .10);
+      overflow:hidden;
+    }
+
+    .sheet::before{
+      content:"";
+      position:absolute;
+      inset:18px;
+      border-radius:22px;
+      border:1px dashed rgba(116, 89, 170, .10);
+      pointer-events:none;
+    }
+
+    .sheet::after{
+      content:"";
+      position:absolute;
+      top:0;
+      left:86px;
+      bottom:0;
+      width:2px;
+      background:rgba(255, 105, 135, .14);
+      pointer-events:none;
+    }
+
+    .topbar{
+      position:relative;
+      z-index:2;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      padding-left:32px;
+      margin-bottom:26px;
+      flex-wrap:wrap;
+    }
+
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:10px 14px;
+      border-radius:999px;
+      background:var(--violet-soft);
+      border:1px solid rgba(124,103,217,.14);
+      color:var(--violet-2);
+      font-size:.86rem;
+      font-weight:800;
+      letter-spacing:.02em;
+      box-shadow:0 8px 18px rgba(106,86,200,.08);
+    }
+
+    .mini-note{
+      color:var(--muted);
+      font-size:.94rem;
+      font-weight:600;
+    }
+
+    .loading{
+      position:relative;
+      z-index:2;
+      min-height:440px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:30px 18px 18px 50px;
+      text-align:center;
+      color:var(--muted);
+    }
+
+    .loading-card{
+      background:rgba(255,255,255,.82);
+      border:1px solid rgba(124,103,217,.14);
+      border-radius:22px;
+      padding:24px 20px;
+      min-width:min(100%, 320px);
+      box-shadow:var(--shadow-soft);
+    }
+
+    .spinner{
+      width:40px;
+      height:40px;
+      margin:0 auto 14px;
+      border-radius:50%;
+      border:4px solid rgba(124,103,217,.16);
+      border-top-color:var(--violet);
+      animation:spin .85s linear infinite;
+    }
+
+    @keyframes spin{
+      to{ transform:rotate(360deg); }
+    }
+
+    #contenido{
+      position:relative;
+      z-index:2;
+      padding-left:32px;
+    }
+
+    .hero{
+      text-align:center;
+      padding:12px 0 26px;
+    }
+
+    .hero h1{
+      margin:0;
+      font-family:'Sora', sans-serif;
+      font-size:clamp(2rem, 4vw, 3rem);
+      line-height:1.05;
+      letter-spacing:-.04em;
+      color:#302742;
+    }
+
+    .hero-sub{
+      margin:12px auto 0;
+      max-width:560px;
+      color:var(--muted);
+      font-size:1rem;
+      line-height:1.7;
+    }
+
+    .tema-box{
+      margin:26px auto 0;
+      max-width:640px;
+      background:
+        linear-gradient(180deg, rgba(124,103,217,.08) 0%, rgba(124,103,217,.03) 100%),
+        #fff;
+      border:1px solid rgba(124,103,217,.14);
+      border-radius:26px;
+      padding:26px 22px;
+      box-shadow:0 16px 28px rgba(92, 64, 151, .08);
+      position:relative;
+      overflow:hidden;
+    }
+
+    .tema-box::before,
+    .tema-box::after{
+      content:"";
+      position:absolute;
+      top:14px;
+      width:22px;
+      height:22px;
+      border-radius:50%;
+      background:#fff2be;
+      border:1px solid rgba(154, 122, 43, .16);
+      box-shadow:inset 0 2px 3px rgba(255,255,255,.72);
+    }
+
+    .tema-box::before{ left:14px; }
+    .tema-box::after{ right:14px; }
+
+    .tema-label{
+      display:inline-block;
+      margin-bottom:10px;
+      font-size:.78rem;
+      font-weight:800;
+      text-transform:uppercase;
+      letter-spacing:.09em;
+      color:#8871da;
+    }
+
+    .tema-title{
+      font-family:'Sora', sans-serif;
+      font-size:clamp(1.35rem, 3vw, 2rem);
+      line-height:1.25;
+      font-weight:800;
+      color:var(--text);
+      word-break:break-word;
+    }
+
+    .details{
+      margin-top:28px;
+      display:grid;
+      grid-template-columns:repeat(2, minmax(0, 1fr));
+      gap:16px;
+    }
+
+    .dato{
+      background:rgba(255,255,255,.78);
+      border:1px solid var(--line);
+      border-radius:20px;
+      padding:16px 16px 15px;
+      box-shadow:var(--shadow-soft);
+      min-height:110px;
+    }
+
+    .label{
+      display:inline-block;
+      margin-bottom:9px;
+      padding:7px 11px;
+      border-radius:999px;
+      font-size:.76rem;
+      font-weight:800;
+      text-transform:uppercase;
+      letter-spacing:.08em;
+      color:#554987;
+      background:rgba(124,103,217,.09);
+      border:1px solid rgba(124,103,217,.10);
+    }
+
+    .value{
+      display:block;
+      font-size:1.04rem;
+      line-height:1.6;
+      color:var(--text);
+      font-weight:600;
+      word-break:break-word;
+    }
+
+    .dato.materia .label{ background:rgba(255, 217, 119, .22); color:#7a5a0e; border-color:rgba(160, 120, 24, .12); }
+    .dato.nivel .label{ background:rgba(221, 239, 255, .75); color:#31597f; border-color:rgba(68, 120, 174, .10); }
+    .dato.duracion .label{ background:rgba(223, 242, 223, .85); color:#3d7040; border-color:rgba(87, 143, 91, .10); }
+    .dato.objetivo .label{ background:rgba(255, 226, 235, .92); color:#904f63; border-color:rgba(176, 100, 125, .10); }
+
+    .footer-note{
+      margin-top:22px;
+      background:linear-gradient(180deg, #fffaf0 0%, #fff4df 100%);
+      border:1px solid rgba(189, 152, 69, .12);
+      border-radius:18px;
+      padding:15px 16px;
+      color:#7a6850;
+      font-size:.96rem;
+      line-height:1.6;
+    }
+
+    .actions{
+      margin-top:28px;
+      display:flex;
+      justify-content:center;
+      gap:14px;
+      flex-wrap:wrap;
+    }
+
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-height:52px;
+      padding:0 22px;
+      border-radius:16px;
+      text-decoration:none;
+      font-weight:800;
+      font-size:.98rem;
+      transition:transform .18s ease, box-shadow .18s ease, background .18s ease;
+      border:1px solid transparent;
+    }
+
+    .btn:hover{
+      transform:translateY(-2px);
+    }
+
+    .btn.secondary{
+      background:rgba(255,255,255,.82);
+      color:#382f4e;
+      border-color:rgba(124,103,217,.12);
+      box-shadow:0 10px 18px rgba(72, 52, 107, .07);
+    }
+
+    .btn.primary{
+      background:linear-gradient(180deg, var(--violet) 0%, var(--violet-2) 100%);
+      color:#fff;
+      box-shadow:0 16px 28px rgba(106, 86, 200, .24);
+    }
+
+    @media (max-width: 740px){
+      .sheet{
+        padding:26px 18px;
+      }
+
+      .sheet::after{
+        left:54px;
+      }
+
+      .folder-tab{
+        left:18px;
+      }
+
+      .topbar,
+      #contenido{
+        padding-left:18px;
+      }
+
+      .details{
+        grid-template-columns:1fr;
+      }
+    }
+
+    @media (max-width: 520px){
+      body{
+        padding:22px 10px;
+      }
+
+      .sheet-frame{
+        padding-top:28px;
+      }
+
+      .folder-tab{
+        min-height:50px;
+        padding:11px 16px;
+        font-size:.92rem;
+        border-radius:16px 16px 0 0;
+      }
+
+      .sheet{
+        border-radius:22px;
+        padding:22px 14px;
+      }
+
+      .sheet::before{
+        inset:12px;
+        border-radius:16px;
+      }
+
+      .sheet::after{
+        left:34px;
+      }
+
+      .topbar,
+      #contenido{
+        padding-left:12px;
+      }
+
+      .hero{
+        padding-top:4px;
+      }
+
+      .tema-box{
+        padding:24px 16px;
+        border-radius:22px;
+      }
+
+      .dato{
+        min-height:auto;
+      }
+
+      .actions{
+        flex-direction:column;
+      }
+
+      .btn{
+        width:100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page-wrap">
+    <section class="sheet-frame">
+      <div class="folder-tab">📚 Ficha de clase</div>
+
+      <div class="sheet">
+        <div class="topbar">
+          <div class="badge">Eduvia · Vista previa</div>
+          <div class="mini-note">Prepará todo antes de entrar al aula</div>
+        </div>
+
+        <div id="loading" class="loading">
+          <div class="loading-card">
+            <div class="spinner"></div>
+            Cargando clase...
+          </div>
+        </div>
+
+        <div id="contenido" style="display:none;">
+          <section class="hero">
+            <h1 id="titulo-clase">Clase</h1>
+            <p class="hero-sub">
+              Revisá la información principal de esta clase antes de empezar.
+            </p>
+
+            <div class="tema-box">
+              <div class="tema-label">Tema central</div>
+              <div class="tema-title" id="tema"></div>
+            </div>
+          </section>
+
+          <section class="details">
+            <div class="dato materia">
+              <span class="label">Materia</span>
+              <span class="value" id="materia"></span>
+            </div>
+
+            <div class="dato nivel">
+              <span class="label">Nivel</span>
+              <span class="value" id="nivel"></span>
+            </div>
+
+            <div class="dato duracion">
+              <span class="label">Duración</span>
+              <span class="value" id="duracion"></span>
+            </div>
+
+            <div class="dato objetivo">
+              <span class="label">Objetivo</span>
+              <span class="value" id="objetivo"></span>
+            </div>
+          </section>
+
+          <div class="footer-note">
+            Todo está organizado para que entres a la clase con el tema claro y una idea rápida de lo que vas a aprender.
+          </div>
+
+          <div class="actions">
+            <a href="panel.html" class="btn secondary">← Volver al panel</a>
+            <a id="btn-empezar-clase" href="#" class="btn primary">Empezar clase →</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script type="module" src="clase.js"></script>
+</body>
+</html>

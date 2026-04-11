@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Eduvia | Mis clases</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg:#f8f3e8;
+      --paper:#fffdf8;
+      --paper-2:#fff8ee;
+      --paper-3:#fff5e5;
+      --text:#2b2434;
+      --muted:#6f6577;
+
+      --violet:#7c6cf2;
+      --violet-soft:#efeaff;
+      --yellow:#ffe89c;
+      --yellow-soft:#fff4c9;
+      --sky:#d8f0ff;
+      --mint:#def4ba;
+      --orange:#ffb36b;
+      --pink:#ffddea;
+
+      --line:rgba(124,108,242,.12);
+      --red-line:rgba(255,90,110,.18);
+
+      --shadow:0 18px 40px rgba(63,72,138,.08);
+      --shadow-soft:0 10px 24px rgba(63,72,138,.06);
+
+      --sidebar:250px;
+    }
+
+    *{
+      box-sizing:border-box;
+      margin:0;
+      padding:0;
+    }
+
+    html{
+      scroll-behavior:smooth;
+    }
+
+    body{
+      font-family:"Inter",sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(255,255,255,.76), transparent 30%),
+        radial-gradient(circle at bottom right, rgba(255,232,156,.22), transparent 24%),
+        var(--bg);
+      min-height:100vh;
+      overflow-x:hidden;
+    }
+
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      background-image:
+        linear-gradient(rgba(124,108,242,.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(124,108,242,.04) 1px, transparent 1px);
+      background-size:28px 28px;
+      pointer-events:none;
+      z-index:0;
+      opacity:.65;
+    }
+
+    body::after{
+      content:"";
+      position:fixed;
+      inset:0;
+      background:
+        radial-gradient(circle at 10% 18%, rgba(255,255,255,.45) 0 2px, transparent 2px),
+        radial-gradient(circle at 82% 24%, rgba(255,255,255,.38) 0 2px, transparent 2px),
+        radial-gradient(circle at 28% 84%, rgba(255,255,255,.3) 0 2px, transparent 2px);
+      background-size:180px 180px, 220px 220px, 250px 250px;
+      pointer-events:none;
+      opacity:.35;
+      z-index:0;
+    }
+
+    .app{
+      position:relative;
+      z-index:1;
+      display:grid;
+      grid-template-columns:var(--sidebar) 1fr;
+      min-height:100vh;
+    }
+
+    .sidebar{
+      position:sticky;
+      top:0;
+      height:100vh;
+      background:rgba(255,252,245,.92);
+      backdrop-filter:blur(14px);
+      border-right:2px dashed rgba(124,108,242,.14);
+      padding:22px 18px;
+      display:flex;
+      flex-direction:column;
+      gap:18px;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      padding:8px 6px 16px;
+      border-bottom:1px dashed rgba(124,108,242,.16);
+    }
+
+    .brand-mark{
+      width:46px;
+      height:46px;
+      border-radius:14px;
+      display:grid;
+      place-items:center;
+      font-family:"Sora",sans-serif;
+      font-weight:800;
+      color:#fff;
+      background:linear-gradient(135deg, var(--violet), var(--orange));
+      box-shadow:0 12px 24px rgba(124,108,242,.2);
+      flex:none;
+    }
+
+    .brand-text strong{
+      display:block;
+      font-family:"Sora",sans-serif;
+      font-size:1rem;
+      letter-spacing:-.03em;
+    }
+
+    .brand-text span{
+      color:var(--muted);
+      font-size:.83rem;
+    }
+
+    .menu{
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+    }
+
+    .menu a,
+    .menu button{
+      width:100%;
+      text-decoration:none;
+      border:none;
+      background:transparent;
+      text-align:left;
+      color:#4b425a;
+      padding:13px 14px;
+      border-radius:15px;
+      font-weight:700;
+      font-family:inherit;
+      font-size:1rem;
+      cursor:pointer;
+      transition:.2s ease;
+    }
+
+    .menu a:hover,
+    .menu button:hover{
+      background:#f7efff;
+      color:#6b5ee8;
+      transform:translateX(4px);
+    }
+
+    .menu a.active{
+      background:linear-gradient(135deg, rgba(124,108,242,.14), rgba(255,179,107,.16));
+      color:#6b5ee8;
+      box-shadow:var(--shadow-soft);
+    }
+
+    .menu button:focus{
+      outline:none;
+      box-shadow:0 0 0 4px rgba(124,108,242,.08);
+    }
+
+    .sidebar-note{
+      margin-top:auto;
+      background:linear-gradient(180deg, #fff1ad, #ffe291);
+      border:1px solid rgba(255,179,107,.24);
+      border-radius:20px;
+      padding:15px;
+      box-shadow:var(--shadow-soft);
+      transform:rotate(-1deg);
+    }
+
+    .sidebar-note strong{
+      display:block;
+      margin-bottom:6px;
+      font-size:.95rem;
+    }
+
+    .sidebar-note p{
+      color:#635869;
+      font-size:.88rem;
+      line-height:1.55;
+    }
+
+    .main{
+      padding:28px;
+    }
+
+    .page{
+      max-width:1200px;
+      margin:0 auto;
+      display:grid;
+      gap:22px;
+    }
+
+    /* HERO CARPETA */
+    .hero-folder{
+      position:relative;
+      background:linear-gradient(180deg, var(--paper) 0%, var(--paper-2) 100%);
+      border:2px solid rgba(124,108,242,.08);
+      border-radius:34px;
+      padding:22px;
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
+
+    .hero-folder::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        radial-gradient(circle at top left, rgba(255,255,255,.84), transparent 26%),
+        radial-gradient(circle at bottom right, rgba(255,232,156,.16), transparent 20%);
+      pointer-events:none;
+    }
+
+    .folder-shell{
+      position:relative;
+      z-index:1;
+      background:linear-gradient(180deg, #f8c86e 0%, #efb85b 100%);
+      border-radius:30px 30px 26px 26px;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.35), 0 12px 22px rgba(79,61,31,.08);
+      padding-top:26px;
+    }
+
+    .folder-tab{
+      position:absolute;
+      top:0;
+      left:28px;
+      width:220px;
+      height:52px;
+      border-radius:18px 18px 0 0;
+      background:linear-gradient(180deg, #ffd98c 0%, #f7c66d 100%);
+      box-shadow:0 6px 12px rgba(79,61,31,.08);
+    }
+
+    .folder-front{
+      position:relative;
+      background:linear-gradient(180deg, #fff8ea 0%, #fffdf8 100%);
+      border-radius:24px;
+      padding:28px;
+      display:grid;
+      grid-template-columns:1.1fr .9fr;
+      gap:22px;
+      overflow:hidden;
+      border:1px solid rgba(124,108,242,.08);
+      box-shadow:0 10px 24px rgba(63,72,138,.06);
+    }
+
+    .folder-front::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        linear-gradient(transparent 35px, rgba(124,108,242,.03) 36px);
+      background-size:100% 36px;
+      pointer-events:none;
+      opacity:.8;
+    }
+
+    .folder-front::after{
+      content:"";
+      position:absolute;
+      left:22px;
+      top:0;
+      bottom:0;
+      width:2px;
+      background:var(--red-line);
+      pointer-events:none;
+    }
+
+    .folder-left,
+    .folder-right{
+      position:relative;
+      z-index:1;
+      padding-left:16px;
+    }
+
+    .folder-chip{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      padding:10px 14px;
+      border-radius:999px;
+      background:var(--violet-soft);
+      border:1px solid rgba(124,108,242,.12);
+      color:#675d79;
+      font-size:.9rem;
+      margin-bottom:16px;
+      box-shadow:var(--shadow-soft);
+      font-weight:800;
+      transform:rotate(-1.4deg);
+    }
+
+    .folder-left h1{
+      font-family:"Sora",sans-serif;
+      font-size:clamp(2rem,4vw,3rem);
+      line-height:1.04;
+      letter-spacing:-.04em;
+      margin-bottom:14px;
+      max-width:650px;
+    }
+
+    .folder-left h1 span{
+      color:var(--violet);
+    }
+
+    .folder-left p{
+      color:var(--muted);
+      line-height:1.8;
+      max-width:650px;
+      font-size:1rem;
+    }
+
+    .stats{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-top:20px;
+    }
+
+    .stat{
+      padding:12px 16px;
+      border-radius:18px;
+      background:#fff;
+      border:1px solid rgba(124,108,242,.12);
+      box-shadow:var(--shadow-soft);
+      font-weight:800;
+      color:#5a5068;
+      transform:rotate(-1deg);
+    }
+
+    .mini-folder{
+      position:relative;
+      background:linear-gradient(180deg, #fff1a8 0%, #fff8d8 100%);
+      border:1px solid rgba(255,179,107,.24);
+      border-radius:24px;
+      padding:22px;
+      box-shadow:var(--shadow-soft);
+      transform:rotate(1.2deg);
+      align-self:start;
+    }
+
+    .mini-folder::before{
+      content:"";
+      position:absolute;
+      top:-1px;
+      left:22px;
+      width:110px;
+      height:24px;
+      border-radius:12px 12px 0 0;
+      background:#ffe08c;
+    }
+
+    .mini-folder::after{
+      content:"";
+      position:absolute;
+      top:14px;
+      right:18px;
+      width:60px;
+      height:16px;
+      background:rgba(124,108,242,.14);
+      border-radius:6px;
+      transform:rotate(8deg);
+    }
+
+    .mini-folder h3{
+      position:relative;
+      z-index:1;
+      font-family:"Sora",sans-serif;
+      font-size:1.08rem;
+      margin-bottom:12px;
+      letter-spacing:-.03em;
+    }
+
+    .mini-folder p{
+      position:relative;
+      z-index:1;
+      color:#4f5a6f;
+      line-height:1.72;
+      font-size:.95rem;
+    }
+
+    /* SECCION */
+    .section-folder{
+      position:relative;
+      background:rgba(255,252,247,.94);
+      border:1px solid rgba(255,255,255,.8);
+      border-radius:30px;
+      padding:24px;
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
+
+    .section-folder::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        radial-gradient(circle at top left, rgba(255,255,255,.7), transparent 24%);
+      pointer-events:none;
+    }
+
+    .section-head{
+      position:relative;
+      z-index:1;
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:16px;
+      margin-bottom:18px;
+      flex-wrap:wrap;
+    }
+
+    .section-head h2{
+      font-family:"Sora",sans-serif;
+      font-size:1.55rem;
+      letter-spacing:-.04em;
+    }
+
+    .section-head p{
+      color:var(--muted);
+      max-width:680px;
+      line-height:1.75;
+    }
+
+    .classes-grid{
+      position:relative;
+      z-index:1;
+      display:grid;
+      grid-template-columns:repeat(2, minmax(0, 1fr));
+      gap:18px;
+    }
+
+    /* TARJETAS COMO CARPETAS */
+    .class-card{
+      position:relative;
+      background:linear-gradient(180deg,#fffdf8 0%, #fff8ee 100%);
+      border:2px solid rgba(124,108,242,.08);
+      border-radius:26px;
+      padding:26px 22px 22px;
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
+
+    .class-card::before{
+      content:"";
+      position:absolute;
+      top:0;
+      left:20px;
+      width:128px;
+      height:24px;
+      border-radius:0 0 12px 12px;
+      background:linear-gradient(180deg, #d9f0ff 0%, #cde9fb 100%);
+      box-shadow:0 4px 10px rgba(63,72,138,.05);
+    }
+
+    .class-card::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        radial-gradient(circle at top left, rgba(255,255,255,.82), transparent 24%);
+      pointer-events:none;
+    }
+
+    .class-top,
+    .meta,
+    .objective,
+    .card-actions{
+      position:relative;
+      z-index:1;
+    }
+
+    .class-top{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:14px;
+      margin-bottom:14px;
+      padding-top:8px;
+    }
+
+    .badge{
+      width:46px;
+      height:46px;
+      border-radius:15px;
+      display:grid;
+      place-items:center;
+      background:#fff;
+      border:2px solid rgba(124,108,242,.14);
+      box-shadow:0 6px 14px rgba(124,108,242,.08);
+      font-size:1.15rem;
+      flex:none;
+      transform:rotate(-2deg);
+    }
+
+    .class-title{
+      flex:1;
+    }
+
+    .class-title h3{
+      font-family:"Sora",sans-serif;
+      font-size:1.1rem;
+      letter-spacing:-.03em;
+      margin-bottom:4px;
+    }
+
+    .class-title p{
+      color:var(--muted);
+      font-size:.94rem;
+      line-height:1.6;
+    }
+
+    .meta{
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:10px;
+      margin:16px 0;
+    }
+
+    .meta-box{
+      background:#fff;
+      border:1px solid rgba(124,108,242,.12);
+      border-radius:16px;
+      padding:12px;
+      box-shadow:var(--shadow-soft);
+    }
+
+    .meta-box span{
+      display:block;
+      font-size:.78rem;
+      color:#7b7084;
+      margin-bottom:4px;
+      font-weight:700;
+    }
+
+    .meta-box strong{
+      font-size:.93rem;
+      color:#30283c;
+    }
+
+    .objective{
+      margin-top:4px;
+      padding:14px;
+      border-radius:18px;
+      background:linear-gradient(180deg, #fffefb 0%, #fff8ef 100%);
+      border:1px solid rgba(124,108,242,.12);
+      color:#554b63;
+      line-height:1.7;
+      font-size:.93rem;
+      box-shadow:var(--shadow-soft);
+    }
+
+    .card-actions{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-top:16px;
+    }
+
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      border:none;
+      text-decoration:none;
+      cursor:pointer;
+      font-family:inherit;
+      font-weight:800;
+      border-radius:999px;
+      padding:13px 18px;
+      transition:.2s ease;
+    }
+
+    .btn:hover{
+      transform:translateY(-2px);
+    }
+
+    .btn-primary{
+      color:#fff;
+      background:linear-gradient(135deg, var(--violet), var(--orange));
+      box-shadow:0 14px 28px rgba(124,108,242,.16);
+    }
+
+    .btn-soft{
+      color:var(--violet);
+      background:#efeaff;
+    }
+
+    .empty-state,
+    .loading-state{
+      position:relative;
+      z-index:1;
+      text-align:center;
+      padding:34px 20px;
+      border-radius:24px;
+      background:#fff;
+      border:1px solid rgba(124,108,242,.12);
+      box-shadow:var(--shadow-soft);
+      color:var(--muted);
+      line-height:1.8;
+    }
+
+    .empty-state strong,
+    .loading-state strong{
+      display:block;
+      color:var(--text);
+      margin-bottom:6px;
+      font-size:1.05rem;
+    }
+
+    @media (max-width: 1080px){
+      .folder-front,
+      .classes-grid{
+        grid-template-columns:1fr;
+      }
+    }
+
+    @media (max-width: 820px){
+      .app{
+        grid-template-columns:1fr;
+      }
+
+      .sidebar{
+        position:relative;
+        height:auto;
+        border-right:none;
+        border-bottom:2px dashed rgba(124,108,242,.12);
+      }
+
+      .main{
+        padding:18px;
+      }
+
+      .hero-folder,
+      .section-folder{
+        padding:20px;
+        border-radius:24px;
+      }
+
+      .folder-front{
+        padding:20px;
+        border-radius:20px;
+      }
+
+      .meta{
+        grid-template-columns:1fr;
+      }
+
+      .folder-left,
+      .folder-right{
+        padding-left:10px;
+      }
+    }
+
+    @media (max-width: 640px){
+      .folder-tab{
+        width:160px;
+        left:18px;
+      }
+
+      .mini-folder{
+        transform:none;
+      }
+
+      .stat{
+        width:100%;
+      }
+
+      .card-actions .btn{
+        width:100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">E</div>
+        <div class="brand-text">
+          <strong>Eduvia</strong>
+          <span>Tu aula con IA</span>
+        </div>
+      </div>
+
+      <nav class="menu">
+        <a href="panel.html">Inicio</a>
+        <a href="crear-clase.html">Crear nueva clase</a>
+        <a href="panel.html#guia">Cómo funciona</a>
+        <a href="mis-clases.html" class="active">Mis clases</a>
+        <a href="#">Historial</a>
+        <a href="#">Ajustes</a>
+        <button id="logout" type="button">Cerrar sesión</button>
+      </nav>
+
+      <div class="sidebar-note">
+        <strong>Consejo</strong>
+        <p>Desde acá vas a poder abrir rápido cada clase y después sumar materiales, pizarra y reunión.</p>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="page">
+
+        <section class="hero-folder">
+          <div class="folder-shell">
+            <div class="folder-tab"></div>
+
+            <div class="folder-front">
+              <div class="folder-left">
+                <div class="folder-chip">📂 Tus clases guardadas</div>
+                <h1>Todo lo que creaste en <span>un solo lugar</span>.</h1>
+                <p>
+                  Acá se muestran las clases que fuiste armando. Podés entrar a cada una,
+                  revisar el tema, el nivel y seguir construyendo la experiencia.
+                </p>
+
+                <div class="stats">
+                  <div class="stat">📚 Total: <span id="total-clases">0</span></div>
+                </div>
+              </div>
+
+              <div class="folder-right">
+                <div class="mini-folder">
+                  <h3>Qué podés hacer desde acá</h3>
+                  <p>
+                    Abrir una clase ya creada, revisar su información y usar esta pantalla
+                    como base para después sumar materiales, pizarra y la parte en vivo.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section-folder">
+          <div class="section-head">
+            <div>
+              <h2>Listado de clases</h2>
+              <p>
+                Cada tarjeta corresponde a una clase creada por tu cuenta. Solo vas a ver las tuyas.
+              </p>
+            </div>
+          </div>
+
+          <div id="loading-state" class="loading-state">
+            <strong>Cargando clases...</strong>
+            Esperá un segundo mientras buscamos tu contenido.
+          </div>
+
+          <div id="empty-state" class="empty-state" style="display:none;">
+            <strong>Todavía no creaste clases</strong>
+            Cuando armes una nueva clase desde el panel, te va a aparecer acá automáticamente.
+            <div style="margin-top:16px;">
+              <a href="crear-clase.html" class="btn btn-primary">Crear primera clase</a>
+            </div>
+          </div>
+
+          <div id="classes-grid" class="classes-grid" style="display:none;"></div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <script type="module" src="mis-clases.js"></script>
+</body>
+</html>

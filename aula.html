@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Eduvia | Aula</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Kalam:wght@400;700&display=swap" rel="stylesheet">
+
+  <style>
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+    }
+
+    :root{
+      --bg:#f3efe8;
+      --card:#f7f3ec;
+      --wall-top:#f3efe8;
+      --wall-bottom:#cfd7c7;
+      --frame:#c9975f;
+      --board:#f8f8f8;
+      --ink:#2f3a44;
+      --muted:#5e6c78;
+      --line:rgba(46, 66, 84, .12);
+      --green:#2f7d55;
+      --blue:#355d95;
+      --soft:#f6f8fb;
+    }
+
+    body{
+      min-height:100vh;
+      font-family:'Inter', sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(255,255,255,0.7), transparent 30%),
+        linear-gradient(180deg, #efe9df 0%, #e9e2d8 100%);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:22px;
+      overflow:hidden;
+    }
+
+    .scene{
+      width:min(1400px, 100%);
+      height:min(860px, calc(100vh - 44px));
+      background:var(--card);
+      border-radius:30px;
+      box-shadow:
+        0 25px 80px rgba(0,0,0,0.10),
+        inset 0 1px 0 rgba(255,255,255,0.7);
+      position:relative;
+      overflow:hidden;
+    }
+
+    .wall{
+      position:absolute;
+      inset:0;
+      background:
+        linear-gradient(
+          to bottom,
+          var(--wall-top) 0%,
+          var(--wall-top) 72%,
+          var(--wall-bottom) 72%,
+          var(--wall-bottom) 100%
+        );
+    }
+
+    .wall::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      opacity:.16;
+      background-image:
+        radial-gradient(rgba(0,0,0,.08) 0.5px, transparent 0.5px);
+      background-size:6px 6px;
+      mix-blend-mode:multiply;
+      pointer-events:none;
+    }
+
+    .wall::after{
+      content:"";
+      position:absolute;
+      left:-40px;
+      top:50px;
+      width:280px;
+      height:700px;
+      background:
+        linear-gradient(
+          115deg,
+          rgba(0,0,0,0.10) 0 12%,
+          transparent 12% 25%,
+          rgba(0,0,0,0.10) 25% 37%,
+          transparent 37% 50%,
+          rgba(0,0,0,0.10) 50% 62%,
+          transparent 62% 75%,
+          rgba(0,0,0,0.10) 75% 87%,
+          transparent 87% 100%
+        );
+      opacity:.23;
+      transform:skewY(-8deg);
+      pointer-events:none;
+      filter:blur(1px);
+    }
+
+    .board-wrap{
+      position:absolute;
+      left:50%;
+      top:49%;
+      transform:translate(-50%, -50%);
+      width:min(1180px, 90%);
+    }
+
+    .whiteboard{
+      position:relative;
+      width:100%;
+      aspect-ratio:2.05 / 1;
+      background:
+        linear-gradient(180deg, #fcfcfc 0%, #f7f7f7 100%);
+      border:14px solid var(--frame);
+      border-bottom-width:18px;
+      border-radius:4px;
+      box-shadow:
+        inset 0 0 0 2px rgba(255,255,255,0.75),
+        inset 0 0 26px rgba(0,0,0,0.05),
+        0 18px 45px rgba(0,0,0,0.12);
+      overflow:hidden;
+    }
+
+    .whiteboard::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        linear-gradient(115deg, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0.08) 28%, transparent 50%);
+      pointer-events:none;
+    }
+
+    .whiteboard::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      box-shadow: inset 0 -12px 24px rgba(0,0,0,0.04);
+      pointer-events:none;
+    }
+
+    .board-clips{
+      position:absolute;
+      top:-8px;
+      left:0;
+      width:100%;
+      pointer-events:none;
+      z-index:3;
+    }
+
+    .clip{
+      position:absolute;
+      width:56px;
+      height:24px;
+      background:linear-gradient(180deg, #3f454c 0%, #2d3136 100%);
+      border-radius:5px;
+      box-shadow:0 6px 12px rgba(0,0,0,0.18);
+    }
+
+    .clip.left{ left:84px; }
+    .clip.right{ right:84px; }
+
+    .marker-nav{
+      position:absolute;
+      top:18px;
+      left:28px;
+      right:28px;
+      display:flex;
+      justify-content:center;
+      gap:12px;
+      z-index:5;
+      flex-wrap:wrap;
+    }
+
+    .marker-btn{
+      border:none;
+      outline:none;
+      cursor:pointer;
+      padding:10px 18px 9px;
+      border-radius:999px;
+      font-family:'Kalam', cursive;
+      font-size:1.02rem;
+      font-weight:700;
+      color:#22303a;
+      box-shadow:
+        0 8px 18px rgba(0,0,0,0.10),
+        inset 0 -2px 0 rgba(0,0,0,0.08),
+        inset 0 1px 0 rgba(255,255,255,0.45);
+      transition:transform .18s ease, box-shadow .18s ease, filter .18s ease;
+      position:relative;
+    }
+
+    .marker-btn:hover{
+      transform:translateY(-2px) scale(1.03);
+      box-shadow:
+        0 12px 20px rgba(0,0,0,0.14),
+        inset 0 -2px 0 rgba(0,0,0,0.08),
+        inset 0 1px 0 rgba(255,255,255,0.45);
+    }
+
+    .marker-btn:active{
+      transform:translateY(1px) scale(.99);
+    }
+
+    .marker-btn::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      border-radius:999px;
+      background:linear-gradient(180deg, rgba(255,255,255,.24), transparent 55%);
+      pointer-events:none;
+    }
+
+    .marker-btn.green{ background:#b9e7b0; }
+    .marker-btn.blue{ background:#b9d9ff; }
+    .marker-btn.yellow{ background:#f5e89c; }
+    .marker-btn.red{
+      background:#f4aaa5;
+      color:#5a1f1f;
+    }
+
+    .board-content{
+      position:absolute;
+      inset:82px 28px 32px 28px;
+      border-radius:12px;
+      z-index:2;
+      padding:12px 14px 12px 12px;
+      overflow:auto;
+      scrollbar-width:thin;
+      scrollbar-color:rgba(74,96,118,.35) transparent;
+    }
+
+    .board-content::-webkit-scrollbar{
+      width:10px;
+    }
+
+    .board-content::-webkit-scrollbar-thumb{
+      background:rgba(74,96,118,.35);
+      border-radius:999px;
+    }
+
+    .placeholder-text{
+      font-family:'Kalam', cursive;
+      font-size:2rem;
+      color:#40505e;
+      opacity:.28;
+      user-select:none;
+    }
+
+    .board-loading{
+      font-family:'Kalam', cursive;
+      font-size:1.9rem;
+      color:#4a6276;
+      opacity:.72;
+    }
+
+    .board-error{
+      max-width:680px;
+      padding:20px 22px;
+      border-radius:18px;
+      background:rgba(244, 170, 165, .18);
+      border:1px solid rgba(190, 72, 63, .18);
+      color:#6a2d28;
+      font-weight:700;
+      line-height:1.6;
+    }
+
+    .board-lesson{
+      width:100%;
+      max-width:1000px;
+      color:var(--ink);
+      padding:8px 8px 20px;
+      display:flex;
+      flex-direction:column;
+      gap:18px;
+    }
+
+    .board-head{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:16px;
+      flex-wrap:wrap;
+      border-bottom:2px dashed rgba(53,93,149,.18);
+      padding-bottom:10px;
+    }
+
+    .board-title{
+      font-family:'Kalam', cursive;
+      font-size:2.2rem;
+      line-height:1.05;
+      color:#2d4f76;
+      margin:0;
+    }
+
+    .board-badge{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 14px;
+      border-radius:999px;
+      background:#eef5ff;
+      border:1px solid rgba(53,93,149,.12);
+      color:#2d4f76;
+      font-weight:800;
+      font-size:.85rem;
+    }
+
+    .board-section{
+      background:rgba(255,255,255,.72);
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:16px 18px;
+      box-shadow:0 8px 18px rgba(0,0,0,.04);
+    }
+
+    .board-section h2{
+      margin:0 0 10px;
+      font-size:1rem;
+      font-weight:800;
+      color:#2f7d55;
+      letter-spacing:.01em;
+    }
+
+    .board-section p{
+      margin:0;
+      line-height:1.75;
+      color:#364754;
+      font-size:1rem;
+    }
+
+    .board-list{
+      display:grid;
+      gap:10px;
+      list-style:none;
+      padding:0;
+      margin:0;
+    }
+
+    .board-list li{
+      padding:12px 14px;
+      border-radius:14px;
+      background:var(--soft);
+      border:1px solid rgba(53,93,149,.08);
+      line-height:1.65;
+      color:#33414d;
+      font-weight:600;
+    }
+
+    .board-list li::before{
+      content:"• ";
+      color:var(--blue);
+      font-weight:900;
+    }
+
+    .board-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:14px;
+    }
+
+    .board-card{
+      background:rgba(255,255,255,.78);
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:16px 18px;
+    }
+
+    .board-card h3{
+      margin:0 0 8px;
+      font-size:1rem;
+      color:#2d4f76;
+    }
+
+    .board-card p{
+      margin:0;
+      line-height:1.7;
+      color:#394955;
+    }
+
+    .tray{
+      position:absolute;
+      left:18px;
+      bottom:10px;
+      display:flex;
+      gap:8px;
+      align-items:center;
+      z-index:4;
+    }
+
+    .marker{
+      width:32px;
+      height:7px;
+      border-radius:999px;
+      box-shadow:0 2px 5px rgba(0,0,0,0.12);
+    }
+
+    .marker.green{ background:#5ca46c; }
+    .marker.blue{ background:#355d95; }
+    .marker.white{ background:#ececec; border:1px solid rgba(0,0,0,0.08); }
+    .marker.red{ background:#d9534f; }
+    .marker.black{ background:#26313a; }
+
+    @media (max-width: 900px){
+      .scene{
+        border-radius:22px;
+        height:min(700px, calc(100vh - 24px));
+      }
+
+      .board-wrap{
+        width:92%;
+        top:47%;
+      }
+
+      .clip{
+        width:42px;
+        height:20px;
+      }
+
+      .clip.left{ left:40px; }
+      .clip.right{ right:40px; }
+
+      .board-title{
+        font-size:1.9rem;
+      }
+    }
+
+    @media (max-width: 640px){
+      body{
+        padding:12px;
+      }
+
+      .scene{
+        height:min(560px, calc(100vh - 24px));
+        border-radius:18px;
+      }
+
+      .board-wrap{
+        width:94%;
+        top:45%;
+      }
+
+      .whiteboard{
+        border-width:10px;
+        border-bottom-width:14px;
+      }
+
+      .marker-nav{
+        top:14px;
+        left:14px;
+        right:14px;
+        gap:8px;
+      }
+
+      .marker-btn{
+        padding:8px 14px 7px;
+        font-size:.95rem;
+      }
+
+      .board-content{
+        inset:78px 16px 24px 16px;
+      }
+
+      .placeholder-text{
+        font-size:1.45rem;
+      }
+
+      .board-loading{
+        font-size:1.4rem;
+      }
+
+      .board-grid{
+        grid-template-columns:1fr;
+      }
+
+      .tray{
+        left:12px;
+        bottom:8px;
+        gap:6px;
+      }
+
+      .marker{
+        width:24px;
+        height:6px;
+      }
+
+      .clip.left{ left:22px; }
+      .clip.right{ right:22px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="scene">
+    <div class="wall"></div>
+
+    <section class="board-wrap">
+      <div class="whiteboard">
+        <div class="board-clips">
+          <span class="clip left"></span>
+          <span class="clip right"></span>
+        </div>
+
+        <div class="marker-nav">
+          <button class="marker-btn green" onclick="location.href='panel.html'">Inicio</button>
+          <button class="marker-btn blue" onclick="location.href='materiales.html'">Material</button>
+          <button class="marker-btn yellow" onclick="location.href='chat.html'">Chat</button>
+          <button class="marker-btn red" onclick="location.href='panel.html'">Abandonar sala</button>
+        </div>
+
+        <div class="board-content" id="board-content">
+          <div class="placeholder-text">Tu clase se mostrará acá</div>
+        </div>
+
+        <div class="tray">
+          <span class="marker green"></span>
+          <span class="marker blue"></span>
+          <span class="marker white"></span>
+          <span class="marker red"></span>
+          <span class="marker black"></span>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script type="module" src="aula.js"></script>
+</body>
+</html>
