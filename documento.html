@@ -381,30 +381,6 @@
       </article>
     </div>
   </main>
-
-  <script>
-    const claseActual = JSON.parse(localStorage.getItem("claseActual") || "{}");
-
-    const tema = claseActual.tema || "Documento sin título";
-    const materia = claseActual.materia || "Sin materia";
-    const nivel = claseActual.nivel || "No definido";
-    const duracion = claseActual.duracion || "No definida";
-    const objetivo = claseActual.objetivo || "";
-
-    document.getElementById("topbar-title").textContent = tema;
-    document.getElementById("doc-title").textContent = tema;
-
-    document.getElementById("chip-materia").textContent = `Materia: ${materia}`;
-    document.getElementById("chip-nivel").textContent = `Nivel: ${nivel}`;
-    document.getElementById("chip-duracion").textContent = `Duración: ${duracion}`;
-
-    document.getElementById("meta-materia").textContent = `Materia: ${materia}`;
-    document.getElementById("meta-nivel").textContent = `Nivel: ${nivel}`;
-    document.getElementById("meta-duracion").textContent = `Duración: ${duracion}`;
-
-    if (objetivo) {
-      document.getElementById("doc-objective").textContent = `Objetivo: ${objetivo}`;
-    }
-  </script>
+<script type="module" src="documento.js"></script>
 </body>
 </html>
