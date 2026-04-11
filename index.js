@@ -8,17 +8,12 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
+app.use(express.static("."));
 
 const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-// ruta de prueba
-app.get("/", (req, res) => {
-  res.send("Backend de Eduvia funcionando");
-});
-
-// ruta para generar la clase
 app.post("/api/generar-clase", async (req, res) => {
   try {
     const { materia, tema, nivel, duracion, objetivo } = req.body || {};
@@ -30,52 +25,61 @@ app.post("/api/generar-clase", async (req, res) => {
       });
     }
 
-    const prompt = `
+    const response = await client.responses.create({
+      model: "gpt-5.4",
+      input: [
+        {
+          role: "developer",
+          content: `
 Sos un profesor claro, didáctico y visual de Eduvia.
 
-Generá una clase breve para mostrar en un pizarrón digital.
-Adaptá el lenguaje al nivel del alumno.
+Tu tarea es generar una clase breve para mostrar en un pizarrón digital.
+Adaptá siempre el lenguaje al nivel del alumno.
+La explicación debe ser clara, concreta y útil para estudiar.
+Nada de markdown.
+Nada de texto fuera del JSON.
+          `.trim(),
+        },
+        {
+          role: "user",
+          content: `
+Generá una clase con estos datos:
 
-Datos:
 - Materia: ${materia}
 - Tema: ${tema}
 - Nivel: ${nivel}
 - Duración: ${duracion || "No especificada"}
 - Objetivo: ${objetivo || "No especificado"}
-
-Respondé SOLO en JSON válido con esta estructura:
-{
-  "titulo": "string",
-  "introduccion": "string",
-  "puntos": ["string", "string", "string"],
-  "ejemplo": "string",
-  "actividad": "string"
-}
-
-Reglas:
-- Explicación clara y pedagógica.
-- Nada de markdown.
-- Nada de texto fuera del JSON.
-- Los puntos tienen que ser concretos.
-`;
-
-    const response = await client.responses.create({
-      model: "gpt-5.4",
-      input: prompt,
+          `.trim(),
+        },
+      ],
+      text: {
+        format: {
+          type: "json_schema",
+          name: "clase_eduvia",
+          strict: true,
+          schema: {
+            type: "object",
+            properties: {
+              titulo: { type: "string" },
+              introduccion: { type: "string" },
+              puntos: {
+                type: "array",
+                items: { type: "string" },
+                minItems: 3,
+                maxItems: 5,
+              },
+              ejemplo: { type: "string" },
+              actividad: { type: "string" },
+            },
+            required: ["titulo", "introduccion", "puntos", "ejemplo", "actividad"],
+            additionalProperties: false,
+          },
+        },
+      },
     });
 
-    const rawText = response.output_text;
-
-    let clase;
-    try {
-      clase = JSON.parse(rawText);
-    } catch (parseError) {
-      console.error("La respuesta no vino en JSON válido:", rawText);
-      return res.status(500).json({
-        ok: false,
-        error: "La IA devolvió un formato inválido.",
-      });
-    }
+    const clase = JSON.parse(response.output_text);
 
     return res.json({
       ok: true,
