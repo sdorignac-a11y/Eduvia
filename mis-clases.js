@@ -16,6 +16,8 @@ const classesGrid = document.getElementById("classes-grid");
 const totalClases = document.getElementById("total-clases");
 const logoutBtn = document.getElementById("logout");
 
+let currentUser = null;
+
 logoutBtn?.addEventListener("click", async () => {
   try {
     await signOut(auth);
@@ -32,30 +34,34 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
 
+  currentUser = user;
   await cargarClases(user.uid);
 });
 
 async function cargarClases(uid) {
+  mostrarCargando();
+
   try {
     const clasesRef = collection(db, "usuarios", uid, "clases");
     const q = query(clasesRef, orderBy("creadoEn", "desc"));
     const snapshot = await getDocs(q);
 
-    loadingState.style.display = "none";
-    totalClases.textContent = snapshot.size;
+    totalClases.textContent = String(snapshot.size);
 
     if (snapshot.empty) {
-      emptyState.style.display = "block";
-      classesGrid.style.display = "none";
+      mostrarVacio();
       return;
     }
 
     classesGrid.innerHTML = "";
     classesGrid.style.display = "grid";
+    loadingState.style.display = "none";
+    emptyState.style.display = "none";
 
     snapshot.forEach((docSnap) => {
-      const clase = docSnap.data();
+      const clase = docSnap.data() || {};
       const claseId = docSnap.id;
+      const formato = normalizarFormato(clase.formato);
 
       const materia = clase.materia || "Sin materia";
       const tema = clase.tema || "Sin tema";
@@ -64,11 +70,15 @@ async function cargarClases(uid) {
       const objetivo = clase.objetivo || "Todavía no se agregó un objetivo.";
       const fechaTexto = formatearFecha(clase.creadoEn);
 
+      const destino = buildClaseUrl(formato, claseId, uid);
+      const textoBoton = formato === "documento" ? "Abrir documento" : "Abrir clase";
+      const emoji = formato === "documento" ? "📄" : "📘";
+
       const article = document.createElement("article");
       article.className = "class-card";
       article.innerHTML = `
         <div class="class-top">
-          <div class="badge">📘</div>
+          <div class="badge">${emoji}</div>
           <div class="class-title">
             <h3>${escapeHTML(tema)}</h3>
             <p>${escapeHTML(materia)}</p>
@@ -92,8 +102,8 @@ async function cargarClases(uid) {
           </div>
 
           <div class="meta-box">
-            <span>ID de clase</span>
-            <strong>${escapeHTML(claseId)}</strong>
+            <span>Formato</span>
+            <strong>${escapeHTML(capitalizar(formato))}</strong>
           </div>
         </div>
 
@@ -103,7 +113,7 @@ async function cargarClases(uid) {
         </div>
 
         <div class="card-actions">
-          <a href="clase.html?id=${encodeURIComponent(claseId)}" class="btn btn-primary">Abrir clase</a>
+          <a href="${destino}" class="btn btn-primary">${textoBoton}</a>
           <a href="crear-clase.html" class="btn btn-soft">Crear otra</a>
         </div>
       `;
@@ -112,11 +122,54 @@ async function cargarClases(uid) {
     });
   } catch (error) {
     console.error("Error al cargar clases:", error);
-    loadingState.innerHTML = `
-      <strong>Error al cargar las clases</strong>
-      Revisá la consola y confirmá que la colección exista en Firestore.
-    `;
+    mostrarError();
   }
+}
+
+function mostrarCargando() {
+  if (loadingState) loadingState.style.display = "block";
+  if (emptyState) emptyState.style.display = "none";
+  if (classesGrid) {
+    classesGrid.style.display = "none";
+    classesGrid.innerHTML = "";
+  }
+  if (totalClases) totalClases.textContent = "0";
+}
+
+function mostrarVacio() {
+  if (loadingState) loadingState.style.display = "none";
+  if (emptyState) emptyState.style.display = "block";
+  if (classesGrid) classesGrid.style.display = "none";
+}
+
+function mostrarError() {
+  if (!loadingState) return;
+
+  loadingState.style.display = "block";
+  loadingState.innerHTML = `
+    <strong>Error al cargar las clases</strong>
+    Revisá la consola y confirmá que la colección exista en Firestore.
+  `;
+
+  if (emptyState) emptyState.style.display = "none";
+  if (classesGrid) classesGrid.style.display = "none";
+}
+
+function normalizarFormato(formato = "") {
+  return String(formato || "").trim().toLowerCase() === "documento"
+    ? "documento"
+    : "pizarron";
+}
+
+function buildClaseUrl(formato, claseId, ownerUid) {
+  const base = formato === "documento" ? "documento.html" : "clase.html";
+  return `${base}?id=${encodeURIComponent(claseId)}&owner=${encodeURIComponent(ownerUid)}`;
+}
+
+function capitalizar(texto = "") {
+  const limpio = String(texto || "").trim();
+  if (!limpio) return "";
+  return limpio.charAt(0).toUpperCase() + limpio.slice(1);
 }
 
 function formatearFecha(timestamp) {
