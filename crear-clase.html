@@ -14,17 +14,14 @@
       --bg:#f8f3e8;
       --paper:#fffdf8;
       --paper-2:#fff8ee;
-      --paper-3:#fff5e4;
       --text:#2b2434;
       --muted:#6f6577;
 
       --violet:#7c6cf2;
       --violet-soft:#efeaff;
       --yellow:#ffe89c;
-      --yellow-soft:#fff5cf;
       --sky:#d8f0ff;
       --mint:#def4ba;
-      --pink:#ffdce8;
       --orange:#ffb36b;
 
       --board:#285246;
@@ -497,112 +494,119 @@
       border-radius:50%;
     }
 
-    /* LAYOUT */
+    /* NUEVA ZONA CENTRAL */
     .content-grid{
       display:grid;
       grid-template-columns:1.12fr .88fr;
-      gap:18px;
+      gap:22px;
       align-items:start;
     }
 
-    .sheet-card,
-    .tips-card{
+    .workspace-card{
       position:relative;
-      border-radius:28px;
-      padding:24px;
-      overflow:hidden;
+      min-height:100%;
+      padding:18px 0 0 0;
+    }
+
+    .workspace-layer{
+      position:absolute;
+      inset:0;
+      border-radius:30px;
       box-shadow:var(--shadow);
-      border:2px solid rgba(0,0,0,.05);
     }
 
-    .sheet-card{
-      background:#fff8cf;
-      transform:rotate(-.6deg);
+    .workspace-layer.layer-1{
+      background:#f7e6ff;
+      transform:rotate(-1.8deg);
+      opacity:.9;
     }
 
-    .tips-card{
-      background:#d9f0ff;
-      transform:rotate(.7deg);
+    .workspace-layer.layer-2{
+      background:#dff3ff;
+      transform:rotate(.9deg);
+      opacity:.9;
     }
 
-    .sheet-card::before,
-    .tips-card::before{
+    .workspace-main{
+      position:relative;
+      z-index:2;
+      background:linear-gradient(180deg,#fffdf8 0%, #fff7eb 100%);
+      border:2px solid rgba(124,108,242,.08);
+      border-radius:30px;
+      padding:26px 24px 24px;
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
+
+    .workspace-main::before{
       content:"";
       position:absolute;
       inset:0;
-      background-image:
-        linear-gradient(transparent 31px, rgba(124,108,242,.045) 32px);
-      background-size:100% 32px;
-      pointer-events:none;
-      opacity:.88;
-    }
-
-    .sheet-card::after,
-    .tips-card::after{
-      content:"";
-      position:absolute;
-      left:20px;
-      top:0;
-      bottom:0;
-      width:2px;
-      background:var(--red-line);
+      background:
+        radial-gradient(circle at top left, rgba(255,255,255,.82), transparent 28%),
+        linear-gradient(transparent 34px, rgba(124,108,242,.035) 35px);
+      background-size:auto, 100% 35px;
       pointer-events:none;
     }
 
-    .sheet-card .tape,
-    .tips-card .tape{
+    .binder-rings{
       position:absolute;
       top:14px;
-      right:18px;
-      width:64px;
-      height:16px;
-      border-radius:5px;
-      background:rgba(255,255,255,.34);
-      transform:rotate(8deg);
-      box-shadow:0 2px 6px rgba(0,0,0,.04);
-      z-index:2;
-    }
-
-    .sheet-inner,
-    .tips-inner{
-      position:relative;
-      z-index:1;
-      padding-left:18px;
-      padding-top:10px;
-    }
-
-    .card-top{
+      left:22px;
       display:flex;
-      align-items:flex-start;
-      gap:12px;
-      margin-bottom:18px;
+      gap:10px;
+      z-index:3;
     }
 
-    .card-icon{
-      width:46px;
-      height:46px;
-      border-radius:15px;
-      display:grid;
-      place-items:center;
+    .binder-rings span{
+      width:18px;
+      height:18px;
+      border:3px solid rgba(124,108,242,.34);
+      border-radius:50%;
       background:#fff;
-      border:2px solid rgba(124,108,242,.14);
-      font-size:1.15rem;
-      box-shadow:0 6px 14px rgba(124,108,242,.08);
-      flex:none;
+      box-shadow:0 2px 6px rgba(0,0,0,.05);
     }
 
-    .card-top h2,
-    .card-top h3{
+    .workspace-head{
+      position:relative;
+      z-index:2;
+      padding:18px 6px 8px 18px;
+      margin-bottom:12px;
+    }
+
+    .workspace-badge{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:9px 14px;
+      border-radius:999px;
+      background:#fff1a8;
+      border:1px solid rgba(0,0,0,.05);
+      box-shadow:var(--shadow-soft);
+      font-weight:800;
+      font-size:.9rem;
+      color:#5a4620;
+      margin-bottom:14px;
+      transform:rotate(-2deg);
+    }
+
+    .workspace-head h2{
       font-family:"Sora",sans-serif;
-      font-size:1.22rem;
+      font-size:1.45rem;
       letter-spacing:-.03em;
-      margin-bottom:6px;
+      margin-bottom:8px;
     }
 
-    .card-top p{
-      color:#5f566c;
-      line-height:1.72;
-      font-size:.95rem;
+    .workspace-head p{
+      color:#62586e;
+      line-height:1.75;
+      max-width:700px;
+    }
+
+    .workspace-main form{
+      position:relative;
+      z-index:2;
+      padding-left:18px;
     }
 
     .form-grid{
@@ -779,41 +783,130 @@
       background:#efeaff;
     }
 
-    .tips-list{
+    .idea-board{
+      position:relative;
+      background:linear-gradient(180deg,#fffdf8 0%, #fff7ee 100%);
+      border:2px solid rgba(124,108,242,.08);
+      border-radius:30px;
+      padding:24px;
+      box-shadow:var(--shadow);
+      overflow:hidden;
+      transform:rotate(.8deg);
+    }
+
+    .idea-board::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        radial-gradient(circle at top left, rgba(255,255,255,.82), transparent 26%);
+      pointer-events:none;
+    }
+
+    .idea-pin{
+      position:absolute;
+      top:14px;
+      width:16px;
+      height:16px;
+      border-radius:50%;
+      box-shadow:0 2px 6px rgba(0,0,0,.15);
+      z-index:3;
+    }
+
+    .idea-pin.pin-yellow{
+      left:22px;
+      background:#ffd84c;
+    }
+
+    .idea-pin.pin-blue{
+      right:22px;
+      background:#8ccfff;
+    }
+
+    .idea-head{
+      position:relative;
+      z-index:2;
+      margin-bottom:18px;
+      padding-top:8px;
+    }
+
+    .idea-label{
+      display:inline-flex;
+      align-items:center;
+      padding:8px 12px;
+      border-radius:999px;
+      background:#efeaff;
+      color:#5e52cc;
+      font-size:.86rem;
+      font-weight:800;
+      margin-bottom:12px;
+    }
+
+    .idea-head h3{
+      font-family:"Sora",sans-serif;
+      font-size:1.28rem;
+      letter-spacing:-.03em;
+      margin-bottom:8px;
+    }
+
+    .idea-head p{
+      color:#6a6075;
+      line-height:1.7;
+      font-size:.94rem;
+    }
+
+    .idea-notes{
       display:grid;
-      gap:12px;
-      margin-top:8px;
+      gap:14px;
+      position:relative;
+      z-index:2;
     }
 
-    .tip-item{
-      padding:14px;
-      border-radius:18px;
-      background:rgba(255,255,255,.82);
-      border:1px solid rgba(124,108,242,.12);
+    .idea-note{
+      padding:16px;
+      border-radius:22px;
       box-shadow:var(--shadow-soft);
+      border:1px solid rgba(0,0,0,.05);
     }
 
-    .tip-item strong{
+    .idea-note strong{
       display:block;
       margin-bottom:6px;
-      color:#352d43;
-      font-size:.95rem;
+      font-size:.96rem;
+      color:#322a40;
     }
 
-    .tip-item p{
-      color:#62586e;
-      line-height:1.6;
+    .idea-note p{
+      color:#5f576c;
+      line-height:1.62;
       font-size:.92rem;
     }
 
-    .subject-tags{
+    .idea-note.yellow{
+      background:#fff1a8;
+      transform:rotate(-1.3deg);
+    }
+
+    .idea-note.blue{
+      background:#d9f0ff;
+      transform:rotate(.9deg);
+    }
+
+    .idea-note.lilac{
+      background:#eadfff;
+      transform:rotate(-.8deg);
+    }
+
+    .idea-tags{
       display:flex;
       flex-wrap:wrap;
       gap:10px;
-      margin-top:16px;
+      margin-top:18px;
+      position:relative;
+      z-index:2;
     }
 
-    .subject-tags span{
+    .idea-tags span{
       padding:9px 12px;
       border-radius:999px;
       background:#fff;
@@ -829,8 +922,7 @@
         grid-template-columns:1fr;
       }
 
-      .tips-card,
-      .sheet-card{
+      .idea-board{
         transform:none;
       }
     }
@@ -882,8 +974,8 @@
       }
 
       .hero-craft,
-      .sheet-card,
-      .tips-card{
+      .workspace-main,
+      .idea-board{
         padding:20px;
         border-radius:24px;
       }
@@ -892,9 +984,12 @@
         grid-template-columns:1fr;
       }
 
-      .sheet-inner,
-      .tips-inner{
-        padding-left:12px;
+      .workspace-main form{
+        padding-left:10px;
+      }
+
+      .workspace-head{
+        padding-left:10px;
       }
     }
 
@@ -920,7 +1015,8 @@
         gap:10px;
       }
 
-      .chalk-tags span{
+      .chalk-tags span,
+      .idea-tags span{
         width:100%;
         justify-content:center;
       }
@@ -1008,16 +1104,22 @@
         </section>
 
         <section class="content-grid">
-          <div class="sheet-card">
-            <span class="tape"></span>
+          <div class="workspace-card">
+            <div class="workspace-layer layer-1"></div>
+            <div class="workspace-layer layer-2"></div>
 
-            <div class="sheet-inner">
-              <div class="card-top">
-                <div class="card-icon">📚</div>
-                <div>
-                  <h2>Ficha de la clase</h2>
-                  <p>Completá esta hoja para dejar la sesión mucho mejor orientada desde el arranque.</p>
-                </div>
+            <div class="workspace-main">
+              <div class="binder-rings">
+                <span></span><span></span><span></span>
+              </div>
+
+              <div class="workspace-head">
+                <div class="workspace-badge">✂️ Armá tu clase</div>
+                <h2>Prepará la clase</h2>
+                <p>
+                  Completá esta base para que la IA tenga claro qué explicar, cómo explicarlo
+                  y con qué material acompañar la clase.
+                </p>
               </div>
 
               <form id="clase-form">
@@ -1025,7 +1127,7 @@
                   <div class="field">
                     <label for="materia">Materia</label>
                     <input id="materia" placeholder="Ejemplo: Matemática" />
-                    <span class="helper">Elegí la materia principal de la clase.</span>
+                    <span class="helper">Elegí la materia principal.</span>
                   </div>
 
                   <div class="field">
@@ -1041,7 +1143,7 @@
                       <option value="Secundaria">Secundaria</option>
                       <option value="Universidad">Universidad</option>
                     </select>
-                    <span class="helper">Ayuda a adaptar el lenguaje y la dificultad.</span>
+                    <span class="helper">Ayuda a adaptar la dificultad.</span>
                   </div>
 
                   <div class="field">
@@ -1052,13 +1154,13 @@
                       <option value="45 min">45 minutos</option>
                       <option value="60 min">60 minutos</option>
                     </select>
-                    <span class="helper">Sirve para organizar mejor la sesión.</span>
+                    <span class="helper">Sirve para ordenar mejor la sesión.</span>
                   </div>
 
                   <div class="field full">
                     <label for="objetivo">Objetivo de la clase</label>
                     <textarea id="objetivo" placeholder="Ejemplo: Que el alumno entienda cómo sumar y restar fracciones con distinto denominador."></textarea>
-                    <span class="helper">Mientras más concreto sea el objetivo, más útil puede ser la explicación.</span>
+                    <span class="helper">Mientras más concreto sea, mejor puede explicar la IA.</span>
                   </div>
 
                   <div class="field full">
@@ -1069,14 +1171,14 @@
                       <div class="upload-inner">
                         <div class="upload-icon">📎</div>
                         <div>
-                          <strong>Subí archivos para que la IA los use en la clase</strong>
-                          <p>Podés agregar apuntes, guías, PDFs, imágenes de ejercicios o resúmenes.</p>
+                          <strong>Subí archivos para usar dentro de la clase</strong>
+                          <p>Apuntes, guías, PDFs, imágenes de ejercicios o resúmenes.</p>
                         </div>
                       </div>
                     </div>
 
                     <span class="helper">
-                      Formatos recomendados: PDF, Word, TXT o imágenes. Mientras más claro sea el material, mejor podrá ayudarte la IA.
+                      Mientras más claro sea el material, mejor podrá usarlo la IA.
                     </span>
 
                     <div id="file-list" class="file-list"></div>
@@ -1091,43 +1193,43 @@
             </div>
           </div>
 
-          <aside class="tips-card">
-            <span class="tape"></span>
+          <aside class="idea-board">
+            <div class="idea-pin pin-yellow"></div>
+            <div class="idea-pin pin-blue"></div>
 
-            <div class="tips-inner">
-              <div class="card-top">
-                <div class="card-icon">✏️</div>
-                <div>
-                  <h3>Qué conviene definir</h3>
-                  <p>Mientras más específica sea la información, más precisa puede ser la ayuda de la IA.</p>
-                </div>
-              </div>
+            <div class="idea-head">
+              <span class="idea-label">💡 Ideas clave</span>
+              <h3>Qué conviene definir</h3>
+              <p>
+                Esta parte está pensada como pistas útiles pegadas en tu mesa de estudio
+                antes de crear la clase.
+              </p>
+            </div>
 
-              <div class="tips-list">
-                <div class="tip-item">
-                  <strong>Definí un tema concreto</strong>
-                  <p>En vez de poner solo “Matemática”, conviene algo como “Fracciones equivalentes” o “Regla de tres simple”.</p>
-                </div>
+            <div class="idea-notes">
+              <article class="idea-note yellow">
+                <strong>Elegí un tema concreto</strong>
+                <p>No pongas solo “Matemática”. Mejor “Fracciones equivalentes” o “Regla de tres”.</p>
+              </article>
 
-                <div class="tip-item">
-                  <strong>Elegí bien el nivel</strong>
-                  <p>No es lo mismo explicar un tema para primaria que para secundaria o universidad. Eso cambia la forma de enseñar.</p>
-                </div>
+              <article class="idea-note blue">
+                <strong>Marcá bien el nivel</strong>
+                <p>Eso cambia la forma de explicar, el vocabulario y el tipo de ejemplo.</p>
+              </article>
 
-                <div class="tip-item">
-                  <strong>Marcá el objetivo</strong>
-                  <p>Podés orientar la clase para entender desde cero, preparar una prueba, repasar o resolver una duda puntual.</p>
-                </div>
-              </div>
+              <article class="idea-note lilac">
+                <strong>Definí el objetivo</strong>
+                <p>Entender desde cero, repasar, preparar una prueba o resolver una duda puntual.</p>
+              </article>
+            </div>
 
-              <div class="subject-tags">
-                <span>Matemática</span>
-                <span>Lengua</span>
-                <span>Historia</span>
-                <span>Biología</span>
-                <span>Química</span>
-                <span>Inglés</span>
-              </div>
+            <div class="idea-tags">
+              <span>Matemática</span>
+              <span>Lengua</span>
+              <span>Historia</span>
+              <span>Biología</span>
+              <span>Química</span>
+              <span>Inglés</span>
             </div>
           </aside>
         </section>
