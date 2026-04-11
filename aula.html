@@ -11,28 +11,24 @@
 
   <style>
     :root{
-      --bg:#f7f3ea;
-      --paper:#fffdf7;
-      --paper-2:#fff8ef;
-      --text:#2b2434;
-      --muted:#6e6476;
-      --line:rgba(126,103,190,.14);
+      --bg:#eef2f7;
+      --bg-2:#dde6f1;
+      --text:#1f2937;
+      --muted:#6b7280;
+      --line:#d7dee8;
+      --white:#ffffff;
 
-      --violet:#7c6cf2;
-      --violet-soft:#eee9ff;
-      --yellow:#ffe79a;
-      --orange:#ffb36b;
-      --sky:#d9f0ff;
-      --mint:#dcf3a6;
-      --red-line:rgba(255,90,110,.18);
+      --primary:#6d5dfc;
+      --primary-soft:#ece9ff;
+      --danger:#ef4444;
+      --danger-soft:#fee2e2;
+      --success:#16a34a;
+      --success-soft:#dcfce7;
 
-      --shadow:0 18px 40px rgba(63,72,138,.08);
-      --shadow-soft:0 10px 24px rgba(63,72,138,.06);
-
-      --sidebar:250px;
-      --board:#ffffff;
-      --board-line:#e9eef8;
-      --board-border:#e7e2ff;
+      --shadow:0 20px 50px rgba(15, 23, 42, .10);
+      --shadow-soft:0 10px 26px rgba(15, 23, 42, .08);
+      --radius:26px;
+      --board-radius:22px;
     }
 
     *{
@@ -41,846 +37,674 @@
       padding:0;
     }
 
-    html{
-      scroll-behavior:smooth;
+    html, body{
+      width:100%;
+      min-height:100%;
     }
 
     body{
-      font-family:"Inter",sans-serif;
+      font-family:"Inter", sans-serif;
       color:var(--text);
-      background:var(--bg);
+      background:
+        radial-gradient(circle at top left, rgba(109,93,252,.08), transparent 24%),
+        radial-gradient(circle at bottom right, rgba(56,189,248,.10), transparent 24%),
+        linear-gradient(180deg, var(--bg), var(--bg-2));
       min-height:100vh;
       overflow-x:hidden;
     }
 
-    body::before{
-      content:"";
-      position:fixed;
-      inset:0;
-      background-image:
-        linear-gradient(rgba(124,108,242,.04) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(124,108,242,.04) 1px, transparent 1px);
-      background-size:28px 28px;
-      pointer-events:none;
-      z-index:0;
-      opacity:.75;
-    }
-
-    .app{
-      position:relative;
-      z-index:1;
-      display:grid;
-      grid-template-columns:var(--sidebar) 1fr;
+    .page{
       min-height:100vh;
-    }
-
-    .sidebar{
-      position:sticky;
-      top:0;
-      height:100vh;
-      background:rgba(255,252,245,.92);
-      backdrop-filter:blur(14px);
-      border-right:2px dashed rgba(124,108,242,.14);
-      padding:22px 18px;
       display:flex;
       flex-direction:column;
+      padding:26px;
       gap:18px;
+    }
+
+    .top-mini{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:14px;
+      flex-wrap:wrap;
     }
 
     .brand{
       display:flex;
       align-items:center;
       gap:12px;
-      padding:8px 6px 16px;
-      border-bottom:1px dashed rgba(124,108,242,.16);
     }
 
     .brand-mark{
-      width:46px;
-      height:46px;
+      width:42px;
+      height:42px;
       border-radius:14px;
       display:grid;
       place-items:center;
-      font-family:"Sora",sans-serif;
-      font-weight:800;
       color:#fff;
-      background:linear-gradient(135deg, var(--violet), var(--orange));
-      box-shadow:0 12px 24px rgba(124,108,242,.2);
-      flex:none;
+      font-family:"Sora", sans-serif;
+      font-weight:800;
+      background:linear-gradient(135deg, #6d5dfc, #8b5cf6);
+      box-shadow:0 12px 24px rgba(109,93,252,.22);
     }
 
     .brand-text strong{
       display:block;
-      font-family:"Sora",sans-serif;
+      font-family:"Sora", sans-serif;
       font-size:1rem;
       letter-spacing:-.03em;
     }
 
     .brand-text span{
       color:var(--muted);
-      font-size:.83rem;
+      font-size:.9rem;
     }
 
-    .menu{
+    .top-actions{
       display:flex;
-      flex-direction:column;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .ghost-btn,
+    .danger-btn,
+    .primary-btn{
+      border:none;
+      cursor:pointer;
+      text-decoration:none;
+      font-family:inherit;
+      font-weight:700;
+      border-radius:999px;
+      padding:12px 16px;
+      transition:.18s ease;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
       gap:8px;
     }
 
-    .menu a,
-    .menu button{
-      text-decoration:none;
-      color:#4b425a;
-      padding:13px 14px;
-      border-radius:15px;
-      font-weight:700;
-      transition:.2s ease;
-      border:none;
-      background:transparent;
-      text-align:left;
-      font-family:inherit;
-      font-size:1rem;
-      cursor:pointer;
-    }
-
-    .menu a:hover,
-    .menu button:hover{
-      background:#f7efff;
-      color:#6b5ee8;
-      transform:translateX(4px);
-    }
-
-    .menu a.active{
-      background:linear-gradient(135deg, rgba(124,108,242,.14), rgba(255,179,107,.16));
-      color:#6b5ee8;
+    .ghost-btn{
+      background:rgba(255,255,255,.78);
+      color:#334155;
       box-shadow:var(--shadow-soft);
     }
 
-    .sidebar-note{
-      margin-top:auto;
-      background:linear-gradient(180deg, #fff1ad, #ffe291);
-      border:1px solid rgba(255,179,107,.24);
-      border-radius:20px;
-      padding:15px;
-      box-shadow:var(--shadow-soft);
+    .ghost-btn:hover{
+      transform:translateY(-1px);
+      background:#fff;
     }
 
-    .sidebar-note strong{
-      display:block;
-      margin-bottom:6px;
-      font-size:.95rem;
-    }
-
-    .sidebar-note p{
-      color:#635869;
-      font-size:.88rem;
-      line-height:1.55;
-    }
-
-    .main{
-      padding:24px;
-      display:grid;
-      gap:18px;
-    }
-
-    .topbar{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:16px;
-      flex-wrap:wrap;
-      background:rgba(255,253,247,.9);
-      border:1px solid rgba(255,255,255,.8);
-      border-radius:26px;
-      padding:16px 18px;
-      box-shadow:var(--shadow);
-    }
-
-    .topbar-left{
-      display:flex;
-      align-items:center;
-      gap:12px;
-      flex-wrap:wrap;
-    }
-
-    .eyebrow{
-      display:inline-flex;
-      align-items:center;
-      gap:10px;
-      padding:10px 14px;
-      border-radius:999px;
-      background:var(--violet-soft);
-      border:1px solid rgba(124,108,242,.12);
-      color:#675d79;
-      font-size:.9rem;
-      font-weight:700;
-      box-shadow:var(--shadow-soft);
-    }
-
-    .class-main-info h1{
-      font-family:"Sora",sans-serif;
-      font-size:1.5rem;
-      letter-spacing:-.04em;
-      line-height:1.05;
-      margin-bottom:4px;
-    }
-
-    .class-main-info p{
-      color:var(--muted);
-      line-height:1.6;
-      font-size:.96rem;
-    }
-
-    .topbar-actions{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-    }
-
-    .btn{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      gap:10px;
-      border:none;
-      text-decoration:none;
-      cursor:pointer;
-      font-family:inherit;
-      font-weight:800;
-      border-radius:999px;
-      padding:13px 18px;
-      transition:.2s ease;
-    }
-
-    .btn:hover{
-      transform:translateY(-2px);
-    }
-
-    .btn-primary{
+    .primary-btn{
+      background:linear-gradient(135deg, #6d5dfc, #8b5cf6);
       color:#fff;
-      background:linear-gradient(135deg, var(--violet), var(--orange));
-      box-shadow:0 14px 28px rgba(124,108,242,.16);
+      box-shadow:0 14px 28px rgba(109,93,252,.18);
     }
 
-    .btn-soft{
-      color:var(--violet);
-      background:#efeaff;
+    .primary-btn:hover{
+      transform:translateY(-1px);
     }
 
-    .scene{
+    .danger-btn{
+      background:var(--danger-soft);
+      color:#b91c1c;
+    }
+
+    .danger-btn:hover{
+      transform:translateY(-1px);
+      background:#fecaca;
+    }
+
+    .classroom{
+      flex:1;
       display:grid;
-      grid-template-columns:320px 1fr;
+      grid-template-columns:220px minmax(0, 1fr);
       gap:18px;
       align-items:stretch;
-      min-height:calc(100vh - 230px);
+      min-height:0;
     }
 
-    .teacher-panel{
-      position:relative;
-      background:linear-gradient(180deg,#fffdf8 0%, #fff8ef 100%);
-      border:2px solid rgba(124,108,242,.08);
-      border-radius:30px;
-      box-shadow:var(--shadow);
-      overflow:hidden;
-      padding:22px;
+    .teacher-side{
       display:flex;
       flex-direction:column;
-      justify-content:space-between;
+      justify-content:flex-end;
+      gap:14px;
+      min-height:100%;
     }
 
-    .teacher-panel::before{
-      content:"";
-      position:absolute;
-      inset:0;
-      background-image:
-        linear-gradient(transparent 31px, rgba(124,108,242,.04) 32px);
-      background-size:100% 32px;
-      pointer-events:none;
-      opacity:.78;
+    .teacher-card{
+      background:rgba(255,255,255,.72);
+      backdrop-filter:blur(10px);
+      border:1px solid rgba(255,255,255,.7);
+      border-radius:28px;
+      padding:18px;
+      box-shadow:var(--shadow-soft);
     }
 
-    .teacher-panel::after{
-      content:"";
-      position:absolute;
-      left:18px;
-      top:0;
-      bottom:0;
-      width:2px;
-      background:var(--red-line);
-      pointer-events:none;
-    }
-
-    .teacher-panel > *{
-      position:relative;
-      z-index:1;
-    }
-
-    .teacher-head{
-      display:flex;
-      align-items:flex-start;
-      gap:12px;
-      margin-bottom:18px;
-    }
-
-    .teacher-icon{
-      width:48px;
-      height:48px;
-      border-radius:16px;
-      display:grid;
-      place-items:center;
-      background:#fff;
-      border:2px solid rgba(124,108,242,.14);
-      font-size:1.2rem;
-      box-shadow:0 8px 18px rgba(124,108,242,.08);
-      flex:none;
-    }
-
-    .teacher-head h2{
-      font-family:"Sora",sans-serif;
-      font-size:1.15rem;
-      letter-spacing:-.03em;
-      margin-bottom:4px;
-    }
-
-    .teacher-head p{
-      color:var(--muted);
-      line-height:1.65;
-      font-size:.93rem;
-    }
-
-    .teacher-stage{
-      flex:1;
-      display:flex;
+    .teacher-label{
+      display:inline-flex;
       align-items:center;
-      justify-content:center;
-      padding:10px 0 18px;
+      gap:8px;
+      padding:8px 12px;
+      border-radius:999px;
+      background:var(--primary-soft);
+      color:#5b4ce0;
+      font-size:.86rem;
+      font-weight:800;
+      margin-bottom:12px;
     }
 
-    .teacher-wrap{
+    .teacher-avatar-wrap{
+      display:flex;
+      align-items:flex-end;
+      justify-content:center;
+      min-height:280px;
       position:relative;
-      width:100%;
-      max-width:250px;
-      height:360px;
     }
 
     .teacher-shadow{
       position:absolute;
       bottom:8px;
-      left:50%;
-      width:150px;
-      height:22px;
-      background:rgba(43,36,52,.08);
+      width:120px;
+      height:18px;
+      background:rgba(15,23,42,.12);
       filter:blur(10px);
       border-radius:999px;
-      transform:translateX(-50%);
     }
 
-    .teacher-body{
-      position:absolute;
-      left:50%;
-      bottom:24px;
-      transform:translateX(-50%);
-      width:190px;
-      height:290px;
-      animation:teacherFloat 4.2s ease-in-out infinite;
+    .teacher-avatar{
+      position:relative;
+      width:150px;
+      height:240px;
+      animation:floatTeacher 3.2s ease-in-out infinite;
     }
 
-    .teacher-head-shape{
+    .head{
       position:absolute;
       top:0;
-      left:58px;
-      width:78px;
-      height:78px;
+      left:43px;
+      width:64px;
+      height:64px;
       border-radius:50%;
-      background:linear-gradient(180deg, #ffdcb9, #f6c79a);
-      z-index:3;
-      box-shadow:0 8px 16px rgba(0,0,0,.06);
-    }
-
-    .teacher-hair{
-      position:absolute;
-      top:-4px;
-      left:50px;
-      width:92px;
-      height:54px;
-      border-radius:45px 45px 28px 28px;
-      background:#3a3247;
-      z-index:4;
-    }
-
-    .teacher-neck{
-      position:absolute;
-      top:67px;
-      left:84px;
-      width:26px;
-      height:22px;
-      border-radius:10px;
-      background:#efc094;
+      background:linear-gradient(180deg, #ffd8b5, #efb88c);
       z-index:2;
     }
 
-    .teacher-torso{
+    .hair{
       position:absolute;
-      top:82px;
+      top:-3px;
       left:35px;
-      width:122px;
-      height:126px;
-      border-radius:32px 32px 26px 26px;
-      background:linear-gradient(180deg, #7c6cf2, #6554e6);
-      z-index:1;
-      box-shadow:0 16px 24px rgba(124,108,242,.18);
-    }
-
-    .teacher-shirt{
-      position:absolute;
-      top:98px;
-      left:66px;
-      width:60px;
-      height:94px;
-      border-radius:20px;
-      background:rgba(255,255,255,.12);
-      z-index:2;
-    }
-
-    .teacher-arm.left{
-      position:absolute;
-      top:105px;
-      left:16px;
-      width:46px;
-      height:122px;
-      border-radius:24px;
-      background:linear-gradient(180deg, #7c6cf2, #5c4cdc);
-      transform:rotate(16deg);
-      z-index:0;
-    }
-
-    .teacher-arm.right{
-      position:absolute;
-      top:96px;
-      right:8px;
-      width:26px;
-      height:126px;
-      border-radius:22px;
-      background:linear-gradient(180deg, #efc094, #e0a777);
-      transform-origin:top center;
-      transform:rotate(-38deg);
-      z-index:5;
-      animation:writeArm 2.5s ease-in-out infinite;
-    }
-
-    .teacher-hand{
-      position:absolute;
-      bottom:-8px;
-      left:-3px;
-      width:30px;
-      height:30px;
-      border-radius:50%;
-      background:linear-gradient(180deg, #ffd7b0, #e6ab79);
-      box-shadow:0 6px 10px rgba(0,0,0,.06);
-    }
-
-    .teacher-marker{
-      position:absolute;
-      bottom:-14px;
-      left:15px;
-      width:36px;
-      height:8px;
-      border-radius:999px;
-      background:linear-gradient(90deg, #2b2434, #7c6cf2);
-      transform:rotate(-18deg);
-      box-shadow:0 4px 10px rgba(0,0,0,.08);
-    }
-
-    .teacher-leg.left,
-    .teacher-leg.right{
-      position:absolute;
-      top:195px;
-      width:34px;
-      height:102px;
-      border-radius:20px;
+      width:80px;
+      height:42px;
+      border-radius:38px 38px 22px 22px;
       background:#2f2a39;
-      z-index:0;
+      z-index:3;
     }
 
-    .teacher-leg.left{ left:68px; }
-    .teacher-leg.right{ left:104px; }
-
-    .teacher-foot.left,
-    .teacher-foot.right{
+    .body-shape{
       position:absolute;
-      bottom:-2px;
-      width:54px;
-      height:18px;
-      border-radius:16px;
-      background:#1e1a26;
+      top:58px;
+      left:26px;
+      width:98px;
+      height:110px;
+      border-radius:28px;
+      background:linear-gradient(180deg, #6d5dfc, #5b4ce0);
+      box-shadow:0 14px 26px rgba(109,93,252,.18);
     }
 
-    .teacher-foot.left{ left:59px; }
-    .teacher-foot.right{ left:97px; }
+    .arm-left,
+    .arm-right{
+      position:absolute;
+      border-radius:999px;
+    }
+
+    .arm-left{
+      top:76px;
+      left:8px;
+      width:34px;
+      height:92px;
+      background:linear-gradient(180deg, #6d5dfc, #4f46e5);
+      transform:rotate(18deg);
+    }
+
+    .arm-right{
+      top:70px;
+      right:8px;
+      width:22px;
+      height:102px;
+      background:linear-gradient(180deg, #efbe94, #e3a679);
+      transform-origin:top center;
+      animation:writeArm 1.8s ease-in-out infinite;
+    }
+
+    .hand{
+      position:absolute;
+      bottom:-6px;
+      left:-4px;
+      width:28px;
+      height:28px;
+      border-radius:50%;
+      background:linear-gradient(180deg, #ffd8b5, #eab083);
+    }
+
+    .marker{
+      position:absolute;
+      bottom:-10px;
+      left:12px;
+      width:30px;
+      height:6px;
+      border-radius:999px;
+      background:linear-gradient(90deg, #111827, #6d5dfc);
+      transform:rotate(-18deg);
+    }
+
+    .legs{
+      position:absolute;
+      top:156px;
+      left:46px;
+      width:58px;
+      height:74px;
+    }
+
+    .leg{
+      position:absolute;
+      top:0;
+      width:22px;
+      height:68px;
+      border-radius:999px;
+      background:#2b2f3a;
+    }
+
+    .leg.right{ right:0; }
+    .leg.left{ left:0; }
 
     .teacher-bubble{
-      padding:14px 15px;
-      border-radius:20px;
       background:#fff;
-      border:1px solid rgba(124,108,242,.12);
+      border:1px solid #edf1f6;
+      border-radius:20px;
+      padding:14px 15px;
+      line-height:1.65;
+      color:#475569;
       box-shadow:var(--shadow-soft);
-      line-height:1.7;
-      font-size:.93rem;
-      color:#50475d;
+      min-height:104px;
     }
 
     .teacher-bubble strong{
-      color:#322a3f;
       display:block;
-      margin-bottom:5px;
+      margin-bottom:6px;
+      color:#1f2937;
     }
 
-    .board-stage{
+    .board-shell{
+      min-width:0;
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+    }
+
+    .board-window{
+      position:relative;
+      flex:1;
+      min-height:680px;
+      background:var(--white);
+      border-radius:var(--board-radius);
+      box-shadow:var(--shadow);
+      border:1px solid rgba(203,213,225,.9);
+      overflow:hidden;
+      display:grid;
+      grid-template-rows:58px 1fr;
+    }
+
+    .board-toolbar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      padding:0 16px;
+      background:linear-gradient(180deg, #f8fafc, #eef2f7);
+      border-bottom:1px solid #e5e7eb;
+    }
+
+    .toolbar-left,
+    .toolbar-right{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      min-width:0;
+    }
+
+    .toolbar-dots{
+      display:flex;
+      align-items:center;
+      gap:7px;
+      margin-right:4px;
+    }
+
+    .toolbar-dots span{
+      width:10px;
+      height:10px;
+      border-radius:50%;
+      display:block;
+    }
+
+    .toolbar-dots span:nth-child(1){ background:#f87171; }
+    .toolbar-dots span:nth-child(2){ background:#facc15; }
+    .toolbar-dots span:nth-child(3){ background:#4ade80; }
+
+    .class-chip{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      max-width:100%;
+      min-width:0;
+      padding:9px 12px;
+      border-radius:999px;
+      background:#fff;
+      border:1px solid #e5e7eb;
+      font-size:.92rem;
+      font-weight:700;
+      color:#334155;
+      box-shadow:0 4px 10px rgba(15,23,42,.04);
+    }
+
+    .class-chip span:last-child{
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .status-chip{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:9px 12px;
+      border-radius:999px;
+      background:var(--success-soft);
+      color:#166534;
+      font-size:.88rem;
+      font-weight:800;
+      white-space:nowrap;
+    }
+
+    .status-dot{
+      width:8px;
+      height:8px;
+      border-radius:50%;
+      background:#22c55e;
+      animation:pulse 1.2s infinite;
+    }
+
+    .toolbar-btn{
+      border:none;
+      cursor:pointer;
+      background:#fff;
+      color:#334155;
+      font-weight:700;
+      padding:10px 14px;
+      border-radius:999px;
+      border:1px solid #e5e7eb;
+      transition:.18s ease;
+    }
+
+    .toolbar-btn:hover{
+      transform:translateY(-1px);
+      background:#f8fafc;
+    }
+
+    .toolbar-btn.leave{
+      background:#fff1f2;
+      color:#be123c;
+      border-color:#fecdd3;
+    }
+
+    .board-content{
+      position:relative;
+      padding:28px;
+      display:grid;
+      grid-template-rows:auto 1fr auto;
+      gap:22px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.96), rgba(255,255,255,.98)),
+        repeating-linear-gradient(
+          to bottom,
+          transparent 0px,
+          transparent 34px,
+          #edf2f7 35px
+        );
+    }
+
+    .board-header{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:18px;
+      flex-wrap:wrap;
+    }
+
+    .board-title-wrap h1{
+      font-family:"Sora", sans-serif;
+      font-size:2rem;
+      line-height:1.05;
+      letter-spacing:-.05em;
+      margin-bottom:8px;
+      color:#111827;
+    }
+
+    .board-title-wrap p{
+      color:#64748b;
+      line-height:1.7;
+      max-width:780px;
+      font-size:1rem;
+    }
+
+    .writing-chip{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      padding:12px 14px;
+      border-radius:999px;
+      background:var(--primary-soft);
+      color:#5648da;
+      font-weight:800;
+      white-space:nowrap;
+    }
+
+    .writing-chip .pen-dot{
+      width:10px;
+      height:10px;
+      border-radius:50%;
+      background:#6d5dfc;
+      animation:pulse 1.2s infinite;
+    }
+
+    .board-main{
+      display:grid;
+      grid-template-columns:1.1fr .9fr;
+      gap:18px;
+      min-height:0;
+    }
+
+    .board-col{
       display:flex;
       flex-direction:column;
       gap:16px;
       min-width:0;
     }
 
-    .board-meta{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
+    .board-card{
+      background:rgba(255,255,255,.72);
+      border:1px solid #e5e7eb;
+      border-radius:20px;
+      padding:18px;
+      box-shadow:0 8px 18px rgba(15,23,42,.05);
     }
 
-    .meta-pill{
-      padding:10px 14px;
-      border-radius:999px;
-      background:#fff;
-      border:1px solid rgba(124,108,242,.12);
-      box-shadow:var(--shadow-soft);
-      color:#655a74;
-      font-size:.9rem;
-      font-weight:700;
-    }
-
-    .board{
-      position:relative;
-      flex:1;
-      background:var(--board);
-      border:2px solid var(--board-border);
-      border-radius:34px;
-      box-shadow:var(--shadow);
-      min-height:560px;
-      overflow:hidden;
-      display:grid;
-      grid-template-rows:auto 1fr;
-    }
-
-    .board::before{
-      content:"";
-      position:absolute;
-      inset:0;
-      background:
-        linear-gradient(transparent 47px, var(--board-line) 48px),
-        linear-gradient(90deg, transparent 47px, rgba(235,239,248,.5) 48px);
-      background-size:48px 48px;
-      pointer-events:none;
-      opacity:.95;
-    }
-
-    .board::after{
-      content:"";
-      position:absolute;
-      inset:16px;
-      border:2px dashed rgba(124,108,242,.08);
-      border-radius:24px;
-      pointer-events:none;
-    }
-
-    .board-top{
-      position:relative;
-      z-index:1;
-      display:flex;
-      align-items:flex-start;
-      justify-content:space-between;
-      gap:16px;
-      padding:24px 24px 6px 24px;
-      flex-wrap:wrap;
-    }
-
-    .board-title-wrap h2{
-      font-family:"Sora",sans-serif;
-      font-size:2rem;
-      letter-spacing:-.05em;
-      color:#241e30;
-      margin-bottom:6px;
-    }
-
-    .board-title-wrap p{
-      color:#6b6578;
-      line-height:1.7;
-      max-width:700px;
+    .board-card h3{
+      font-family:"Sora", sans-serif;
       font-size:1rem;
-    }
-
-    .writing-status{
-      display:inline-flex;
-      align-items:center;
-      gap:10px;
-      background:linear-gradient(135deg, rgba(124,108,242,.12), rgba(255,179,107,.14));
-      border:1px solid rgba(124,108,242,.12);
-      border-radius:999px;
-      padding:10px 14px;
-      font-weight:800;
-      color:#5d5290;
-      box-shadow:var(--shadow-soft);
-    }
-
-    .dot{
-      width:10px;
-      height:10px;
-      border-radius:50%;
-      background:var(--violet);
-      animation:pulse 1.2s infinite;
-    }
-
-    .board-content{
-      position:relative;
-      z-index:1;
-      padding:8px 24px 24px 24px;
-      display:grid;
-      grid-template-columns:1.1fr .9fr;
-      gap:16px;
-      min-height:0;
-    }
-
-    .board-col{
-      display:grid;
-      gap:16px;
-      align-content:start;
-    }
-
-    .chalk-card{
-      background:rgba(255,255,255,.88);
-      border:1px solid rgba(124,108,242,.12);
-      border-radius:24px;
-      padding:18px;
-      box-shadow:var(--shadow-soft);
-      position:relative;
-      overflow:hidden;
-    }
-
-    .chalk-card::before{
-      content:"";
-      position:absolute;
-      top:12px;
-      right:16px;
-      width:58px;
-      height:16px;
-      border-radius:6px;
-      background:rgba(124,108,242,.08);
-      transform:rotate(8deg);
-    }
-
-    .chalk-card h3{
-      font-family:"Sora",sans-serif;
-      font-size:1.05rem;
+      margin-bottom:12px;
       letter-spacing:-.03em;
-      margin-bottom:10px;
-      color:#2d253a;
+      color:#111827;
     }
 
-    .chalk-card p{
-      color:#51495f;
-      line-height:1.78;
-      font-size:.96rem;
-    }
-
-    .board-lines{
-      display:grid;
+    .typed-lines{
+      display:flex;
+      flex-direction:column;
       gap:10px;
-      margin-top:4px;
+      min-height:260px;
     }
 
-    .board-line{
-      min-height:46px;
-      border-radius:16px;
-      padding:12px 14px;
-      background:rgba(255,255,255,.82);
-      border:1px solid rgba(124,108,242,.12);
-      box-shadow:var(--shadow-soft);
-      color:#3d3649;
-      font-weight:600;
+    .typed-line{
+      min-height:44px;
+      padding:11px 14px;
+      border-radius:14px;
+      background:#ffffff;
+      border:1px solid #e8edf4;
+      color:#334155;
       line-height:1.65;
-      position:relative;
-      animation:lineAppear .5s ease both;
-    }
-
-    .board-line:nth-child(2){ animation-delay:.12s; }
-    .board-line:nth-child(3){ animation-delay:.24s; }
-    .board-line:nth-child(4){ animation-delay:.36s; }
-
-    .board-line::after{
-      content:"";
-      position:absolute;
-      left:14px;
-      right:14px;
-      bottom:8px;
-      height:2px;
-      background:linear-gradient(90deg, rgba(124,108,242,.2), transparent);
-      border-radius:999px;
-    }
-
-    .example-box{
-      padding:16px;
-      border-radius:18px;
-      background:linear-gradient(180deg,#f8fbff,#eef6ff);
-      border:1px solid rgba(124,108,242,.1);
-      color:#425067;
-      line-height:1.75;
       font-weight:600;
+      opacity:0;
+      transform:translateY(8px);
+      animation:fadeUp .35s ease forwards;
     }
 
-    .mini-exercise{
-      padding:16px;
-      border-radius:18px;
-      background:linear-gradient(180deg,#fff8d8,#fff4bf);
-      border:1px solid rgba(255,179,107,.22);
-      color:#4f4a3f;
+    .typed-line.show:nth-child(1){ animation-delay:0s; }
+    .typed-line.show:nth-child(2){ animation-delay:.08s; }
+    .typed-line.show:nth-child(3){ animation-delay:.16s; }
+    .typed-line.show:nth-child(4){ animation-delay:.24s; }
+    .typed-line.show:nth-child(5){ animation-delay:.32s; }
+    .typed-line.show:nth-child(6){ animation-delay:.40s; }
+
+    .example-box,
+    .goal-box,
+    .exercise-box{
       line-height:1.75;
-      font-weight:700;
+      color:#475569;
+      font-weight:600;
+      min-height:110px;
     }
 
-    .marker-cursor{
-      position:absolute;
-      right:38%;
-      top:108px;
-      width:22px;
-      height:22px;
-      z-index:2;
-      pointer-events:none;
-      animation:markerMove 2.5s ease-in-out infinite;
+    .exercise-box{
+      background:#f8fafc;
+      border-radius:16px;
+      padding:14px;
     }
 
-    .marker-cursor::before{
-      content:"";
-      position:absolute;
-      width:18px;
-      height:6px;
-      background:linear-gradient(90deg, #2b2434, #7c6cf2);
-      border-radius:999px;
-      transform:rotate(-18deg);
-      top:7px;
-      left:2px;
-      box-shadow:0 4px 10px rgba(0,0,0,.08);
-    }
-
-    .marker-cursor::after{
-      content:"";
-      position:absolute;
-      width:8px;
-      height:8px;
-      border-radius:50%;
-      background:rgba(124,108,242,.16);
-      top:12px;
-      left:12px;
-      filter:blur(2px);
-    }
-
-    .bottom-bar{
+    .board-footer{
       display:grid;
-      gap:14px;
-      background:rgba(255,253,247,.92);
-      border:1px solid rgba(255,255,255,.8);
-      border-radius:28px;
-      padding:18px;
-      box-shadow:var(--shadow);
+      gap:12px;
     }
 
     .quick-actions{
       display:flex;
-      gap:10px;
       flex-wrap:wrap;
+      gap:10px;
     }
 
     .quick-btn{
       border:none;
       cursor:pointer;
-      font-family:inherit;
-      font-weight:800;
-      color:var(--violet);
-      background:#efeaff;
-      padding:12px 15px;
+      padding:11px 14px;
       border-radius:999px;
-      transition:.2s ease;
+      background:#fff;
+      color:#4f46e5;
+      border:1px solid #dfe5ee;
+      font-weight:800;
+      transition:.18s ease;
     }
 
     .quick-btn:hover{
-      transform:translateY(-2px);
-      background:#e7e0ff;
+      transform:translateY(-1px);
+      background:#f7f7ff;
     }
 
-    .input-row{
+    .input-wrap{
       display:grid;
-      grid-template-columns:1fr auto auto;
+      grid-template-columns:1fr auto;
       gap:10px;
-      align-items:center;
     }
 
-    .input-row input{
+    .input-wrap input{
       width:100%;
-      height:58px;
-      border-radius:18px;
-      border:2px solid #e5ddff;
+      height:56px;
+      border-radius:16px;
+      border:1.5px solid #dce3ec;
       background:#fff;
       padding:0 16px;
+      outline:none;
       font-size:1rem;
       font-family:inherit;
-      color:var(--text);
-      outline:none;
       font-weight:600;
-      box-shadow:var(--shadow-soft);
+      color:#1f2937;
     }
 
-    .input-row input:focus{
-      border-color:var(--violet);
-      box-shadow:0 0 0 4px rgba(124,108,242,.08);
-    }
-
-    .mic-btn{
-      width:58px;
-      height:58px;
-      border:none;
-      cursor:pointer;
-      border-radius:18px;
-      background:#fff;
-      border:2px solid #e5ddff;
-      font-size:1.1rem;
-      box-shadow:var(--shadow-soft);
-      transition:.2s ease;
-    }
-
-    .mic-btn:hover{
-      transform:translateY(-2px);
+    .input-wrap input:focus{
+      border-color:#6d5dfc;
+      box-shadow:0 0 0 4px rgba(109,93,252,.08);
     }
 
     .send-btn{
-      min-width:128px;
-      height:58px;
+      min-width:132px;
     }
 
-    @keyframes teacherFloat{
-      0%,100%{ transform:translateX(-50%) translateY(0); }
-      50%{ transform:translateX(-50%) translateY(-8px); }
+    .board-cursor{
+      position:absolute;
+      top:176px;
+      right:42%;
+      width:22px;
+      height:22px;
+      pointer-events:none;
+      animation:moveCursor 2.2s ease-in-out infinite;
     }
 
-    @keyframes writeArm{
-      0%,100%{ transform:rotate(-38deg); }
-      50%{ transform:rotate(-28deg); }
+    .board-cursor::before{
+      content:"";
+      position:absolute;
+      top:8px;
+      left:2px;
+      width:18px;
+      height:6px;
+      border-radius:999px;
+      background:linear-gradient(90deg, #111827, #6d5dfc);
+      transform:rotate(-18deg);
+      box-shadow:0 4px 10px rgba(15,23,42,.12);
+    }
+
+    .board-cursor::after{
+      content:"";
+      position:absolute;
+      top:13px;
+      left:13px;
+      width:6px;
+      height:6px;
+      border-radius:50%;
+      background:rgba(109,93,252,.16);
+      filter:blur(1px);
     }
 
     @keyframes pulse{
       0%,100%{ transform:scale(1); opacity:1; }
-      50%{ transform:scale(1.3); opacity:.65; }
+      50%{ transform:scale(1.25); opacity:.7; }
     }
 
-    @keyframes lineAppear{
+    @keyframes floatTeacher{
+      0%,100%{ transform:translateY(0); }
+      50%{ transform:translateY(-8px); }
+    }
+
+    @keyframes writeArm{
+      0%,100%{ transform:rotate(-35deg); }
+      50%{ transform:rotate(-24deg); }
+    }
+
+    @keyframes moveCursor{
+      0%,100%{ transform:translate(0,0) rotate(-5deg); }
+      25%{ transform:translate(18px,8px) rotate(3deg); }
+      50%{ transform:translate(-8px,24px) rotate(-9deg); }
+      75%{ transform:translate(16px,38px) rotate(2deg); }
+    }
+
+    @keyframes fadeUp{
       from{
         opacity:0;
         transform:translateY(8px);
@@ -891,275 +715,264 @@
       }
     }
 
-    @keyframes markerMove{
-      0%,100%{
-        transform:translate(0,0) rotate(-8deg);
-      }
-      25%{
-        transform:translate(22px,10px) rotate(2deg);
-      }
-      50%{
-        transform:translate(-10px,24px) rotate(-12deg);
-      }
-      75%{
-        transform:translate(18px,38px) rotate(4deg);
-      }
-    }
-
-    @media (max-width: 1180px){
-      .scene{
+    @media (max-width: 1100px){
+      .classroom{
         grid-template-columns:1fr;
       }
 
-      .teacher-panel{
+      .teacher-side{
+        order:2;
+      }
+
+      .teacher-card{
+        display:grid;
+        grid-template-columns:180px 1fr;
+        gap:16px;
+        align-items:center;
+      }
+
+      .teacher-avatar-wrap{
+        min-height:220px;
+      }
+    }
+
+    @media (max-width: 860px){
+      .page{
+        padding:16px;
+      }
+
+      .board-window{
         min-height:unset;
       }
 
-      .teacher-stage{
-        padding-bottom:0;
-      }
-    }
-
-    @media (max-width: 980px){
-      .board-content{
-        grid-template-columns:1fr;
-      }
-    }
-
-    @media (max-width: 820px){
-      .app{
-        grid-template-columns:1fr;
-      }
-
-      .sidebar{
-        position:relative;
+      .board-toolbar{
+        min-height:58px;
         height:auto;
-        border-right:none;
-        border-bottom:2px dashed rgba(124,108,242,.12);
+        padding:12px;
+        align-items:flex-start;
+        flex-direction:column;
       }
 
-      .main{
+      .toolbar-left,
+      .toolbar-right{
+        width:100%;
+        justify-content:space-between;
+        flex-wrap:wrap;
+      }
+
+      .board-content{
         padding:18px;
       }
 
-      .topbar,
-      .teacher-panel,
-      .board,
-      .bottom-bar{
-        border-radius:24px;
-      }
-
-      .board{
-        min-height:unset;
-      }
-
-      .board-top{
-        padding:20px 20px 6px 20px;
-      }
-
-      .board-content{
-        padding:8px 20px 20px 20px;
-      }
-
-      .board-title-wrap h2{
-        font-size:1.6rem;
-      }
-
-      .input-row{
+      .board-main{
         grid-template-columns:1fr;
       }
 
-      .mic-btn,
+      .board-title-wrap h1{
+        font-size:1.55rem;
+      }
+
+      .input-wrap{
+        grid-template-columns:1fr;
+      }
+
       .send-btn{
         width:100%;
       }
 
-      .teacher-wrap{
-        height:300px;
+      .teacher-card{
+        grid-template-columns:1fr;
+      }
+    }
+
+    @media (max-width: 560px){
+      .top-mini{
+        align-items:flex-start;
       }
 
-      .teacher-body{
-        transform:translateX(-50%) scale(.92);
-        transform-origin:bottom center;
+      .top-actions{
+        width:100%;
+      }
+
+      .top-actions a,
+      .top-actions button{
+        flex:1;
+      }
+
+      .class-chip,
+      .status-chip{
+        width:100%;
+        justify-content:center;
+      }
+
+      .toolbar-right{
+        gap:8px;
+      }
+
+      .toolbar-btn{
+        flex:1;
+      }
+
+      .quick-actions{
+        display:grid;
+        grid-template-columns:1fr 1fr;
       }
     }
   </style>
 </head>
 <body>
-  <div class="app">
-    <aside class="sidebar">
+  <div class="page">
+    <div class="top-mini">
       <div class="brand">
         <div class="brand-mark">E</div>
         <div class="brand-text">
           <strong>Eduvia</strong>
-          <span>Tu aula con IA</span>
+          <span>Aula interactiva</span>
         </div>
       </div>
 
-      <nav class="menu">
-        <a href="panel.html">Inicio</a>
-        <a href="crear-clase.html">Crear nueva clase</a>
-        <a href="mis-clases.html" class="active">Mis clases</a>
-        <a id="volver-clase-link" href="#">Volver a la ficha</a>
-        <button id="logout" type="button">Cerrar sesión</button>
-      </nav>
-
-      <div class="sidebar-note">
-        <strong>Modo clase</strong>
-        <p>Acá el centro es el pizarrón. El avatar acompaña la explicación y da la sensación de estar escribiendo en tiempo real.</p>
+      <div class="top-actions">
+        <a href="mis-clases.html" class="ghost-btn">Mis clases</a>
+        <a href="panel.html" class="ghost-btn">Volver al panel</a>
       </div>
-    </aside>
+    </div>
 
-    <main class="main">
-      <section class="topbar">
-        <div class="topbar-left">
-          <div class="eyebrow">Clase en vivo con IA</div>
+    <section class="classroom">
+      <aside class="teacher-side">
+        <div class="teacher-card">
+          <div class="teacher-avatar-wrap">
+            <div class="teacher-shadow"></div>
 
-          <div class="class-main-info">
-            <h1 id="class-title">Clase de Fracciones</h1>
-            <p id="class-subtitle">Una explicación visual, paso a paso y adaptada al nivel del alumno.</p>
+            <div class="teacher-avatar">
+              <div class="hair"></div>
+              <div class="head"></div>
+              <div class="body-shape"></div>
+
+              <div class="arm-left"></div>
+
+              <div class="arm-right">
+                <div class="hand"></div>
+                <div class="marker"></div>
+              </div>
+
+              <div class="legs">
+                <div class="leg left"></div>
+                <div class="leg right"></div>
+              </div>
+            </div>
           </div>
-        </div>
 
-        <div class="topbar-actions">
-          <a href="mis-clases.html" class="btn btn-soft">Mis clases</a>
-          <a id="btn-salir-aula" href="panel.html" class="btn btn-primary">Salir del aula</a>
-        </div>
-      </section>
-
-      <section class="scene">
-        <aside class="teacher-panel">
           <div>
-            <div class="teacher-head">
-              <div class="teacher-icon">👨‍🏫</div>
-              <div>
-                <h2>Profesor Eduvia</h2>
-                <p>El avatar acompaña la explicación y cambia a pose de escritura cuando aparece nuevo contenido en el pizarrón.</p>
+            <div class="teacher-label">Profesor IA</div>
+
+            <div class="teacher-bubble" id="teacher-bubble">
+              <strong>Vamos paso a paso.</strong>
+              Primero entendemos la idea, después vemos un ejemplo y recién al final practicamos.
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <div class="board-shell">
+        <section class="board-window">
+          <div class="board-toolbar">
+            <div class="toolbar-left">
+              <div class="toolbar-dots">
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+
+              <div class="class-chip">
+                <span>📘</span>
+                <span id="toolbar-class-name">Clase de Matemática • Fracciones</span>
               </div>
             </div>
 
-            <div class="teacher-stage">
-              <div class="teacher-wrap">
-                <div class="teacher-shadow"></div>
-
-                <div class="teacher-body">
-                  <div class="teacher-hair"></div>
-                  <div class="teacher-head-shape"></div>
-                  <div class="teacher-neck"></div>
-
-                  <div class="teacher-torso"></div>
-                  <div class="teacher-shirt"></div>
-
-                  <div class="teacher-arm left"></div>
-
-                  <div class="teacher-arm right">
-                    <div class="teacher-hand"></div>
-                    <div class="teacher-marker"></div>
-                  </div>
-
-                  <div class="teacher-leg left"></div>
-                  <div class="teacher-leg right"></div>
-
-                  <div class="teacher-foot left"></div>
-                  <div class="teacher-foot right"></div>
-                </div>
+            <div class="toolbar-right">
+              <div class="status-chip">
+                <span class="status-dot"></span>
+                <span id="toolbar-status">Clase en curso</span>
               </div>
+
+              <button id="btn-fullscreen" class="toolbar-btn" type="button">Pantalla completa</button>
+              <a href="panel.html" class="toolbar-btn leave">Abandonar clase</a>
             </div>
           </div>
 
-          <div class="teacher-bubble" id="teacher-bubble">
-            <strong>Hoy vamos paso a paso.</strong>
-            Primero entendemos la idea principal, después vemos un ejemplo y recién ahí practicamos.
-          </div>
-        </aside>
+          <div class="board-content">
+            <div class="board-cursor"></div>
 
-        <div class="board-stage">
-          <div class="board-meta">
-            <div class="meta-pill">📘 Materia: <span id="chip-materia">Matemática</span></div>
-            <div class="meta-pill">📝 Tema: <span id="chip-tema">Fracciones</span></div>
-            <div class="meta-pill">🎓 Nivel: <span id="chip-nivel">Secundaria</span></div>
-            <div class="meta-pill">⏱️ Duración: <span id="chip-duracion">30 min</span></div>
-          </div>
-
-          <section class="board">
-            <div class="marker-cursor"></div>
-
-            <div class="board-top">
+            <div class="board-header">
               <div class="board-title-wrap">
-                <h2 id="board-title">Entendamos las fracciones</h2>
+                <h1 id="board-title">Entendamos las fracciones</h1>
                 <p id="board-subtitle">
-                  Vamos a trabajar con una explicación clara, simple y visual para entender cómo funciona el tema.
+                  Vamos a verlo de una forma clara, visual y fácil de seguir, como si el profesor lo estuviera escribiendo en el pizarrón.
                 </p>
               </div>
 
-              <div class="writing-status">
-                <span class="dot"></span>
-                <span id="writing-label">Escribiendo en el pizarrón</span>
+              <div class="writing-chip">
+                <span class="pen-dot"></span>
+                <span id="writing-state">Escribiendo en el pizarrón</span>
               </div>
             </div>
 
-            <div class="board-content">
+            <div class="board-main">
               <div class="board-col">
-                <article class="chalk-card">
-                  <h3>Pasos de la explicación</h3>
-                  <div id="board-lines" class="board-lines">
-                    <div class="board-line">1. Una fracción representa partes de un todo.</div>
-                    <div class="board-line">2. El número de arriba es el numerador.</div>
-                    <div class="board-line">3. El de abajo es el denominador.</div>
-                    <div class="board-line">4. Para operar, primero miramos si tienen el mismo denominador.</div>
-                  </div>
+                <article class="board-card">
+                  <h3>Explicación paso a paso</h3>
+                  <div class="typed-lines" id="typed-lines"></div>
                 </article>
 
-                <article class="chalk-card">
-                  <h3 id="board-example-title">Ejemplo guiado</h3>
-                  <div id="board-example-text" class="example-box">
-                    1/2 + 1/4. Llevamos ambas fracciones al mismo denominador: 1/2 = 2/4. Entonces 2/4 + 1/4 = 3/4.
+                <article class="board-card">
+                  <h3 id="example-title">Ejemplo guiado</h3>
+                  <div class="example-box" id="example-box">
+                    1/2 + 1/4. Primero buscamos el mismo denominador. 1/2 es igual a 2/4. Entonces 2/4 + 1/4 = 3/4.
                   </div>
                 </article>
               </div>
 
               <div class="board-col">
-                <article class="chalk-card">
+                <article class="board-card">
                   <h3>Objetivo de la clase</h3>
-                  <p id="board-goal">
+                  <div class="goal-box" id="goal-box">
                     Que el alumno entienda cómo leer, interpretar y operar fracciones simples sin memorizar mecánicamente.
-                  </p>
+                  </div>
                 </article>
 
-                <article class="chalk-card">
-                  <h3 id="board-exercise-title">Mini ejercicio</h3>
-                  <div id="board-exercise-text" class="mini-exercise">
-                    Calculá: 3/4 - 1/4. Después explicá por qué no tuviste que cambiar el denominador.
+                <article class="board-card">
+                  <h3 id="exercise-title">Mini ejercicio</h3>
+                  <div class="exercise-box" id="exercise-box">
+                    Calculá 3/4 - 1/4 y explicá por qué el denominador no cambia.
                   </div>
                 </article>
               </div>
             </div>
-          </section>
 
-          <section class="bottom-bar">
-            <div class="quick-actions">
-              <button class="quick-btn" data-action="facil">Explicalo fácil</button>
-              <button class="quick-btn" data-action="ejemplo">Dame un ejemplo</button>
-              <button class="quick-btn" data-action="preguntas">Haceme preguntas</button>
-              <button class="quick-btn" data-action="resumen">Resumilo</button>
-              <button class="quick-btn" data-action="ejercicio">Pasemos a ejercicio</button>
-            </div>
+            <div class="board-footer">
+              <div class="quick-actions">
+                <button class="quick-btn" data-action="facil">Explicalo fácil</button>
+                <button class="quick-btn" data-action="ejemplo">Dame otro ejemplo</button>
+                <button class="quick-btn" data-action="pregunta">Tomame una pregunta</button>
+                <button class="quick-btn" data-action="resumen">Resumí la clase</button>
+                <button class="quick-btn" data-action="ejercicio">Dame un ejercicio</button>
+              </div>
 
-            <div class="input-row">
-              <input
-                id="chat-input"
-                type="text"
-                placeholder="Escribí una duda. Ejemplo: explicamelo más fácil o dame otro ejemplo"
-              />
-              <button class="mic-btn" type="button" aria-label="Usar micrófono">🎤</button>
-              <button id="send-btn" class="btn btn-primary send-btn" type="button">Enviar</button>
+              <div class="input-wrap">
+                <input
+                  id="chat-input"
+                  type="text"
+                  placeholder="Escribí algo como: explicamelo más fácil, dame otro ejemplo, no entendí esta parte..."
+                />
+                <button id="send-btn" class="primary-btn send-btn" type="button">Enviar</button>
+              </div>
             </div>
-          </section>
-        </div>
-      </section>
-    </main>
+          </div>
+        </section>
+      </div>
+    </section>
   </div>
 
   <script type="module" src="aula.js"></script>
 </body>
-</html>ahora el neuvo de aula.jsahoraelne
+</html>
