@@ -50,14 +50,16 @@ form?.addEventListener("submit", async (e) => {
     );
 
     console.log("Clase creada:", docRef.id);
+
     localStorage.setItem("claseActual", JSON.stringify({
-  id: docRef.id,
-  materia,
-  tema,
-  nivel,
-  duracion: duracion || "",
-  objetivo: objetivo || ""
-}));
+      id: docRef.id,
+      materia,
+      tema,
+      nivel,
+      duracion: duracion || "",
+      objetivo: objetivo || ""
+    }));
+
     window.location.href = `clase.html?id=${docRef.id}`;
   } catch (error) {
     console.error("Error al crear la clase:", error);
