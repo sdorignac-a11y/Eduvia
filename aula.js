@@ -17,6 +17,8 @@ const FETCH_TIMEOUT_MS = 30000;
 let claseGuardadaActual = null;
 let claseGeneradaActual = null;
 let ultimaRespuestaChat = null;
+let fuentesClaseActual = [];
+let investigacionClaseActual = "";
 
 function escapeHtml(value = "") {
   return String(value)
@@ -724,10 +726,15 @@ function renderLeccion(clase, meta = {}, options = {}) {
   });
 }
 
-function renderClase(claseRaw, meta = {}) {
+function renderClase(claseRaw, meta = {}, extras = {}) {
   const clase = normalizarClase(claseRaw);
 
-  claseGeneradaActual = clase;
+  claseGeneradaActual = {
+    ...clase,
+    fuentes: Array.isArray(extras.fuentes) ? extras.fuentes : [],
+    investigacion: String(extras.investigacion || "").trim(),
+  };
+
   ultimaRespuestaChat = null;
 
   renderLeccion(clase, meta);
@@ -839,6 +846,8 @@ async function preguntarEnChat(pregunta) {
         claseGuardada: claseGuardadaActual,
         claseGenerada: claseGeneradaActual,
         ultimaRespuesta: ultimaRespuestaChat,
+        fuentes: fuentesClaseActual,
+        investigacion: investigacionClaseActual,
       }),
     });
   } catch (error) {
@@ -922,6 +931,8 @@ async function cargarClaseEnPizarron() {
 
     const raw = localStorage.getItem("claseActual");
     if (!raw) {
+      fuentesClaseActual = [];
+      investigacionClaseActual = "";
       renderError("No se encontró la clase actual en el navegador.");
       updateChatStatus("No hay clase cargada.");
       return;
@@ -931,6 +942,8 @@ async function cargarClaseEnPizarron() {
     try {
       claseGuardada = JSON.parse(raw);
     } catch {
+      fuentesClaseActual = [];
+      investigacionClaseActual = "";
       renderError("La clase guardada está dañada o tiene un formato inválido.");
       updateChatStatus("Clase inválida.");
       return;
@@ -947,6 +960,8 @@ async function cargarClaseEnPizarron() {
     } = claseGuardada || {};
 
     if (!materia || !tema || !nivel) {
+      fuentesClaseActual = [];
+      investigacionClaseActual = "";
       renderError("Faltan datos clave de la clase: materia, tema o nivel.");
       updateChatStatus("Faltan datos de la clase.");
       return;
@@ -987,12 +1002,25 @@ async function cargarClaseEnPizarron() {
     }
 
     if (!response.ok || !data?.ok || !data?.clase) {
+      fuentesClaseActual = [];
+      investigacionClaseActual = "";
       renderError(data?.error || "Hubo un error al generar la clase.");
       updateChatStatus("No se pudo generar la clase.");
       return;
     }
 
-    renderClase(data.clase, { materia, nivel, tema, objetivo });
+    fuentesClaseActual = Array.isArray(data.fuentes) ? data.fuentes : [];
+    investigacionClaseActual = String(data.investigacion || "").trim();
+
+    renderClase(
+      data.clase,
+      { materia, nivel, tema, objetivo },
+      {
+        fuentes: fuentesClaseActual,
+        investigacion: investigacionClaseActual,
+      }
+    );
+
     updateChatStatus("Listo para preguntar.");
   } catch (err) {
     console.error("Error cargando clase:", err);
