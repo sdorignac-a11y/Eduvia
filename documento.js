@@ -680,6 +680,104 @@ function resolveUserRole(clase, user, ownerUid) {
   return null;
 }
 
+async function generarDocumentoSiFalta(clase = {}) {
+  const yaExiste =
+    limpiarTexto(clase.contenidoHtml) ||
+    limpiarTexto(clase.documentoHtml) ||
+    limpiarTexto(clase.htmlDocumento) ||
+    limpiarTexto(clase.documentoTexto) ||
+    limpiarTexto(clase.textoDocumento) ||
+    limpiarTexto(clase.contenidoTexto) ||
+    (clase.documento && typeof clase.documento === "object") ||
+    (clase.contenidoDocumento && typeof clase.contenidoDocumento === "object") ||
+    (clase.contenido && typeof clase.contenido === "object");
+
+  if (yaExiste) {
+    return clase;
+  }
+
+  if (!clase?.materia || !clase?.tema || !clase?.nivel) {
+    return clase;
+  }
+
+  const payload = {
+    materia: clase.materia || "",
+    tema: clase.tema || "",
+    nivel: clase.nivel || "",
+    duracion: clase.duracion || "",
+    objetivo: clase.objetivo || "",
+    investigacion: clase.investigacion || "",
+    fuentes: Array.isArray(clase.fuentes) ? clase.fuentes : [],
+  };
+
+  const response = await fetch("/api/generar-documento", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  let data;
+  try {
+    data = await response.json();
+  } catch {
+    throw new Error("El servidor devolvió un formato inválido al generar el documento.");
+  }
+
+  if (!response.ok || !data?.ok || !data?.documento) {
+    throw new Error(data?.error || "No se pudo generar el documento.");
+  }
+
+  const merged = {
+    ...clase,
+    tituloDocumento:
+      data.documento.tituloDocumento ||
+      clase.tituloDocumento ||
+      clase.tema ||
+      "Documento",
+    objetivoDocumento:
+      data.documento.objetivoDocumento ||
+      clase.objetivoDocumento ||
+      clase.objetivo ||
+      "",
+    contenidoHtml: data.documento.contenidoHtml || "",
+    resumenDocumento: data.documento.resumenCorto || "",
+    investigacion: data.investigacion || clase.investigacion || "",
+    fuentes: Array.isArray(data.fuentes)
+      ? data.fuentes
+      : Array.isArray(clase.fuentes)
+        ? clase.fuentes
+        : [],
+    updatedAt: new Date().toISOString()
+  };
+
+  if (currentClaseRef && canEdit()) {
+    try {
+      await setDoc(
+        currentClaseRef,
+        {
+          tituloDocumento: merged.tituloDocumento,
+          objetivoDocumento: merged.objetivoDocumento,
+          contenidoHtml: merged.contenidoHtml,
+          resumenDocumento: merged.resumenDocumento,
+          investigacion: merged.investigacion,
+          fuentes: merged.fuentes,
+          updatedAt: serverTimestamp()
+        },
+        { merge: true }
+      );
+    } catch (error) {
+      console.error("Error guardando documento generado:", error);
+    }
+  }
+
+  currentClaseData = merged;
+  writeClaseToLocalStorage(merged, currentOwnerUid, currentClaseId);
+
+  return merged;
+}
+
 function updateTopbarTitleFromEditor() {
   if (!topbarTitle || !docTitle) return;
   const value = docTitle.textContent.trim();
@@ -690,4 +788,386 @@ function getCurrentDocumentPayload() {
   const titulo = docTitle?.textContent?.trim() || "Documento sin título";
   const objetivoRaw = docObjective?.textContent?.trim() || "";
   const objetivo = stripObjectivePrefix(objetivoRaw);
-  const contenidoHtml = doc
+  const contenidoHtml = docContent?.innerHTML || "";
+
+  return {
+    tituloDocumento: titulo,
+    objetivoDocumento: objetivo,
+    contenidoHtml,
+    ultimoEditorUid: currentUser?.uid || "",
+    ultimoEditorEmail: normalizeEmail(currentUser?.email || ""),
+    updatedAt: serverTimestamp()
+  };
+}
+
+function scheduleSave() {
+  if (!currentClaseRef || !canEdit()) return;
+
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    saveDocumentEdits();
+  }, 700);
+}
+
+async function saveDocumentEdits(force = false) {
+  if (!currentClaseRef || !canEdit()) return;
+  if (saveInFlight && !force) return;
+
+  saveInFlight = true;
+
+  try {
+    const payload = getCurrentDocumentPayload();
+
+    await updateDoc(currentClaseRef, payload);
+
+    currentClaseData = {
+      ...(currentClaseData || {}),
+      ...payload,
+      updatedAt: new Date().toISOString()
+    };
+
+    writeClaseToLocalStorage(currentClaseData, currentOwnerUid, currentClaseId);
+  } catch (error) {
+    console.error("Error guardando documento:", error);
+
+    try {
+      const payload = getCurrentDocumentPayload();
+      await setDoc(currentClaseRef, payload, { merge: true });
+
+      currentClaseData = {
+        ...(currentClaseData || {}),
+        ...payload,
+        updatedAt: new Date().toISOString()
+      };
+
+      writeClaseToLocalStorage(currentClaseData, currentOwnerUid, currentClaseId);
+    } catch (secondError) {
+      console.error("Error secundario guardando documento:", secondError);
+    }
+  } finally {
+    saveInFlight = false;
+  }
+}
+
+function attachAutosaveListeners() {
+  const onInput = () => {
+    updateTopbarTitleFromEditor();
+    scheduleSave();
+  };
+
+  docTitle?.addEventListener("input", onInput);
+  docObjective?.addEventListener("input", onInput);
+  docContent?.addEventListener("input", onInput);
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) {
+      clearTimeout(saveTimer);
+      saveDocumentEdits(true);
+    }
+  });
+}
+
+function getShareUrl() {
+  if (!currentClaseId || !currentOwnerUid) return window.location.href;
+
+  const url = new URL(window.location.href);
+  url.searchParams.set("id", currentClaseId);
+  url.searchParams.set("owner", currentOwnerUid);
+  return url.toString();
+}
+
+function replaceElementToClearOldListeners(id) {
+  const oldEl = document.getElementById(id);
+  if (!oldEl || !oldEl.parentNode) return oldEl;
+  const clone = oldEl.cloneNode(true);
+  oldEl.parentNode.replaceChild(clone, oldEl);
+  return clone;
+}
+
+function setupShareUi() {
+  if (!shareModal || shareUiInitialized) return;
+  shareUiInitialized = true;
+
+  const openShareBtn = replaceElementToClearOldListeners("open-share-btn");
+  const closeShareBtn = replaceElementToClearOldListeners("close-share-btn");
+  const copyLinkBtn = replaceElementToClearOldListeners("copy-link-btn");
+  const sendShareBtn = replaceElementToClearOldListeners("send-share-btn");
+
+  if (docLinkInput) {
+    docLinkInput.value = getShareUrl();
+  }
+
+  openShareBtn?.addEventListener("click", () => {
+    if (docLinkInput) docLinkInput.value = getShareUrl();
+    if (shareStatus) shareStatus.textContent = "";
+    shareModal.classList.add("show");
+  });
+
+  closeShareBtn?.addEventListener("click", () => {
+    shareModal.classList.remove("show");
+  });
+
+  shareModal.addEventListener("click", (e) => {
+    if (e.target === shareModal) {
+      shareModal.classList.remove("show");
+    }
+  });
+
+  copyLinkBtn?.addEventListener("click", async () => {
+    try {
+      const url = getShareUrl();
+      await navigator.clipboard.writeText(url);
+      if (docLinkInput) docLinkInput.value = url;
+      if (shareStatus) shareStatus.textContent = "Link copiado.";
+    } catch {
+      if (shareStatus) shareStatus.textContent = "No se pudo copiar el link.";
+    }
+  });
+
+  sendShareBtn?.addEventListener("click", async () => {
+    if (currentRole !== "owner") {
+      if (shareStatus) {
+        shareStatus.textContent = "Solo el dueño del documento puede compartirlo.";
+      }
+      return;
+    }
+
+    const email = normalizeEmail(shareEmailInput?.value || "");
+    const role = normalizeRole(shareRoleSelect?.value || "viewer");
+
+    if (!email) {
+      if (shareStatus) shareStatus.textContent = "Escribí un email válido.";
+      return;
+    }
+
+    if (!currentClaseRef || !currentClaseId || !currentOwnerUid) {
+      if (shareStatus) {
+        shareStatus.textContent = "Todavía no se pudo identificar este documento.";
+      }
+      return;
+    }
+
+    if (email === normalizeEmail(currentUser?.email || "")) {
+      if (shareStatus) {
+        shareStatus.textContent = "Ese email ya es el dueño del documento.";
+      }
+      return;
+    }
+
+    try {
+      const sharedUserKey = `sharedUsers.${emailToKey(email)}`;
+
+      const updates = {
+        sharedWithEmails: arrayUnion(email),
+        [sharedUserKey]: {
+          email,
+          role,
+          invitedBy: normalizeEmail(currentUser?.email || ""),
+          invitedAt: new Date().toISOString()
+        },
+        updatedAt: serverTimestamp()
+      };
+
+      if (role === "editor") {
+        updates.sharedEditorEmails = arrayUnion(email);
+        updates.sharedViewerEmails = arrayRemove(email);
+      } else {
+        updates.sharedViewerEmails = arrayUnion(email);
+        updates.sharedEditorEmails = arrayRemove(email);
+      }
+
+      await updateDoc(currentClaseRef, updates);
+
+      currentClaseData = {
+        ...(currentClaseData || {}),
+        sharedWithEmails: Array.isArray(currentClaseData?.sharedWithEmails)
+          ? Array.from(new Set([...currentClaseData.sharedWithEmails, email]))
+          : [email]
+      };
+
+      writeClaseToLocalStorage(currentClaseData, currentOwnerUid, currentClaseId);
+
+      const shareUrl = getShareUrl();
+      if (docLinkInput) docLinkInput.value = shareUrl;
+
+      const subject = encodeURIComponent("Te compartieron un documento de Eduvia");
+      const body = encodeURIComponent(
+        `Hola.\n\n` +
+          `Te compartieron este documento de Eduvia:\n` +
+          `${shareUrl}\n\n` +
+          `Permiso: ${role === "editor" ? "Puede editar" : "Solo ver"}\n\n` +
+          `Ese enlace te da acceso únicamente a este documento.`
+      );
+
+      const gmailUrl =
+        `https://mail.google.com/mail/?view=cm&fs=1` +
+        `&to=${encodeURIComponent(email)}` +
+        `&su=${subject}` +
+        `&body=${body}`;
+
+      window.open(gmailUrl, "_blank");
+
+      if (shareStatus) {
+        shareStatus.textContent = "Permiso guardado y Gmail abierto con la invitación.";
+      }
+
+      if (shareEmailInput) shareEmailInput.value = "";
+      if (shareRoleSelect) shareRoleSelect.value = "viewer";
+    } catch (error) {
+      console.error("Error compartiendo documento:", error);
+      if (shareStatus) {
+        shareStatus.textContent = "No se pudo compartir el documento.";
+      }
+    }
+  });
+}
+
+async function loadClase(user) {
+  const fallbackOwner = ownerUidFromUrl || user.uid;
+  const localClase = readClaseFromLocalStorage(fallbackOwner, claseIdFromUrl);
+
+  if (!currentClaseId && localClase?.id) {
+    currentClaseId = localClase.id;
+  }
+
+  if (!currentOwnerUid) {
+    currentOwnerUid = ownerUidFromUrl || localClase?.ownerUid || user.uid;
+  }
+
+  if (!currentClaseId) {
+    if (localClase) {
+      currentClaseData = localClase;
+      currentRole = currentOwnerUid === user.uid ? "owner" : "viewer";
+
+      if (currentRole === "owner") {
+        clearSharedDocSession();
+      } else {
+        setSharedDocSession(
+          currentRole,
+          user,
+          currentOwnerUid,
+          localClase.id || currentClaseId
+        );
+      }
+
+      if (currentClaseId && currentOwnerUid) {
+        currentClaseRef = doc(db, "usuarios", currentOwnerUid, "clases", currentClaseId);
+      }
+
+      const claseLista = await generarDocumentoSiFalta(localClase);
+      renderClase(claseLista);
+      applyRoleUi(currentRole);
+      showDocument();
+      setupShareUi();
+      return;
+    }
+
+    renderError("No se encontró el identificador de la clase.");
+    showDocument();
+    return;
+  }
+
+  try {
+    const claseRef = doc(db, "usuarios", currentOwnerUid, "clases", currentClaseId);
+    const claseSnap = await getDoc(claseRef);
+
+    if (!claseSnap.exists()) {
+      if (localClase) {
+        currentClaseData = localClase;
+        currentRole = currentOwnerUid === user.uid ? "owner" : "viewer";
+
+        if (currentRole === "owner") {
+          clearSharedDocSession();
+        } else {
+          setSharedDocSession(currentRole, user, currentOwnerUid, currentClaseId);
+        }
+
+        currentClaseRef = claseRef;
+
+        const claseLista = await generarDocumentoSiFalta(localClase);
+        renderClase(claseLista);
+        applyRoleUi(currentRole);
+        showDocument();
+        setupShareUi();
+        return;
+      }
+
+      renderError("La clase no existe o no se pudo encontrar en Firestore.");
+      showDocument();
+      return;
+    }
+
+    const claseData = {
+      id: claseSnap.id,
+      ownerUid: currentOwnerUid,
+      ...claseSnap.data()
+    };
+
+    const role = resolveUserRole(claseData, user, currentOwnerUid);
+
+    if (!role) {
+      showDenied();
+      return;
+    }
+
+    setSharedDocSession(role, user, currentOwnerUid, currentClaseId);
+
+    currentClaseRef = claseRef;
+    currentClaseData = claseData;
+    currentRole = role;
+
+    const claseLista = await generarDocumentoSiFalta(claseData);
+
+    writeClaseToLocalStorage(claseLista, currentOwnerUid, currentClaseId);
+    renderClase(claseLista);
+    applyRoleUi(role);
+    showDocument();
+    setupShareUi();
+  } catch (error) {
+    console.error("Error al cargar la clase:", error);
+
+    if (localClase) {
+      currentClaseData = localClase;
+      currentRole = currentOwnerUid === user.uid ? "owner" : "viewer";
+
+      if (currentRole === "owner") {
+        clearSharedDocSession();
+      } else {
+        setSharedDocSession(currentRole, user, currentOwnerUid, currentClaseId);
+      }
+
+      if (currentClaseId && currentOwnerUid) {
+        currentClaseRef = doc(db, "usuarios", currentOwnerUid, "clases", currentClaseId);
+      }
+
+      try {
+        const claseLista = await generarDocumentoSiFalta(localClase);
+        renderClase(claseLista);
+      } catch (innerError) {
+        console.error("Error generando documento desde local:", innerError);
+        renderClase(localClase);
+      }
+
+      applyRoleUi(currentRole);
+      showDocument();
+      setupShareUi();
+      return;
+    }
+
+    renderError(error.message || "Hubo un problema al cargar la clase.");
+    showDocument();
+  }
+}
+
+attachAutosaveListeners();
+
+onAuthStateChanged(auth, async (user) => {
+  if (!user) {
+    clearSharedDocSession();
+    window.location.href = "login.html";
+    return;
+  }
+
+  currentUser = user;
+  await loadClase(user);
+});
