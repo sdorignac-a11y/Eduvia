@@ -1,52 +1,59 @@
-import { auth, db } from "from "./firebase.js?v=7"
+import { auth, db } from "./firebase.js?v=7";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import { collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-const form = document.getElementById("clase-form");
-let currentUser = null;
+const loading = document.getElementById("loading");
+const contenido = document.getElementById("contenido");
 
-onAuthStateChanged(auth, (user) => {
+const tituloClase = document.getElementById("titulo-clase");
+const materiaEl = document.getElementById("materia");
+const temaEl = document.getElementById("tema");
+const nivelEl = document.getElementById("nivel");
+const duracionEl = document.getElementById("duracion");
+const objetivoEl = document.getElementById("objetivo");
+
+const params = new URLSearchParams(window.location.search);
+const claseId = params.get("id");
+
+onAuthStateChanged(auth, async (user) => {
   if (!user) {
     window.location.href = "login.html";
     return;
   }
 
-  currentUser = user;
-  console.log("Usuario logueado:", user.uid);
-});
-
-form.addEventListener("submit", async (e) => {
-  e.preventDefault();
-
-  if (!currentUser) {
-    alert("Todavía no cargó el usuario. Probá de nuevo en un segundo.");
-    return;
-  }
-
-  const materia = document.getElementById("materia").value.trim();
-  const tema = document.getElementById("tema").value.trim();
-  const nivel = document.getElementById("nivel").value;
-
-  if (!materia || !tema || !nivel) {
-    alert("Completá todos los campos.");
+  if (!claseId) {
+    loading.textContent = "No se encontró el ID de la clase.";
     return;
   }
 
   try {
-    const docRef = await addDoc(
-      collection(db, "usuarios", currentUser.uid, "clases"),
-      {
-        materia,
-        tema,
-        nivel,
-        creadoEn: serverTimestamp()
-      }
-    );
+    const ref = doc(db, "usuarios", user.uid, "clases", claseId);
+    const snap = await getDoc(ref);
 
-    console.log("Clase creada:", docRef.id);
-    window.location.href = `clase.html?id=${docRef.id}`;
+    if (!snap.exists()) {
+      loading.textContent = "La clase no existe o no tenés acceso.";
+      return;
+    }
+
+    const data = snap.data();
+
+    tituloClase.textContent = data.tema || "Clase";
+    materiaEl.textContent = data.materia || "-";
+    temaEl.textContent = data.tema || "-";
+    nivelEl.textContent = data.nivel || "-";
+
+    if (duracionEl) {
+      duracionEl.textContent = data.duracion || "-";
+    }
+
+    if (objetivoEl) {
+      objetivoEl.textContent = data.objetivo || "-";
+    }
+
+    loading.style.display = "none";
+    contenido.style.display = "block";
   } catch (error) {
-    console.error("Error al crear la clase:", error);
-    alert("Error al crear la clase: " + error.message);
+    console.error("Error al cargar la clase:", error);
+    loading.textContent = "Error al cargar la clase.";
   }
 });
