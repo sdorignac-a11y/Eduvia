@@ -30,6 +30,7 @@ form?.addEventListener("submit", async (e) => {
   const nivel = document.getElementById("nivel")?.value;
   const duracion = document.getElementById("duracion")?.value;
   const objetivo = document.getElementById("objetivo")?.value.trim();
+  const formato = document.querySelector('input[name="formato"]:checked')?.value || "pizarron";
 
   if (!materia || !tema || !nivel) {
     alert("Completá materia, tema y nivel.");
@@ -45,6 +46,7 @@ form?.addEventListener("submit", async (e) => {
         nivel,
         duracion: duracion || "",
         objetivo: objetivo || "",
+        formato,
         creadoEn: serverTimestamp()
       }
     );
@@ -57,10 +59,12 @@ form?.addEventListener("submit", async (e) => {
       tema,
       nivel,
       duracion: duracion || "",
-      objetivo: objetivo || ""
+      objetivo: objetivo || "",
+      formato
     }));
 
-    window.location.href = `clase.html?id=${docRef.id}`;
+    const destino = formato === "documento" ? "documento.html" : "clase.html";
+    window.location.href = `${destino}?id=${docRef.id}`;
   } catch (error) {
     console.error("Error al crear la clase:", error);
     alert("Error al crear la clase: " + error.message);
