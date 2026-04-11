@@ -746,6 +746,162 @@
       box-shadow:var(--shadow-soft);
     }
 
+        .mode-selector{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:14px;
+      margin-top:4px;
+    }
+
+    .mode-option{
+      position:relative;
+    }
+
+    .mode-option input{
+      position:absolute;
+      inset:0;
+      opacity:0;
+      cursor:pointer;
+    }
+
+    .mode-card{
+      height:100%;
+      border-radius:22px;
+      border:2px solid #e5ddff;
+      background:linear-gradient(180deg,#fffdf8 0%, #fff8ef 100%);
+      padding:18px;
+      box-shadow:0 8px 16px rgba(124,108,242,.04);
+      transition:.2s ease;
+      overflow:hidden;
+      position:relative;
+    }
+
+    .mode-card::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        radial-gradient(circle at top left, rgba(255,255,255,.86), transparent 28%);
+      pointer-events:none;
+    }
+
+    .mode-card:hover{
+      transform:translateY(-2px);
+      border-color:var(--violet);
+    }
+
+    .mode-option input:checked + .mode-card{
+      border-color:var(--violet);
+      box-shadow:0 0 0 4px rgba(124,108,242,.08), 0 16px 28px rgba(124,108,242,.12);
+      background:linear-gradient(180deg,#ffffff 0%, #f7f0ff 100%);
+    }
+
+    .mode-top{
+      position:relative;
+      z-index:2;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:12px;
+    }
+
+    .mode-icon{
+      width:48px;
+      height:48px;
+      border-radius:16px;
+      display:grid;
+      place-items:center;
+      background:#fff;
+      border:2px solid rgba(124,108,242,.12);
+      font-size:1.2rem;
+      box-shadow:0 6px 14px rgba(124,108,242,.08);
+      flex:none;
+    }
+
+    .mode-check{
+      width:24px;
+      height:24px;
+      border-radius:50%;
+      border:2px solid #d4c9ff;
+      background:#fff;
+      transition:.2s ease;
+      box-shadow:0 4px 10px rgba(124,108,242,.06);
+      flex:none;
+    }
+
+    .mode-option input:checked + .mode-card .mode-check{
+      background:linear-gradient(135deg, var(--violet), var(--orange));
+      border-color:transparent;
+      box-shadow:0 8px 16px rgba(124,108,242,.18);
+    }
+
+    .mode-card h4{
+      position:relative;
+      z-index:2;
+      font-family:"Sora",sans-serif;
+      font-size:1rem;
+      letter-spacing:-.03em;
+      margin-bottom:6px;
+      color:#322a40;
+    }
+
+    .mode-card p{
+      position:relative;
+      z-index:2;
+      color:#645a73;
+      line-height:1.6;
+      font-size:.92rem;
+      margin-bottom:14px;
+    }
+
+    .mode-mini{
+      position:relative;
+      z-index:2;
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+    }
+
+    .mode-mini span{
+      padding:8px 10px;
+      border-radius:999px;
+      background:#fff;
+      border:1px solid rgba(124,108,242,.12);
+      color:#62586e;
+      font-size:.8rem;
+      font-weight:700;
+      box-shadow:var(--shadow-soft);
+    }
+
+    .format-preview{
+      margin-top:14px;
+      padding:14px 16px;
+      border-radius:18px;
+      background:linear-gradient(180deg,#fff 0%, #fff8ef 100%);
+      border:1px solid rgba(124,108,242,.12);
+      box-shadow:var(--shadow-soft);
+    }
+
+    .format-preview strong{
+      display:block;
+      margin-bottom:6px;
+      font-size:.94rem;
+      color:#352d43;
+    }
+
+    .format-preview p{
+      color:#6a6075;
+      line-height:1.6;
+      font-size:.9rem;
+    }
+
+    @media (max-width: 640px){
+      .mode-selector{
+        grid-template-columns:1fr;
+      }
+    }
+
     .form-actions{
       display:flex;
       gap:12px;
@@ -1155,6 +1311,65 @@
                       <option value="60 min">60 minutos</option>
                     </select>
                     <span class="helper">Sirve para ordenar mejor la sesión.</span>
+                  </div>
+
+                                    <div class="field full">
+                    <label>Formato de la clase</label>
+
+                    <div class="mode-selector">
+                      <label class="mode-option">
+                        <input type="radio" name="formato" value="pizarron" checked />
+                        <div class="mode-card">
+                          <div class="mode-top">
+                            <div class="mode-icon">🧑‍🏫</div>
+                            <div class="mode-check"></div>
+                          </div>
+
+                          <h4>Modo Pizarrón</h4>
+                          <p>
+                            Ideal para chicos o clases más visuales, dinámicas e interactivas.
+                          </p>
+
+                          <div class="mode-mini">
+                            <span>Visual</span>
+                            <span>Más guiado</span>
+                            <span>Estilo aula</span>
+                          </div>
+                        </div>
+                      </label>
+
+                      <label class="mode-option">
+                        <input type="radio" name="formato" value="documento" />
+                        <div class="mode-card">
+                          <div class="mode-top">
+                            <div class="mode-icon">📄</div>
+                            <div class="mode-check"></div>
+                          </div>
+
+                          <h4>Modo Documento</h4>
+                          <p>
+                            Pensado para estudiantes más grandes, apuntes claros y estudio más serio.
+                          </p>
+
+                          <div class="mode-mini">
+                            <span>Apunte</span>
+                            <span>Más ordenado</span>
+                            <span>Ideal para repasar</span>
+                          </div>
+                        </div>
+                      </label>
+                    </div>
+
+                    <div id="format-preview" class="format-preview">
+                      <strong>Vista elegida: Pizarrón</strong>
+                      <p>
+                        La clase se mostrará en una experiencia más visual, tipo aula interactiva.
+                      </p>
+                    </div>
+
+                    <span class="helper">
+                      Elegí el formato según la edad del alumno y la forma en la que querés estudiar.
+                    </span>
                   </div>
 
                   <div class="field full">
