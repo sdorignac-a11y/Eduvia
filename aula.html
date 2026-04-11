@@ -7,7 +7,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Kalam:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Patrick+Hand&display=swap" rel="stylesheet">
 
   <style>
     *{
@@ -31,7 +31,7 @@
       --green:#2f7d55;
       --blue:#355d95;
       --red:#9b4f5d;
-      --yellow-mark:rgba(255, 224, 130, .52);
+      --yellow-mark:rgba(255, 224, 130, .6);
 
       --soft:#f6f8fb;
     }
@@ -190,8 +190,8 @@
       cursor:pointer;
       padding:10px 18px 9px;
       border-radius:999px;
-      font-family:'Kalam', cursive;
-      font-size:1.02rem;
+      font-family:'Patrick Hand', cursive;
+      font-size:1.08rem;
       font-weight:700;
       color:#22303a;
       box-shadow:
@@ -248,8 +248,8 @@
     }
 
     .placeholder-text{
-      font-family:'Kalam', cursive;
-      font-size:2rem;
+      font-family:'Patrick Hand', cursive;
+      font-size:2.2rem;
       color:#40505e;
       opacity:.28;
       user-select:none;
@@ -260,8 +260,8 @@
       display:flex;
       align-items:center;
       justify-content:center;
-      font-family:'Kalam', cursive;
-      font-size:1.9rem;
+      font-family:'Patrick Hand', cursive;
+      font-size:2rem;
       color:#4a6276;
       opacity:.78;
       text-align:center;
@@ -295,8 +295,8 @@
       color:#6a2d28;
       font-weight:700;
       line-height:1.6;
-      font-family:'Kalam', cursive;
-      font-size:1.2rem;
+      font-family:'Patrick Hand', cursive;
+      font-size:1.35rem;
     }
 
     .board-lesson{
@@ -341,14 +341,14 @@
     }
 
     .board-title{
-      font-family:'Kalam', cursive;
-      font-size:clamp(2rem, 4vw, 3.2rem);
-      line-height:1.05;
+      font-family:'Patrick Hand', cursive;
+      font-size:clamp(2.3rem, 4vw, 3.7rem);
+      line-height:1.02;
       color:#2d4f76;
       margin:0;
       position:relative;
       display:inline-block;
-      text-shadow:.6px .6px 0 rgba(255,255,255,.7);
+      text-shadow:.5px .5px 0 rgba(255,255,255,.8);
     }
 
     .board-title::after{
@@ -357,7 +357,7 @@
       left:-8px;
       right:-8px;
       bottom:5px;
-      height:14px;
+      height:16px;
       background:var(--yellow-mark);
       border-radius:999px;
       transform:rotate(-1deg);
@@ -366,15 +366,24 @@
 
     .board-badge{
       display:inline-block;
-      padding:8px 14px;
+      padding:9px 15px;
       border-radius:999px;
       background:#eef5ff;
       border:1px solid rgba(53,93,149,.12);
       color:#2d4f76;
-      font-family:'Kalam', cursive;
+      font-family:'Patrick Hand', cursive;
       font-weight:700;
-      font-size:1rem;
+      font-size:1.18rem;
       transform:rotate(-1deg);
+    }
+
+    .board-summary{
+      margin:0 0 18px;
+      padding:12px 0 18px;
+      border-bottom:2px dashed rgba(53,93,149,.12);
+      opacity:0;
+      filter:blur(2px);
+      transform:translateY(10px);
     }
 
     .board-section{
@@ -392,12 +401,12 @@
 
     .board-section h2{
       margin:0 0 10px;
-      font-family:'Kalam', cursive;
-      font-size:1.55rem;
+      font-family:'Patrick Hand', cursive;
+      font-size:1.75rem;
       font-weight:700;
       color:var(--green);
       letter-spacing:.01em;
-      transform:rotate(-.6deg);
+      transform:rotate(-.4deg);
       display:inline-block;
     }
 
@@ -405,8 +414,8 @@
       margin:0;
       line-height:1.9;
       color:var(--ink);
-      font-size:1.14rem;
-      font-family:'Kalam', cursive;
+      font-size:1.28rem;
+      font-family:'Patrick Hand', cursive;
       font-weight:700;
     }
 
@@ -424,8 +433,8 @@
       line-height:1.8;
       color:var(--ink);
       font-weight:700;
-      font-size:1.1rem;
-      font-family:'Kalam', cursive;
+      font-size:1.2rem;
+      font-family:'Patrick Hand', cursive;
     }
 
     .board-list li::before{
@@ -437,6 +446,17 @@
       font-weight:900;
     }
 
+    .board-highlight{
+      background:linear-gradient(180deg, transparent 40%, rgba(255, 227, 122, .9) 40%);
+      color:inherit;
+      padding:0 .12em;
+      border-radius:6px;
+    }
+
+    .type-target{
+      white-space:pre-wrap;
+    }
+
     .board-side{
       display:flex;
       flex-direction:column;
@@ -445,153 +465,111 @@
     }
 
     .visual-box{
-      background:linear-gradient(180deg, rgba(255,255,255,.92) 0%, rgba(248,251,255,.88) 100%);
+      background:rgba(255,255,255,.76);
       border:1px solid rgba(53,93,149,.10);
       border-radius:24px;
-      padding:16px;
+      padding:12px;
       box-shadow:0 14px 28px rgba(0,0,0,.06);
       opacity:0;
+      filter:blur(2px);
       transform:translateY(10px);
+      transform-origin:center;
+    }
+
+    .visual-box:nth-child(1){
+      transform:translateY(10px) rotate(1.2deg);
+    }
+
+    .visual-box:nth-child(2){
+      transform:translateY(10px) rotate(-1.4deg);
+    }
+
+    .visual-box:nth-child(3){
+      transform:translateY(10px) rotate(.8deg);
     }
 
     .visual-box.visual-blue{
-      border-color:rgba(53,93,149,.14);
       background:linear-gradient(180deg, #f4f8ff 0%, #edf4ff 100%);
     }
 
     .visual-box.visual-green{
-      border-color:rgba(47,125,85,.14);
       background:linear-gradient(180deg, #f3fbf6 0%, #ebf8ef 100%);
     }
 
     .visual-box.visual-yellow{
-      border-color:rgba(155,122,23,.14);
       background:linear-gradient(180deg, #fffdf2 0%, #fff9e7 100%);
     }
 
     .visual-box.visual-red{
-      border-color:rgba(155,79,93,.14);
       background:linear-gradient(180deg, #fff5f7 0%, #fff0f3 100%);
     }
 
-    .visual-top{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-      margin-bottom:12px;
-    }
-
-    .visual-title{
-      font-family:'Kalam', cursive;
-      font-size:1.2rem;
-      font-weight:700;
-      color:#2d4f76;
-      line-height:1.2;
-    }
-
-    .visual-badge{
-      min-width:36px;
-      height:36px;
-      display:grid;
-      place-items:center;
-      border-radius:12px;
-      font-family:'Kalam', cursive;
-      font-size:1rem;
-      font-weight:700;
-      background:rgba(255,255,255,.7);
-      color:#355d95;
-      box-shadow:inset 0 1px 0 rgba(255,255,255,.8);
-    }
-
-    .visual-main{
+    .visual-img{
+      width:100%;
+      aspect-ratio:4 / 3;
+      object-fit:cover;
       border-radius:18px;
-      background:rgba(255,255,255,.72);
-      border:1px dashed rgba(53,93,149,.12);
-      padding:16px 14px;
-      min-height:120px;
-      display:flex;
-      flex-direction:column;
-      justify-content:center;
-      gap:10px;
-    }
-
-    .visual-formula{
-      font-family:'Kalam', cursive;
-      font-size:1.55rem;
-      font-weight:700;
-      color:#2f3a44;
-      line-height:1.35;
-      text-align:center;
-    }
-
-    .visual-lines{
-      display:flex;
-      flex-direction:column;
-      gap:8px;
-    }
-
-    .visual-line{
-      font-family:'Kalam', cursive;
-      font-size:1rem;
-      font-weight:700;
-      color:#2f3a44;
-      line-height:1.5;
-      padding-left:18px;
-      position:relative;
-    }
-
-    .visual-line::before{
-      content:"•";
-      position:absolute;
-      left:0;
-      top:0;
-      color:#355d95;
-    }
-
-    .visual-steps{
-      display:flex;
-      flex-direction:column;
-      gap:10px;
-    }
-
-    .visual-step{
-      display:flex;
-      gap:10px;
-      align-items:flex-start;
-    }
-
-    .visual-step-num{
-      flex:0 0 28px;
-      width:28px;
-      height:28px;
-      border-radius:999px;
-      display:grid;
-      place-items:center;
-      font-family:'Kalam', cursive;
-      font-size:1rem;
-      font-weight:700;
-      color:#fff;
-      background:#355d95;
-      margin-top:2px;
-    }
-
-    .visual-step-text{
-      font-family:'Kalam', cursive;
-      font-size:1rem;
-      font-weight:700;
-      color:#2f3a44;
-      line-height:1.45;
+      display:block;
+      background:#f3f6fb;
+      border:1px solid rgba(53,93,149,.08);
     }
 
     .visual-caption{
       margin-top:10px;
-      font-family:'Kalam', cursive;
-      font-size:.98rem;
-      color:#4d6277;
+      font-family:'Patrick Hand', cursive;
+      font-size:1.08rem;
+      color:#355d95;
       font-weight:700;
       text-align:center;
-      line-height:1.4;
+      line-height:1.35;
+    }
+
+    .inline-visual{
+      margin:18px 0 22px;
+      padding:14px;
+      border-radius:24px;
+      background:rgba(255,255,255,.72);
+      border:1px solid rgba(53,93,149,.10);
+      box-shadow:0 12px 28px rgba(0,0,0,.05);
+      opacity:0;
+      filter:blur(2px);
+      transform:translateY(10px);
+    }
+
+    .inline-blue{
+      background:linear-gradient(180deg, #f4f8ff 0%, #edf4ff 100%);
+    }
+
+    .inline-green{
+      background:linear-gradient(180deg, #f3fbf6 0%, #ebf8ef 100%);
+    }
+
+    .inline-yellow{
+      background:linear-gradient(180deg, #fffdf2 0%, #fff9e7 100%);
+    }
+
+    .inline-red{
+      background:linear-gradient(180deg, #fff5f7 0%, #fff0f3 100%);
+    }
+
+    .inline-visual-img{
+      width:100%;
+      aspect-ratio:16 / 7;
+      object-fit:cover;
+      display:block;
+      border-radius:18px;
+      background:#f3f6fb;
+      border:1px solid rgba(53,93,149,.08);
+    }
+
+    .inline-visual-caption{
+      margin-top:10px;
+      text-align:center;
+      color:#4d6277;
+      font-family:'Patrick Hand', cursive;
+      font-size:1.08rem;
+      font-weight:700;
+      line-height:1.35;
     }
 
     .tray{
@@ -689,14 +667,14 @@
 
     .chat-panel-header h3{
       margin:0;
-      font-size:1rem;
+      font-size:1.08rem;
       color:#2d4f76;
       font-weight:800;
     }
 
     .chat-panel-header p{
       margin:4px 0 0;
-      font-size:.86rem;
+      font-size:.9rem;
       line-height:1.4;
       color:#5e6c78;
     }
@@ -801,7 +779,7 @@
       .clip.right{ right:40px; }
 
       .board-title{
-        font-size:1.9rem;
+        font-size:2.2rem;
       }
     }
 
@@ -834,7 +812,7 @@
 
       .marker-btn{
         padding:8px 14px 7px;
-        font-size:.95rem;
+        font-size:.96rem;
       }
 
       .board-content{
@@ -842,11 +820,11 @@
       }
 
       .placeholder-text{
-        font-size:1.45rem;
+        font-size:1.55rem;
       }
 
       .board-loading{
-        font-size:1.4rem;
+        font-size:1.55rem;
       }
 
       .board-main{
@@ -861,8 +839,26 @@
         grid-template-columns:1fr;
       }
 
-      .visual-formula{
-        font-size:1.3rem;
+      .board-title{
+        font-size:2.45rem;
+      }
+
+      .board-badge{
+        font-size:1.05rem;
+      }
+
+      .board-section h2{
+        font-size:1.45rem;
+      }
+
+      .board-section p,
+      .board-list li{
+        font-size:1.1rem;
+      }
+
+      .visual-caption,
+      .inline-visual-caption{
+        font-size:1rem;
       }
 
       .tray{
