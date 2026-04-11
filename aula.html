@@ -626,9 +626,9 @@
       }
     }
 
-    .chat-panel{
+    .chat-panel,
+    .sources-panel{
       position:absolute;
-      right:18px;
       bottom:26px;
       width:min(360px, calc(100% - 36px));
       background:rgba(255,255,255,.96);
@@ -641,7 +641,17 @@
       backdrop-filter:blur(10px);
     }
 
-    .chat-panel.is-open{
+    .chat-panel{
+      right:18px;
+    }
+
+    .sources-panel{
+      left:18px;
+      width:min(390px, calc(100% - 36px));
+    }
+
+    .chat-panel.is-open,
+    .sources-panel.is-open{
       display:block;
       animation:chatFadeIn .22s ease;
     }
@@ -657,7 +667,8 @@
       }
     }
 
-    .chat-panel-header{
+    .chat-panel-header,
+    .sources-panel-header{
       display:flex;
       align-items:flex-start;
       justify-content:space-between;
@@ -665,21 +676,24 @@
       margin-bottom:12px;
     }
 
-    .chat-panel-header h3{
+    .chat-panel-header h3,
+    .sources-panel-header h3{
       margin:0;
       font-size:1.08rem;
       color:#2d4f76;
       font-weight:800;
     }
 
-    .chat-panel-header p{
+    .chat-panel-header p,
+    .sources-panel-header p{
       margin:4px 0 0;
       font-size:.9rem;
       line-height:1.4;
       color:#5e6c78;
     }
 
-    .chat-close{
+    .chat-close,
+    .sources-close{
       border:none;
       background:#eef5ff;
       color:#2d4f76;
@@ -745,6 +759,82 @@
     .chat-send-btn:disabled{
       opacity:.6;
       cursor:not-allowed;
+    }
+
+    .sources-list{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      max-height:290px;
+      overflow:auto;
+      padding-right:4px;
+      scrollbar-width:thin;
+      scrollbar-color:rgba(74,96,118,.35) transparent;
+    }
+
+    .sources-list::-webkit-scrollbar{
+      width:8px;
+    }
+
+    .sources-list::-webkit-scrollbar-thumb{
+      background:rgba(74,96,118,.35);
+      border-radius:999px;
+    }
+
+    .source-empty{
+      padding:14px;
+      border-radius:16px;
+      background:#f7fbff;
+      border:1px dashed rgba(53,93,149,.18);
+      color:#5e6c78;
+      font-size:.92rem;
+      line-height:1.5;
+    }
+
+    .source-item{
+      padding:12px 14px;
+      border-radius:16px;
+      background:#f7fbff;
+      border:1px solid rgba(53,93,149,.10);
+    }
+
+    .source-top{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom:8px;
+    }
+
+    .source-title{
+      font-size:.95rem;
+      line-height:1.4;
+      color:#2d4f76;
+      font-weight:800;
+    }
+
+    .source-pill{
+      flex-shrink:0;
+      padding:5px 10px;
+      border-radius:999px;
+      background:#eef5ff;
+      border:1px solid rgba(53,93,149,.10);
+      color:#355d95;
+      font-size:.76rem;
+      font-weight:800;
+    }
+
+    .source-url{
+      display:block;
+      font-size:.84rem;
+      line-height:1.45;
+      color:#5e6c78;
+      text-decoration:none;
+      word-break:break-word;
+    }
+
+    .source-url:hover{
+      text-decoration:underline;
     }
 
     @media (max-width: 980px){
@@ -875,7 +965,8 @@
       .clip.left{ left:22px; }
       .clip.right{ right:22px; }
 
-      .chat-panel{
+      .chat-panel,
+      .sources-panel{
         right:12px;
         left:12px;
         bottom:18px;
@@ -899,6 +990,7 @@
         <div class="marker-nav">
           <button class="marker-btn green" type="button" onclick="location.href='panel.html'">Inicio</button>
           <button class="marker-btn blue" type="button" onclick="location.href='materiales.html'">Material</button>
+          <button class="marker-btn blue" type="button" id="toggle-sources-btn">Fuentes</button>
           <button class="marker-btn yellow" type="button" id="toggle-chat-btn">Chat</button>
           <button class="marker-btn red" type="button" onclick="location.href='panel.html'">Abandonar sala</button>
         </div>
@@ -906,6 +998,22 @@
         <div class="board-content" id="board-content">
           <div class="placeholder-text">Tu clase se mostrará acá</div>
         </div>
+
+        <aside class="sources-panel" id="sources-panel" aria-hidden="true">
+          <div class="sources-panel-header">
+            <div>
+              <h3>Fuentes consultadas</h3>
+              <p>Estas páginas se usaron como base para armar la clase</p>
+            </div>
+            <button type="button" class="sources-close" id="sources-close-btn">×</button>
+          </div>
+
+          <div class="sources-list" id="sources-list">
+            <div class="source-empty">
+              Todavía no hay fuentes cargadas para esta clase.
+            </div>
+          </div>
+        </aside>
 
         <aside class="chat-panel" id="chat-panel" aria-hidden="true">
           <div class="chat-panel-header">
