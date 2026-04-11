@@ -12,6 +12,11 @@ const chatInput = document.getElementById("chat-input");
 const chatStatus = document.getElementById("chat-status");
 const chatSendBtn = document.getElementById("chat-send-btn");
 
+const sourcesPanel = document.getElementById("sources-panel");
+const toggleSourcesBtn = document.getElementById("toggle-sources-btn");
+const closeSourcesBtn = document.getElementById("sources-close-btn");
+const sourcesList = document.getElementById("sources-list");
+
 const FETCH_TIMEOUT_MS = 30000;
 
 let claseGuardadaActual = null;
@@ -43,6 +48,57 @@ function decodeStoredHtml(value = "") {
   } catch {
     return "";
   }
+}
+
+function sanitizeUrl(value = "") {
+  try {
+    const url = new URL(String(value), window.location.origin);
+    if (url.protocol === "http:" || url.protocol === "https:") {
+      return url.href;
+    }
+    return "";
+  } catch {
+    return "";
+  }
+}
+
+function renderSourcesPanel(fuentes = []) {
+  if (!sourcesList) return;
+
+  const items = Array.isArray(fuentes) ? fuentes : [];
+
+  if (!items.length) {
+    sourcesList.innerHTML = `
+      <div class="source-empty">
+        Todavía no hay fuentes visibles para esta clase.
+      </div>
+    `;
+    return;
+  }
+
+  sourcesList.innerHTML = items.map((fuente, index) => {
+    const titulo = escapeHtml(
+      fuente?.title || fuente?.titulo || `Fuente ${index + 1}`
+    );
+    const safeUrl = sanitizeUrl(fuente?.url || "");
+    const textoUrl = safeUrl
+      ? escapeHtml(safeUrl.replace(/^https?:\/\//, ""))
+      : "URL no disponible";
+
+    return `
+      <article class="source-item">
+        <div class="source-top">
+          <div class="source-title">${titulo}</div>
+          <span class="source-pill">Fuente ${index + 1}</span>
+        </div>
+        ${
+          safeUrl
+            ? `<a class="source-url" href="${safeUrl}" target="_blank" rel="noopener noreferrer">${textoUrl}</a>`
+            : `<span class="source-url">${textoUrl}</span>`
+        }
+      </article>
+    `;
+  }).join("");
 }
 
 function renderError(message) {
@@ -736,7 +792,7 @@ function renderClase(claseRaw, meta = {}, extras = {}) {
   };
 
   ultimaRespuestaChat = null;
-
+  renderSourcesPanel(claseGeneradaActual.fuentes);
   renderLeccion(clase, meta);
 }
 
@@ -819,6 +875,7 @@ function renderRespuestaChat(respuestaRaw, pregunta) {
 
 function abrirChat() {
   if (!chatPanel) return;
+  cerrarFuentes();
   chatPanel.classList.add("is-open");
   chatPanel.setAttribute("aria-hidden", "false");
   setTimeout(() => {
@@ -830,6 +887,19 @@ function cerrarChat() {
   if (!chatPanel) return;
   chatPanel.classList.remove("is-open");
   chatPanel.setAttribute("aria-hidden", "true");
+}
+
+function abrirFuentes() {
+  if (!sourcesPanel) return;
+  cerrarChat();
+  sourcesPanel.classList.add("is-open");
+  sourcesPanel.setAttribute("aria-hidden", "false");
+}
+
+function cerrarFuentes() {
+  if (!sourcesPanel) return;
+  sourcesPanel.classList.remove("is-open");
+  sourcesPanel.setAttribute("aria-hidden", "true");
 }
 
 async function preguntarEnChat(pregunta) {
@@ -933,6 +1003,7 @@ async function cargarClaseEnPizarron() {
     if (!raw) {
       fuentesClaseActual = [];
       investigacionClaseActual = "";
+      renderSourcesPanel([]);
       renderError("No se encontró la clase actual en el navegador.");
       updateChatStatus("No hay clase cargada.");
       return;
@@ -944,6 +1015,7 @@ async function cargarClaseEnPizarron() {
     } catch {
       fuentesClaseActual = [];
       investigacionClaseActual = "";
+      renderSourcesPanel([]);
       renderError("La clase guardada está dañada o tiene un formato inválido.");
       updateChatStatus("Clase inválida.");
       return;
@@ -962,6 +1034,7 @@ async function cargarClaseEnPizarron() {
     if (!materia || !tema || !nivel) {
       fuentesClaseActual = [];
       investigacionClaseActual = "";
+      renderSourcesPanel([]);
       renderError("Faltan datos clave de la clase: materia, tema o nivel.");
       updateChatStatus("Faltan datos de la clase.");
       return;
@@ -996,6 +1069,7 @@ async function cargarClaseEnPizarron() {
     try {
       data = await response.json();
     } catch {
+      renderSourcesPanel([]);
       renderError("El servidor respondió con un formato inválido.");
       updateChatStatus("Error del servidor.");
       return;
@@ -1004,6 +1078,7 @@ async function cargarClaseEnPizarron() {
     if (!response.ok || !data?.ok || !data?.clase) {
       fuentesClaseActual = [];
       investigacionClaseActual = "";
+      renderSourcesPanel([]);
       renderError(data?.error || "Hubo un error al generar la clase.");
       updateChatStatus("No se pudo generar la clase.");
       return;
@@ -1011,6 +1086,7 @@ async function cargarClaseEnPizarron() {
 
     fuentesClaseActual = Array.isArray(data.fuentes) ? data.fuentes : [];
     investigacionClaseActual = String(data.investigacion || "").trim();
+    renderSourcesPanel(fuentesClaseActual);
 
     renderClase(
       data.clase,
@@ -1024,6 +1100,7 @@ async function cargarClaseEnPizarron() {
     updateChatStatus("Listo para preguntar.");
   } catch (err) {
     console.error("Error cargando clase:", err);
+    renderSourcesPanel([]);
     renderError("Error al cargar la clase en el pizarrón.");
     updateChatStatus("Error al cargar.");
   }
@@ -1039,6 +1116,16 @@ toggleChatBtn?.addEventListener("click", () => {
 
 closeChatBtn?.addEventListener("click", cerrarChat);
 
+toggleSourcesBtn?.addEventListener("click", () => {
+  if (sourcesPanel?.classList.contains("is-open")) {
+    cerrarFuentes();
+  } else {
+    abrirFuentes();
+  }
+});
+
+closeSourcesBtn?.addEventListener("click", cerrarFuentes);
+
 chatForm?.addEventListener("submit", manejarPreguntaChat);
 
 chatInput?.addEventListener("keydown", (event) => {
@@ -1051,6 +1138,7 @@ chatInput?.addEventListener("keydown", (event) => {
 window.addEventListener("keydown", (event) => {
   if (event.key === "Escape") {
     cerrarChat();
+    cerrarFuentes();
   }
 });
 
