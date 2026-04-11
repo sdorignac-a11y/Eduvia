@@ -155,7 +155,7 @@ export default async function handler(req, res) {
     let investigacionFinal = limpiarTexto(investigacion);
     let fuentesFinales = limpiarFuentes(fuentes);
 
-    if (!investigacionFinal) {
+   if (!investigacionFinal || !fuentesFinales.length) {
       const researchResponse = await client.responses.create({
         model: process.env.OPENAI_RESEARCH_MODEL || "gpt-5.4-mini",
         reasoning: { effort: "low" },
