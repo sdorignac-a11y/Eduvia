@@ -1,5 +1,9 @@
 const board = document.getElementById("board-content");
 
+if (!board) {
+  throw new Error("No se encontró el contenedor #board-content en aula.html");
+}
+
 function escapeHtml(value = "") {
   return String(value)
     .replaceAll("&", "&amp;")
