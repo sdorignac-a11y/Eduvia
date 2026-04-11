@@ -21,6 +21,98 @@ function renderError(message) {
   `;
 }
 
+function wait(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function escribirTexto(el, texto, velocidad = 18) {
+  if (!el) return;
+
+  el.textContent = "";
+  el.classList.add("is-typing");
+
+  for (let i = 0; i < texto.length; i++) {
+    el.textContent += texto[i];
+    await wait(velocidad);
+  }
+
+  el.classList.remove("is-typing");
+}
+
+async function mostrarBloque(el, delay = 180) {
+  if (!el) return;
+  el.classList.add("is-visible");
+  await wait(delay);
+}
+
+async function animarClase() {
+  const title = board.querySelector(".board-title");
+  const badge = board.querySelector(".board-badge");
+
+  const introSection = board.querySelectorAll(".board-section")[0];
+  const puntosSection = board.querySelectorAll(".board-section")[1];
+
+  const introText = introSection?.querySelector("p");
+  const puntosItems = puntosSection?.querySelectorAll("li") || [];
+
+  const ejemploCard = board.querySelectorAll(".board-card")[0];
+  const actividadCard = board.querySelectorAll(".board-card")[1];
+
+  const ejemploText = ejemploCard?.querySelector("p");
+  const actividadText = actividadCard?.querySelector("p");
+
+  if (title) {
+    const text = title.textContent;
+    await mostrarBloque(title, 120);
+    await escribirTexto(title, text, 24);
+  }
+
+  if (badge) {
+    const text = badge.textContent;
+    await mostrarBloque(badge, 100);
+    await escribirTexto(badge, text, 10);
+  }
+
+  if (introSection) {
+    await mostrarBloque(introSection, 120);
+  }
+
+  if (introText) {
+    const text = introText.textContent;
+    await escribirTexto(introText, text, 14);
+  }
+
+  if (puntosSection) {
+    await mostrarBloque(puntosSection, 120);
+  }
+
+  for (const item of puntosItems) {
+    const text = item.textContent;
+    item.textContent = "";
+    item.classList.add("is-visible");
+    await escribirTexto(item, text, 12);
+    await wait(100);
+  }
+
+  if (ejemploCard) {
+    await mostrarBloque(ejemploCard, 120);
+  }
+
+  if (ejemploText) {
+    const text = ejemploText.textContent;
+    await escribirTexto(ejemploText, text, 14);
+  }
+
+  if (actividadCard) {
+    await mostrarBloque(actividadCard, 120);
+  }
+
+  if (actividadText) {
+    const text = actividadText.textContent;
+    await escribirTexto(actividadText, text, 14);
+  }
+}
+
 function renderClase(clase, meta = {}) {
   const puntos = Array.isArray(clase?.puntos) ? clase.puntos : [];
 
@@ -60,6 +152,8 @@ function renderClase(clase, meta = {}) {
       </div>
     </div>
   `;
+
+  animarClase();
 }
 
 async function cargarClaseEnPizarron() {
