@@ -8,12 +8,12 @@ function limpiarTexto(value = "") {
   return String(value || "").trim();
 }
 
-function limpiarLista(value) {
+function limpiarLista(value, max = 8) {
   if (!Array.isArray(value)) return [];
   return value
     .map((item) => limpiarTexto(item))
     .filter(Boolean)
-    .slice(0, 8);
+    .slice(0, max);
 }
 
 function limpiarFormulas(value) {
@@ -46,6 +46,27 @@ function limpiarFormulas(value) {
     })
     .filter(Boolean)
     .slice(0, 5);
+}
+
+function limpiarFuentes(value) {
+  if (!Array.isArray(value)) return [];
+
+  return value
+    .map((item) => {
+      if (!item || typeof item !== "object") return null;
+
+      const titulo = limpiarTexto(item.title || item.titulo || "Fuente");
+      const url = limpiarTexto(item.url || "");
+
+      if (!titulo && !url) return null;
+
+      return {
+        title: titulo || "Fuente",
+        url,
+      };
+    })
+    .filter(Boolean)
+    .slice(0, 8);
 }
 
 function extraerOutputText(response) {
@@ -81,16 +102,28 @@ function normalizarRespuesta(parsed = {}) {
       limpiarTexto(parsed.resumen) ||
       limpiarTexto(parsed.introduccion) ||
       "Esta es la idea más importante de la respuesta.",
-    puntos: limpiarLista(parsed.puntos),
+    puntos: limpiarLista(parsed.puntos, 8),
     formulas: limpiarFormulas(parsed.formulas),
-    pasos: limpiarLista(parsed.pasos),
-    tips: limpiarLista(parsed.tips),
-    errores: limpiarLista(parsed.errores),
+    pasos: limpiarLista(parsed.pasos, 8),
+    tips: limpiarLista(parsed.tips, 8),
+    errores: limpiarLista(parsed.errores, 8),
     ejemplo: limpiarTexto(parsed.ejemplo),
     actividad:
       limpiarTexto(parsed.actividad) ||
       "Podés hacer otra pregunta desde el chat para seguir profundizando.",
   };
+}
+
+function construirTextoFuentes(fuentes = []) {
+  if (!fuentes.length) return "No hay fuentes explícitas disponibles.";
+
+  return fuentes
+    .map((fuente, index) => {
+      const titulo = limpiarTexto(fuente.title || "Fuente");
+      const url = limpiarTexto(fuente.url || "");
+      return `${index + 1}. ${titulo}${url ? ` — ${url}` : ""}`;
+    })
+    .join("\n");
 }
 
 export default async function handler(req, res) {
@@ -107,6 +140,8 @@ export default async function handler(req, res) {
       claseGuardada = null,
       claseGenerada = null,
       ultimaRespuesta = null,
+      fuentes = [],
+      investigacion = "",
     } = req.body || {};
 
     const preguntaLimpia = limpiarTexto(pregunta);
@@ -118,14 +153,19 @@ export default async function handler(req, res) {
       });
     }
 
+    const fuentesLimpias = limpiarFuentes(fuentes);
+    const investigacionLimpia = limpiarTexto(investigacion);
+
     const contexto = {
       claseGuardada: claseGuardada || {},
       claseGenerada: claseGenerada || {},
       ultimaRespuesta: ultimaRespuesta || {},
+      investigacion: investigacionLimpia,
+      fuentes: fuentesLimpias,
     };
 
     const response = await client.responses.create({
-      model: "gpt-5.4",
+      model: process.env.OPENAI_MODEL || "gpt-5.4",
       input: [
         {
           role: "developer",
@@ -137,6 +177,7 @@ Objetivo:
 - Resolver la pregunta de forma clara, visual y útil.
 - Mantener relación con la clase actual.
 - Escribir como si la respuesta fuera a mostrarse en un pizarrón.
+- Apoyarte en la investigación previa y en las fuentes ya usadas para la clase.
 
 Reglas:
 - Respondé en español rioplatense neutro.
@@ -145,7 +186,9 @@ Reglas:
 - Si es matemática, incluí fórmulas y pasos cuando sirva.
 - Si es inglés, incluí ejemplos claros y cortos.
 - Si la pregunta es simple, no inventes contenido de más.
-- Si falta información, igual ayudá con una explicación útil basada en el tema actual.
+- Priorizá la investigación previa antes que inventar.
+- Si falta información exacta, explicalo con prudencia y mantenete dentro del tema actual.
+- No contradigas el contenido base de la clase.
 - Devolvé SOLO JSON válido.
           `.trim(),
         },
@@ -153,7 +196,21 @@ Reglas:
           role: "user",
           content: `
 CONTEXTO DE LA CLASE:
-${JSON.stringify(contexto, null, 2)}
+${JSON.stringify(
+  {
+    claseGuardada: contexto.claseGuardada,
+    claseGenerada: contexto.claseGenerada,
+    ultimaRespuesta: contexto.ultimaRespuesta,
+  },
+  null,
+  2
+)}
+
+INVESTIGACIÓN PREVIA DE LA CLASE:
+${investigacionLimpia || "No disponible."}
+
+FUENTES USADAS:
+${construirTextoFuentes(fuentesLimpias)}
 
 PREGUNTA DEL ALUMNO:
 ${preguntaLimpia}
