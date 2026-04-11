@@ -41,6 +41,8 @@ const params = new URLSearchParams(window.location.search);
 const claseIdFromUrl = params.get("id") || params.get("doc");
 const ownerUidFromUrl = params.get("owner");
 
+const SHARED_DOC_KEY = "eduvia_shared_doc_access";
+
 let currentUser = null;
 let currentClaseId = claseIdFromUrl || null;
 let currentOwnerUid = ownerUidFromUrl || null;
@@ -49,31 +51,7 @@ let currentClaseData = null;
 let currentRole = "viewer";
 let saveTimer = null;
 let saveInFlight = false;
-const SHARED_DOC_KEY = "eduvia_shared_doc_access";
-
-function setSharedDocSession(role, user, ownerUid, claseId) {
-  if (!user || !ownerUid || !claseId) return;
-
-  if (role === "owner") {
-    sessionStorage.removeItem(SHARED_DOC_KEY);
-    return;
-  }
-
-  sessionStorage.setItem(
-    SHARED_DOC_KEY,
-    JSON.stringify({
-      userUid: user.uid,
-      userEmail: normalizeEmail(user.email || ""),
-      ownerUid,
-      claseId,
-      role
-    })
-  );
-}
-
-function clearSharedDocSession() {
-  sessionStorage.removeItem(SHARED_DOC_KEY);
-}
+let shareUiInitialized = false;
 
 if (documentApp) {
   documentApp.style.display = "none";
@@ -105,6 +83,30 @@ function normalizeRole(role = "") {
 
 function canEdit() {
   return currentRole === "owner" || currentRole === "editor";
+}
+
+function setSharedDocSession(role, user, ownerUid, claseId) {
+  if (!user || !ownerUid || !claseId) return;
+
+  if (role === "owner") {
+    sessionStorage.removeItem(SHARED_DOC_KEY);
+    return;
+  }
+
+  sessionStorage.setItem(
+    SHARED_DOC_KEY,
+    JSON.stringify({
+      userUid: user.uid,
+      userEmail: normalizeEmail(user.email || ""),
+      ownerUid,
+      claseId,
+      role
+    })
+  );
+}
+
+function clearSharedDocSession() {
+  sessionStorage.removeItem(SHARED_DOC_KEY);
 }
 
 function localStorageKey(ownerUid, claseId) {
@@ -566,7 +568,8 @@ function replaceElementToClearOldListeners(id) {
 }
 
 function setupShareUi() {
-  if (!shareModal) return;
+  if (!shareModal || shareUiInitialized) return;
+  shareUiInitialized = true;
 
   const openShareBtn = replaceElementToClearOldListeners("open-share-btn");
   const closeShareBtn = replaceElementToClearOldListeners("close-share-btn");
@@ -606,7 +609,9 @@ function setupShareUi() {
 
   sendShareBtn?.addEventListener("click", async () => {
     if (currentRole !== "owner") {
-      if (shareStatus) shareStatus.textContent = "Solo el dueño del documento puede compartirlo.";
+      if (shareStatus) {
+        shareStatus.textContent = "Solo el dueño del documento puede compartirlo.";
+      }
       return;
     }
 
@@ -619,12 +624,16 @@ function setupShareUi() {
     }
 
     if (!currentClaseRef || !currentClaseId || !currentOwnerUid) {
-      if (shareStatus) shareStatus.textContent = "Todavía no se pudo identificar este documento.";
+      if (shareStatus) {
+        shareStatus.textContent = "Todavía no se pudo identificar este documento.";
+      }
       return;
     }
 
     if (email === normalizeEmail(currentUser?.email || "")) {
-      if (shareStatus) shareStatus.textContent = "Ese email ya es el dueño del documento.";
+      if (shareStatus) {
+        shareStatus.textContent = "Ese email ya es el dueño del documento.";
+      }
       return;
     }
 
@@ -667,10 +676,10 @@ function setupShareUi() {
       const subject = encodeURIComponent("Te compartieron un documento de Eduvia");
       const body = encodeURIComponent(
         `Hola.\n\n` +
-        `Te compartieron este documento de Eduvia:\n` +
-        `${shareUrl}\n\n` +
-        `Permiso: ${role === "editor" ? "Puede editar" : "Solo ver"}\n\n` +
-        `Ese enlace te da acceso únicamente a este documento.`
+          `Te compartieron este documento de Eduvia:\n` +
+          `${shareUrl}\n\n` +
+          `Permiso: ${role === "editor" ? "Puede editar" : "Solo ver"}\n\n` +
+          `Ese enlace te da acceso únicamente a este documento.`
       );
 
       const gmailUrl =
@@ -705,24 +714,38 @@ async function loadClase(user) {
   }
 
   if (!currentOwnerUid) {
-    currentOwnerUid = ownerUidFromUrl || user.uid;
+    currentOwnerUid = ownerUidFromUrl || localClase?.ownerUid || user.uid;
   }
 
-if (!currentClaseId) {
-  if (localClase) {
-    currentClaseData = localClase;
-    currentRole = currentOwnerUid === user.uid ? "owner" : "viewer";
+  if (!currentClaseId) {
+    if (localClase) {
+      currentClaseData = localClase;
+      currentRole = currentOwnerUid === user.uid ? "owner" : "viewer";
 
-    if (currentRole === "owner") {
-      clearSharedDocSession();
-    } else {
-      setSharedDocSession(currentRole, user, currentOwnerUid, localClase.id || currentClaseId);
+      if (currentRole === "owner") {
+        clearSharedDocSession();
+      } else {
+        setSharedDocSession(
+          currentRole,
+          user,
+          currentOwnerUid,
+          localClase.id || currentClaseId
+        );
+      }
+
+      if (currentClaseId && currentOwnerUid) {
+        currentClaseRef = doc(db, "usuarios", currentOwnerUid, "clases", currentClaseId);
+      }
+
+      renderClase(localClase);
+      applyRoleUi(currentRole);
+      showDocument();
+      setupShareUi();
+      return;
     }
 
-    renderClase(localClase);
-    applyRoleUi(currentRole);
+    renderError("No se encontró el identificador de la clase.");
     showDocument();
-    setupShareUi();
     return;
   }
 
@@ -730,23 +753,29 @@ if (!currentClaseId) {
     const claseRef = doc(db, "usuarios", currentOwnerUid, "clases", currentClaseId);
     const claseSnap = await getDoc(claseRef);
 
-if (!claseSnap.exists()) {
-  if (localClase) {
-    currentClaseData = localClase;
-    currentRole = currentOwnerUid === user.uid ? "owner" : "viewer";
+    if (!claseSnap.exists()) {
+      if (localClase) {
+        currentClaseData = localClase;
+        currentRole = currentOwnerUid === user.uid ? "owner" : "viewer";
 
-    if (currentRole === "owner") {
-      clearSharedDocSession();
-    } else {
-      setSharedDocSession(currentRole, user, currentOwnerUid, currentClaseId);
+        if (currentRole === "owner") {
+          clearSharedDocSession();
+        } else {
+          setSharedDocSession(currentRole, user, currentOwnerUid, currentClaseId);
+        }
+
+        currentClaseRef = claseRef;
+        renderClase(localClase);
+        applyRoleUi(currentRole);
+        showDocument();
+        setupShareUi();
+        return;
+      }
+
+      renderError("La clase no existe o no se pudo encontrar en Firestore.");
+      showDocument();
+      return;
     }
-
-    renderClase(localClase);
-    applyRoleUi(currentRole);
-    showDocument();
-    setupShareUi();
-    return;
-  }
 
     const claseData = {
       id: claseSnap.id,
@@ -754,18 +783,18 @@ if (!claseSnap.exists()) {
       ...claseSnap.data()
     };
 
-const role = resolveUserRole(claseData, user, currentOwnerUid);
+    const role = resolveUserRole(claseData, user, currentOwnerUid);
 
-if (!role) {
-  showDenied();
-  return;
-}
+    if (!role) {
+      showDenied();
+      return;
+    }
 
-setSharedDocSession(role, user, currentOwnerUid, currentClaseId);
+    setSharedDocSession(role, user, currentOwnerUid, currentClaseId);
 
-currentClaseRef = claseRef;
-currentClaseData = claseData;
-currentRole = role;
+    currentClaseRef = claseRef;
+    currentClaseData = claseData;
+    currentRole = role;
 
     writeClaseToLocalStorage(claseData, currentOwnerUid, currentClaseId);
     renderClase(claseData);
@@ -775,22 +804,26 @@ currentRole = role;
   } catch (error) {
     console.error("Error al cargar la clase:", error);
 
-if (localClase) {
-  currentClaseData = localClase;
-  currentRole = currentOwnerUid === user.uid ? "owner" : "viewer";
+    if (localClase) {
+      currentClaseData = localClase;
+      currentRole = currentOwnerUid === user.uid ? "owner" : "viewer";
 
-  if (currentRole === "owner") {
-    clearSharedDocSession();
-  } else {
-    setSharedDocSession(currentRole, user, currentOwnerUid, currentClaseId);
-  }
+      if (currentRole === "owner") {
+        clearSharedDocSession();
+      } else {
+        setSharedDocSession(currentRole, user, currentOwnerUid, currentClaseId);
+      }
 
-  renderClase(localClase);
-  applyRoleUi(currentRole);
-  showDocument();
-  setupShareUi();
-  return;
-}
+      if (currentClaseId && currentOwnerUid) {
+        currentClaseRef = doc(db, "usuarios", currentOwnerUid, "clases", currentClaseId);
+      }
+
+      renderClase(localClase);
+      applyRoleUi(currentRole);
+      showDocument();
+      setupShareUi();
+      return;
+    }
 
     renderError(error.message || "Hubo un problema al cargar la clase.");
     showDocument();
