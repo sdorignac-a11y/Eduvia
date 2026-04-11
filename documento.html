@@ -143,30 +143,30 @@
       color:var(--danger);
     }
 
-.subbar{
-  position:sticky;
-  top:64px;
-  z-index:35;
-  background:rgba(255,255,255,.92);
-  backdrop-filter:blur(10px);
-  border-bottom:1px solid var(--line);
-  padding:10px 18px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:14px;
-  flex-wrap:nowrap;
-  overflow-x:auto;
-}
+    .subbar{
+      position:sticky;
+      top:64px;
+      z-index:35;
+      background:rgba(255,255,255,.92);
+      backdrop-filter:blur(10px);
+      border-bottom:1px solid var(--line);
+      padding:10px 18px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+      flex-wrap:nowrap;
+      overflow-x:auto;
+    }
 
     .subbar-left,
-.subbar-tools{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  flex-wrap:nowrap;
-  flex:none;
-}
+    .subbar-tools{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:nowrap;
+      flex:none;
+    }
 
     .chip{
       display:inline-flex;
@@ -561,22 +561,22 @@
         justify-content:flex-start;
       }
 
-.subbar{
-  position:static;
-  padding:10px 14px;
-  align-items:center;
-  flex-wrap:nowrap;
-  overflow-x:auto;
-}
+      .subbar{
+        position:static;
+        padding:10px 14px;
+        align-items:center;
+        flex-wrap:nowrap;
+        overflow-x:auto;
+      }
 
-.subbar-left,
-.subbar-tools{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  flex-wrap:nowrap;
-  flex:none;
-}
+      .subbar-left,
+      .subbar-tools{
+        display:flex;
+        align-items:center;
+        gap:10px;
+        flex-wrap:nowrap;
+        flex:none;
+      }
 
       .subbar-tools{
         padding-top:4px;
@@ -587,14 +587,14 @@
         justify-content:flex-start;
       }
 
-  .tool-select{
-  min-width:170px;
-}
+      .tool-select{
+        min-width:170px;
+      }
 
-.color-pill{
-  flex:none;
-  justify-content:flex-start;
-}
+      .color-pill{
+        flex:none;
+        justify-content:flex-start;
+      }
 
       .workspace{
         padding-top:18px;
@@ -621,22 +621,23 @@
         grid-template-columns:1fr;
       }
     }
+
     .subbar::-webkit-scrollbar{
-  height:8px;
-}
+      height:8px;
+    }
 
-.subbar::-webkit-scrollbar-thumb{
-  background:#d7dce2;
-  border-radius:999px;
-}
+    .subbar::-webkit-scrollbar-thumb{
+      background:#d7dce2;
+      border-radius:999px;
+    }
 
-.chip,
-.tool-btn,
-.tool-select,
-.color-pill,
-.mini-divider{
-  flex:none;
-}
+    .chip,
+    .tool-btn,
+    .tool-select,
+    .color-pill,
+    .mini-divider{
+      flex:none;
+    }
   </style>
 </head>
 <body>
@@ -649,12 +650,13 @@
       </p>
     </div>
   </div>
+
   <div class="access-guard show" id="doc-loading">
-  <div class="access-card">
-    <h2>Cargando documento...</h2>
-    <p>Estamos preparando el contenido y validando el acceso.</p>
+    <div class="access-card">
+      <h2>Cargando documento...</h2>
+      <p>Estamos preparando el contenido y validando el acceso.</p>
+    </div>
   </div>
-</div>
 
   <div id="document-app">
     <header class="topbar">
@@ -824,27 +826,13 @@
   <script>
     const editor = document.getElementById("doc-content");
     const titleEditor = document.getElementById("doc-title");
-    const topbarTitle = document.getElementById("topbar-title");
-
-    const shareModal = document.getElementById("share-modal");
-    const openShareBtn = document.getElementById("open-share-btn");
-    const closeShareBtn = document.getElementById("close-share-btn");
-    const copyLinkBtn = document.getElementById("copy-link-btn");
-    const sendShareBtn = document.getElementById("send-share-btn");
-    const shareEmail = document.getElementById("share-email");
-    const shareRole = document.getElementById("share-role");
-    const docLink = document.getElementById("doc-link");
-    const shareStatus = document.getElementById("share-status");
+    const topbarTitleEl = document.getElementById("topbar-title");
     const formatBlock = document.getElementById("format-block");
     const textColor = document.getElementById("text-color");
     const highlightColor = document.getElementById("highlight-color");
 
-    const params = new URLSearchParams(window.location.search);
-    const docId = params.get("doc") || "demo-doc";
-    docLink.value = `${window.location.origin}${window.location.pathname}?doc=${docId}`;
-
     function focusEditor() {
-      editor.focus({ preventScroll: true });
+      editor?.focus({ preventScroll: true });
     }
 
     function exec(command, value = null) {
@@ -879,55 +867,9 @@
 
     titleEditor?.addEventListener("input", () => {
       const value = titleEditor.textContent.trim();
-      topbarTitle.textContent = value || "Documento sin título";
-    });
-
-    openShareBtn?.addEventListener("click", () => {
-      shareModal.classList.add("show");
-      shareStatus.textContent = "";
-    });
-
-    closeShareBtn?.addEventListener("click", () => {
-      shareModal.classList.remove("show");
-    });
-
-    shareModal?.addEventListener("click", (e) => {
-      if (e.target === shareModal) {
-        shareModal.classList.remove("show");
+      if (topbarTitleEl) {
+        topbarTitleEl.textContent = value || "Documento sin título";
       }
-    });
-
-    copyLinkBtn?.addEventListener("click", async () => {
-      try {
-        await navigator.clipboard.writeText(docLink.value);
-        shareStatus.textContent = "Link copiado.";
-      } catch {
-        shareStatus.textContent = "No se pudo copiar el link.";
-      }
-    });
-
-    sendShareBtn?.addEventListener("click", () => {
-      const email = shareEmail.value.trim();
-      const role = shareRole.value;
-
-      if (!email) {
-        shareStatus.textContent = "Escribí un email para compartir.";
-        return;
-      }
-
-      const subject = encodeURIComponent("Te compartieron un documento de Eduvia");
-      const body = encodeURIComponent(
-        `Hola, te compartieron este documento de Eduvia.\n\n` +
-        `Documento: ${topbarTitle.textContent.trim() || "Documento sin título"}\n` +
-        `Permiso: ${role === "editor" ? "Puede editar" : "Solo ver"}\n` +
-        `Acceso: ${docLink.value}\n\n` +
-        `Importante: este acceso debe validarse desde Firebase para que solo puedas entrar a este documento.`
-      );
-
-      const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(email)}&su=${subject}&body=${body}`;
-      window.open(gmailUrl, "_blank");
-
-      shareStatus.textContent = "Se abrió Gmail con la invitación preparada.";
     });
   </script>
 
