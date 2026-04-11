@@ -27,17 +27,40 @@ export default async function handler(req, res) {
       input: [
         {
           role: "developer",
-          content: `
-Sos un profesor claro, didáctico y visual de Eduvia.
-Generá una clase breve para mostrar en un pizarrón digital.
-Adaptá el lenguaje al nivel del alumno.
-Nada de markdown.
-Nada de texto fuera del JSON.
-          `.trim(),
+          content: [
+            {
+              type: "input_text",
+              text: `
+Sos un profesor excelente de Eduvia, muy claro, didáctico, visual y pedagógico.
+
+Tu tarea es generar una clase COMPLETA para mostrar dentro de un pizarrón digital dirigido a chicos y jóvenes.
+
+Objetivos de la respuesta:
+- Explicar el tema de forma clara, no superficial.
+- Dar una explicación útil para aprender de verdad, no un resumen corto.
+- Si el tema tiene fórmulas, reglas o estructuras, incluirlas sí o sí.
+- Dar pasos para reconocer o resolver el tema.
+- Dar tips útiles y errores comunes.
+- Proponer visuales relacionados con el contenido real de la clase.
+
+Reglas importantes:
+- Adaptá el lenguaje al nivel del alumno.
+- Nada de markdown.
+- Nada de texto fuera del JSON.
+- No uses símbolos raros innecesarios.
+- Las fórmulas deben ser claras y simples de leer.
+- En los visuales, pensá ideas concretas que ayuden a entender el tema.
+- No repitas exactamente lo mismo en todas las secciones.
+              `.trim(),
+            },
+          ],
         },
         {
           role: "user",
-          content: `
+          content: [
+            {
+              type: "input_text",
+              text: `
 Generá una clase con estos datos:
 
 - Materia: ${materia}
@@ -45,29 +68,115 @@ Generá una clase con estos datos:
 - Nivel: ${nivel}
 - Duración: ${duracion || "No especificada"}
 - Objetivo: ${objetivo || "No especificado"}
-          `.trim(),
+
+Quiero que la clase sea clara, completa y útil.
+Si el tema incluye fórmulas, patrones, reglas, pasos o formas de identificación, incluilos.
+              `.trim(),
+            },
+          ],
         },
       ],
       text: {
         format: {
           type: "json_schema",
-          name: "clase_eduvia",
+          name: "clase_eduvia_completa",
+          description: "Clase estructurada para mostrar en el pizarrón de Eduvia",
           strict: true,
           schema: {
             type: "object",
             properties: {
-              titulo: { type: "string" },
-              introduccion: { type: "string" },
+              titulo: {
+                type: "string",
+              },
+              introduccion: {
+                type: "string",
+              },
+              ideaPrincipal: {
+                type: "string",
+              },
+              formulas: {
+                type: "array",
+                minItems: 0,
+                maxItems: 5,
+                items: {
+                  type: "object",
+                  properties: {
+                    nombre: { type: "string" },
+                    formula: { type: "string" },
+                    explicacion: { type: "string" },
+                  },
+                  required: ["nombre", "formula", "explicacion"],
+                  additionalProperties: false,
+                },
+              },
+              pasos: {
+                type: "array",
+                minItems: 2,
+                maxItems: 6,
+                items: { type: "string" },
+              },
               puntos: {
                 type: "array",
-                items: { type: "string" },
                 minItems: 3,
-                maxItems: 5,
+                maxItems: 7,
+                items: { type: "string" },
               },
-              ejemplo: { type: "string" },
-              actividad: { type: "string" },
+              tips: {
+                type: "array",
+                minItems: 2,
+                maxItems: 5,
+                items: { type: "string" },
+              },
+              errores: {
+                type: "array",
+                minItems: 2,
+                maxItems: 5,
+                items: { type: "string" },
+              },
+              ejemplo: {
+                type: "string",
+              },
+              actividad: {
+                type: "string",
+              },
+              visuales: {
+                type: "array",
+                minItems: 3,
+                maxItems: 3,
+                items: {
+                  type: "object",
+                  properties: {
+                    titulo: { type: "string" },
+                    lineas: {
+                      type: "array",
+                      minItems: 2,
+                      maxItems: 4,
+                      items: { type: "string" },
+                    },
+                    caption: { type: "string" },
+                    color: {
+                      type: "string",
+                      enum: ["blue", "green", "yellow", "red"],
+                    },
+                  },
+                  required: ["titulo", "lineas", "caption", "color"],
+                  additionalProperties: false,
+                },
+              },
             },
-            required: ["titulo", "introduccion", "puntos", "ejemplo", "actividad"],
+            required: [
+              "titulo",
+              "introduccion",
+              "ideaPrincipal",
+              "formulas",
+              "pasos",
+              "puntos",
+              "tips",
+              "errores",
+              "ejemplo",
+              "actividad",
+              "visuales",
+            ],
             additionalProperties: false,
           },
         },
