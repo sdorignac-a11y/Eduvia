@@ -28,11 +28,12 @@ function wait(ms) {
 async function escribirTexto(el, texto, velocidad = 18) {
   if (!el) return;
 
+  const contenido = String(texto || "");
   el.textContent = "";
   el.classList.add("is-typing");
 
-  for (let i = 0; i < texto.length; i++) {
-    el.textContent += texto[i];
+  for (let i = 0; i < contenido.length; i++) {
+    el.textContent += contenido[i];
     await wait(velocidad);
   }
 
@@ -46,17 +47,25 @@ async function mostrarBloque(el, delay = 180) {
 }
 
 async function animarClase() {
+  if (board.dataset.animando === "true") return;
+  board.dataset.animando = "true";
+
   const title = board.querySelector(".board-title");
   const badge = board.querySelector(".board-badge");
 
-  const introSection = board.querySelectorAll(".board-section")[0];
-  const puntosSection = board.querySelectorAll(".board-section")[1];
+  const sections = board.querySelectorAll(".board-section");
+  const introSection = sections[0];
+  const puntosSection = sections[1];
 
   const introText = introSection?.querySelector("p");
-  const puntosItems = puntosSection?.querySelectorAll("li") || [];
 
-  const ejemploCard = board.querySelectorAll(".board-card")[0];
-  const actividadCard = board.querySelectorAll(".board-card")[1];
+  const puntosItems = puntosSection?.querySelectorAll("li") || [];
+  const puntosTextoVacio =
+    puntosItems.length === 0 ? puntosSection?.querySelector("p") : null;
+
+  const cards = board.querySelectorAll(".board-card");
+  const ejemploCard = cards[0];
+  const actividadCard = cards[1];
 
   const ejemploText = ejemploCard?.querySelector("p");
   const actividadText = actividadCard?.querySelector("p");
@@ -86,12 +95,17 @@ async function animarClase() {
     await mostrarBloque(puntosSection, 120);
   }
 
-  for (const item of puntosItems) {
-    const text = item.textContent;
-    item.textContent = "";
-    item.classList.add("is-visible");
-    await escribirTexto(item, text, 12);
-    await wait(100);
+  if (puntosItems.length) {
+    for (const item of puntosItems) {
+      const text = item.textContent;
+      item.textContent = "";
+      item.classList.add("is-visible");
+      await escribirTexto(item, text, 12);
+      await wait(100);
+    }
+  } else if (puntosTextoVacio) {
+    const text = puntosTextoVacio.textContent;
+    await escribirTexto(puntosTextoVacio, text, 14);
   }
 
   if (ejemploCard) {
