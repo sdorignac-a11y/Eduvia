@@ -1472,5 +1472,38 @@
       });
     });
   </script>
+  <script>
+  const formatInputs = document.querySelectorAll('input[name="formato"]');
+  const formatPreview = document.getElementById("format-preview");
+
+  function updateFormatPreview() {
+    const selected = document.querySelector('input[name="formato"]:checked')?.value || "pizarron";
+
+    if (!formatPreview) return;
+
+    if (selected === "documento") {
+      formatPreview.innerHTML = `
+        <strong>Vista elegida: Documento</strong>
+        <p>
+          La clase se mostrará como un apunte ordenado, con bloques claros para leer,
+          estudiar y repasar el tema.
+        </p>
+      `;
+    } else {
+      formatPreview.innerHTML = `
+        <strong>Vista elegida: Pizarrón</strong>
+        <p>
+          La clase se mostrará en una experiencia más visual, tipo aula interactiva.
+        </p>
+      `;
+    }
+  }
+
+  formatInputs.forEach(input => {
+    input.addEventListener("change", updateFormatPreview);
+  });
+
+  updateFormatPreview();
+</script>
 </body>
 </html>
