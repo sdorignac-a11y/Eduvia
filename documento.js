@@ -1,6 +1,14 @@
 import { auth, db } from "./firebase.js?v=7";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import {
+  doc,
+  getDoc,
+  updateDoc,
+  setDoc,
+  serverTimestamp,
+  arrayUnion,
+  arrayRemove
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const topbarTitle = document.getElementById("topbar-title");
 const docTitle = document.getElementById("doc-title");
@@ -16,8 +24,38 @@ const metaDuracion = document.getElementById("meta-duracion");
 const docObjective = document.getElementById("doc-objective");
 const docContent = document.getElementById("doc-content");
 
+const documentApp = document.getElementById("document-app");
+const accessGuard = document.getElementById("access-guard");
+const toolbarWrap = document.querySelector(".toolbar-wrap");
+const toolbarControls = document.querySelectorAll(
+  ".toolbar button, .toolbar select, .toolbar input"
+);
+
+const shareModal = document.getElementById("share-modal");
+const shareEmailInput = document.getElementById("share-email");
+const shareRoleSelect = document.getElementById("share-role");
+const shareStatus = document.getElementById("share-status");
+const docLinkInput = document.getElementById("doc-link");
+
 const params = new URLSearchParams(window.location.search);
-const claseId = params.get("id");
+const claseIdFromUrl = params.get("id") || params.get("doc");
+const ownerUidFromUrl = params.get("owner");
+
+let currentUser = null;
+let currentClaseId = claseIdFromUrl || null;
+let currentOwnerUid = ownerUidFromUrl || null;
+let currentClaseRef = null;
+let currentClaseData = null;
+let currentRole = "viewer";
+let saveTimer = null;
+let saveInFlight = false;
+
+if (documentApp) {
+  documentApp.style.display = "none";
+}
+if (accessGuard) {
+  accessGuard.classList.remove("show");
+}
 
 function escapeHtml(value = "") {
   return String(value)
@@ -28,23 +66,74 @@ function escapeHtml(value = "") {
     .replaceAll("'", "&#039;");
 }
 
-function readClaseFromLocalStorage() {
+function normalizeEmail(email = "") {
+  return String(email || "").trim().toLowerCase();
+}
+
+function emailToKey(email = "") {
+  return normalizeEmail(email).replace(/[^a-z0-9]/gi, "_");
+}
+
+function normalizeRole(role = "") {
+  return role === "editor" ? "editor" : "viewer";
+}
+
+function canEdit() {
+  return currentRole === "owner" || currentRole === "editor";
+}
+
+function localStorageKey(ownerUid, claseId) {
+  return `claseActual:${ownerUid || "unknown"}:${claseId || "unknown"}`;
+}
+
+function readClaseFromLocalStorage(ownerUid, claseId) {
   try {
-    return JSON.parse(localStorage.getItem("claseActual") || "null");
+    const specificKey = localStorageKey(ownerUid, claseId);
+    const specific = localStorage.getItem(specificKey);
+    if (specific) return JSON.parse(specific);
+
+    const legacy = localStorage.getItem("claseActual");
+    if (legacy) return JSON.parse(legacy);
+
+    return null;
   } catch {
     return null;
   }
 }
 
+function writeClaseToLocalStorage(clase, ownerUid, claseId) {
+  try {
+    if (!clase || !ownerUid || !claseId) return;
+    localStorage.setItem(localStorageKey(ownerUid, claseId), JSON.stringify(clase));
+    localStorage.setItem("claseActual", JSON.stringify(clase));
+  } catch {
+    // no-op
+  }
+}
+
+function stripObjectivePrefix(value = "") {
+  return String(value || "")
+    .replace(/^objetivo:\s*/i, "")
+    .trim();
+}
+
+function getDocumentoTitle(clase = {}) {
+  return clase.tituloDocumento || clase.tema || "Documento sin título";
+}
+
+function getDocumentoObjective(clase = {}) {
+  return clase.objetivoDocumento || clase.objetivo || "";
+}
+
 function setBasicMeta(clase = {}) {
-  const tema = clase.tema || "Documento sin título";
+  const titulo = getDocumentoTitle(clase);
   const materia = clase.materia || "Sin materia";
   const nivel = clase.nivel || "No definido";
   const duracion = clase.duracion || "No definida";
-  const objetivo = clase.objetivo || "";
+  const objetivo = getDocumentoObjective(clase);
 
-  if (topbarTitle) topbarTitle.textContent = tema;
-  if (docTitle) docTitle.textContent = tema;
+  if (topbarTitle) topbarTitle.textContent = titulo;
+  if (docTitle) docTitle.textContent = titulo;
 
   if (chipMateria) chipMateria.textContent = `Materia: ${materia}`;
   if (chipNivel) chipNivel.textContent = `Nivel: ${nivel}`;
@@ -70,16 +159,22 @@ function renderError(message) {
       <p>${escapeHtml(message)}</p>
     </div>
   `;
+
+  if (documentApp) {
+    documentApp.style.display = "";
+  }
 }
 
 function renderGeneratedStructure(clase = {}) {
   if (!docContent) return;
 
   const materia = escapeHtml(clase.materia || "la materia");
-  const tema = escapeHtml(clase.tema || "este tema");
+  const tema = escapeHtml(getDocumentoTitle(clase));
   const nivel = escapeHtml(clase.nivel || "el nivel seleccionado");
   const duracion = escapeHtml(clase.duracion || "la duración indicada");
-  const objetivo = escapeHtml(clase.objetivo || "comprender mejor el contenido trabajado");
+  const objetivo = escapeHtml(
+    getDocumentoObjective(clase) || "comprender mejor el contenido trabajado"
+  );
 
   docContent.innerHTML = `
     <h2>Resumen</h2>
@@ -134,6 +229,23 @@ function renderGeneratedStructure(clase = {}) {
   `;
 }
 
+function renderRichHtmlDocumento(clase = {}) {
+  if (!docContent) return false;
+
+  const html =
+    clase.contenidoHtml ||
+    clase.documentoHtml ||
+    clase.htmlDocumento ||
+    "";
+
+  if (!html || typeof html !== "string" || !html.trim()) {
+    return false;
+  }
+
+  docContent.innerHTML = html;
+  return true;
+}
+
 function renderStructuredDocumento(clase = {}) {
   if (!docContent) return false;
 
@@ -169,9 +281,7 @@ function renderStructuredDocumento(clase = {}) {
 
   if (puntosClave.length) {
     html += `<h2>Puntos clave</h2><ul>`;
-    html += puntosClave
-      .map((item) => `<li>${escapeHtml(item)}</li>`)
-      .join("");
+    html += puntosClave.map((item) => `<li>${escapeHtml(item)}</li>`).join("");
     html += `</ul>`;
   }
 
@@ -184,9 +294,7 @@ function renderStructuredDocumento(clase = {}) {
 
   if (preguntas.length) {
     html += `<h2>Preguntas para practicar</h2><ol>`;
-    html += preguntas
-      .map((item) => `<li>${escapeHtml(item)}</li>`)
-      .join("");
+    html += preguntas.map((item) => `<li>${escapeHtml(item)}</li>`).join("");
     html += `</ol>`;
   }
 
@@ -236,60 +344,422 @@ function renderPlainTextDocumento(clase = {}) {
 function renderClase(clase = {}) {
   setBasicMeta(clase);
 
-  const renderedStructured = renderStructuredDocumento(clase);
-  if (renderedStructured) return;
-
-  const renderedText = renderPlainTextDocumento(clase);
-  if (renderedText) return;
+  if (renderRichHtmlDocumento(clase)) return;
+  if (renderStructuredDocumento(clase)) return;
+  if (renderPlainTextDocumento(clase)) return;
 
   renderGeneratedStructure(clase);
 }
 
-async function loadClase(user) {
-  const localClase = readClaseFromLocalStorage();
+function setEditableState(element, editable) {
+  if (!element) return;
+  element.setAttribute("contenteditable", editable ? "true" : "false");
+}
 
-  if (!claseId) {
+function applyRoleUi(role) {
+  const editable = role === "owner" || role === "editor";
+
+  setEditableState(docTitle, editable);
+  setEditableState(docObjective, editable);
+  setEditableState(docContent, editable);
+
+  toolbarControls.forEach((control) => {
+    control.disabled = !editable;
+  });
+
+  if (toolbarWrap) {
+    toolbarWrap.style.opacity = editable ? "1" : "0.55";
+    toolbarWrap.style.pointerEvents = editable ? "auto" : "none";
+  }
+
+  const openShareBtn = document.getElementById("open-share-btn");
+  if (openShareBtn) {
+    openShareBtn.style.display = role === "owner" ? "" : "none";
+  }
+}
+
+function showDenied() {
+  if (documentApp) documentApp.style.display = "none";
+  if (accessGuard) accessGuard.classList.add("show");
+}
+
+function showDocument() {
+  if (accessGuard) accessGuard.classList.remove("show");
+  if (documentApp) documentApp.style.display = "";
+}
+
+function resolveUserRole(clase, user, ownerUid) {
+  if (!user) return null;
+  if (user.uid === ownerUid) return "owner";
+
+  const email = normalizeEmail(user.email);
+  if (!email) return null;
+
+  const viewerEmails = Array.isArray(clase.sharedViewerEmails)
+    ? clase.sharedViewerEmails.map(normalizeEmail)
+    : [];
+
+  const editorEmails = Array.isArray(clase.sharedEditorEmails)
+    ? clase.sharedEditorEmails.map(normalizeEmail)
+    : [];
+
+  const allEmails = Array.isArray(clase.sharedWithEmails)
+    ? clase.sharedWithEmails.map(normalizeEmail)
+    : [];
+
+  if (editorEmails.includes(email)) return "editor";
+  if (viewerEmails.includes(email)) return "viewer";
+  if (allEmails.includes(email)) return "viewer";
+
+  const sharedUsers = clase.sharedUsers && typeof clase.sharedUsers === "object"
+    ? clase.sharedUsers
+    : {};
+
+  const key = emailToKey(email);
+  const sharedUser = sharedUsers[key] || null;
+
+  if (sharedUser?.role) {
+    return normalizeRole(sharedUser.role);
+  }
+
+  const legacyShared = Array.isArray(clase.sharedWith) ? clase.sharedWith : [];
+  const legacyEntry = legacyShared.find(
+    (item) => normalizeEmail(item?.email) === email
+  );
+
+  if (legacyEntry) {
+    return normalizeRole(legacyEntry.role);
+  }
+
+  return null;
+}
+
+function updateTopbarTitleFromEditor() {
+  if (!topbarTitle || !docTitle) return;
+  const value = docTitle.textContent.trim();
+  topbarTitle.textContent = value || "Documento sin título";
+}
+
+function getCurrentDocumentPayload() {
+  const titulo = docTitle?.textContent?.trim() || "Documento sin título";
+  const objetivoRaw = docObjective?.textContent?.trim() || "";
+  const objetivo = stripObjectivePrefix(objetivoRaw);
+  const contenidoHtml = docContent?.innerHTML || "";
+
+  return {
+    tituloDocumento: titulo,
+    objetivoDocumento: objetivo,
+    contenidoHtml,
+    ultimoEditorUid: currentUser?.uid || "",
+    ultimoEditorEmail: normalizeEmail(currentUser?.email || ""),
+    updatedAt: serverTimestamp()
+  };
+}
+
+function scheduleSave() {
+  if (!currentClaseRef || !canEdit()) return;
+
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    saveDocumentEdits();
+  }, 700);
+}
+
+async function saveDocumentEdits(force = false) {
+  if (!currentClaseRef || !canEdit()) return;
+  if (saveInFlight && !force) return;
+
+  saveInFlight = true;
+
+  try {
+    const payload = getCurrentDocumentPayload();
+
+    await updateDoc(currentClaseRef, payload);
+
+    currentClaseData = {
+      ...(currentClaseData || {}),
+      ...payload,
+      updatedAt: new Date().toISOString()
+    };
+
+    writeClaseToLocalStorage(currentClaseData, currentOwnerUid, currentClaseId);
+  } catch (error) {
+    console.error("Error guardando documento:", error);
+
+    try {
+      const payload = getCurrentDocumentPayload();
+      await setDoc(currentClaseRef, payload, { merge: true });
+
+      currentClaseData = {
+        ...(currentClaseData || {}),
+        ...payload,
+        updatedAt: new Date().toISOString()
+      };
+
+      writeClaseToLocalStorage(currentClaseData, currentOwnerUid, currentClaseId);
+    } catch (secondError) {
+      console.error("Error secundario guardando documento:", secondError);
+    }
+  } finally {
+    saveInFlight = false;
+  }
+}
+
+function attachAutosaveListeners() {
+  const onInput = () => {
+    updateTopbarTitleFromEditor();
+    scheduleSave();
+  };
+
+  docTitle?.addEventListener("input", onInput);
+  docObjective?.addEventListener("input", onInput);
+  docContent?.addEventListener("input", onInput);
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) {
+      clearTimeout(saveTimer);
+      saveDocumentEdits(true);
+    }
+  });
+}
+
+function getShareUrl() {
+  if (!currentClaseId || !currentOwnerUid) return window.location.href;
+
+  const url = new URL(window.location.href);
+  url.searchParams.set("id", currentClaseId);
+  url.searchParams.set("owner", currentOwnerUid);
+  return url.toString();
+}
+
+function replaceElementToClearOldListeners(id) {
+  const oldEl = document.getElementById(id);
+  if (!oldEl || !oldEl.parentNode) return oldEl;
+  const clone = oldEl.cloneNode(true);
+  oldEl.parentNode.replaceChild(clone, oldEl);
+  return clone;
+}
+
+function setupShareUi() {
+  if (!shareModal) return;
+
+  const openShareBtn = replaceElementToClearOldListeners("open-share-btn");
+  const closeShareBtn = replaceElementToClearOldListeners("close-share-btn");
+  const copyLinkBtn = replaceElementToClearOldListeners("copy-link-btn");
+  const sendShareBtn = replaceElementToClearOldListeners("send-share-btn");
+
+  if (docLinkInput) {
+    docLinkInput.value = getShareUrl();
+  }
+
+  openShareBtn?.addEventListener("click", () => {
+    if (docLinkInput) docLinkInput.value = getShareUrl();
+    if (shareStatus) shareStatus.textContent = "";
+    shareModal.classList.add("show");
+  });
+
+  closeShareBtn?.addEventListener("click", () => {
+    shareModal.classList.remove("show");
+  });
+
+  shareModal.addEventListener("click", (e) => {
+    if (e.target === shareModal) {
+      shareModal.classList.remove("show");
+    }
+  });
+
+  copyLinkBtn?.addEventListener("click", async () => {
+    try {
+      const url = getShareUrl();
+      await navigator.clipboard.writeText(url);
+      if (docLinkInput) docLinkInput.value = url;
+      if (shareStatus) shareStatus.textContent = "Link copiado.";
+    } catch {
+      if (shareStatus) shareStatus.textContent = "No se pudo copiar el link.";
+    }
+  });
+
+  sendShareBtn?.addEventListener("click", async () => {
+    if (currentRole !== "owner") {
+      if (shareStatus) shareStatus.textContent = "Solo el dueño del documento puede compartirlo.";
+      return;
+    }
+
+    const email = normalizeEmail(shareEmailInput?.value || "");
+    const role = normalizeRole(shareRoleSelect?.value || "viewer");
+
+    if (!email) {
+      if (shareStatus) shareStatus.textContent = "Escribí un email válido.";
+      return;
+    }
+
+    if (!currentClaseRef || !currentClaseId || !currentOwnerUid) {
+      if (shareStatus) shareStatus.textContent = "Todavía no se pudo identificar este documento.";
+      return;
+    }
+
+    if (email === normalizeEmail(currentUser?.email || "")) {
+      if (shareStatus) shareStatus.textContent = "Ese email ya es el dueño del documento.";
+      return;
+    }
+
+    try {
+      const sharedUserKey = `sharedUsers.${emailToKey(email)}`;
+
+      const updates = {
+        sharedWithEmails: arrayUnion(email),
+        [sharedUserKey]: {
+          email,
+          role,
+          invitedBy: normalizeEmail(currentUser?.email || ""),
+          invitedAt: new Date().toISOString()
+        },
+        updatedAt: serverTimestamp()
+      };
+
+      if (role === "editor") {
+        updates.sharedEditorEmails = arrayUnion(email);
+        updates.sharedViewerEmails = arrayRemove(email);
+      } else {
+        updates.sharedViewerEmails = arrayUnion(email);
+        updates.sharedEditorEmails = arrayRemove(email);
+      }
+
+      await updateDoc(currentClaseRef, updates);
+
+      currentClaseData = {
+        ...(currentClaseData || {}),
+        sharedWithEmails: Array.isArray(currentClaseData?.sharedWithEmails)
+          ? Array.from(new Set([...currentClaseData.sharedWithEmails, email]))
+          : [email]
+      };
+
+      writeClaseToLocalStorage(currentClaseData, currentOwnerUid, currentClaseId);
+
+      const shareUrl = getShareUrl();
+      if (docLinkInput) docLinkInput.value = shareUrl;
+
+      const subject = encodeURIComponent("Te compartieron un documento de Eduvia");
+      const body = encodeURIComponent(
+        `Hola.\n\n` +
+        `Te compartieron este documento de Eduvia:\n` +
+        `${shareUrl}\n\n` +
+        `Permiso: ${role === "editor" ? "Puede editar" : "Solo ver"}\n\n` +
+        `Ese enlace te da acceso únicamente a este documento.`
+      );
+
+      const gmailUrl =
+        `https://mail.google.com/mail/?view=cm&fs=1` +
+        `&to=${encodeURIComponent(email)}` +
+        `&su=${subject}` +
+        `&body=${body}`;
+
+      window.open(gmailUrl, "_blank");
+
+      if (shareStatus) {
+        shareStatus.textContent = "Permiso guardado y Gmail abierto con la invitación.";
+      }
+
+      if (shareEmailInput) shareEmailInput.value = "";
+      if (shareRoleSelect) shareRoleSelect.value = "viewer";
+    } catch (error) {
+      console.error("Error compartiendo documento:", error);
+      if (shareStatus) {
+        shareStatus.textContent = "No se pudo compartir el documento.";
+      }
+    }
+  });
+}
+
+async function loadClase(user) {
+  const fallbackOwner = ownerUidFromUrl || user.uid;
+  const localClase = readClaseFromLocalStorage(fallbackOwner, claseIdFromUrl);
+
+  if (!currentClaseId && localClase?.id) {
+    currentClaseId = localClase.id;
+  }
+
+  if (!currentOwnerUid) {
+    currentOwnerUid = ownerUidFromUrl || user.uid;
+  }
+
+  if (!currentClaseId) {
     if (localClase) {
+      currentClaseData = localClase;
+      currentRole = "owner";
       renderClase(localClase);
+      applyRoleUi(currentRole);
+      showDocument();
+      setupShareUi();
       return;
     }
 
     renderError("No se encontró el identificador de la clase.");
+    showDocument();
     return;
   }
 
   try {
-    const claseRef = doc(db, "usuarios", user.uid, "clases", claseId);
+    const claseRef = doc(db, "usuarios", currentOwnerUid, "clases", currentClaseId);
     const claseSnap = await getDoc(claseRef);
 
-    if (claseSnap.exists()) {
-      const claseData = {
-        id: claseSnap.id,
-        ...claseSnap.data()
-      };
+    if (!claseSnap.exists()) {
+      if (localClase) {
+        currentClaseData = localClase;
+        currentRole = currentOwnerUid === user.uid ? "owner" : "viewer";
+        renderClase(localClase);
+        applyRoleUi(currentRole);
+        showDocument();
+        setupShareUi();
+        return;
+      }
 
-      localStorage.setItem("claseActual", JSON.stringify(claseData));
-      renderClase(claseData);
+      renderError("La clase no existe o no se pudo encontrar en Firestore.");
+      showDocument();
       return;
     }
 
-    if (localClase) {
-      renderClase(localClase);
+    const claseData = {
+      id: claseSnap.id,
+      ownerUid: currentOwnerUid,
+      ...claseSnap.data()
+    };
+
+    const role = resolveUserRole(claseData, user, currentOwnerUid);
+
+    if (!role) {
+      showDenied();
       return;
     }
 
-    renderError("La clase no existe o no se pudo encontrar en Firestore.");
+    currentClaseRef = claseRef;
+    currentClaseData = claseData;
+    currentRole = role;
+
+    writeClaseToLocalStorage(claseData, currentOwnerUid, currentClaseId);
+    renderClase(claseData);
+    applyRoleUi(role);
+    showDocument();
+    setupShareUi();
   } catch (error) {
     console.error("Error al cargar la clase:", error);
 
     if (localClase) {
+      currentClaseData = localClase;
+      currentRole = currentOwnerUid === user.uid ? "owner" : "viewer";
       renderClase(localClase);
+      applyRoleUi(currentRole);
+      showDocument();
+      setupShareUi();
       return;
     }
 
     renderError(error.message || "Hubo un problema al cargar la clase.");
+    showDocument();
   }
 }
+
+attachAutosaveListeners();
 
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
@@ -297,5 +767,6 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
 
+  currentUser = user;
   await loadClase(user);
 });
