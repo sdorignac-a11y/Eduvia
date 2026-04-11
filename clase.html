@@ -7,7 +7,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&family=Kalam:wght@400;700&display=swap" rel="stylesheet">
 
   <style>
     :root{
@@ -29,6 +29,10 @@
       --green:#dff2df;
       --blue:#ddefff;
       --pink:#ffe2eb;
+
+      --marker:#3b3329;
+      --marker-soft:rgba(59, 51, 41, .08);
+      --marker-yellow:rgba(255, 217, 119, .45);
 
       --shadow:0 24px 60px rgba(74, 49, 120, .14);
       --shadow-soft:0 10px 24px rgba(74, 49, 120, .08);
@@ -227,23 +231,45 @@
     .hero{
       text-align:center;
       padding:12px 0 26px;
+      opacity:0;
+      transform:translateY(16px);
+      filter:blur(3px);
     }
 
     .hero h1{
       margin:0;
-      font-family:'Sora', sans-serif;
-      font-size:clamp(2rem, 4vw, 3rem);
+      font-family:'Kalam', cursive;
+      font-size:clamp(2.2rem, 4vw, 3.25rem);
       line-height:1.05;
-      letter-spacing:-.04em;
-      color:#302742;
+      font-weight:700;
+      letter-spacing:.01em;
+      color:var(--marker);
+      text-shadow:1px 1px 0 rgba(255,255,255,.6);
+      display:inline-block;
+      position:relative;
+    }
+
+    .hero h1::after{
+      content:"";
+      position:absolute;
+      left:-6px;
+      right:-6px;
+      bottom:6px;
+      height:12px;
+      background:var(--marker-yellow);
+      border-radius:10px;
+      z-index:-1;
+      transform:rotate(-1deg);
     }
 
     .hero-sub{
       margin:12px auto 0;
       max-width:560px;
-      color:var(--muted);
-      font-size:1rem;
-      line-height:1.7;
+      font-family:'Kalam', cursive;
+      color:#5d5145;
+      font-size:1.12rem;
+      line-height:1.8;
+      min-height:32px;
     }
 
     .tema-box{
@@ -258,6 +284,9 @@
       box-shadow:0 16px 28px rgba(92, 64, 151, .08);
       position:relative;
       overflow:hidden;
+      opacity:0;
+      transform:translateY(16px);
+      filter:blur(3px);
     }
 
     .tema-box::before,
@@ -279,20 +308,22 @@
     .tema-label{
       display:inline-block;
       margin-bottom:10px;
-      font-size:.78rem;
-      font-weight:800;
-      text-transform:uppercase;
-      letter-spacing:.09em;
-      color:#8871da;
+      font-family:'Kalam', cursive;
+      font-size:1rem;
+      font-weight:700;
+      letter-spacing:.02em;
+      color:#705bc9;
+      transform:rotate(-1.4deg);
     }
 
     .tema-title{
-      font-family:'Sora', sans-serif;
-      font-size:clamp(1.35rem, 3vw, 2rem);
-      line-height:1.25;
-      font-weight:800;
-      color:var(--text);
+      font-family:'Kalam', cursive;
+      font-size:clamp(1.55rem, 3vw, 2.1rem);
+      line-height:1.35;
+      font-weight:700;
+      color:var(--marker);
       word-break:break-word;
+      min-height:48px;
     }
 
     .details{
@@ -309,6 +340,9 @@
       padding:16px 16px 15px;
       box-shadow:var(--shadow-soft);
       min-height:110px;
+      opacity:0;
+      transform:translateY(16px);
+      filter:blur(3px);
     }
 
     .label{
@@ -316,28 +350,51 @@
       margin-bottom:9px;
       padding:7px 11px;
       border-radius:999px;
-      font-size:.76rem;
-      font-weight:800;
-      text-transform:uppercase;
-      letter-spacing:.08em;
+      font-family:'Kalam', cursive;
+      font-size:1rem;
+      font-weight:700;
+      letter-spacing:.01em;
       color:#554987;
       background:rgba(124,103,217,.09);
       border:1px solid rgba(124,103,217,.10);
+      transform:rotate(-1deg);
     }
 
     .value{
       display:block;
-      font-size:1.04rem;
-      line-height:1.6;
-      color:var(--text);
-      font-weight:600;
+      font-family:'Kalam', cursive;
+      font-size:1.2rem;
+      line-height:1.65;
+      color:var(--marker);
+      font-weight:700;
       word-break:break-word;
+      min-height:34px;
+      text-shadow:.5px .5px 0 rgba(255,255,255,.55);
     }
 
-    .dato.materia .label{ background:rgba(255, 217, 119, .22); color:#7a5a0e; border-color:rgba(160, 120, 24, .12); }
-    .dato.nivel .label{ background:rgba(221, 239, 255, .75); color:#31597f; border-color:rgba(68, 120, 174, .10); }
-    .dato.duracion .label{ background:rgba(223, 242, 223, .85); color:#3d7040; border-color:rgba(87, 143, 91, .10); }
-    .dato.objetivo .label{ background:rgba(255, 226, 235, .92); color:#904f63; border-color:rgba(176, 100, 125, .10); }
+    .dato.materia .label{
+      background:rgba(255, 217, 119, .22);
+      color:#7a5a0e;
+      border-color:rgba(160, 120, 24, .12);
+    }
+
+    .dato.nivel .label{
+      background:rgba(221, 239, 255, .75);
+      color:#31597f;
+      border-color:rgba(68, 120, 174, .10);
+    }
+
+    .dato.duracion .label{
+      background:rgba(223, 242, 223, .85);
+      color:#3d7040;
+      border-color:rgba(87, 143, 91, .10);
+    }
+
+    .dato.objetivo .label{
+      background:rgba(255, 226, 235, .92);
+      color:#904f63;
+      border-color:rgba(176, 100, 125, .10);
+    }
 
     .footer-note{
       margin-top:22px;
@@ -345,9 +402,13 @@
       border:1px solid rgba(189, 152, 69, .12);
       border-radius:18px;
       padding:15px 16px;
-      color:#7a6850;
-      font-size:.96rem;
-      line-height:1.6;
+      font-family:'Kalam', cursive;
+      color:#6a5842;
+      font-size:1.08rem;
+      line-height:1.75;
+      opacity:0;
+      transform:translateY(16px);
+      filter:blur(3px);
     }
 
     .actions{
@@ -356,6 +417,9 @@
       justify-content:center;
       gap:14px;
       flex-wrap:wrap;
+      opacity:0;
+      transform:translateY(16px);
+      filter:blur(3px);
     }
 
     .btn{
@@ -387,6 +451,27 @@
       background:linear-gradient(180deg, var(--violet) 0%, var(--violet-2) 100%);
       color:#fff;
       box-shadow:0 16px 28px rgba(106, 86, 200, .24);
+    }
+
+    .is-visible{
+      animation:boardReveal .6s cubic-bezier(.22,.85,.2,1) forwards;
+    }
+
+    @keyframes boardReveal{
+      to{
+        opacity:1;
+        transform:translateY(0);
+        filter:blur(0);
+      }
+    }
+
+    .typing{
+      border-right:3px solid rgba(72, 56, 39, .55);
+      animation:blinkCursor .75s step-end infinite;
+    }
+
+    @keyframes blinkCursor{
+      50%{ border-color:transparent; }
     }
 
     @media (max-width: 740px){
@@ -489,45 +574,45 @@
         </div>
 
         <div id="contenido" style="display:none;">
-          <section class="hero">
+          <section class="hero" id="bloque-hero">
             <h1 id="titulo-clase">Clase</h1>
-            <p class="hero-sub">
+            <p class="hero-sub" id="sub-clase">
               Revisá la información principal de esta clase antes de empezar.
             </p>
 
-            <div class="tema-box">
+            <div class="tema-box" id="bloque-tema">
               <div class="tema-label">Tema central</div>
               <div class="tema-title" id="tema"></div>
             </div>
           </section>
 
           <section class="details">
-            <div class="dato materia">
+            <div class="dato materia" id="card-materia">
               <span class="label">Materia</span>
               <span class="value" id="materia"></span>
             </div>
 
-            <div class="dato nivel">
+            <div class="dato nivel" id="card-nivel">
               <span class="label">Nivel</span>
               <span class="value" id="nivel"></span>
             </div>
 
-            <div class="dato duracion">
+            <div class="dato duracion" id="card-duracion">
               <span class="label">Duración</span>
               <span class="value" id="duracion"></span>
             </div>
 
-            <div class="dato objetivo">
+            <div class="dato objetivo" id="card-objetivo">
               <span class="label">Objetivo</span>
               <span class="value" id="objetivo"></span>
             </div>
           </section>
 
-          <div class="footer-note">
+          <div class="footer-note" id="footer-note">
             Todo está organizado para que entres a la clase con el tema claro y una idea rápida de lo que vas a aprender.
           </div>
 
-          <div class="actions">
+          <div class="actions" id="actions">
             <a href="panel.html" class="btn secondary">← Volver al panel</a>
             <a id="btn-empezar-clase" href="#" class="btn primary">Empezar clase →</a>
           </div>
@@ -535,6 +620,84 @@
       </div>
     </section>
   </main>
+
+  <script>
+    const esperar = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+    async function escribirTexto(el, texto, velocidad = 22){
+      if(!el) return;
+
+      const contenidoFinal = String(texto || "");
+      el.textContent = "";
+      el.classList.add("typing");
+
+      for(let i = 0; i < contenidoFinal.length; i++){
+        el.textContent += contenidoFinal[i];
+        await esperar(velocidad);
+      }
+
+      el.classList.remove("typing");
+    }
+
+    async function mostrarCard(card, valueSelector, velocidad = 20){
+      const cardEl = document.querySelector(card);
+      const valueEl = document.querySelector(valueSelector);
+
+      if(!cardEl || !valueEl) return;
+
+      const texto = valueEl.dataset.fulltext || valueEl.textContent || "";
+      valueEl.dataset.fulltext = texto;
+      valueEl.textContent = "";
+
+      cardEl.classList.add("is-visible");
+      await esperar(240);
+      await escribirTexto(valueEl, texto, velocidad);
+      await esperar(120);
+    }
+
+    window.animarPizarron = async function(){
+      const contenido = document.getElementById("contenido");
+      if(!contenido || contenido.dataset.animado === "true") return;
+
+      contenido.dataset.animado = "true";
+
+      const titulo = document.getElementById("titulo-clase");
+      const sub = document.getElementById("sub-clase");
+      const tema = document.getElementById("tema");
+      const footer = document.getElementById("footer-note");
+
+      const textoTitulo = titulo.textContent;
+      const textoSub = sub.textContent;
+      const textoTema = tema.textContent;
+      const textoFooter = footer.textContent;
+
+      titulo.textContent = "";
+      sub.textContent = "";
+      tema.textContent = "";
+      footer.textContent = "";
+
+      document.getElementById("bloque-hero")?.classList.add("is-visible");
+      await esperar(250);
+      await escribirTexto(titulo, textoTitulo, 28);
+      await esperar(120);
+      await escribirTexto(sub, textoSub, 16);
+
+      document.getElementById("bloque-tema")?.classList.add("is-visible");
+      await esperar(250);
+      await escribirTexto(tema, textoTema, 22);
+
+      await mostrarCard("#card-materia", "#materia", 18);
+      await mostrarCard("#card-nivel", "#nivel", 18);
+      await mostrarCard("#card-duracion", "#duracion", 18);
+      await mostrarCard("#card-objetivo", "#objetivo", 18);
+
+      footer.classList.add("is-visible");
+      await esperar(220);
+      await escribirTexto(footer, textoFooter, 14);
+
+      document.getElementById("actions")?.classList.add("is-visible");
+    };
+  </script>
 
   <script type="module" src="clase.js"></script>
 </body>
