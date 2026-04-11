@@ -20,6 +20,7 @@
       --muted:#5f6368;
       --blue:#1a73e8;
       --blue-soft:#e8f0fe;
+      --danger:#d93025;
       --shadow:0 1px 2px rgba(60,64,67,.16), 0 4px 12px rgba(60,64,67,.10);
     }
 
@@ -39,18 +40,24 @@
       color:var(--text);
     }
 
+    button,
+    input,
+    select{
+      font:inherit;
+    }
+
     .topbar{
       position:sticky;
       top:0;
-      z-index:20;
-      height:64px;
+      z-index:40;
+      min-height:64px;
       background:#fff;
       border-bottom:1px solid var(--line);
       display:flex;
       align-items:center;
       justify-content:space-between;
       gap:16px;
-      padding:0 18px;
+      padding:10px 18px;
     }
 
     .topbar-left{
@@ -105,7 +112,6 @@
       border:none;
       border-radius:999px;
       padding:10px 16px;
-      font-family:inherit;
       font-size:.92rem;
       font-weight:700;
       cursor:pointer;
@@ -132,10 +138,15 @@
       box-shadow:0 10px 18px rgba(26,115,232,.18);
     }
 
+    .btn-danger{
+      background:#feeceb;
+      color:var(--danger);
+    }
+
     .subbar{
       position:sticky;
       top:64px;
-      z-index:15;
+      z-index:35;
       background:var(--bg-soft);
       border-bottom:1px solid var(--line);
       padding:10px 18px;
@@ -157,8 +168,103 @@
       font-weight:600;
     }
 
+    .toolbar-wrap{
+      position:sticky;
+      top:121px;
+      z-index:30;
+      background:var(--bg);
+      padding:14px 14px 0;
+    }
+
+    .toolbar{
+      max-width:980px;
+      margin:0 auto;
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:16px;
+      box-shadow:var(--shadow);
+      padding:10px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      align-items:center;
+    }
+
+    .tool-group{
+      display:flex;
+      align-items:center;
+      gap:6px;
+      padding-right:8px;
+      margin-right:4px;
+      border-right:1px solid #edf0f2;
+    }
+
+    .tool-group:last-child{
+      border-right:none;
+      margin-right:0;
+      padding-right:0;
+    }
+
+    .tool-btn{
+      min-width:38px;
+      height:38px;
+      border:none;
+      border-radius:10px;
+      background:#fff;
+      color:#202124;
+      font-weight:700;
+      cursor:pointer;
+      transition:.16s ease;
+      padding:0 10px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    .tool-btn:hover{
+      background:#f1f3f4;
+    }
+
+    .tool-btn.is-active{
+      background:#e8f0fe;
+      color:var(--blue);
+    }
+
+    .tool-select{
+      height:38px;
+      border:1px solid var(--line);
+      border-radius:10px;
+      background:#fff;
+      padding:0 12px;
+      color:#202124;
+      min-width:150px;
+      outline:none;
+    }
+
+    .color-wrap{
+      position:relative;
+      overflow:hidden;
+      width:38px;
+      height:38px;
+      border-radius:10px;
+      border:1px solid var(--line);
+      background:#fff;
+      flex:none;
+    }
+
+    .color-wrap input{
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      border:none;
+      cursor:pointer;
+      background:none;
+      padding:0;
+    }
+
     .workspace{
-      padding:30px 14px 56px;
+      padding:24px 14px 56px;
     }
 
     .paper-wrap{
@@ -174,6 +280,8 @@
       background:var(--paper);
       border:1px solid #e0e0e0;
       box-shadow:var(--shadow);
+      border-radius:8px;
+      overflow:hidden;
     }
 
     .paper-inner{
@@ -194,6 +302,7 @@
       font-weight:700;
       margin-bottom:14px;
       color:#202124;
+      outline:none;
     }
 
     .doc-meta{
@@ -213,12 +322,19 @@
       color:#334155;
       line-height:1.7;
       font-size:.97rem;
+      outline:none;
     }
 
     .doc-content{
       font-size:1rem;
       line-height:1.9;
       color:#202124;
+      outline:none;
+      min-height:640px;
+    }
+
+    .doc-content:focus{
+      outline:none;
     }
 
     .doc-content h2{
@@ -273,6 +389,139 @@
       margin-bottom:16px;
     }
 
+    .doc-editable[contenteditable="true"]:empty:before{
+      content:attr(data-placeholder);
+      color:#9aa0a6;
+    }
+
+    .share-modal-backdrop{
+      position:fixed;
+      inset:0;
+      background:rgba(15,23,42,.35);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:18px;
+      z-index:100;
+    }
+
+    .share-modal-backdrop.show{
+      display:flex;
+    }
+
+    .share-modal{
+      width:min(100%, 560px);
+      background:#fff;
+      border-radius:22px;
+      box-shadow:0 20px 50px rgba(15,23,42,.2);
+      padding:24px;
+    }
+
+    .share-modal h3{
+      font-size:1.4rem;
+      margin-bottom:8px;
+    }
+
+    .share-modal p{
+      color:var(--muted);
+      line-height:1.6;
+      margin-bottom:18px;
+    }
+
+    .share-field{
+      margin-bottom:14px;
+    }
+
+    .share-field label{
+      display:block;
+      font-size:.92rem;
+      font-weight:700;
+      margin-bottom:8px;
+      color:#111827;
+    }
+
+    .share-field input,
+    .share-field select{
+      width:100%;
+      height:48px;
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:0 14px;
+      outline:none;
+      background:#fff;
+    }
+
+    .share-field input:focus,
+    .share-field select:focus{
+      border-color:var(--blue);
+      box-shadow:0 0 0 4px rgba(26,115,232,.12);
+    }
+
+    .share-row{
+      display:grid;
+      grid-template-columns:1fr 160px;
+      gap:12px;
+    }
+
+    .share-actions{
+      margin-top:18px;
+      display:flex;
+      justify-content:flex-end;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .share-note{
+      margin-top:10px;
+      font-size:.88rem;
+      color:#64748b;
+      line-height:1.6;
+      background:#f8fafc;
+      border-radius:12px;
+      padding:12px 14px;
+    }
+
+    .share-status{
+      margin-top:12px;
+      font-size:.9rem;
+      color:var(--blue);
+      font-weight:600;
+      min-height:20px;
+    }
+
+    .access-guard{
+      display:none;
+      min-height:100vh;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
+      background:var(--bg);
+    }
+
+    .access-guard.show{
+      display:flex;
+    }
+
+    .access-card{
+      max-width:520px;
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:24px;
+      box-shadow:var(--shadow);
+      padding:32px;
+      text-align:center;
+    }
+
+    .access-card h2{
+      font-size:1.6rem;
+      margin-bottom:10px;
+    }
+
+    .access-card p{
+      color:var(--muted);
+      line-height:1.7;
+    }
+
     @media (max-width: 900px){
       .paper-inner{
         padding:42px 28px 50px;
@@ -281,19 +530,38 @@
       .doc-title{
         font-size:1.8rem;
       }
+
+      .toolbar-wrap{
+        top:121px;
+      }
     }
 
     @media (max-width: 720px){
       .topbar{
-        height:auto;
         padding:12px 14px;
         align-items:flex-start;
         flex-direction:column;
       }
 
       .subbar{
-        top:88px;
+        position:static;
         padding:10px 14px;
+      }
+
+      .toolbar-wrap{
+        position:static;
+        padding:12px 14px 0;
+      }
+
+      .toolbar{
+        gap:10px;
+      }
+
+      .tool-group{
+        border-right:none;
+        padding-right:0;
+        margin-right:0;
+        flex-wrap:wrap;
       }
 
       .topbar-actions{
@@ -302,7 +570,7 @@
       }
 
       .workspace{
-        padding-top:22px;
+        padding-top:18px;
       }
 
       .paper{
@@ -326,61 +594,294 @@
         width:100%;
         justify-content:flex-start;
       }
+
+      .share-row{
+        grid-template-columns:1fr;
+      }
     }
   </style>
 </head>
 <body>
-  <header class="topbar">
-    <div class="topbar-left">
-      <div class="doc-icon">📄</div>
-      <div class="topbar-text">
-        <strong id="topbar-title">Documento sin título</strong>
-        <span>Eduvia · modo documento</span>
+  <div class="access-guard" id="access-guard">
+    <div class="access-card">
+      <h2>No tenés acceso a este documento</h2>
+      <p>
+        Este enlace corresponde a un documento privado de Eduvia.
+        Para entrar, tu email tiene que estar invitado específicamente a este documento.
+      </p>
+    </div>
+  </div>
+
+  <div id="document-app">
+    <header class="topbar">
+      <div class="topbar-left">
+        <div class="doc-icon">📄</div>
+        <div class="topbar-text">
+          <strong id="topbar-title">Documento sin título</strong>
+          <span>Eduvia · modo documento</span>
+        </div>
+      </div>
+
+      <div class="topbar-actions">
+        <a href="crear-clase.html" class="btn btn-soft">Volver</a>
+        <button type="button" class="btn btn-soft" id="open-share-btn">Compartir</button>
+        <button type="button" class="btn btn-primary">Generar ejercicios</button>
+      </div>
+    </header>
+
+    <div class="subbar">
+      <div class="chip" id="chip-materia">Materia: —</div>
+      <div class="chip" id="chip-nivel">Nivel: —</div>
+      <div class="chip" id="chip-duracion">Duración: —</div>
+      <div class="chip">Formato: Documento</div>
+    </div>
+
+    <div class="toolbar-wrap">
+      <div class="toolbar">
+        <div class="tool-group">
+          <select class="tool-select" id="format-block">
+            <option value="p">Texto normal</option>
+            <option value="h2">Título grande</option>
+            <option value="h3">Subtítulo</option>
+            <option value="blockquote">Cita</option>
+          </select>
+        </div>
+
+        <div class="tool-group">
+          <button type="button" class="tool-btn" data-command="bold" title="Negrita"><strong>B</strong></button>
+          <button type="button" class="tool-btn" data-command="italic" title="Cursiva"><em>I</em></button>
+          <button type="button" class="tool-btn" data-command="underline" title="Subrayado"><u>U</u></button>
+        </div>
+
+        <div class="tool-group">
+          <label class="color-wrap" title="Color de texto">
+            <input type="color" id="text-color" value="#202124">
+          </label>
+          <label class="color-wrap" title="Resaltado">
+            <input type="color" id="highlight-color" value="#fff59d">
+          </label>
+        </div>
+
+        <div class="tool-group">
+          <button type="button" class="tool-btn" data-command="insertUnorderedList" title="Lista">• Lista</button>
+          <button type="button" class="tool-btn" data-command="insertOrderedList" title="Lista numerada">1. Lista</button>
+        </div>
+
+        <div class="tool-group">
+          <button type="button" class="tool-btn" data-command="justifyLeft" title="Alinear izquierda">⬅</button>
+          <button type="button" class="tool-btn" data-command="justifyCenter" title="Centrar">⬌</button>
+          <button type="button" class="tool-btn" data-command="justifyRight" title="Alinear derecha">➡</button>
+        </div>
+
+        <div class="tool-group">
+          <button type="button" class="tool-btn" data-command="undo" title="Deshacer">↶</button>
+          <button type="button" class="tool-btn" data-command="redo" title="Rehacer">↷</button>
+        </div>
       </div>
     </div>
 
-    <div class="topbar-actions">
-      <a href="crear-clase.html" class="btn btn-soft">Volver</a>
-      <button type="button" class="btn btn-primary">Generar ejercicios</button>
-    </div>
-  </header>
+    <main class="workspace">
+      <div class="paper-wrap">
+        <article class="paper">
+          <div class="paper-inner">
+            <header class="doc-header">
+              <h1
+                class="doc-title doc-editable"
+                id="doc-title"
+                contenteditable="true"
+                spellcheck="true"
+                data-placeholder="Escribí el título del documento"
+              >Documento sin título</h1>
 
-  <div class="subbar">
-    <div class="chip" id="chip-materia">Materia: —</div>
-    <div class="chip" id="chip-nivel">Nivel: —</div>
-    <div class="chip" id="chip-duracion">Duración: —</div>
-    <div class="chip">Formato: Documento</div>
+              <div class="doc-meta">
+                <span id="meta-materia">Materia: —</span>
+                <span id="meta-nivel">Nivel: —</span>
+                <span id="meta-duracion">Duración: —</span>
+              </div>
+
+              <div
+                class="doc-objective doc-editable"
+                id="doc-objective"
+                contenteditable="true"
+                spellcheck="true"
+                data-placeholder="Escribí el objetivo de esta clase"
+              >
+                Objetivo: todavía no se definió un objetivo para esta clase.
+              </div>
+            </header>
+
+            <section
+              class="doc-content doc-editable"
+              id="doc-content"
+              contenteditable="true"
+              spellcheck="true"
+              data-placeholder="Acá la IA o el usuario pueden escribir el contenido del documento..."
+            >
+              <div class="doc-placeholder">
+                <p>Acá la IA va a pegar toda la información de la clase.</p>
+                <p>Ahora además ya queda editable como un mini Google Docs.</p>
+                <p>Podés marcar texto y cambiar negrita, color, listas, subtítulos y más.</p>
+              </div>
+            </section>
+          </div>
+        </article>
+      </div>
+    </main>
   </div>
 
-  <main class="workspace">
-    <div class="paper-wrap">
-      <article class="paper">
-        <div class="paper-inner">
-          <header class="doc-header">
-            <h1 class="doc-title" id="doc-title">Documento sin título</h1>
+  <div class="share-modal-backdrop" id="share-modal">
+    <div class="share-modal">
+      <h3>Compartir documento</h3>
+      <p>
+        Invitá a otra persona por email para que pueda entrar únicamente a este documento.
+      </p>
 
-            <div class="doc-meta">
-              <span id="meta-materia">Materia: —</span>
-              <span id="meta-nivel">Nivel: —</span>
-              <span id="meta-duracion">Duración: —</span>
-            </div>
+      <div class="share-field">
+        <label for="share-email">Email</label>
+        <input type="email" id="share-email" placeholder="ejemplo@gmail.com">
+      </div>
 
-            <div class="doc-objective" id="doc-objective">
-              Objetivo: todavía no se definió un objetivo para esta clase.
-            </div>
-          </header>
-
-          <section class="doc-content" id="doc-content">
-            <div class="doc-placeholder">
-              <p>Acá la IA va a pegar toda la información de la clase.</p>
-              <p>La idea de esta vista es que se sienta como un documento limpio, claro y fácil de estudiar.</p>
-              <p>Después conectamos <strong>documento.js</strong> para que cargue el contenido real automáticamente.</p>
-            </div>
-          </section>
+      <div class="share-field share-row">
+        <div>
+          <label for="share-role">Permiso</label>
+          <select id="share-role">
+            <option value="viewer">Solo ver</option>
+            <option value="editor">Puede editar</option>
+          </select>
         </div>
-      </article>
+
+        <div>
+          <label for="doc-link">Link</label>
+          <input type="text" id="doc-link" readonly>
+        </div>
+      </div>
+
+      <div class="share-note">
+        Este modal ya deja lista la interfaz para compartir. Para que el acceso quede
+        protegido de verdad, el email invitado tiene que guardarse en Firebase y luego
+        validarse en <strong>documento.js</strong> antes de mostrar el documento.
+      </div>
+
+      <div class="share-status" id="share-status"></div>
+
+      <div class="share-actions">
+        <button type="button" class="btn btn-soft" id="copy-link-btn">Copiar link</button>
+        <button type="button" class="btn btn-soft" id="close-share-btn">Cancelar</button>
+        <button type="button" class="btn btn-primary" id="send-share-btn">Enviar invitación</button>
+      </div>
     </div>
-  </main>
-<script type="module" src="documento.js"></script>
+  </div>
+
+  <script>
+    const editor = document.getElementById("doc-content");
+    const titleEditor = document.getElementById("doc-title");
+    const topbarTitle = document.getElementById("topbar-title");
+
+    const shareModal = document.getElementById("share-modal");
+    const openShareBtn = document.getElementById("open-share-btn");
+    const closeShareBtn = document.getElementById("close-share-btn");
+    const copyLinkBtn = document.getElementById("copy-link-btn");
+    const sendShareBtn = document.getElementById("send-share-btn");
+    const shareEmail = document.getElementById("share-email");
+    const shareRole = document.getElementById("share-role");
+    const docLink = document.getElementById("doc-link");
+    const shareStatus = document.getElementById("share-status");
+    const formatBlock = document.getElementById("format-block");
+    const textColor = document.getElementById("text-color");
+    const highlightColor = document.getElementById("highlight-color");
+
+    const params = new URLSearchParams(window.location.search);
+    const docId = params.get("doc") || "demo-doc";
+    docLink.value = `${window.location.origin}${window.location.pathname}?doc=${docId}`;
+
+    function focusEditor() {
+      editor.focus({ preventScroll: true });
+    }
+
+    function exec(command, value = null) {
+      focusEditor();
+      document.execCommand(command, false, value);
+    }
+
+    document.querySelectorAll("[data-command]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const command = btn.dataset.command;
+        exec(command);
+      });
+    });
+
+    formatBlock?.addEventListener("change", () => {
+      const map = {
+        p: "P",
+        h2: "H2",
+        h3: "H3",
+        blockquote: "BLOCKQUOTE"
+      };
+      exec("formatBlock", map[formatBlock.value] || "P");
+    });
+
+    textColor?.addEventListener("input", () => {
+      exec("foreColor", textColor.value);
+    });
+
+    highlightColor?.addEventListener("input", () => {
+      exec("hiliteColor", highlightColor.value);
+    });
+
+    titleEditor?.addEventListener("input", () => {
+      const value = titleEditor.textContent.trim();
+      topbarTitle.textContent = value || "Documento sin título";
+    });
+
+    openShareBtn?.addEventListener("click", () => {
+      shareModal.classList.add("show");
+      shareStatus.textContent = "";
+    });
+
+    closeShareBtn?.addEventListener("click", () => {
+      shareModal.classList.remove("show");
+    });
+
+    shareModal?.addEventListener("click", (e) => {
+      if (e.target === shareModal) {
+        shareModal.classList.remove("show");
+      }
+    });
+
+    copyLinkBtn?.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(docLink.value);
+        shareStatus.textContent = "Link copiado.";
+      } catch {
+        shareStatus.textContent = "No se pudo copiar el link.";
+      }
+    });
+
+    sendShareBtn?.addEventListener("click", () => {
+      const email = shareEmail.value.trim();
+      const role = shareRole.value;
+
+      if (!email) {
+        shareStatus.textContent = "Escribí un email para compartir.";
+        return;
+      }
+
+      const subject = encodeURIComponent("Te compartieron un documento de Eduvia");
+      const body = encodeURIComponent(
+        `Hola, te compartieron este documento de Eduvia.\n\n` +
+        `Documento: ${topbarTitle.textContent.trim() || "Documento sin título"}\n` +
+        `Permiso: ${role === "editor" ? "Puede editar" : "Solo ver"}\n` +
+        `Acceso: ${docLink.value}\n\n` +
+        `Importante: este acceso debe validarse desde Firebase para que solo puedas entrar a este documento.`
+      );
+
+      const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(email)}&su=${subject}&body=${body}`;
+      window.open(gmailUrl, "_blank");
+
+      shareStatus.textContent = "Se abrió Gmail con la invitación preparada.";
+    });
+  </script>
+
+  <script type="module" src="documento.js"></script>
 </body>
 </html>
