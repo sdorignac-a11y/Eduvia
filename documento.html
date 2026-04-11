@@ -7,30 +7,20 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@600;700&display=swap" rel="stylesheet">
 
   <style>
     :root{
-      --bg:#f3f1fb;
-      --bg-2:#ece8fa;
-      --panel:#ffffffcc;
+      --bg:#f1f3f4;
+      --bg-soft:#f8f9fa;
       --paper:#ffffff;
-      --paper-line:#ebe7f7;
-      --text:#241f31;
-      --muted:#6d667b;
-
-      --violet:#7c6cf2;
-      --violet-soft:#efeaff;
-      --blue-soft:#eaf3ff;
-      --yellow-soft:#fff4bf;
-      --green-soft:#e7f7d8;
-      --orange:#ffb36b;
-
-      --line:rgba(124,108,242,.12);
-      --shadow:0 20px 50px rgba(69,64,117,.10);
-      --shadow-soft:0 10px 26px rgba(69,64,117,.08);
-
-      --sidebar:250px;
+      --line:#dadce0;
+      --line-soft:#eceff1;
+      --text:#202124;
+      --muted:#5f6368;
+      --blue:#1a73e8;
+      --blue-soft:#e8f0fe;
+      --shadow:0 1px 2px rgba(60,64,67,.16), 0 4px 12px rgba(60,64,67,.10);
     }
 
     *{
@@ -39,165 +29,28 @@
       padding:0;
     }
 
+    html, body{
+      min-height:100%;
+    }
+
     body{
       font-family:"Inter",sans-serif;
-      background:
-        radial-gradient(circle at top left, rgba(255,255,255,.82), transparent 28%),
-        radial-gradient(circle at bottom right, rgba(124,108,242,.08), transparent 24%),
-        linear-gradient(180deg, var(--bg) 0%, var(--bg-2) 100%);
+      background:var(--bg);
       color:var(--text);
-      min-height:100vh;
-      overflow-x:hidden;
-    }
-
-    body::before{
-      content:"";
-      position:fixed;
-      inset:0;
-      background-image:
-        linear-gradient(rgba(124,108,242,.04) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(124,108,242,.04) 1px, transparent 1px);
-      background-size:30px 30px;
-      pointer-events:none;
-      opacity:.5;
-      z-index:0;
-    }
-
-    .app{
-      position:relative;
-      z-index:1;
-      min-height:100vh;
-      display:grid;
-      grid-template-columns:var(--sidebar) 1fr;
-    }
-
-    .sidebar{
-      position:sticky;
-      top:0;
-      height:100vh;
-      background:rgba(255,252,245,.9);
-      backdrop-filter:blur(14px);
-      border-right:1px solid rgba(124,108,242,.1);
-      padding:22px 18px;
-      display:flex;
-      flex-direction:column;
-      gap:18px;
-    }
-
-    .brand{
-      display:flex;
-      align-items:center;
-      gap:12px;
-      padding:8px 6px 16px;
-      border-bottom:1px dashed rgba(124,108,242,.18);
-    }
-
-    .brand-mark{
-      width:46px;
-      height:46px;
-      border-radius:14px;
-      display:grid;
-      place-items:center;
-      font-family:"Sora",sans-serif;
-      font-weight:800;
-      color:#fff;
-      background:linear-gradient(135deg, var(--violet), var(--orange));
-      box-shadow:0 12px 24px rgba(124,108,242,.2);
-      flex:none;
-    }
-
-    .brand-text strong{
-      display:block;
-      font-family:"Sora",sans-serif;
-      font-size:1rem;
-      letter-spacing:-.03em;
-    }
-
-    .brand-text span{
-      color:var(--muted);
-      font-size:.83rem;
-    }
-
-    .menu{
-      display:flex;
-      flex-direction:column;
-      gap:8px;
-    }
-
-    .menu a,
-    .menu button{
-      width:100%;
-      text-decoration:none;
-      border:none;
-      background:transparent;
-      text-align:left;
-      color:#4b425a;
-      padding:13px 14px;
-      border-radius:15px;
-      font-weight:700;
-      font-family:inherit;
-      font-size:1rem;
-      cursor:pointer;
-      transition:.2s ease;
-    }
-
-    .menu a:hover,
-    .menu button:hover{
-      background:#f4efff;
-      color:#6b5ee8;
-      transform:translateX(4px);
-    }
-
-    .menu a.active{
-      background:linear-gradient(135deg, rgba(124,108,242,.14), rgba(255,179,107,.14));
-      color:#6b5ee8;
-      box-shadow:var(--shadow-soft);
-    }
-
-    #logout::before{
-      content:"↩";
-      margin-right:10px;
-    }
-
-    .sidebar-note{
-      margin-top:auto;
-      background:linear-gradient(180deg, #fff6c9, #ffe7a1);
-      border:1px solid rgba(255,179,107,.24);
-      border-radius:20px;
-      padding:15px;
-      box-shadow:var(--shadow-soft);
-      transform:rotate(-1deg);
-    }
-
-    .sidebar-note strong{
-      display:block;
-      margin-bottom:6px;
-      font-size:.95rem;
-    }
-
-    .sidebar-note p{
-      color:#635869;
-      font-size:.88rem;
-      line-height:1.55;
-    }
-
-    .main{
-      padding:24px;
-      display:grid;
-      gap:18px;
     }
 
     .topbar{
+      position:sticky;
+      top:0;
+      z-index:20;
+      height:64px;
+      background:#fff;
+      border-bottom:1px solid var(--line);
       display:flex;
       align-items:center;
       justify-content:space-between;
-      gap:14px;
-      padding:14px 16px;
-      border-radius:22px;
-      background:rgba(255,255,255,.66);
-      backdrop-filter:blur(14px);
-      border:1px solid rgba(124,108,242,.08);
-      box-shadow:var(--shadow-soft);
+      gap:16px;
+      padding:0 18px;
     }
 
     .topbar-left{
@@ -207,34 +60,33 @@
       min-width:0;
     }
 
-    .doc-badge{
-      width:42px;
-      height:42px;
-      border-radius:14px;
+    .doc-icon{
+      width:38px;
+      height:38px;
+      border-radius:10px;
       display:grid;
       place-items:center;
-      background:linear-gradient(135deg, #8bb9ff, #6f8cff);
+      background:var(--blue);
       color:#fff;
-      font-size:1.05rem;
-      box-shadow:0 10px 18px rgba(111,140,255,.2);
+      font-size:1rem;
       flex:none;
+      box-shadow:0 8px 18px rgba(26,115,232,.18);
     }
 
-    .topbar-title{
+    .topbar-text{
       min-width:0;
     }
 
-    .topbar-title strong{
+    .topbar-text strong{
       display:block;
-      font-family:"Sora",sans-serif;
       font-size:1rem;
-      letter-spacing:-.03em;
+      font-weight:700;
       white-space:nowrap;
       overflow:hidden;
       text-overflow:ellipsis;
     }
 
-    .topbar-title span{
+    .topbar-text span{
       display:block;
       font-size:.84rem;
       color:var(--muted);
@@ -243,533 +95,315 @@
 
     .topbar-actions{
       display:flex;
-      flex-wrap:wrap;
+      align-items:center;
       gap:10px;
+      flex-wrap:wrap;
       justify-content:flex-end;
     }
 
-    .action-btn{
+    .btn{
       border:none;
       border-radius:999px;
-      padding:11px 16px;
+      padding:10px 16px;
       font-family:inherit;
-      font-weight:800;
+      font-size:.92rem;
+      font-weight:700;
       cursor:pointer;
-      transition:.2s ease;
-    }
-
-    .action-btn:hover{
-      transform:translateY(-2px);
-    }
-
-    .action-btn.primary{
-      background:linear-gradient(135deg, var(--violet), var(--orange));
-      color:#fff;
-      box-shadow:0 12px 22px rgba(124,108,242,.18);
-    }
-
-    .action-btn.soft{
-      background:#efeaff;
-      color:var(--violet);
-    }
-
-    .toolbar{
-      display:flex;
-      flex-wrap:wrap;
-      gap:10px;
-      align-items:center;
-      padding:12px 14px;
-      border-radius:18px;
-      background:rgba(255,255,255,.74);
-      border:1px solid rgba(124,108,242,.08);
-      box-shadow:var(--shadow-soft);
-    }
-
-    .tool-chip{
-      padding:10px 12px;
-      border-radius:12px;
-      background:#fff;
-      border:1px solid rgba(124,108,242,.1);
-      color:#594f66;
-      font-size:.88rem;
-      font-weight:700;
-      box-shadow:0 4px 12px rgba(124,108,242,.04);
-    }
-
-    .workspace{
-      display:grid;
-      place-items:center;
-      padding:6px 0 22px;
-    }
-
-    .doc-shell{
-      width:min(100%, 980px);
-      display:grid;
-      gap:18px;
-    }
-
-    .doc-meta{
-      display:flex;
-      flex-wrap:wrap;
-      gap:10px;
-      align-items:center;
-      justify-content:flex-start;
-    }
-
-    .meta-pill{
-      padding:10px 14px;
-      border-radius:999px;
-      background:rgba(255,255,255,.78);
-      border:1px solid rgba(124,108,242,.08);
-      box-shadow:var(--shadow-soft);
-      font-size:.88rem;
-      font-weight:800;
-      color:#5f566b;
-    }
-
-    .paper{
-      position:relative;
-      background:var(--paper);
-      border-radius:26px;
-      box-shadow:0 28px 70px rgba(42,39,71,.12);
-      border:1px solid rgba(124,108,242,.08);
-      overflow:hidden;
-    }
-
-    .paper::before{
-      content:"";
-      position:absolute;
-      inset:0;
-      background:
-        linear-gradient(transparent 40px, rgba(124,108,242,.045) 41px);
-      background-size:100% 41px;
-      opacity:.65;
-      pointer-events:none;
-    }
-
-    .paper::after{
-      content:"";
-      position:absolute;
-      top:0;
-      bottom:0;
-      left:74px;
-      width:2px;
-      background:rgba(255,116,136,.18);
-      pointer-events:none;
-    }
-
-    .paper-inner{
-      position:relative;
-      z-index:1;
-      padding:52px 56px 56px 104px;
-      min-height:900px;
-    }
-
-    .doc-header{
-      margin-bottom:30px;
-      padding-bottom:24px;
-      border-bottom:1px solid var(--paper-line);
-    }
-
-    .doc-title{
-      font-family:"Sora",sans-serif;
-      font-size:clamp(2rem,4vw,2.8rem);
-      letter-spacing:-.05em;
-      line-height:1.05;
-      margin-bottom:12px;
-      color:#1f1a2b;
-    }
-
-    .doc-subtitle{
-      color:#6d647c;
-      line-height:1.8;
-      max-width:760px;
-      font-size:1rem;
-    }
-
-    .doc-objective{
-      margin-top:18px;
+      text-decoration:none;
+      transition:.18s ease;
       display:inline-flex;
-      align-items:flex-start;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+    }
+
+    .btn:hover{
+      transform:translateY(-1px);
+    }
+
+    .btn-soft{
+      background:#eef3fd;
+      color:var(--blue);
+    }
+
+    .btn-primary{
+      background:var(--blue);
+      color:#fff;
+      box-shadow:0 10px 18px rgba(26,115,232,.18);
+    }
+
+    .subbar{
+      position:sticky;
+      top:64px;
+      z-index:15;
+      background:var(--bg-soft);
+      border-bottom:1px solid var(--line);
+      padding:10px 18px;
+      display:flex;
+      flex-wrap:wrap;
       gap:10px;
-      padding:14px 16px;
-      border-radius:18px;
-      background:var(--violet-soft);
-      border:1px solid rgba(124,108,242,.1);
-      color:#51486a;
-      font-weight:700;
-      line-height:1.6;
     }
 
-    .doc-section{
-      margin-bottom:32px;
-    }
-
-    .section-label{
+    .chip{
       display:inline-flex;
       align-items:center;
       gap:8px;
       padding:8px 12px;
       border-radius:999px;
-      font-size:.78rem;
-      font-weight:800;
-      letter-spacing:.08em;
-      color:#5d5486;
-      background:#f1ecff;
-      margin-bottom:14px;
-      text-transform:uppercase;
-    }
-
-    .doc-section h2{
-      font-family:"Sora",sans-serif;
-      font-size:1.38rem;
-      letter-spacing:-.03em;
-      margin-bottom:12px;
-      color:#241f31;
-    }
-
-    .doc-section p{
-      font-size:1rem;
-      line-height:1.95;
-      color:#3a3447;
-      margin-bottom:14px;
-    }
-
-    .highlight-box,
-    .example-box,
-    .summary-box{
-      border-radius:20px;
-      padding:18px 18px 16px;
-      margin:18px 0;
-      border:1px solid rgba(124,108,242,.08);
-      box-shadow:0 10px 24px rgba(124,108,242,.06);
-    }
-
-    .highlight-box{
-      background:var(--yellow-soft);
-    }
-
-    .example-box{
-      background:var(--blue-soft);
-    }
-
-    .summary-box{
-      background:var(--green-soft);
-    }
-
-    .highlight-box strong,
-    .example-box strong,
-    .summary-box strong{
-      display:block;
-      margin-bottom:8px;
-      font-size:.96rem;
-      color:#2b2434;
-    }
-
-    .highlight-box p,
-    .example-box p,
-    .summary-box p{
-      margin:0;
-      color:#4b4357;
-      line-height:1.75;
-      font-size:.96rem;
-    }
-
-    .doc-list{
-      display:grid;
-      gap:12px;
-      margin-top:14px;
-    }
-
-    .doc-list li{
-      list-style:none;
-      padding:14px 16px;
-      border-radius:16px;
-      background:#fbfaff;
-      border:1px solid rgba(124,108,242,.08);
-      color:#433d52;
-      line-height:1.7;
-      box-shadow:0 6px 14px rgba(124,108,242,.04);
-    }
-
-    .doc-footer{
-      margin-top:34px;
-      padding-top:24px;
-      border-top:1px solid var(--paper-line);
-      display:flex;
-      flex-wrap:wrap;
-      gap:12px;
-    }
-
-    .footer-chip{
-      padding:10px 14px;
-      border-radius:999px;
-      background:#f7f4ff;
-      color:#5c5372;
-      font-weight:800;
+      background:#fff;
+      border:1px solid var(--line-soft);
+      color:#3c4043;
       font-size:.86rem;
-      border:1px solid rgba(124,108,242,.09);
-    }
-
-    .empty-note{
-      padding:20px;
-      border-radius:20px;
-      background:#fff8eb;
-      border:1px dashed rgba(124,108,242,.16);
-      color:#675f73;
-      line-height:1.7;
       font-weight:600;
     }
 
-    @media (max-width: 980px){
-      .paper-inner{
-        padding:42px 30px 42px 64px;
-      }
-
-      .paper::after{
-        left:40px;
-      }
+    .workspace{
+      padding:30px 14px 56px;
     }
 
-    @media (max-width: 820px){
-      .app{
-        grid-template-columns:1fr;
-      }
-
-      .sidebar{
-        position:relative;
-        height:auto;
-        border-right:none;
-        border-bottom:1px solid rgba(124,108,242,.08);
-      }
-
-      .main{
-        padding:18px;
-      }
-
-      .topbar{
-        flex-direction:column;
-        align-items:stretch;
-      }
-
-      .topbar-actions{
-        justify-content:flex-start;
-      }
-
-      .paper{
-        border-radius:20px;
-      }
-
-      .paper-inner{
-        padding:32px 18px 32px 34px;
-        min-height:auto;
-      }
-
-      .paper::after{
-        left:18px;
-      }
+    .paper-wrap{
+      max-width:980px;
+      margin:0 auto;
     }
 
-    @media (max-width: 640px){
-      .toolbar{
-        gap:8px;
-      }
+    .paper{
+      width:100%;
+      max-width:816px;
+      min-height:1120px;
+      margin:0 auto;
+      background:var(--paper);
+      border:1px solid #e0e0e0;
+      box-shadow:var(--shadow);
+    }
 
-      .tool-chip{
-        width:100%;
-      }
+    .paper-inner{
+      padding:72px 78px 84px;
+    }
 
-      .doc-meta{
-        gap:8px;
-      }
+    .doc-header{
+      margin-bottom:34px;
+      padding-bottom:24px;
+      border-bottom:1px solid #f1f3f4;
+    }
 
-      .meta-pill{
-        width:100%;
+    .doc-title{
+      font-family:"Sora",sans-serif;
+      font-size:2.15rem;
+      line-height:1.08;
+      letter-spacing:-.04em;
+      font-weight:700;
+      margin-bottom:14px;
+      color:#202124;
+    }
+
+    .doc-meta{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px 18px;
+      color:var(--muted);
+      font-size:.95rem;
+      margin-bottom:18px;
+    }
+
+    .doc-objective{
+      padding:14px 16px;
+      border-left:4px solid var(--blue);
+      background:var(--blue-soft);
+      border-radius:8px;
+      color:#334155;
+      line-height:1.7;
+      font-size:.97rem;
+    }
+
+    .doc-content{
+      font-size:1rem;
+      line-height:1.9;
+      color:#202124;
+    }
+
+    .doc-content h2{
+      font-family:"Sora",sans-serif;
+      font-size:1.45rem;
+      line-height:1.2;
+      letter-spacing:-.03em;
+      margin:34px 0 14px;
+      color:#202124;
+    }
+
+    .doc-content h3{
+      font-size:1.08rem;
+      margin:24px 0 10px;
+      color:#202124;
+    }
+
+    .doc-content p{
+      margin-bottom:16px;
+      color:#202124;
+    }
+
+    .doc-content ul,
+    .doc-content ol{
+      margin:0 0 18px 24px;
+    }
+
+    .doc-content li{
+      margin-bottom:8px;
+    }
+
+    .doc-content strong{
+      font-weight:800;
+    }
+
+    .doc-content blockquote{
+      margin:18px 0;
+      padding:12px 16px;
+      border-left:4px solid #c7d2fe;
+      background:#f8fafc;
+      color:#334155;
+      border-radius:8px;
+    }
+
+    .doc-placeholder{
+      color:var(--muted);
+      font-size:1rem;
+      line-height:1.9;
+    }
+
+    .doc-placeholder p{
+      margin-bottom:16px;
+    }
+
+    @media (max-width: 900px){
+      .paper-inner{
+        padding:42px 28px 50px;
       }
 
       .doc-title{
         font-size:1.8rem;
       }
+    }
 
-      .doc-objective{
-        display:flex;
+    @media (max-width: 720px){
+      .topbar{
+        height:auto;
+        padding:12px 14px;
+        align-items:flex-start;
+        flex-direction:column;
+      }
+
+      .subbar{
+        top:88px;
+        padding:10px 14px;
+      }
+
+      .topbar-actions{
+        width:100%;
+        justify-content:flex-start;
+      }
+
+      .workspace{
+        padding-top:22px;
+      }
+
+      .paper{
+        min-height:auto;
+      }
+
+      .paper-inner{
+        padding:28px 18px 36px;
+      }
+
+      .doc-title{
+        font-size:1.55rem;
+      }
+
+      .doc-meta{
+        flex-direction:column;
+        gap:8px;
+      }
+
+      .chip{
+        width:100%;
+        justify-content:flex-start;
       }
     }
   </style>
 </head>
 <body>
-  <div class="app">
-    <aside class="sidebar">
-      <div class="brand">
-        <div class="brand-mark">E</div>
-        <div class="brand-text">
-          <strong>Eduvia</strong>
-          <span>Documento de estudio</span>
-        </div>
+  <header class="topbar">
+    <div class="topbar-left">
+      <div class="doc-icon">📄</div>
+      <div class="topbar-text">
+        <strong id="topbar-title">Documento sin título</strong>
+        <span>Eduvia · modo documento</span>
       </div>
+    </div>
 
-      <nav class="menu">
-        <a href="panel.html">Inicio</a>
-        <a href="crear-clase.html">Crear nueva clase</a>
-        <a href="mis-clases.html" class="active">Documento actual</a>
-        <a href="panel.html#guia">Cómo funciona</a>
-        <a href="#">Historial</a>
-        <a href="#">Ajustes</a>
-        <button id="logout" type="button">Cerrar sesión</button>
-      </nav>
+    <div class="topbar-actions">
+      <a href="crear-clase.html" class="btn btn-soft">Volver</a>
+      <button type="button" class="btn btn-primary">Generar ejercicios</button>
+    </div>
+  </header>
 
-      <div class="sidebar-note">
-        <strong>Tip de estudio</strong>
-        <p>Usá este modo para leer con calma, repasar conceptos y convertir después el contenido en ejercicios o tarjetas.</p>
-      </div>
-    </aside>
-
-    <main class="main">
-      <header class="topbar">
-        <div class="topbar-left">
-          <div class="doc-badge">📄</div>
-          <div class="topbar-title">
-            <strong id="topbar-doc-name">Documento de clase</strong>
-            <span id="topbar-doc-state">Listo para estudiar</span>
-          </div>
-        </div>
-
-        <div class="topbar-actions">
-          <button class="action-btn soft" type="button" onclick="window.print()">Imprimir</button>
-          <button class="action-btn soft" type="button">Compartir</button>
-          <button class="action-btn primary" type="button">Generar ejercicios</button>
-        </div>
-      </header>
-
-      <div class="toolbar">
-        <div class="tool-chip">Modo lectura</div>
-        <div class="tool-chip">Resumen guiado</div>
-        <div class="tool-chip">Conceptos clave</div>
-        <div class="tool-chip">Ejemplos</div>
-        <div class="tool-chip">Repaso final</div>
-      </div>
-
-      <section class="workspace">
-        <div class="doc-shell">
-          <div class="doc-meta">
-            <div class="meta-pill" id="meta-materia">Materia: —</div>
-            <div class="meta-pill" id="meta-nivel">Nivel: —</div>
-            <div class="meta-pill" id="meta-duracion">Duración: —</div>
-            <div class="meta-pill" id="meta-formato">Formato: Documento</div>
-          </div>
-
-          <article class="paper">
-            <div class="paper-inner">
-              <header class="doc-header">
-                <h1 class="doc-title" id="doc-title">Clase sin título</h1>
-                <p class="doc-subtitle" id="doc-subtitle">
-                  Acá vas a ver la clase en formato documento, con una estructura más clara y ordenada para estudiar.
-                </p>
-
-                <div class="doc-objective" id="doc-objective-box">
-                  <span>🎯</span>
-                  <span id="doc-objective-text">Todavía no se definió un objetivo para esta clase.</span>
-                </div>
-              </header>
-
-              <section class="doc-section">
-                <span class="section-label">Resumen inicial</span>
-                <h2>Resumen del tema</h2>
-                <p id="section-resumen">
-                  Este espacio está pensado para mostrar un resumen claro y fácil de leer del tema de la clase.
-                  Más adelante, la IA puede insertar acá una explicación breve para arrancar el estudio.
-                </p>
-
-                <div class="highlight-box">
-                  <strong>Idea importante</strong>
-                  <p id="highlight-main">
-                    El documento sirve para estudiar con más calma, repasar y volver a leer los conceptos importantes.
-                  </p>
-                </div>
-              </section>
-
-              <section class="doc-section">
-                <span class="section-label">Desarrollo</span>
-                <h2>Explicación paso a paso</h2>
-                <p id="section-explicacion">
-                  Acá va a ir la explicación principal del contenido. La idea es que la IA lo redacte como un apunte
-                  bien ordenado, con ejemplos y lenguaje adaptado al nivel del alumno.
-                </p>
-
-                <div class="example-box">
-                  <strong>Ejemplo guiado</strong>
-                  <p id="section-ejemplo">
-                    En esta parte pueden aparecer ejemplos resueltos, comparaciones o aplicaciones concretas del tema.
-                  </p>
-                </div>
-              </section>
-
-              <section class="doc-section">
-                <span class="section-label">Puntos clave</span>
-                <h2>Qué tenés que recordar</h2>
-                <ul class="doc-list" id="key-points-list">
-                  <li>Concepto clave 1: la IA puede completar esta parte con ideas importantes del tema.</li>
-                  <li>Concepto clave 2: también puede resumir fórmulas, definiciones o reglas.</li>
-                  <li>Concepto clave 3: perfecto para repasar antes de una prueba.</li>
-                </ul>
-              </section>
-
-              <section class="doc-section">
-                <span class="section-label">Cierre</span>
-                <h2>Resumen final</h2>
-                <div class="summary-box">
-                  <strong>Repaso rápido</strong>
-                  <p id="section-cierre">
-                    Este cierre puede servir para condensar toda la clase en pocas líneas y dejar listo el contenido
-                    para generar ejercicios, tarjetas o mapas mentales.
-                  </p>
-                </div>
-              </section>
-
-              <section class="doc-section">
-                <span class="section-label">Siguiente paso</span>
-                <h2>Preguntas para practicar</h2>
-                <div class="empty-note" id="practice-box">
-                  Después podemos hacer que Eduvia genere automáticamente preguntas, ejercicios o flashcards a partir de este documento.
-                </div>
-              </section>
-
-              <footer class="doc-footer">
-                <span class="footer-chip" id="footer-chip-1">Documento Eduvia</span>
-                <span class="footer-chip" id="footer-chip-2">Modo estudio</span>
-                <span class="footer-chip" id="footer-chip-3">Listo para repasar</span>
-              </footer>
-            </div>
-          </article>
-        </div>
-      </section>
-    </main>
+  <div class="subbar">
+    <div class="chip" id="chip-materia">Materia: —</div>
+    <div class="chip" id="chip-nivel">Nivel: —</div>
+    <div class="chip" id="chip-duracion">Duración: —</div>
+    <div class="chip">Formato: Documento</div>
   </div>
+
+  <main class="workspace">
+    <div class="paper-wrap">
+      <article class="paper">
+        <div class="paper-inner">
+          <header class="doc-header">
+            <h1 class="doc-title" id="doc-title">Documento sin título</h1>
+
+            <div class="doc-meta">
+              <span id="meta-materia">Materia: —</span>
+              <span id="meta-nivel">Nivel: —</span>
+              <span id="meta-duracion">Duración: —</span>
+            </div>
+
+            <div class="doc-objective" id="doc-objective">
+              Objetivo: todavía no se definió un objetivo para esta clase.
+            </div>
+          </header>
+
+          <section class="doc-content" id="doc-content">
+            <div class="doc-placeholder">
+              <p>Acá la IA va a pegar toda la información de la clase.</p>
+              <p>La idea de esta vista es que se sienta como un documento limpio, claro y fácil de estudiar.</p>
+              <p>Después conectamos <strong>documento.js</strong> para que cargue el contenido real automáticamente.</p>
+            </div>
+          </section>
+        </div>
+      </article>
+    </div>
+  </main>
 
   <script>
     const claseActual = JSON.parse(localStorage.getItem("claseActual") || "{}");
 
+    const tema = claseActual.tema || "Documento sin título";
     const materia = claseActual.materia || "Sin materia";
-    const tema = claseActual.tema || "Clase sin título";
     const nivel = claseActual.nivel || "No definido";
     const duracion = claseActual.duracion || "No definida";
     const objetivo = claseActual.objetivo || "";
 
-    document.getElementById("topbar-doc-name").textContent = tema;
+    document.getElementById("topbar-title").textContent = tema;
     document.getElementById("doc-title").textContent = tema;
 
-    document.getElementById("topbar-doc-state").textContent =
-      `Documento generado para ${materia}`;
+    document.getElementById("chip-materia").textContent = `Materia: ${materia}`;
+    document.getElementById("chip-nivel").textContent = `Nivel: ${nivel}`;
+    document.getElementById("chip-duracion").textContent = `Duración: ${duracion}`;
 
     document.getElementById("meta-materia").textContent = `Materia: ${materia}`;
     document.getElementById("meta-nivel").textContent = `Nivel: ${nivel}`;
     document.getElementById("meta-duracion").textContent = `Duración: ${duracion}`;
 
-    document.getElementById("doc-subtitle").textContent =
-      `Este documento organiza la clase de ${materia} sobre ${tema} en un formato más limpio, pensado para leer, estudiar y repasar.`;
-
     if (objetivo) {
-      document.getElementById("doc-objective-text").textContent = objetivo;
+      document.getElementById("doc-objective").textContent = `Objetivo: ${objetivo}`;
     }
   </script>
 </body>
