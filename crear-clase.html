@@ -218,7 +218,6 @@
       gap:22px;
     }
 
-    /* HERO */
     .hero-craft{
       position:relative;
       overflow:hidden;
@@ -494,7 +493,6 @@
       border-radius:50%;
     }
 
-    /* NUEVA ZONA CENTRAL */
     .content-grid{
       display:grid;
       grid-template-columns:1.12fr .88fr;
@@ -746,7 +744,7 @@
       box-shadow:var(--shadow-soft);
     }
 
-        .mode-selector{
+    .mode-selector{
       display:grid;
       grid-template-columns:1fr 1fr;
       gap:14px;
@@ -894,12 +892,6 @@
       color:#6a6075;
       line-height:1.6;
       font-size:.9rem;
-    }
-
-    @media (max-width: 640px){
-      .mode-selector{
-        grid-template-columns:1fr;
-      }
     }
 
     .form-actions{
@@ -1176,6 +1168,10 @@
         width:100%;
         justify-content:center;
       }
+
+      .mode-selector{
+        grid-template-columns:1fr;
+      }
     }
   </style>
 </head>
@@ -1313,7 +1309,7 @@
                     <span class="helper">Sirve para ordenar mejor la sesión.</span>
                   </div>
 
-                                    <div class="field full">
+                  <div class="field full">
                     <label>Formato de la clase</label>
 
                     <div class="mode-selector">
@@ -1452,6 +1448,7 @@
     </main>
   </div>
 
+  <script type="module" src="owner-access-guard.js"></script>
   <script type="module" src="crear-clase.js"></script>
 
   <script>
@@ -1472,39 +1469,41 @@
       });
     });
   </script>
+
   <script>
-  const formatInputs = document.querySelectorAll('input[name="formato"]');
-  const formatPreview = document.getElementById("format-preview");
+    const formatInputs = document.querySelectorAll('input[name="formato"]');
+    const formatPreview = document.getElementById("format-preview");
 
-  function updateFormatPreview() {
-    const selected = document.querySelector('input[name="formato"]:checked')?.value || "pizarron";
+    function updateFormatPreview() {
+      const selected = document.querySelector('input[name="formato"]:checked')?.value || "pizarron";
 
-    if (!formatPreview) return;
+      if (!formatPreview) return;
 
-    if (selected === "documento") {
-      formatPreview.innerHTML = `
-        <strong>Vista elegida: Documento</strong>
-        <p>
-          La clase se mostrará como un apunte ordenado, con bloques claros para leer,
-          estudiar y repasar el tema.
-        </p>
-      `;
-    } else {
-      formatPreview.innerHTML = `
-        <strong>Vista elegida: Pizarrón</strong>
-        <p>
-          La clase se mostrará en una experiencia más visual, tipo aula interactiva.
-        </p>
-      `;
+      if (selected === "documento") {
+        formatPreview.innerHTML = `
+          <strong>Vista elegida: Documento</strong>
+          <p>
+            La clase se mostrará como un apunte ordenado, con bloques claros para leer,
+            estudiar y repasar el tema.
+          </p>
+        `;
+      } else {
+        formatPreview.innerHTML = `
+          <strong>Vista elegida: Pizarrón</strong>
+          <p>
+            La clase se mostrará en una experiencia más visual, tipo aula interactiva.
+          </p>
+        `;
+      }
     }
-  }
 
-  formatInputs.forEach(input => {
-    input.addEventListener("change", updateFormatPreview);
-  });
+    formatInputs.forEach(input => {
+      input.addEventListener("change", updateFormatPreview);
+    });
 
-  updateFormatPreview();
-</script>
-<script type="module" src="panel-auth.js?v=1"></script>
+    updateFormatPreview();
+  </script>
+
+  <script type="module" src="panel-auth.js?v=1"></script>
 </body>
 </html>
