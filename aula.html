@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Eduvia | Aula</title>
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap" rel="stylesheet">
@@ -20,15 +21,18 @@
       --violet:#7c6cf2;
       --violet-soft:#eee9ff;
       --yellow:#ffe79a;
-      --yellow-soft:#fff7d6;
-      --sky:#d9f0ff;
       --orange:#ffb36b;
-      --red-line:rgba(255,90,110,.2);
+      --sky:#d9f0ff;
+      --mint:#dcf3a6;
+      --red-line:rgba(255,90,110,.18);
 
       --shadow:0 18px 40px rgba(63,72,138,.08);
       --shadow-soft:0 10px 24px rgba(63,72,138,.06);
 
       --sidebar:250px;
+      --board:#ffffff;
+      --board-line:#e9eef8;
+      --board-border:#e7e2ff;
     }
 
     *{
@@ -54,44 +58,12 @@
       position:fixed;
       inset:0;
       background-image:
-        linear-gradient(rgba(124,108,242,.045) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(124,108,242,.045) 1px, transparent 1px);
+        linear-gradient(rgba(124,108,242,.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(124,108,242,.04) 1px, transparent 1px);
       background-size:28px 28px;
       pointer-events:none;
       z-index:0;
-      opacity:.7;
-    }
-
-    .loader{
-      position:fixed;
-      inset:0;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      flex-direction:column;
-      gap:14px;
-      background:rgba(247,243,234,.92);
-      backdrop-filter:blur(10px);
-      z-index:50;
-    }
-
-    .loader-badge{
-      width:68px;
-      height:68px;
-      border-radius:22px;
-      display:grid;
-      place-items:center;
-      font-family:"Sora",sans-serif;
-      font-size:1.3rem;
-      font-weight:800;
-      color:#fff;
-      background:linear-gradient(135deg, var(--violet), var(--orange));
-      box-shadow:0 16px 30px rgba(124,108,242,.18);
-    }
-
-    .loader p{
-      color:var(--muted);
-      font-weight:700;
+      opacity:.75;
     }
 
     .app{
@@ -106,7 +78,7 @@
       position:sticky;
       top:0;
       height:100vh;
-      background:rgba(255,252,245,.9);
+      background:rgba(255,252,245,.92);
       backdrop-filter:blur(14px);
       border-right:2px dashed rgba(124,108,242,.14);
       padding:22px 18px;
@@ -206,26 +178,29 @@
     }
 
     .main{
-      padding:28px;
-    }
-
-    .page{
-      max-width:1400px;
-      margin:0 auto;
+      padding:24px;
       display:grid;
-      gap:20px;
+      gap:18px;
     }
 
-    .hero{
-      background:var(--paper);
-      border:2px solid rgba(124,108,242,.08);
-      border-radius:34px;
-      padding:26px;
+    .topbar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      flex-wrap:wrap;
+      background:rgba(255,253,247,.9);
+      border:1px solid rgba(255,255,255,.8);
+      border-radius:26px;
+      padding:16px 18px;
       box-shadow:var(--shadow);
-      display:grid;
-      grid-template-columns:1.15fr .85fr;
-      gap:20px;
-      align-items:start;
+    }
+
+    .topbar-left{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      flex-wrap:wrap;
     }
 
     .eyebrow{
@@ -238,38 +213,342 @@
       border:1px solid rgba(124,108,242,.12);
       color:#675d79;
       font-size:.9rem;
-      margin-bottom:16px;
-      box-shadow:var(--shadow-soft);
       font-weight:700;
+      box-shadow:var(--shadow-soft);
     }
 
-    .hero h1{
+    .class-main-info h1{
       font-family:"Sora",sans-serif;
-      font-size:clamp(2rem,4vw,3rem);
-      line-height:1.04;
+      font-size:1.5rem;
       letter-spacing:-.04em;
-      margin-bottom:10px;
-      max-width:700px;
+      line-height:1.05;
+      margin-bottom:4px;
     }
 
-    .hero h1 span{
-      color:var(--violet);
-    }
-
-    .hero p{
+    .class-main-info p{
       color:var(--muted);
-      line-height:1.8;
-      max-width:720px;
+      line-height:1.6;
+      font-size:.96rem;
     }
 
-    .chips{
+    .topbar-actions{
       display:flex;
-      flex-wrap:wrap;
       gap:10px;
-      margin-top:18px;
+      flex-wrap:wrap;
     }
 
-    .chip{
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      border:none;
+      text-decoration:none;
+      cursor:pointer;
+      font-family:inherit;
+      font-weight:800;
+      border-radius:999px;
+      padding:13px 18px;
+      transition:.2s ease;
+    }
+
+    .btn:hover{
+      transform:translateY(-2px);
+    }
+
+    .btn-primary{
+      color:#fff;
+      background:linear-gradient(135deg, var(--violet), var(--orange));
+      box-shadow:0 14px 28px rgba(124,108,242,.16);
+    }
+
+    .btn-soft{
+      color:var(--violet);
+      background:#efeaff;
+    }
+
+    .scene{
+      display:grid;
+      grid-template-columns:320px 1fr;
+      gap:18px;
+      align-items:stretch;
+      min-height:calc(100vh - 230px);
+    }
+
+    .teacher-panel{
+      position:relative;
+      background:linear-gradient(180deg,#fffdf8 0%, #fff8ef 100%);
+      border:2px solid rgba(124,108,242,.08);
+      border-radius:30px;
+      box-shadow:var(--shadow);
+      overflow:hidden;
+      padding:22px;
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+    }
+
+    .teacher-panel::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background-image:
+        linear-gradient(transparent 31px, rgba(124,108,242,.04) 32px);
+      background-size:100% 32px;
+      pointer-events:none;
+      opacity:.78;
+    }
+
+    .teacher-panel::after{
+      content:"";
+      position:absolute;
+      left:18px;
+      top:0;
+      bottom:0;
+      width:2px;
+      background:var(--red-line);
+      pointer-events:none;
+    }
+
+    .teacher-panel > *{
+      position:relative;
+      z-index:1;
+    }
+
+    .teacher-head{
+      display:flex;
+      align-items:flex-start;
+      gap:12px;
+      margin-bottom:18px;
+    }
+
+    .teacher-icon{
+      width:48px;
+      height:48px;
+      border-radius:16px;
+      display:grid;
+      place-items:center;
+      background:#fff;
+      border:2px solid rgba(124,108,242,.14);
+      font-size:1.2rem;
+      box-shadow:0 8px 18px rgba(124,108,242,.08);
+      flex:none;
+    }
+
+    .teacher-head h2{
+      font-family:"Sora",sans-serif;
+      font-size:1.15rem;
+      letter-spacing:-.03em;
+      margin-bottom:4px;
+    }
+
+    .teacher-head p{
+      color:var(--muted);
+      line-height:1.65;
+      font-size:.93rem;
+    }
+
+    .teacher-stage{
+      flex:1;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:10px 0 18px;
+    }
+
+    .teacher-wrap{
+      position:relative;
+      width:100%;
+      max-width:250px;
+      height:360px;
+    }
+
+    .teacher-shadow{
+      position:absolute;
+      bottom:8px;
+      left:50%;
+      width:150px;
+      height:22px;
+      background:rgba(43,36,52,.08);
+      filter:blur(10px);
+      border-radius:999px;
+      transform:translateX(-50%);
+    }
+
+    .teacher-body{
+      position:absolute;
+      left:50%;
+      bottom:24px;
+      transform:translateX(-50%);
+      width:190px;
+      height:290px;
+      animation:teacherFloat 4.2s ease-in-out infinite;
+    }
+
+    .teacher-head-shape{
+      position:absolute;
+      top:0;
+      left:58px;
+      width:78px;
+      height:78px;
+      border-radius:50%;
+      background:linear-gradient(180deg, #ffdcb9, #f6c79a);
+      z-index:3;
+      box-shadow:0 8px 16px rgba(0,0,0,.06);
+    }
+
+    .teacher-hair{
+      position:absolute;
+      top:-4px;
+      left:50px;
+      width:92px;
+      height:54px;
+      border-radius:45px 45px 28px 28px;
+      background:#3a3247;
+      z-index:4;
+    }
+
+    .teacher-neck{
+      position:absolute;
+      top:67px;
+      left:84px;
+      width:26px;
+      height:22px;
+      border-radius:10px;
+      background:#efc094;
+      z-index:2;
+    }
+
+    .teacher-torso{
+      position:absolute;
+      top:82px;
+      left:35px;
+      width:122px;
+      height:126px;
+      border-radius:32px 32px 26px 26px;
+      background:linear-gradient(180deg, #7c6cf2, #6554e6);
+      z-index:1;
+      box-shadow:0 16px 24px rgba(124,108,242,.18);
+    }
+
+    .teacher-shirt{
+      position:absolute;
+      top:98px;
+      left:66px;
+      width:60px;
+      height:94px;
+      border-radius:20px;
+      background:rgba(255,255,255,.12);
+      z-index:2;
+    }
+
+    .teacher-arm.left{
+      position:absolute;
+      top:105px;
+      left:16px;
+      width:46px;
+      height:122px;
+      border-radius:24px;
+      background:linear-gradient(180deg, #7c6cf2, #5c4cdc);
+      transform:rotate(16deg);
+      z-index:0;
+    }
+
+    .teacher-arm.right{
+      position:absolute;
+      top:96px;
+      right:8px;
+      width:26px;
+      height:126px;
+      border-radius:22px;
+      background:linear-gradient(180deg, #efc094, #e0a777);
+      transform-origin:top center;
+      transform:rotate(-38deg);
+      z-index:5;
+      animation:writeArm 2.5s ease-in-out infinite;
+    }
+
+    .teacher-hand{
+      position:absolute;
+      bottom:-8px;
+      left:-3px;
+      width:30px;
+      height:30px;
+      border-radius:50%;
+      background:linear-gradient(180deg, #ffd7b0, #e6ab79);
+      box-shadow:0 6px 10px rgba(0,0,0,.06);
+    }
+
+    .teacher-marker{
+      position:absolute;
+      bottom:-14px;
+      left:15px;
+      width:36px;
+      height:8px;
+      border-radius:999px;
+      background:linear-gradient(90deg, #2b2434, #7c6cf2);
+      transform:rotate(-18deg);
+      box-shadow:0 4px 10px rgba(0,0,0,.08);
+    }
+
+    .teacher-leg.left,
+    .teacher-leg.right{
+      position:absolute;
+      top:195px;
+      width:34px;
+      height:102px;
+      border-radius:20px;
+      background:#2f2a39;
+      z-index:0;
+    }
+
+    .teacher-leg.left{ left:68px; }
+    .teacher-leg.right{ left:104px; }
+
+    .teacher-foot.left,
+    .teacher-foot.right{
+      position:absolute;
+      bottom:-2px;
+      width:54px;
+      height:18px;
+      border-radius:16px;
+      background:#1e1a26;
+    }
+
+    .teacher-foot.left{ left:59px; }
+    .teacher-foot.right{ left:97px; }
+
+    .teacher-bubble{
+      padding:14px 15px;
+      border-radius:20px;
+      background:#fff;
+      border:1px solid rgba(124,108,242,.12);
+      box-shadow:var(--shadow-soft);
+      line-height:1.7;
+      font-size:.93rem;
+      color:#50475d;
+    }
+
+    .teacher-bubble strong{
+      color:#322a3f;
+      display:block;
+      margin-bottom:5px;
+    }
+
+    .board-stage{
+      display:flex;
+      flex-direction:column;
+      gap:16px;
+      min-width:0;
+    }
+
+    .board-meta{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .meta-pill{
       padding:10px 14px;
       border-radius:999px;
       background:#fff;
@@ -280,136 +559,244 @@
       font-weight:700;
     }
 
-    .hero-note{
+    .board{
       position:relative;
-      background:linear-gradient(180deg,#fff0a8 0%, #fff8dc 100%);
-      border:1px solid rgba(255,179,107,.24);
-      border-radius:28px;
-      padding:22px;
-      box-shadow:var(--shadow-soft);
-      transform:rotate(-1deg);
-      align-self:start;
-    }
-
-    .hero-note::before{
-      content:"";
-      position:absolute;
-      top:14px;
-      right:18px;
-      width:58px;
-      height:16px;
-      background:rgba(124,108,242,.14);
-      border-radius:6px;
-      transform:rotate(8deg);
-    }
-
-    .hero-note h3{
-      font-family:"Sora",sans-serif;
-      font-size:1.08rem;
-      margin-bottom:12px;
-      letter-spacing:-.03em;
-    }
-
-    .hero-note ul{
-      display:grid;
-      gap:10px;
-      padding-left:18px;
-      color:#435067;
-      line-height:1.65;
-      font-size:.95rem;
-    }
-
-    .aula-grid{
-      display:grid;
-      grid-template-columns:1.2fr .8fr;
-      gap:18px;
-      align-items:start;
-    }
-
-    .board-card,
-    .chat-card{
-      position:relative;
-      background:linear-gradient(180deg,#fffdf8 0%, #fff8ef 100%);
-      border:2px solid rgba(124,108,242,.08);
-      border-radius:28px;
+      flex:1;
+      background:var(--board);
+      border:2px solid var(--board-border);
+      border-radius:34px;
       box-shadow:var(--shadow);
+      min-height:560px;
       overflow:hidden;
+      display:grid;
+      grid-template-rows:auto 1fr;
     }
 
-    .board-card::before,
-    .chat-card::before{
+    .board::before{
       content:"";
       position:absolute;
       inset:0;
-      background-image:
-        linear-gradient(transparent 31px, rgba(124,108,242,.04) 32px);
-      background-size:100% 32px;
+      background:
+        linear-gradient(transparent 47px, var(--board-line) 48px),
+        linear-gradient(90deg, transparent 47px, rgba(235,239,248,.5) 48px);
+      background-size:48px 48px;
       pointer-events:none;
-      opacity:.82;
+      opacity:.95;
     }
 
-    .board-card::after,
-    .chat-card::after{
+    .board::after{
       content:"";
       position:absolute;
-      left:18px;
-      top:0;
-      bottom:0;
-      width:2px;
-      background:var(--red-line);
+      inset:16px;
+      border:2px dashed rgba(124,108,242,.08);
+      border-radius:24px;
+      pointer-events:none;
     }
 
-    .board-card > *,
-    .chat-card > *{
+    .board-top{
       position:relative;
       z-index:1;
-    }
-
-    .card-head{
       display:flex;
       align-items:flex-start;
       justify-content:space-between;
-      gap:14px;
-      padding:22px 22px 0;
+      gap:16px;
+      padding:24px 24px 6px 24px;
+      flex-wrap:wrap;
     }
 
-    .card-head-left{
-      display:flex;
-      align-items:flex-start;
-      gap:12px;
-    }
-
-    .card-icon{
-      width:46px;
-      height:46px;
-      border-radius:15px;
-      display:grid;
-      place-items:center;
-      background:#fff;
-      border:2px solid rgba(124,108,242,.14);
-      box-shadow:0 6px 14px rgba(124,108,242,.08);
-      font-size:1.15rem;
-      flex:none;
-    }
-
-    .card-head h2{
+    .board-title-wrap h2{
       font-family:"Sora",sans-serif;
-      font-size:1.2rem;
-      letter-spacing:-.03em;
+      font-size:2rem;
+      letter-spacing:-.05em;
+      color:#241e30;
       margin-bottom:6px;
     }
 
-    .card-head p{
-      color:var(--muted);
+    .board-title-wrap p{
+      color:#6b6578;
+      line-height:1.7;
+      max-width:700px;
+      font-size:1rem;
+    }
+
+    .writing-status{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      background:linear-gradient(135deg, rgba(124,108,242,.12), rgba(255,179,107,.14));
+      border:1px solid rgba(124,108,242,.12);
+      border-radius:999px;
+      padding:10px 14px;
+      font-weight:800;
+      color:#5d5290;
+      box-shadow:var(--shadow-soft);
+    }
+
+    .dot{
+      width:10px;
+      height:10px;
+      border-radius:50%;
+      background:var(--violet);
+      animation:pulse 1.2s infinite;
+    }
+
+    .board-content{
+      position:relative;
+      z-index:1;
+      padding:8px 24px 24px 24px;
+      display:grid;
+      grid-template-columns:1.1fr .9fr;
+      gap:16px;
+      min-height:0;
+    }
+
+    .board-col{
+      display:grid;
+      gap:16px;
+      align-content:start;
+    }
+
+    .chalk-card{
+      background:rgba(255,255,255,.88);
+      border:1px solid rgba(124,108,242,.12);
+      border-radius:24px;
+      padding:18px;
+      box-shadow:var(--shadow-soft);
+      position:relative;
+      overflow:hidden;
+    }
+
+    .chalk-card::before{
+      content:"";
+      position:absolute;
+      top:12px;
+      right:16px;
+      width:58px;
+      height:16px;
+      border-radius:6px;
+      background:rgba(124,108,242,.08);
+      transform:rotate(8deg);
+    }
+
+    .chalk-card h3{
+      font-family:"Sora",sans-serif;
+      font-size:1.05rem;
+      letter-spacing:-.03em;
+      margin-bottom:10px;
+      color:#2d253a;
+    }
+
+    .chalk-card p{
+      color:#51495f;
+      line-height:1.78;
+      font-size:.96rem;
+    }
+
+    .board-lines{
+      display:grid;
+      gap:10px;
+      margin-top:4px;
+    }
+
+    .board-line{
+      min-height:46px;
+      border-radius:16px;
+      padding:12px 14px;
+      background:rgba(255,255,255,.82);
+      border:1px solid rgba(124,108,242,.12);
+      box-shadow:var(--shadow-soft);
+      color:#3d3649;
+      font-weight:600;
       line-height:1.65;
-      font-size:.95rem;
+      position:relative;
+      animation:lineAppear .5s ease both;
+    }
+
+    .board-line:nth-child(2){ animation-delay:.12s; }
+    .board-line:nth-child(3){ animation-delay:.24s; }
+    .board-line:nth-child(4){ animation-delay:.36s; }
+
+    .board-line::after{
+      content:"";
+      position:absolute;
+      left:14px;
+      right:14px;
+      bottom:8px;
+      height:2px;
+      background:linear-gradient(90deg, rgba(124,108,242,.2), transparent);
+      border-radius:999px;
+    }
+
+    .example-box{
+      padding:16px;
+      border-radius:18px;
+      background:linear-gradient(180deg,#f8fbff,#eef6ff);
+      border:1px solid rgba(124,108,242,.1);
+      color:#425067;
+      line-height:1.75;
+      font-weight:600;
+    }
+
+    .mini-exercise{
+      padding:16px;
+      border-radius:18px;
+      background:linear-gradient(180deg,#fff8d8,#fff4bf);
+      border:1px solid rgba(255,179,107,.22);
+      color:#4f4a3f;
+      line-height:1.75;
+      font-weight:700;
+    }
+
+    .marker-cursor{
+      position:absolute;
+      right:38%;
+      top:108px;
+      width:22px;
+      height:22px;
+      z-index:2;
+      pointer-events:none;
+      animation:markerMove 2.5s ease-in-out infinite;
+    }
+
+    .marker-cursor::before{
+      content:"";
+      position:absolute;
+      width:18px;
+      height:6px;
+      background:linear-gradient(90deg, #2b2434, #7c6cf2);
+      border-radius:999px;
+      transform:rotate(-18deg);
+      top:7px;
+      left:2px;
+      box-shadow:0 4px 10px rgba(0,0,0,.08);
+    }
+
+    .marker-cursor::after{
+      content:"";
+      position:absolute;
+      width:8px;
+      height:8px;
+      border-radius:50%;
+      background:rgba(124,108,242,.16);
+      top:12px;
+      left:12px;
+      filter:blur(2px);
+    }
+
+    .bottom-bar{
+      display:grid;
+      gap:14px;
+      background:rgba(255,253,247,.92);
+      border:1px solid rgba(255,255,255,.8);
+      border-radius:28px;
+      padding:18px;
+      box-shadow:var(--shadow);
     }
 
     .quick-actions{
       display:flex;
-      flex-wrap:wrap;
       gap:10px;
-      padding:18px 22px 0;
+      flex-wrap:wrap;
     }
 
     .quick-btn{
@@ -419,7 +806,7 @@
       font-weight:800;
       color:var(--violet);
       background:#efeaff;
-      padding:11px 14px;
+      padding:12px 15px;
       border-radius:999px;
       transition:.2s ease;
     }
@@ -429,174 +816,112 @@
       background:#e7e0ff;
     }
 
-    .board-content{
-      padding:18px 22px 22px;
+    .input-row{
       display:grid;
-      gap:16px;
-    }
-
-    .board-block{
-      background:#fff;
-      border:1px solid rgba(124,108,242,.12);
-      border-radius:20px;
-      padding:16px;
-      box-shadow:var(--shadow-soft);
-    }
-
-    .board-block h3{
-      font-family:"Sora",sans-serif;
-      font-size:1rem;
-      margin-bottom:8px;
-      letter-spacing:-.02em;
-    }
-
-    .board-block p{
-      color:#544b61;
-      line-height:1.75;
-      font-size:.95rem;
-    }
-
-    .board-list{
-      display:grid;
+      grid-template-columns:1fr auto auto;
       gap:10px;
-      margin-top:8px;
+      align-items:center;
     }
 
-    .board-list li{
-      list-style:none;
-      padding:12px 14px;
-      border-radius:16px;
-      background:rgba(255,255,255,.82);
-      border:1px solid rgba(124,108,242,.12);
-      color:#465067;
-      line-height:1.65;
-      font-size:.94rem;
-      font-weight:600;
-    }
-
-    .chat-shell{
-      padding:18px 22px 22px;
-      display:flex;
-      flex-direction:column;
-      gap:14px;
-      min-height:680px;
-    }
-
-    .chat-messages{
-      flex:1;
-      min-height:440px;
-      max-height:540px;
-      overflow:auto;
-      display:flex;
-      flex-direction:column;
-      gap:12px;
-      padding-right:4px;
-    }
-
-    .msg{
-      max-width:88%;
-      padding:13px 14px;
-      border-radius:18px;
-      line-height:1.7;
-      font-size:.95rem;
-      box-shadow:var(--shadow-soft);
-      white-space:pre-wrap;
-    }
-
-    .msg.assistant{
-      align-self:flex-start;
-      background:#fff;
-      border:1px solid rgba(124,108,242,.12);
-      color:#433b52;
-      border-top-left-radius:8px;
-    }
-
-    .msg.user{
-      align-self:flex-end;
-      background:linear-gradient(135deg, var(--violet), var(--orange));
-      color:#fff;
-      border-top-right-radius:8px;
-    }
-
-    .msg small{
-      display:block;
-      margin-top:6px;
-      opacity:.72;
-      font-size:.78rem;
-      font-weight:700;
-    }
-
-    .chat-form{
-      display:grid;
-      gap:12px;
-    }
-
-    .chat-box{
-      display:flex;
-      gap:10px;
-      align-items:flex-end;
-    }
-
-    .chat-box textarea{
-      flex:1;
-      min-height:62px;
-      max-height:140px;
-      resize:vertical;
+    .input-row input{
+      width:100%;
+      height:58px;
       border-radius:18px;
       border:2px solid #e5ddff;
       background:#fff;
-      padding:14px 16px;
+      padding:0 16px;
       font-size:1rem;
       font-family:inherit;
       color:var(--text);
       outline:none;
       font-weight:600;
+      box-shadow:var(--shadow-soft);
     }
 
-    .chat-box textarea:focus{
+    .input-row input:focus{
       border-color:var(--violet);
       box-shadow:0 0 0 4px rgba(124,108,242,.08);
     }
 
-    .send-btn{
+    .mic-btn{
+      width:58px;
+      height:58px;
       border:none;
       cursor:pointer;
-      font-family:inherit;
-      font-weight:800;
-      color:#fff;
-      background:linear-gradient(135deg, var(--violet), var(--orange));
-      box-shadow:0 14px 28px rgba(124,108,242,.16);
       border-radius:18px;
-      padding:16px 18px;
-      min-width:126px;
+      background:#fff;
+      border:2px solid #e5ddff;
+      font-size:1.1rem;
+      box-shadow:var(--shadow-soft);
       transition:.2s ease;
     }
 
-    .send-btn:hover{
+    .mic-btn:hover{
       transform:translateY(-2px);
     }
 
-    .helper{
-      color:#766d81;
-      font-size:.88rem;
-      line-height:1.6;
-      font-weight:600;
+    .send-btn{
+      min-width:128px;
+      height:58px;
     }
 
-    .error-box{
-      display:none;
-      padding:16px;
-      border-radius:18px;
-      background:#fff;
-      border:1px solid rgba(239,68,68,.18);
-      color:#7b2f2f;
-      box-shadow:var(--shadow-soft);
-      line-height:1.65;
+    @keyframes teacherFloat{
+      0%,100%{ transform:translateX(-50%) translateY(0); }
+      50%{ transform:translateX(-50%) translateY(-8px); }
+    }
+
+    @keyframes writeArm{
+      0%,100%{ transform:rotate(-38deg); }
+      50%{ transform:rotate(-28deg); }
+    }
+
+    @keyframes pulse{
+      0%,100%{ transform:scale(1); opacity:1; }
+      50%{ transform:scale(1.3); opacity:.65; }
+    }
+
+    @keyframes lineAppear{
+      from{
+        opacity:0;
+        transform:translateY(8px);
+      }
+      to{
+        opacity:1;
+        transform:translateY(0);
+      }
+    }
+
+    @keyframes markerMove{
+      0%,100%{
+        transform:translate(0,0) rotate(-8deg);
+      }
+      25%{
+        transform:translate(22px,10px) rotate(2deg);
+      }
+      50%{
+        transform:translate(-10px,24px) rotate(-12deg);
+      }
+      75%{
+        transform:translate(18px,38px) rotate(4deg);
+      }
     }
 
     @media (max-width: 1180px){
-      .hero,
-      .aula-grid{
+      .scene{
+        grid-template-columns:1fr;
+      }
+
+      .teacher-panel{
+        min-height:unset;
+      }
+
+      .teacher-stage{
+        padding-bottom:0;
+      }
+    }
+
+    @media (max-width: 980px){
+      .board-content{
         grid-template-columns:1fr;
       }
     }
@@ -617,41 +942,51 @@
         padding:18px;
       }
 
-      .hero,
-      .board-card,
-      .chat-card{
+      .topbar,
+      .teacher-panel,
+      .board,
+      .bottom-bar{
         border-radius:24px;
       }
 
-      .hero{
-        padding:20px;
+      .board{
+        min-height:unset;
       }
 
-      .chat-shell{
-        min-height:auto;
+      .board-top{
+        padding:20px 20px 6px 20px;
       }
 
-      .chat-messages{
-        max-height:420px;
+      .board-content{
+        padding:8px 20px 20px 20px;
       }
 
-      .chat-box{
-        flex-direction:column;
+      .board-title-wrap h2{
+        font-size:1.6rem;
       }
 
+      .input-row{
+        grid-template-columns:1fr;
+      }
+
+      .mic-btn,
       .send-btn{
         width:100%;
+      }
+
+      .teacher-wrap{
+        height:300px;
+      }
+
+      .teacher-body{
+        transform:translateX(-50%) scale(.92);
+        transform-origin:bottom center;
       }
     }
   </style>
 </head>
 <body>
-  <div id="loader" class="loader">
-    <div class="loader-badge">E</div>
-    <p>Cargando tu aula...</p>
-  </div>
-
-  <div class="app" id="app" style="display:none;">
+  <div class="app">
     <aside class="sidebar">
       <div class="brand">
         <div class="brand-mark">E</div>
@@ -670,53 +1005,138 @@
       </nav>
 
       <div class="sidebar-note">
-        <strong>Consejo rápido</strong>
-        <p>Probá los botones rápidos para cambiar la forma en que la IA explica el tema sin salir del aula.</p>
+        <strong>Modo clase</strong>
+        <p>Acá el centro es el pizarrón. El avatar acompaña la explicación y da la sensación de estar escribiendo en tiempo real.</p>
       </div>
     </aside>
 
     <main class="main">
-      <div class="page">
-        <section class="hero">
+      <section class="topbar">
+        <div class="topbar-left">
+          <div class="eyebrow">Clase en vivo con IA</div>
+
+          <div class="class-main-info">
+            <h1 id="class-title">Clase de Fracciones</h1>
+            <p id="class-subtitle">Una explicación visual, paso a paso y adaptada al nivel del alumno.</p>
+          </div>
+        </div>
+
+        <div class="topbar-actions">
+          <a href="mis-clases.html" class="btn btn-soft">Mis clases</a>
+          <a id="btn-salir-aula" href="panel.html" class="btn btn-primary">Salir del aula</a>
+        </div>
+      </section>
+
+      <section class="scene">
+        <aside class="teacher-panel">
           <div>
-            <div class="eyebrow">Clase en curso</div>
-            <h1 id="class-title">Tu clase sobre <span>este tema</span>.</h1>
-            <p id="class-subtitle">
-              Estamos preparando la explicación inicial para que arranques con una base clara.
-            </p>
-
-            <div class="chips">
-              <div class="chip">📘 Materia: <span id="chip-materia">-</span></div>
-              <div class="chip">📝 Tema: <span id="chip-tema">-</span></div>
-              <div class="chip">🎓 Nivel: <span id="chip-nivel">-</span></div>
-              <div class="chip">⏱️ Duración: <span id="chip-duracion">-</span></div>
-            </div>
-          </div>
-
-          <div class="hero-note">
-            <h3>Objetivo de esta clase</h3>
-            <ul>
-              <li id="goal-main">Todavía no se cargó el objetivo.</li>
-              <li>La IA va a usar esta información para adaptar la explicación.</li>
-              <li>Podés pedir ejemplos, resúmenes o ejercicios desde el chat.</li>
-            </ul>
-          </div>
-        </section>
-
-        <div class="error-box" id="error-box"></div>
-
-        <section class="aula-grid">
-          <article class="board-card">
-            <div class="card-head">
-              <div class="card-head-left">
-                <div class="card-icon">🖍️</div>
-                <div>
-                  <h2>Pizarra de la clase</h2>
-                  <p>Acá Eduvia organiza la explicación en pasos, ejemplos y ejercicios guiados.</p>
-                </div>
+            <div class="teacher-head">
+              <div class="teacher-icon">👨‍🏫</div>
+              <div>
+                <h2>Profesor Eduvia</h2>
+                <p>El avatar acompaña la explicación y cambia a pose de escritura cuando aparece nuevo contenido en el pizarrón.</p>
               </div>
             </div>
 
+            <div class="teacher-stage">
+              <div class="teacher-wrap">
+                <div class="teacher-shadow"></div>
+
+                <div class="teacher-body">
+                  <div class="teacher-hair"></div>
+                  <div class="teacher-head-shape"></div>
+                  <div class="teacher-neck"></div>
+
+                  <div class="teacher-torso"></div>
+                  <div class="teacher-shirt"></div>
+
+                  <div class="teacher-arm left"></div>
+
+                  <div class="teacher-arm right">
+                    <div class="teacher-hand"></div>
+                    <div class="teacher-marker"></div>
+                  </div>
+
+                  <div class="teacher-leg left"></div>
+                  <div class="teacher-leg right"></div>
+
+                  <div class="teacher-foot left"></div>
+                  <div class="teacher-foot right"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="teacher-bubble" id="teacher-bubble">
+            <strong>Hoy vamos paso a paso.</strong>
+            Primero entendemos la idea principal, después vemos un ejemplo y recién ahí practicamos.
+          </div>
+        </aside>
+
+        <div class="board-stage">
+          <div class="board-meta">
+            <div class="meta-pill">📘 Materia: <span id="chip-materia">Matemática</span></div>
+            <div class="meta-pill">📝 Tema: <span id="chip-tema">Fracciones</span></div>
+            <div class="meta-pill">🎓 Nivel: <span id="chip-nivel">Secundaria</span></div>
+            <div class="meta-pill">⏱️ Duración: <span id="chip-duracion">30 min</span></div>
+          </div>
+
+          <section class="board">
+            <div class="marker-cursor"></div>
+
+            <div class="board-top">
+              <div class="board-title-wrap">
+                <h2 id="board-title">Entendamos las fracciones</h2>
+                <p id="board-subtitle">
+                  Vamos a trabajar con una explicación clara, simple y visual para entender cómo funciona el tema.
+                </p>
+              </div>
+
+              <div class="writing-status">
+                <span class="dot"></span>
+                <span id="writing-label">Escribiendo en el pizarrón</span>
+              </div>
+            </div>
+
+            <div class="board-content">
+              <div class="board-col">
+                <article class="chalk-card">
+                  <h3>Pasos de la explicación</h3>
+                  <div id="board-lines" class="board-lines">
+                    <div class="board-line">1. Una fracción representa partes de un todo.</div>
+                    <div class="board-line">2. El número de arriba es el numerador.</div>
+                    <div class="board-line">3. El de abajo es el denominador.</div>
+                    <div class="board-line">4. Para operar, primero miramos si tienen el mismo denominador.</div>
+                  </div>
+                </article>
+
+                <article class="chalk-card">
+                  <h3 id="board-example-title">Ejemplo guiado</h3>
+                  <div id="board-example-text" class="example-box">
+                    1/2 + 1/4. Llevamos ambas fracciones al mismo denominador: 1/2 = 2/4. Entonces 2/4 + 1/4 = 3/4.
+                  </div>
+                </article>
+              </div>
+
+              <div class="board-col">
+                <article class="chalk-card">
+                  <h3>Objetivo de la clase</h3>
+                  <p id="board-goal">
+                    Que el alumno entienda cómo leer, interpretar y operar fracciones simples sin memorizar mecánicamente.
+                  </p>
+                </article>
+
+                <article class="chalk-card">
+                  <h3 id="board-exercise-title">Mini ejercicio</h3>
+                  <div id="board-exercise-text" class="mini-exercise">
+                    Calculá: 3/4 - 1/4. Después explicá por qué no tuviste que cambiar el denominador.
+                  </div>
+                </article>
+              </div>
+            </div>
+          </section>
+
+          <section class="bottom-bar">
             <div class="quick-actions">
               <button class="quick-btn" data-action="facil">Explicalo fácil</button>
               <button class="quick-btn" data-action="ejemplo">Dame un ejemplo</button>
@@ -725,59 +1145,21 @@
               <button class="quick-btn" data-action="ejercicio">Pasemos a ejercicio</button>
             </div>
 
-            <div class="board-content">
-              <div class="board-block">
-                <h3 id="board-main-title">Preparando la explicación...</h3>
-                <p id="board-main-text">Estamos organizando el contenido de esta clase.</p>
-              </div>
-
-              <div class="board-block">
-                <h3>Objetivo</h3>
-                <p id="board-goal">Todavía no hay objetivo cargado.</p>
-              </div>
-
-              <div class="board-block">
-                <h3>Pasos de la clase</h3>
-                <ul id="board-steps" class="board-list"></ul>
-              </div>
-
-              <div class="board-block">
-                <h3>Ejemplo o apoyo visual</h3>
-                <p id="board-example">Acá va a aparecer un ejemplo guiado según el tema.</p>
-              </div>
+            <div class="input-row">
+              <input
+                id="chat-input"
+                type="text"
+                placeholder="Escribí una duda. Ejemplo: explicamelo más fácil o dame otro ejemplo"
+              />
+              <button class="mic-btn" type="button" aria-label="Usar micrófono">🎤</button>
+              <button id="send-btn" class="btn btn-primary send-btn" type="button">Enviar</button>
             </div>
-          </article>
-
-          <article class="chat-card">
-            <div class="card-head">
-              <div class="card-head-left">
-                <div class="card-icon">🤖</div>
-                <div>
-                  <h2>Asistente de clase</h2>
-                  <p>Preguntale dudas, pedile otra explicación o usá los botones rápidos para cambiar el enfoque.</p>
-                </div>
-              </div>
-            </div>
-
-            <div class="chat-shell">
-              <div id="chat-messages" class="chat-messages"></div>
-
-              <form id="chat-form" class="chat-form">
-                <div class="chat-box">
-                  <textarea id="chat-input" placeholder="Escribí tu duda. Ejemplo: explicame álgebra más fácil o dame un ejercicio."></textarea>
-                  <button type="submit" class="send-btn">Enviar</button>
-                </div>
-                <div class="helper">
-                  Tip: podés escribir cosas como “explicalo más fácil”, “dame un ejemplo”, “tomame una mini prueba” o “resumilo”.
-                </div>
-              </form>
-            </div>
-          </article>
-        </section>
-      </div>
+          </section>
+        </div>
+      </section>
     </main>
   </div>
 
   <script type="module" src="aula.js"></script>
 </body>
-</html>
+</html>ahora el neuvo de aula.jsahoraelne
