@@ -34,65 +34,82 @@ export default async function handler(req, res) {
         {
           role: "developer",
           content: `
-Sos un profesor excelente de Eduvia, muy claro, didáctico, pedagógico y preciso.
+Sos un profesor excelente de Eduvia.
+Explicás de forma clara, didáctica, visual, precisa y útil para estudiar para una prueba.
 
-Tu tarea es generar una clase útil para chicos y jóvenes que se va a mostrar en un pizarrón digital.
+Tu tarea es generar un resumen de estudio completo para mostrar en un pizarrón digital.
+El contenido está orientado a chicos y jóvenes.
 
-IMPORTANTE:
-- La clase debe tratar únicamente sobre el tema indicado por el usuario.
+REGLAS:
+- Tratá únicamente el tema indicado por el usuario.
 - No inventes otro tema distinto.
-- No uses ejemplos de otros temas si no corresponden.
 - Adaptá el lenguaje al nivel del alumno.
-- Nada de markdown.
-- Nada de texto fuera del JSON.
+- No uses markdown.
+- No escribas nada fuera del JSON.
+- No hagas texto relleno.
+- El contenido debe servir para estudiar de verdad.
 
-QUÉ QUIERO EN CADA CAMPO:
+MUY IMPORTANTE:
+- No uses una estructura fija.
+- Elegí las secciones según lo que el tema necesite.
+- Si el tema requiere fórmulas, incluilas.
+- Si el tema requiere causas y consecuencias, incluilas.
+- Si el tema requiere pasos, procedimiento, fechas, comparaciones o errores comunes, incluilos.
+- Si el tema es más teórico, priorizá explicación, ideas clave, relaciones y ejemplos.
+- Si el tema es más práctico, priorizá reglas, procedimiento, aplicación y errores comunes.
 
+QUÉ TENÉS QUE DEVOLVER:
 1. "titulo"
-- Debe sonar claro y específico.
-- Tiene que reflejar exactamente el tema pedido.
+- Claro y específico.
 
-2. "introduccion"
-- No hagas una introducción vacía.
-- Tiene que explicar de qué trata el tema, por qué importa y cómo reconocerlo.
-- Debe ser más completa que un simple resumen.
-- Si el tema tiene fórmulas, reglas, estructuras o fechas clave, mencioná lo principal acá.
-- Debe quedar clara para un estudiante que recién empieza.
+2. "resumen"
+- Un resumen principal más completo, claro y útil.
+- Debe explicar bien de qué trata el tema y por qué importa.
 
-3. "puntos"
-- Deben ser abundantes, concretos y útiles.
-- Cada punto debe aportar información real, no frases genéricas.
-- Incluir definición, características, reglas, pasos, fórmulas, consejos o errores comunes cuando aplique.
-- Si el tema es de matemática, física o química, incluir fórmulas y cómo se usan.
-- Si el tema es de historia, literatura, biología o geografía, incluir causas, consecuencias, relaciones o conceptos importantes.
-- Es mejor que cada punto sea claro y sustancioso.
-- Evitá repetir lo mismo con otras palabras.
+3. "palabrasClave"
+- Entre 5 y 10 palabras o frases cortas que sean esenciales para este tema.
+- Sirven para resaltarlas visualmente.
 
-4. "ejemplo"
-- Tiene que ser realmente explicativo.
-- Si el tema lo permite, resolvelo paso a paso.
-- Si hay fórmula, usala.
-- Si es teoría, mostralo con un caso concreto y entendible.
-- Tiene que ayudar a entender mejor el tema, no solo repetirlo.
+4. "secciones"
+- Entre 4 y 8 secciones.
+- Cada sección debe tener:
+  - "titulo"
+  - "texto"
+  - "bullets"
+- Las sections deben surgir del tema, no de una plantilla fija.
+- "texto" debe explicar.
+- "bullets" debe resumir puntos fuertes si hace falta.
 
-5. "actividad"
-- Tiene que servir para practicar de verdad.
-- Debe ser concreta, breve y entendible.
-- Puede incluir una consigna y una pequeña guía o pista.
-- Debe estar adaptada al nivel del alumno.
+5. "cardsDerecha"
+- 3 cards visuales pensadas para estar a la derecha.
+- Cada una debe tener:
+  - "titulo"
+  - "lineas" (2 a 4)
+  - "caption"
+  - "estilo" (blue, green, yellow o red)
+- Deben ser visuales, claras y realmente útiles para estudiar.
+
+6. "imagenesContenido"
+- Entre 2 y 4 apoyos visuales para intercalar entre secciones.
+- Cada uno debe tener:
+  - "titulo"
+  - "lineas" (2 a 4)
+  - "caption"
+  - "estilo" (blue, green, yellow o red)
+- Deben representar ideas importantes del contenido, no decoración vacía.
 
 ESTILO:
 - Claro
-- Didáctico
+- Pedagógico
 - Preciso
-- Útil
-- Nada superficial
+- Visual
+- Útil para preparar una prueba
           `.trim(),
         },
         {
           role: "user",
           content: `
-Generá una clase con estos datos:
+Generá el resumen de estudio con estos datos:
 
 - Materia: ${materia}
 - Tema: ${tema}
@@ -100,31 +117,103 @@ Generá una clase con estos datos:
 - Duración: ${duracion || "No especificada"}
 - Objetivo: ${objetivo || "No especificado"}
 
-Quiero que sea una explicación más completa, más precisa y con mejor cantidad de información.
-Si el tema tiene fórmulas, reglas, pasos, estructuras, fechas clave, causas, consecuencias o errores comunes, incluilos dentro de la misma estructura.
+Quiero que quede completo, claro, útil y bien explicado.
           `.trim(),
         },
       ],
       text: {
         format: {
           type: "json_schema",
-          name: "clase_eduvia",
+          name: "resumen_estudio_eduvia",
           strict: true,
           schema: {
             type: "object",
             properties: {
               titulo: { type: "string" },
-              introduccion: { type: "string" },
-              puntos: {
+              resumen: { type: "string" },
+              palabrasClave: {
                 type: "array",
-                items: { type: "string" },
                 minItems: 5,
-                maxItems: 8,
+                maxItems: 10,
+                items: { type: "string" },
               },
-              ejemplo: { type: "string" },
-              actividad: { type: "string" },
+              secciones: {
+                type: "array",
+                minItems: 4,
+                maxItems: 8,
+                items: {
+                  type: "object",
+                  properties: {
+                    titulo: { type: "string" },
+                    texto: { type: "string" },
+                    bullets: {
+                      type: "array",
+                      minItems: 0,
+                      maxItems: 5,
+                      items: { type: "string" },
+                    },
+                  },
+                  required: ["titulo", "texto", "bullets"],
+                  additionalProperties: false,
+                },
+              },
+              cardsDerecha: {
+                type: "array",
+                minItems: 3,
+                maxItems: 3,
+                items: {
+                  type: "object",
+                  properties: {
+                    titulo: { type: "string" },
+                    lineas: {
+                      type: "array",
+                      minItems: 2,
+                      maxItems: 4,
+                      items: { type: "string" },
+                    },
+                    caption: { type: "string" },
+                    estilo: {
+                      type: "string",
+                      enum: ["blue", "green", "yellow", "red"],
+                    },
+                  },
+                  required: ["titulo", "lineas", "caption", "estilo"],
+                  additionalProperties: false,
+                },
+              },
+              imagenesContenido: {
+                type: "array",
+                minItems: 2,
+                maxItems: 4,
+                items: {
+                  type: "object",
+                  properties: {
+                    titulo: { type: "string" },
+                    lineas: {
+                      type: "array",
+                      minItems: 2,
+                      maxItems: 4,
+                      items: { type: "string" },
+                    },
+                    caption: { type: "string" },
+                    estilo: {
+                      type: "string",
+                      enum: ["blue", "green", "yellow", "red"],
+                    },
+                  },
+                  required: ["titulo", "lineas", "caption", "estilo"],
+                  additionalProperties: false,
+                },
+              },
             },
-            required: ["titulo", "introduccion", "puntos", "ejemplo", "actividad"],
+            required: [
+              "titulo",
+              "resumen",
+              "palabrasClave",
+              "secciones",
+              "cardsDerecha",
+              "imagenesContenido",
+            ],
             additionalProperties: false,
           },
         },
