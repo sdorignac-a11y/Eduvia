@@ -11,6 +11,7 @@ const temaEl = document.getElementById("tema");
 const nivelEl = document.getElementById("nivel");
 const duracionEl = document.getElementById("duracion");
 const objetivoEl = document.getElementById("objetivo");
+const btnEmpezarClase = document.getElementById("btn-empezar-clase");
 
 const params = new URLSearchParams(window.location.search);
 const claseId = params.get("id");
@@ -48,6 +49,10 @@ onAuthStateChanged(auth, async (user) => {
 
     if (objetivoEl) {
       objetivoEl.textContent = data.objetivo || "-";
+    }
+
+    if (btnEmpezarClase) {
+      btnEmpezarClase.href = `aula.html?id=${claseId}`;
     }
 
     loading.style.display = "none";
