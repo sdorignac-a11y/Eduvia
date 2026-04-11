@@ -26,6 +26,7 @@ const docContent = document.getElementById("doc-content");
 
 const documentApp = document.getElementById("document-app");
 const accessGuard = document.getElementById("access-guard");
+const docLoading = document.getElementById("doc-loading");
 const toolbarWrap = document.querySelector(".toolbar-wrap");
 const toolbarControls = document.querySelectorAll(
   ".toolbar button, .toolbar select, .toolbar input"
@@ -55,10 +56,13 @@ let saveInFlight = false;
 let shareUiInitialized = false;
 
 if (documentApp) {
-  documentApp.style.display = "none";
+  documentApp.style.display = "";
 }
 if (accessGuard) {
   accessGuard.classList.remove("show");
+}
+if (docLoading) {
+  docLoading.classList.add("show");
 }
 
 function escapeHtml(value = "") {
@@ -367,8 +371,15 @@ function setBasicMeta(clase = {}) {
   }
 }
 
+function hideLoading() {
+  if (docLoading) {
+    docLoading.classList.remove("show");
+  }
+}
+
 function renderError(message) {
   clearSupportPanel();
+  hideLoading();
 
   if (!docContent) return;
 
@@ -625,11 +636,13 @@ function applyRoleUi(role) {
 }
 
 function showDenied() {
+  hideLoading();
   if (documentApp) documentApp.style.display = "none";
   if (accessGuard) accessGuard.classList.add("show");
 }
 
 function showDocument() {
+  hideLoading();
   if (accessGuard) accessGuard.classList.remove("show");
   if (documentApp) documentApp.style.display = "";
 }
@@ -1054,11 +1067,12 @@ async function loadClase(user) {
         currentClaseRef = doc(db, "usuarios", currentOwnerUid, "clases", currentClaseId);
       }
 
+      showDocument();
+      setupShareUi();
+
       const claseLista = await generarDocumentoSiFalta(localClase);
       renderClase(claseLista);
       applyRoleUi(currentRole);
-      showDocument();
-      setupShareUi();
       return;
     }
 
@@ -1084,11 +1098,12 @@ async function loadClase(user) {
 
         currentClaseRef = claseRef;
 
+        showDocument();
+        setupShareUi();
+
         const claseLista = await generarDocumentoSiFalta(localClase);
         renderClase(claseLista);
         applyRoleUi(currentRole);
-        showDocument();
-        setupShareUi();
         return;
       }
 
@@ -1116,13 +1131,14 @@ async function loadClase(user) {
     currentClaseData = claseData;
     currentRole = role;
 
+    showDocument();
+    setupShareUi();
+
     const claseLista = await generarDocumentoSiFalta(claseData);
 
     writeClaseToLocalStorage(claseLista, currentOwnerUid, currentClaseId);
     renderClase(claseLista);
     applyRoleUi(role);
-    showDocument();
-    setupShareUi();
   } catch (error) {
     console.error("Error al cargar la clase:", error);
 
@@ -1140,6 +1156,9 @@ async function loadClase(user) {
         currentClaseRef = doc(db, "usuarios", currentOwnerUid, "clases", currentClaseId);
       }
 
+      showDocument();
+      setupShareUi();
+
       try {
         const claseLista = await generarDocumentoSiFalta(localClase);
         renderClase(claseLista);
@@ -1149,8 +1168,6 @@ async function loadClase(user) {
       }
 
       applyRoleUi(currentRole);
-      showDocument();
-      setupShareUi();
       return;
     }
 
