@@ -22,6 +22,7 @@
       --blue-soft:#e8f0fe;
       --danger:#d93025;
       --shadow:0 1px 2px rgba(60,64,67,.16), 0 4px 12px rgba(60,64,67,.10);
+      --shadow-soft:0 18px 44px rgba(15,23,42,.16);
     }
 
     *{
@@ -46,30 +47,72 @@
       font:inherit;
     }
 
-    .topbar{
+    a{
+      color:inherit;
+      text-decoration:none;
+    }
+
+    .access-guard{
+      display:none;
+      min-height:100vh;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
+      background:var(--bg);
+    }
+
+    .access-guard.show{
+      display:flex;
+    }
+
+    .access-card{
+      max-width:520px;
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:24px;
+      box-shadow:var(--shadow);
+      padding:32px;
+      text-align:center;
+    }
+
+    .access-card h2{
+      font-size:1.6rem;
+      margin-bottom:10px;
+    }
+
+    .access-card p{
+      color:var(--muted);
+      line-height:1.7;
+    }
+
+    .editor-chrome{
       position:sticky;
       top:0;
-      z-index:40;
-      min-height:64px;
+      z-index:60;
       background:#fff;
       border-bottom:1px solid var(--line);
+    }
+
+    .topbar{
+      min-height:72px;
       display:flex;
       align-items:center;
       justify-content:space-between;
-      gap:16px;
-      padding:10px 18px;
+      gap:18px;
+      padding:12px 18px 10px;
     }
 
     .topbar-left{
       display:flex;
       align-items:center;
-      gap:12px;
+      gap:14px;
       min-width:0;
+      flex:1;
     }
 
     .doc-icon{
-      width:38px;
-      height:38px;
+      width:40px;
+      height:48px;
       border-radius:10px;
       display:grid;
       place-items:center;
@@ -77,35 +120,52 @@
       color:#fff;
       font-size:1rem;
       flex:none;
-      box-shadow:0 8px 18px rgba(26,115,232,.18);
+      box-shadow:0 10px 18px rgba(26,115,232,.18);
     }
 
     .topbar-text{
       min-width:0;
+      display:flex;
+      flex-direction:column;
+      gap:5px;
     }
 
-    .topbar-text strong{
+    .topbar-title-row{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      min-width:0;
+    }
+
+    .topbar-title-row strong{
       display:block;
-      font-size:1rem;
+      font-size:1.05rem;
       font-weight:700;
       white-space:nowrap;
       overflow:hidden;
       text-overflow:ellipsis;
+      min-width:0;
     }
 
-    .topbar-text span{
-      display:block;
-      font-size:.84rem;
+    .topbar-sub{
       color:var(--muted);
-      margin-top:2px;
+      font-size:.88rem;
+      display:flex;
+      align-items:center;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+
+    .topbar-sub span{
+      white-space:nowrap;
     }
 
     .topbar-actions{
       display:flex;
       align-items:center;
       gap:10px;
-      flex-wrap:wrap;
-      justify-content:flex-end;
+      margin-left:auto;
+      flex:none;
     }
 
     .btn{
@@ -115,59 +175,94 @@
       font-size:.92rem;
       font-weight:700;
       cursor:pointer;
-      text-decoration:none;
       transition:.16s ease;
       display:inline-flex;
       align-items:center;
       justify-content:center;
       gap:8px;
+      white-space:nowrap;
     }
 
     .btn:hover{
       transform:translateY(-1px);
     }
 
+    .btn-ghost{
+      background:transparent;
+      color:#3c4043;
+    }
+
+    .btn-ghost:hover{
+      background:#f1f3f4;
+      transform:none;
+    }
+
     .btn-soft{
-      background:#eef3fd;
-      color:var(--blue);
+      background:#f1f3f4;
+      color:#202124;
+    }
+
+    .btn-soft:hover{
+      background:#e8eaed;
+      transform:none;
+    }
+
+    .btn-outline{
+      background:#fff;
+      color:#202124;
+      border:1px solid #d7dde3;
+    }
+
+    .btn-outline:hover{
+      background:#f8f9fa;
+      border-color:#cfd4da;
+      transform:none;
     }
 
     .btn-primary{
-      background:var(--blue);
-      color:#fff;
-      box-shadow:0 10px 18px rgba(26,115,232,.18);
-    }
-
-    .btn-danger{
-      background:#feeceb;
-      color:var(--danger);
-    }
-
-    .btn-toolbar{
-      background:#f1f3f4;
-      color:#3c4043;
+      background:#c2e7ff;
+      color:#0b57d0;
+      padding:11px 18px;
       box-shadow:none;
     }
 
-    .btn-toolbar:hover{
-      background:#e8eaed;
+    .btn-primary:hover{
+      background:#b5e0ff;
+      transform:none;
     }
 
-    .subbar{
-      position:sticky;
-      top:64px;
-      z-index:35;
-      background:#fff;
-      border-bottom:1px solid var(--line);
-      padding:8px 14px;
+    .doc-menu{
+      display:flex;
+      align-items:center;
+      gap:2px;
+      padding:0 18px 8px;
       overflow-x:auto;
     }
 
-    .toolbar-track{
+    .menu-link{
+      border:none;
+      background:transparent;
+      color:#3c4043;
+      border-radius:8px;
+      padding:8px 10px;
+      font-size:.92rem;
+      cursor:pointer;
+      white-space:nowrap;
+      flex:none;
+    }
+
+    .menu-link:hover{
+      background:#f1f3f4;
+    }
+
+    .toolbar{
       display:flex;
       align-items:center;
       gap:0;
-      min-width:max-content;
+      padding:10px 14px;
+      border-top:1px solid #f1f3f4;
+      background:#fff;
+      overflow-x:auto;
     }
 
     .toolbar-group{
@@ -182,32 +277,9 @@
       border-left:1px solid #e0e3e7;
     }
 
-    .toolbar-group.meta-group{
-      gap:8px;
-    }
-
-    .chip{
-      display:inline-flex;
-      align-items:center;
-      padding:8px 12px;
-      border-radius:999px;
-      background:#f1f3f4;
-      border:none;
-      color:#3c4043;
-      font-size:.83rem;
-      font-weight:600;
-      box-shadow:none;
-      white-space:nowrap;
-      flex:none;
-    }
-
-    .mini-divider{
-      display:none;
-    }
-
     .tool-btn{
-      min-width:34px;
-      height:34px;
+      min-width:36px;
+      height:36px;
       border:none;
       border-radius:8px;
       background:transparent;
@@ -215,22 +287,16 @@
       font-weight:700;
       cursor:pointer;
       transition:.15s ease;
-      padding:0 8px;
+      padding:0 9px;
       display:inline-flex;
       align-items:center;
       justify-content:center;
       gap:6px;
-      box-shadow:none;
       flex:none;
     }
 
     .tool-btn:hover{
       background:#f1f3f4;
-      transform:none;
-    }
-
-    .tool-btn:active{
-      transform:none;
     }
 
     .tool-btn.is-active{
@@ -239,46 +305,47 @@
     }
 
     .tool-select{
-      height:34px;
+      height:36px;
       border:none;
       border-radius:8px;
       background:transparent;
       padding:0 10px;
       color:#202124;
-      min-width:150px;
+      min-width:110px;
       outline:none;
       font-weight:500;
-      box-shadow:none;
       flex:none;
     }
 
-    .tool-select:hover{
-      background:#f1f3f4;
-    }
-
+    .tool-select:hover,
     .tool-select:focus{
       background:#f1f3f4;
-      box-shadow:none;
     }
 
-    .color-pill{
+    .tool-select.style-select{
+      min-width:150px;
+    }
+
+    .tool-select.font-select{
+      min-width:135px;
+    }
+
+    .tool-label{
       display:inline-flex;
       align-items:center;
       gap:8px;
-      height:34px;
+      height:36px;
       padding:0 10px;
       border-radius:8px;
       background:transparent;
-      border:none;
-      box-shadow:none;
-      font-size:.82rem;
-      font-weight:600;
       color:#3c4043;
       cursor:pointer;
-      flex:none;
+      font-size:.84rem;
+      font-weight:600;
+      white-space:nowrap;
     }
 
-    .color-pill:hover{
+    .tool-label:hover{
       background:#f1f3f4;
     }
 
@@ -305,7 +372,7 @@
     }
 
     .workspace{
-      padding:24px 14px 56px;
+      padding:26px 14px 56px;
     }
 
     .paper-wrap{
@@ -420,16 +487,6 @@
       border-radius:8px;
     }
 
-    .doc-placeholder{
-      color:var(--muted);
-      font-size:1rem;
-      line-height:1.9;
-    }
-
-    .doc-placeholder p{
-      margin-bottom:16px;
-    }
-
     .doc-editable[contenteditable="true"]:empty:before{
       content:attr(data-placeholder);
       color:#9aa0a6;
@@ -530,121 +587,71 @@
       min-height:20px;
     }
 
-    .access-guard{
-      display:none;
-      min-height:100vh;
-      align-items:center;
-      justify-content:center;
-      padding:24px;
-      background:var(--bg);
-    }
-
-    .access-guard.show{
-      display:flex;
-    }
-
-    .access-card{
-      max-width:520px;
-      background:#fff;
-      border:1px solid var(--line);
-      border-radius:24px;
-      box-shadow:var(--shadow);
-      padding:32px;
-      text-align:center;
-    }
-
-    .access-card h2{
-      font-size:1.6rem;
-      margin-bottom:10px;
-    }
-
-    .access-card p{
-      color:var(--muted);
-      line-height:1.7;
-    }
-
-    .sidepanel-backdrop{
+    .more-backdrop{
       position:fixed;
       inset:0;
-      background:rgba(32,33,36,.18);
+      background:transparent;
       opacity:0;
       pointer-events:none;
-      transition:.18s ease;
-      z-index:85;
+      z-index:89;
     }
 
-    .sidepanel-backdrop.show{
+    .more-backdrop.show{
       opacity:1;
       pointer-events:auto;
     }
 
-    .sidepanel{
+    .more-dropdown{
       position:fixed;
-      top:0;
-      right:-360px;
-      width:min(340px, 92vw);
-      height:100vh;
+      top:88px;
+      right:20px;
+      width:min(360px, calc(100vw - 24px));
       background:#fff;
-      border-left:1px solid #e0e3e7;
-      box-shadow:-2px 0 12px rgba(60,64,67,.15);
+      border:1px solid #e5e7eb;
+      border-radius:20px;
+      box-shadow:var(--shadow-soft);
+      opacity:0;
+      transform:translateY(-8px) scale(.98);
+      pointer-events:none;
+      transition:.16s ease;
       z-index:90;
-      transition:right .18s ease;
-      display:flex;
-      flex-direction:column;
+      overflow:hidden;
     }
 
-    .sidepanel.show{
-      right:0;
+    .more-dropdown.show{
+      opacity:1;
+      transform:translateY(0) scale(1);
+      pointer-events:auto;
     }
 
-    .sidepanel-header{
-      padding:18px 16px 14px;
-      border-bottom:1px solid #eceff1;
-      display:flex;
-      align-items:flex-start;
-      justify-content:space-between;
-      gap:12px;
+    .more-header{
+      padding:18px 18px 14px;
+      border-bottom:1px solid #eef1f4;
+      background:linear-gradient(180deg, #ffffff 0%, #fbfcff 100%);
     }
 
-    .sidepanel-header h3{
+    .more-header h3{
       font-size:1rem;
       font-weight:700;
       margin-bottom:4px;
     }
 
-    .sidepanel-header p{
+    .more-header p{
       color:#5f6368;
       line-height:1.5;
       font-size:.88rem;
     }
 
-    .sidepanel-close{
-      width:34px;
-      height:34px;
-      border:none;
-      border-radius:8px;
-      background:transparent;
-      color:#3c4043;
-      cursor:pointer;
-      font-size:1rem;
-      font-weight:700;
-      flex:none;
+    .more-list{
+      padding:8px;
     }
 
-    .sidepanel-close:hover{
-      background:#f1f3f4;
-    }
-
-    .sidepanel-body{
-      padding:6px 0;
-      overflow:auto;
-    }
-
-    .panel-action{
+    .more-item{
       width:100%;
       border:none;
       background:#fff;
-      padding:12px 16px;
+      border-radius:14px;
+      padding:12px 12px;
       display:flex;
       align-items:center;
       gap:12px;
@@ -653,59 +660,62 @@
       transition:.14s ease;
     }
 
-    .panel-action:hover{
+    .more-item:hover{
       background:#f8f9fa;
-      transform:none;
     }
 
-    .panel-action-icon{
-      width:28px;
-      height:28px;
+    .more-item + .more-item{
+      margin-top:4px;
+    }
+
+    .more-item-icon{
+      width:36px;
+      height:36px;
+      border-radius:10px;
       display:grid;
       place-items:center;
-      color:#3c4043;
-      font-size:.95rem;
-      font-weight:700;
+      background:#f1f3f4;
+      color:#202124;
+      font-size:1rem;
       flex:none;
     }
 
-    .panel-action-main{
-      display:flex;
-      flex-direction:column;
+    .more-item-main{
       min-width:0;
       flex:1;
+      display:flex;
+      flex-direction:column;
+      gap:2px;
     }
 
-    .panel-action-title{
+    .more-item-title{
       font-size:.94rem;
-      font-weight:600;
+      font-weight:700;
       color:#202124;
-      margin-bottom:2px;
     }
 
-    .panel-action-desc{
-      color:#5f6368;
+    .more-item-desc{
       font-size:.82rem;
+      color:#5f6368;
       line-height:1.45;
     }
 
-    .panel-action-arrow{
+    .more-item-arrow{
       color:#9aa0a6;
       font-size:1.15rem;
       flex:none;
     }
 
-    .sidepanel-footer{
-      margin-top:auto;
-      padding:12px 16px 16px;
-      border-top:1px solid #eceff1;
+    .more-footer{
+      padding:12px 18px 16px;
+      border-top:1px solid #eef1f4;
     }
 
-    .panel-status{
+    .more-status{
       min-height:20px;
       font-size:.85rem;
-      font-weight:500;
-      color:var(--blue);
+      color:#0b57d0;
+      font-weight:600;
       line-height:1.4;
     }
 
@@ -721,7 +731,7 @@
 
     @media (max-width: 720px){
       .topbar{
-        padding:12px 14px;
+        padding:12px 14px 10px;
         align-items:flex-start;
         flex-direction:column;
       }
@@ -729,20 +739,16 @@
       .topbar-actions{
         width:100%;
         justify-content:flex-start;
+        margin-left:0;
+        flex-wrap:wrap;
       }
 
-      .subbar{
-        position:static;
-        top:auto;
-        padding:8px 10px;
+      .doc-menu{
+        padding:0 10px 8px;
       }
 
-      .toolbar-group{
-        padding:0 8px;
-      }
-
-      .tool-select{
-        min-width:140px;
+      .toolbar{
+        padding:10px 8px;
       }
 
       .workspace{
@@ -769,16 +775,51 @@
       .share-row{
         grid-template-columns:1fr;
       }
+
+      .more-dropdown{
+        right:12px !important;
+        left:12px !important;
+        width:auto;
+      }
     }
 
-    .subbar::-webkit-scrollbar,
-    .sidepanel-body::-webkit-scrollbar{
+    @media print{
+      body{
+        background:#fff;
+      }
+
+      .editor-chrome,
+      .share-modal-backdrop,
+      .more-dropdown,
+      .more-backdrop,
+      #doc-loading,
+      #access-guard{
+        display:none !important;
+      }
+
+      .workspace{
+        padding:0;
+      }
+
+      .paper{
+        max-width:none;
+        border:none;
+        box-shadow:none;
+        border-radius:0;
+      }
+
+      .paper-inner{
+        padding:0;
+      }
+    }
+
+    .doc-menu::-webkit-scrollbar,
+    .toolbar::-webkit-scrollbar{
       height:8px;
-      width:8px;
     }
 
-    .subbar::-webkit-scrollbar-thumb,
-    .sidepanel-body::-webkit-scrollbar-thumb{
+    .doc-menu::-webkit-scrollbar-thumb,
+    .toolbar::-webkit-scrollbar-thumb{
       background:#d7dce2;
       border-radius:999px;
     }
@@ -803,38 +844,69 @@
   </div>
 
   <div id="document-app">
-    <header class="topbar">
-      <div class="topbar-left">
-        <div class="doc-icon">📄</div>
-        <div class="topbar-text">
-          <strong id="topbar-title">Documento sin título</strong>
-          <span>Eduvia · modo documento</span>
+    <div class="editor-chrome">
+      <header class="topbar">
+        <div class="topbar-left">
+          <div class="doc-icon">📄</div>
+
+          <div class="topbar-text">
+            <div class="topbar-title-row">
+              <strong id="topbar-title">Documento sin título</strong>
+            </div>
+
+            <div class="topbar-sub">
+              <span>Eduvia · modo documento</span>
+              <span id="topbar-last-save">Guardado automático</span>
+            </div>
+          </div>
         </div>
+
+        <div class="topbar-actions">
+          <a href="crear-clase.html" class="btn btn-outline">← Volver</a>
+          <button type="button" class="btn btn-soft" id="open-more-btn">Más ▾</button>
+          <button type="button" class="btn btn-primary" id="open-share-btn">🔒 Compartir</button>
+        </div>
+      </header>
+
+      <div class="doc-menu">
+        <button class="menu-link" type="button">Archivo</button>
+        <button class="menu-link" type="button">Editar</button>
+        <button class="menu-link" type="button">Ver</button>
+        <button class="menu-link" type="button">Insertar</button>
+        <button class="menu-link" type="button">Formato</button>
+        <button class="menu-link" type="button">Herramientas</button>
       </div>
 
-      <div class="topbar-actions">
-        <a href="crear-clase.html" class="btn btn-soft">Volver</a>
-        <button type="button" class="btn btn-soft" id="open-share-btn">Compartir</button>
-        <button type="button" class="btn btn-toolbar" id="open-sidepanel-btn">Más</button>
-        <button type="button" class="btn btn-primary">Generar ejercicios</button>
-      </div>
-    </header>
-
-    <div class="subbar">
-      <div class="toolbar-track">
-        <div class="toolbar-group meta-group">
-          <div class="chip" id="chip-materia">Materia: —</div>
-          <div class="chip" id="chip-nivel">Nivel: —</div>
-          <div class="chip" id="chip-duracion">Duración: —</div>
-          <div class="chip">Formato: Documento</div>
+      <div class="toolbar">
+        <div class="toolbar-group">
+          <button type="button" class="tool-btn" id="undo-btn" title="Deshacer">↶</button>
+          <button type="button" class="tool-btn" id="redo-btn" title="Rehacer">↷</button>
+          <button type="button" class="tool-btn" id="print-btn" title="Imprimir">🖨</button>
         </div>
 
         <div class="toolbar-group">
-          <select class="tool-select" id="format-block">
+          <select class="tool-select style-select" id="format-block" title="Estilo">
             <option value="p">Texto normal</option>
             <option value="h2">Título grande</option>
             <option value="h3">Subtítulo</option>
             <option value="blockquote">Cita</option>
+          </select>
+
+          <select class="tool-select font-select" id="font-family-select" title="Fuente">
+            <option value="Arial">Arial</option>
+            <option value="Inter">Inter</option>
+            <option value="Georgia">Georgia</option>
+            <option value="Times New Roman">Times New Roman</option>
+            <option value="Verdana">Verdana</option>
+          </select>
+
+          <select class="tool-select" id="font-size-select" title="Tamaño">
+            <option value="2">10</option>
+            <option value="3" selected>12</option>
+            <option value="4">14</option>
+            <option value="5">18</option>
+            <option value="6">24</option>
+            <option value="7">32</option>
           </select>
         </div>
 
@@ -842,17 +914,18 @@
           <button type="button" class="tool-btn" data-command="bold" title="Negrita"><strong>B</strong></button>
           <button type="button" class="tool-btn" data-command="italic" title="Cursiva"><em>I</em></button>
           <button type="button" class="tool-btn" data-command="underline" title="Subrayado"><u>U</u></button>
+          <button type="button" class="tool-btn" data-command="strikeThrough" title="Tachado"><s>S</s></button>
         </div>
 
         <div class="toolbar-group">
-          <label class="color-pill" title="Color de texto">
+          <label class="tool-label" title="Color de texto">
             Texto
             <span class="color-wrap">
               <input type="color" id="text-color" value="#202124">
             </span>
           </label>
 
-          <label class="color-pill" title="Resaltado">
+          <label class="tool-label" title="Resaltado">
             Fondo
             <span class="color-wrap">
               <input type="color" id="highlight-color" value="#fff59d">
@@ -861,19 +934,23 @@
         </div>
 
         <div class="toolbar-group">
+          <button type="button" class="tool-btn" id="link-btn" title="Insertar link">🔗</button>
+          <button type="button" class="tool-btn" id="image-btn" title="Insertar imagen">🖼</button>
+          <button type="button" class="tool-btn" data-command="removeFormat" title="Quitar formato">Tx</button>
+        </div>
+
+        <div class="toolbar-group">
           <button type="button" class="tool-btn" data-command="insertUnorderedList" title="Lista">•</button>
           <button type="button" class="tool-btn" data-command="insertOrderedList" title="Lista numerada">1.</button>
+          <button type="button" class="tool-btn" data-command="outdent" title="Reducir sangría">⇤</button>
+          <button type="button" class="tool-btn" data-command="indent" title="Aumentar sangría">⇥</button>
         </div>
 
         <div class="toolbar-group">
-          <button type="button" class="tool-btn" data-command="justifyLeft" title="Alinear izquierda">⬅</button>
-          <button type="button" class="tool-btn" data-command="justifyCenter" title="Centrar">⬌</button>
-          <button type="button" class="tool-btn" data-command="justifyRight" title="Alinear derecha">➡</button>
-        </div>
-
-        <div class="toolbar-group">
-          <button type="button" class="tool-btn" data-command="undo" title="Deshacer">↶</button>
-          <button type="button" class="tool-btn" data-command="redo" title="Rehacer">↷</button>
+          <button type="button" class="tool-btn" data-command="justifyLeft" title="Alinear izquierda">⯇</button>
+          <button type="button" class="tool-btn" data-command="justifyCenter" title="Centrar">≡</button>
+          <button type="button" class="tool-btn" data-command="justifyRight" title="Alinear derecha">⯈</button>
+          <button type="button" class="tool-btn" data-command="justifyFull" title="Justificar">☰</button>
         </div>
       </div>
     </div>
@@ -914,13 +991,7 @@
               contenteditable="true"
               spellcheck="true"
               data-placeholder="Acá la IA o el usuario pueden escribir el contenido del documento..."
-            >
-              <div class="doc-placeholder">
-                <p>Acá la IA va a pegar toda la información de la clase.</p>
-                <p>Ahora además ya queda editable como un mini Google Docs.</p>
-                <p>Podés marcar texto y cambiar negrita, color, listas, subtítulos y más.</p>
-              </div>
-            </section>
+            ></section>
           </div>
         </article>
       </div>
@@ -955,9 +1026,8 @@
       </div>
 
       <div class="share-note">
-        Este modal ya deja lista la interfaz para compartir. Para que el acceso quede
-        protegido de verdad, el email invitado tiene que guardarse en Firebase y luego
-        validarse en <strong>documento.js</strong> antes de mostrar el documento.
+        La interfaz ya está lista. Después solo lo conectás con Firebase para guardar
+        invitaciones y validar acceso real en <strong>documento.js</strong>.
       </div>
 
       <div class="share-status" id="share-status"></div>
@@ -970,115 +1040,279 @@
     </div>
   </div>
 
-  <div class="sidepanel-backdrop" id="sidepanel-backdrop"></div>
+  <div class="more-backdrop" id="more-backdrop"></div>
 
-  <aside class="sidepanel" id="sidepanel">
-    <div class="sidepanel-header">
-      <div>
-        <h3>Más opciones</h3>
-        <p>Acciones rápidas para este documento.</p>
-      </div>
-      <button type="button" class="sidepanel-close" id="close-sidepanel-btn">✕</button>
+  <div class="more-dropdown" id="more-dropdown" aria-hidden="true">
+    <div class="more-header">
+      <h3>Más opciones</h3>
+      <p>Acciones rápidas y mejor organizadas para este documento.</p>
     </div>
 
-    <div class="sidepanel-body">
-      <button type="button" class="panel-action" id="action-presentation">
-        <span class="panel-action-icon">🎞️</span>
-        <span class="panel-action-main">
-          <span class="panel-action-title">Pasar a presentación</span>
-          <span class="panel-action-desc">Convertir el documento en diapositivas.</span>
+    <div class="more-list">
+      <button type="button" class="more-item" id="action-chat">
+        <span class="more-item-icon">💬</span>
+        <span class="more-item-main">
+          <span class="more-item-title">Abrir chat</span>
+          <span class="more-item-desc">Usar el asistente para seguir trabajando sobre este documento.</span>
         </span>
-        <span class="panel-action-arrow">›</span>
+        <span class="more-item-arrow">›</span>
       </button>
 
-      <button type="button" class="panel-action" id="action-pdf">
-        <span class="panel-action-icon">PDF</span>
-        <span class="panel-action-main">
-          <span class="panel-action-title">Descargar PDF</span>
-          <span class="panel-action-desc">Guardar este documento como PDF.</span>
+      <button type="button" class="more-item" id="action-presentation">
+        <span class="more-item-icon">🎞️</span>
+        <span class="more-item-main">
+          <span class="more-item-title">Pasar a presentación</span>
+          <span class="more-item-desc">Convertir este contenido en una versión tipo diapositivas.</span>
         </span>
-        <span class="panel-action-arrow">›</span>
+        <span class="more-item-arrow">›</span>
       </button>
 
-      <button type="button" class="panel-action" id="action-print">
-        <span class="panel-action-icon">🖨️</span>
-        <span class="panel-action-main">
-          <span class="panel-action-title">Imprimir</span>
-          <span class="panel-action-desc">Abrir la impresión del navegador.</span>
+      <button type="button" class="more-item" id="action-pdf">
+        <span class="more-item-icon">PDF</span>
+        <span class="more-item-main">
+          <span class="more-item-title">Descargar PDF</span>
+          <span class="more-item-desc">Abrir impresión para guardar el documento en PDF.</span>
         </span>
-        <span class="panel-action-arrow">›</span>
+        <span class="more-item-arrow">›</span>
       </button>
 
-      <button type="button" class="panel-action" id="action-duplicate">
-        <span class="panel-action-icon">📄</span>
-        <span class="panel-action-main">
-          <span class="panel-action-title">Duplicar documento</span>
-          <span class="panel-action-desc">Crear una copia del contenido.</span>
+      <button type="button" class="more-item" id="action-print">
+        <span class="more-item-icon">🖨️</span>
+        <span class="more-item-main">
+          <span class="more-item-title">Imprimir</span>
+          <span class="more-item-desc">Abrir la impresión del navegador.</span>
         </span>
-        <span class="panel-action-arrow">›</span>
+        <span class="more-item-arrow">›</span>
       </button>
 
-      <button type="button" class="panel-action" id="action-share-panel">
-        <span class="panel-action-icon">🔗</span>
-        <span class="panel-action-main">
-          <span class="panel-action-title">Compartir</span>
-          <span class="panel-action-desc">Abrir permisos e invitaciones.</span>
+      <button type="button" class="more-item" id="action-duplicate">
+        <span class="more-item-icon">📄</span>
+        <span class="more-item-main">
+          <span class="more-item-title">Duplicar documento</span>
+          <span class="more-item-desc">Crear una copia visual del contenido actual.</span>
         </span>
-        <span class="panel-action-arrow">›</span>
+        <span class="more-item-arrow">›</span>
+      </button>
+
+      <button type="button" class="more-item" id="action-share-panel">
+        <span class="more-item-icon">🔒</span>
+        <span class="more-item-main">
+          <span class="more-item-title">Compartir</span>
+          <span class="more-item-desc">Abrir permisos e invitaciones del documento.</span>
+        </span>
+        <span class="more-item-arrow">›</span>
       </button>
     </div>
 
-    <div class="sidepanel-footer">
-      <div class="panel-status" id="panel-status"></div>
+    <div class="more-footer">
+      <div class="more-status" id="more-status"></div>
     </div>
-  </aside>
+  </div>
 
   <script>
+    const editableAreas = document.querySelectorAll(".doc-editable");
     const editor = document.getElementById("doc-content");
     const titleEditor = document.getElementById("doc-title");
     const topbarTitleEl = document.getElementById("topbar-title");
+    const lastSaveEl = document.getElementById("topbar-last-save");
+
     const formatBlock = document.getElementById("format-block");
+    const fontFamilySelect = document.getElementById("font-family-select");
+    const fontSizeSelect = document.getElementById("font-size-select");
     const textColor = document.getElementById("text-color");
     const highlightColor = document.getElementById("highlight-color");
 
-    const sidepanel = document.getElementById("sidepanel");
-    const sidepanelBackdrop = document.getElementById("sidepanel-backdrop");
-    const openSidepanelBtn = document.getElementById("open-sidepanel-btn");
-    const closeSidepanelBtn = document.getElementById("close-sidepanel-btn");
-    const panelStatus = document.getElementById("panel-status");
+    const openShareBtn = document.getElementById("open-share-btn");
+    const closeShareBtn = document.getElementById("close-share-btn");
+    const shareModal = document.getElementById("share-modal");
+    const copyLinkBtn = document.getElementById("copy-link-btn");
+    const sendShareBtn = document.getElementById("send-share-btn");
+    const shareStatus = document.getElementById("share-status");
+    const docLink = document.getElementById("doc-link");
 
+    const openMoreBtn = document.getElementById("open-more-btn");
+    const moreDropdown = document.getElementById("more-dropdown");
+    const moreBackdrop = document.getElementById("more-backdrop");
+    const moreStatus = document.getElementById("more-status");
+
+    const actionChat = document.getElementById("action-chat");
     const actionPresentation = document.getElementById("action-presentation");
     const actionPdf = document.getElementById("action-pdf");
     const actionPrint = document.getElementById("action-print");
     const actionDuplicate = document.getElementById("action-duplicate");
     const actionSharePanel = document.getElementById("action-share-panel");
-    const openShareBtn = document.getElementById("open-share-btn");
 
-    function focusEditor() {
-      editor?.focus({ preventScroll: true });
+    const linkBtn = document.getElementById("link-btn");
+    const imageBtn = document.getElementById("image-btn");
+    const printBtn = document.getElementById("print-btn");
+    const undoBtn = document.getElementById("undo-btn");
+    const redoBtn = document.getElementById("redo-btn");
+
+    let activeEditable = editor;
+    let savedRange = null;
+    let saveTimer = null;
+
+    if (docLink) {
+      docLink.value = window.location.href;
+    }
+
+    function setLastSaveText(text) {
+      if (lastSaveEl) lastSaveEl.textContent = text;
+    }
+
+    function fakeAutosave() {
+      setLastSaveText("Guardando...");
+      clearTimeout(saveTimer);
+      saveTimer = setTimeout(() => {
+        setLastSaveText("Guardado automático");
+      }, 500);
+    }
+
+    function setMoreStatus(message = "") {
+      if (moreStatus) moreStatus.textContent = message;
+    }
+
+    function openShareModal() {
+      shareModal?.classList.add("show");
+      shareStatus.textContent = "";
+    }
+
+    function closeShareModal() {
+      shareModal?.classList.remove("show");
+      shareStatus.textContent = "";
+    }
+
+    function positionMoreDropdown() {
+      if (!openMoreBtn || !moreDropdown) return;
+      const rect = openMoreBtn.getBoundingClientRect();
+      const dropdownWidth = Math.min(360, window.innerWidth - 24);
+      let left = rect.right - dropdownWidth;
+      const top = rect.bottom + 10;
+
+      if (left < 12) left = 12;
+      if (left + dropdownWidth > window.innerWidth - 12) {
+        left = window.innerWidth - dropdownWidth - 12;
+      }
+
+      moreDropdown.style.top = `${top}px`;
+      moreDropdown.style.left = `${left}px`;
+      moreDropdown.style.right = "auto";
+    }
+
+    function openMoreDropdown() {
+      positionMoreDropdown();
+      moreDropdown?.classList.add("show");
+      moreBackdrop?.classList.add("show");
+      openMoreBtn?.setAttribute("aria-expanded", "true");
+      setMoreStatus("");
+    }
+
+    function closeMoreDropdown() {
+      moreDropdown?.classList.remove("show");
+      moreBackdrop?.classList.remove("show");
+      openMoreBtn?.setAttribute("aria-expanded", "false");
+      setMoreStatus("");
+    }
+
+    function saveSelection() {
+      const sel = window.getSelection();
+      if (!sel || !sel.rangeCount || !activeEditable) return;
+
+      const range = sel.getRangeAt(0);
+      if (activeEditable.contains(range.commonAncestorContainer)) {
+        savedRange = range.cloneRange();
+      }
+    }
+
+    function restoreSelection() {
+      if (!savedRange) return;
+      const sel = window.getSelection();
+      if (!sel) return;
+      sel.removeAllRanges();
+      sel.addRange(savedRange);
+    }
+
+    function focusEditable() {
+      if (!activeEditable) {
+        activeEditable = editor;
+      }
+      activeEditable.focus({ preventScroll: true });
+      restoreSelection();
     }
 
     function exec(command, value = null) {
-      focusEditor();
+      focusEditable();
       document.execCommand(command, false, value);
+      saveSelection();
+      refreshToolbarState();
+      fakeAutosave();
     }
 
-    function setPanelStatus(message = "") {
-      if (panelStatus) panelStatus.textContent = message;
+    function refreshToolbarState() {
+      const commands = [
+        "bold",
+        "italic",
+        "underline",
+        "strikeThrough",
+        "justifyLeft",
+        "justifyCenter",
+        "justifyRight",
+        "justifyFull",
+        "insertOrderedList",
+        "insertUnorderedList"
+      ];
+
+      document.querySelectorAll("[data-command]").forEach((btn) => {
+        const command = btn.dataset.command;
+        if (!commands.includes(command)) {
+          btn.classList.remove("is-active");
+          return;
+        }
+
+        try {
+          const active = document.queryCommandState(command);
+          btn.classList.toggle("is-active", !!active);
+        } catch {
+          btn.classList.remove("is-active");
+        }
+      });
     }
 
-    function openSidepanel() {
-      sidepanel?.classList.add("show");
-      sidepanelBackdrop?.classList.add("show");
-      document.body.style.overflow = "hidden";
-    }
+    editableAreas.forEach((area) => {
+      area.addEventListener("focus", () => {
+        activeEditable = area;
+        saveSelection();
+        refreshToolbarState();
+      });
 
-    function closeSidepanel() {
-      sidepanel?.classList.remove("show");
-      sidepanelBackdrop?.classList.remove("show");
-      document.body.style.overflow = "";
-      setPanelStatus("");
-    }
+      area.addEventListener("keyup", () => {
+        saveSelection();
+        refreshToolbarState();
+        fakeAutosave();
+      });
+
+      area.addEventListener("mouseup", () => {
+        saveSelection();
+        refreshToolbarState();
+      });
+
+      area.addEventListener("input", () => {
+        saveSelection();
+        fakeAutosave();
+      });
+    });
+
+    document.addEventListener("selectionchange", () => {
+      saveSelection();
+      refreshToolbarState();
+    });
+
+    titleEditor?.addEventListener("input", () => {
+      const value = titleEditor.textContent.trim();
+      if (topbarTitleEl) {
+        topbarTitleEl.textContent = value || "Documento sin título";
+      }
+    });
 
     document.querySelectorAll("[data-command]").forEach((btn) => {
       btn.addEventListener("click", () => {
@@ -1097,6 +1331,14 @@
       exec("formatBlock", map[formatBlock.value] || "P");
     });
 
+    fontFamilySelect?.addEventListener("change", () => {
+      exec("fontName", fontFamilySelect.value);
+    });
+
+    fontSizeSelect?.addEventListener("change", () => {
+      exec("fontSize", fontSizeSelect.value);
+    });
+
     textColor?.addEventListener("input", () => {
       exec("foreColor", textColor.value);
     });
@@ -1105,44 +1347,106 @@
       exec("hiliteColor", highlightColor.value);
     });
 
-    titleEditor?.addEventListener("input", () => {
-      const value = titleEditor.textContent.trim();
-      if (topbarTitleEl) {
-        topbarTitleEl.textContent = value || "Documento sin título";
+    linkBtn?.addEventListener("click", () => {
+      const url = prompt("Pegá el link que querés insertar:");
+      if (!url) return;
+      exec("createLink", url);
+    });
+
+    imageBtn?.addEventListener("click", () => {
+      const url = prompt("Pegá la URL de la imagen:");
+      if (!url) return;
+      exec("insertImage", url);
+    });
+
+    printBtn?.addEventListener("click", () => {
+      window.print();
+    });
+
+    undoBtn?.addEventListener("click", () => {
+      exec("undo");
+    });
+
+    redoBtn?.addEventListener("click", () => {
+      exec("redo");
+    });
+
+    openShareBtn?.addEventListener("click", openShareModal);
+    closeShareBtn?.addEventListener("click", closeShareModal);
+
+    shareModal?.addEventListener("click", (e) => {
+      if (e.target === shareModal) {
+        closeShareModal();
       }
     });
 
-    openSidepanelBtn?.addEventListener("click", openSidepanel);
-    closeSidepanelBtn?.addEventListener("click", closeSidepanel);
-    sidepanelBackdrop?.addEventListener("click", closeSidepanel);
+    copyLinkBtn?.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(window.location.href);
+        shareStatus.textContent = "Link copiado.";
+      } catch {
+        shareStatus.textContent = "No se pudo copiar el link.";
+      }
+    });
+
+    sendShareBtn?.addEventListener("click", () => {
+      const email = document.getElementById("share-email")?.value?.trim();
+      const role = document.getElementById("share-role")?.value || "viewer";
+
+      if (!email) {
+        shareStatus.textContent = "Ingresá un email.";
+        return;
+      }
+
+      shareStatus.textContent = `Invitación preparada para ${email} con permiso de ${role === "editor" ? "edición" : "lectura"}.`;
+    });
+
+    openMoreBtn?.addEventListener("click", () => {
+      const isOpen = moreDropdown?.classList.contains("show");
+      if (isOpen) closeMoreDropdown();
+      else openMoreDropdown();
+    });
+
+    moreBackdrop?.addEventListener("click", closeMoreDropdown);
+
+    window.addEventListener("resize", () => {
+      if (moreDropdown?.classList.contains("show")) {
+        positionMoreDropdown();
+      }
+    });
 
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape") {
-        closeSidepanel();
+        closeMoreDropdown();
+        closeShareModal();
       }
     });
 
+    actionChat?.addEventListener("click", () => {
+      setMoreStatus("La opción de abrir chat ya quedó lista en la interfaz.");
+    });
+
     actionPresentation?.addEventListener("click", () => {
-      setPanelStatus("Esta opción ya quedó lista en la interfaz para conectarla después.");
+      setMoreStatus("La conversión a presentación quedó lista para conectarla después.");
     });
 
     actionPdf?.addEventListener("click", () => {
-      setPanelStatus("Se abrió la impresión para guardarlo como PDF.");
+      setMoreStatus("Se abrió la impresión para guardarlo como PDF.");
       window.print();
     });
 
     actionPrint?.addEventListener("click", () => {
-      setPanelStatus("Abriendo impresión...");
+      setMoreStatus("Abriendo impresión...");
       window.print();
     });
 
     actionDuplicate?.addEventListener("click", () => {
-      setPanelStatus("La interfaz de duplicar ya está lista para conectarla con Firebase.");
+      setMoreStatus("La interfaz de duplicar ya está lista para conectarla con Firebase.");
     });
 
     actionSharePanel?.addEventListener("click", () => {
-      closeSidepanel();
-      openShareBtn?.click();
+      closeMoreDropdown();
+      openShareModal();
     });
   </script>
 
