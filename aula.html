@@ -297,6 +297,7 @@
       line-height:1.6;
       font-family:'Patrick Hand', cursive;
       font-size:1.35rem;
+      margin:20px auto;
     }
 
     .board-lesson{
@@ -976,7 +977,7 @@
     }
   </style>
 </head>
-<body style="visibility:hidden; opacity:0;">
+<body>
   <main class="scene">
     <div class="wall"></div>
 
@@ -1052,6 +1053,38 @@
       </div>
     </section>
   </main>
+
+  <script>
+    const boardEl = document.getElementById("board-content");
+
+    function escapeHtml(value = "") {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function mostrarErrorPantalla(mensaje) {
+      if (!boardEl) return;
+      boardEl.innerHTML = `
+        <div class="board-error">
+          ${escapeHtml(mensaje)}
+        </div>
+      `;
+    }
+
+    window.addEventListener("error", (e) => {
+      console.error("Error global:", e.error || e.message);
+      mostrarErrorPantalla("Hubo un error cargando el aula. Revisá la consola del navegador.");
+    });
+
+    window.addEventListener("unhandledrejection", (e) => {
+      console.error("Promesa no manejada:", e.reason);
+      mostrarErrorPantalla("Hubo un problema cargando la clase. Revisá la consola del navegador.");
+    });
+  </script>
 
   <script type="module" src="aula.js"></script>
   <script type="module" src="panel-auth.js?v=1"></script>
