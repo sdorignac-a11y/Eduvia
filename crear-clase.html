@@ -171,11 +171,11 @@
     }
 
     .main{
-      padding:30px;
+      padding:30px 36px 30px 30px;
     }
 
     .page{
-      max-width:1180px;
+      max-width:1360px;
       margin:0 auto;
       display:grid;
       gap:20px;
@@ -184,7 +184,7 @@
     .page-header{
       display:grid;
       gap:10px;
-      max-width:700px;
+      max-width:760px;
     }
 
     .eyebrow{
@@ -215,16 +215,20 @@
     }
 
     .editor-shell{
-      max-width:980px;
+      width:100%;
+      max-width:none;
       background:var(--surface);
       border:1px solid var(--line);
       border-radius:28px;
       box-shadow:var(--shadow);
       overflow:hidden;
+      display:flex;
+      flex-direction:column;
+      height:760px;
     }
 
     .stepper-wrap{
-      padding:24px 24px 18px;
+      padding:22px 24px 14px;
       border-bottom:1px solid var(--line);
       background:linear-gradient(180deg, #ffffff 0%, #fcfdfe 100%);
     }
@@ -238,11 +242,12 @@
 
     .stepper-item{
       display:flex;
-      align-items:center;
+      align-items:flex-start;
       gap:10px;
       min-width:0;
       cursor:pointer;
       user-select:none;
+      padding-top:2px;
     }
 
     .stepper-item:not(:last-child){
@@ -252,7 +257,7 @@
     .stepper-item:not(:last-child)::after{
       content:"";
       position:absolute;
-      top:16px;
+      top:21px;
       left:42px;
       right:-8px;
       height:1.5px;
@@ -279,7 +284,7 @@
 
     .stepper-copy{
       min-width:0;
-      padding-top:3px;
+      transform:translateY(-5px);
     }
 
     .stepper-copy strong{
@@ -287,15 +292,16 @@
       font-size:.9rem;
       color:#7a8392;
       font-weight:800;
+      line-height:1.1;
       transition:.18s ease;
     }
 
     .stepper-copy span{
       display:block;
-      margin-top:2px;
+      margin-top:3px;
       font-size:.78rem;
       color:#9aa2af;
-      line-height:1.35;
+      line-height:1.3;
     }
 
     .stepper-item.active .stepper-dot{
@@ -320,12 +326,15 @@
     }
 
     .form-stage{
-      padding:26px 24px 26px;
+      padding:26px 24px;
+      flex:1;
+      overflow-y:auto;
     }
 
     .step-panel{
       display:none;
       animation:fadeUp .18s ease;
+      min-height:100%;
     }
 
     .step-panel.active{
@@ -698,14 +707,22 @@
       padding:18px 24px 22px;
       border-top:1px solid var(--line);
       background:#fff;
+      margin-top:auto;
     }
 
-    .wizard-footer-left,
+    .wizard-footer-left{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      flex-wrap:wrap;
+    }
+
     .wizard-footer-right{
       display:flex;
       gap:10px;
       align-items:center;
       flex-wrap:wrap;
+      margin-left:auto;
     }
 
     .step-counter{
@@ -747,12 +764,6 @@
       border:1px solid var(--line);
     }
 
-    .btn-ghost{
-      background:var(--bg-soft);
-      color:#4c5667;
-      border:1px solid var(--line);
-    }
-
     .hidden-legacy{
       display:none !important;
     }
@@ -791,6 +802,12 @@
 
       .editor-shell{
         border-radius:22px;
+        height:auto;
+        min-height:unset;
+      }
+
+      .form-stage{
+        overflow:visible;
       }
     }
 
@@ -875,7 +892,7 @@
         </header>
 
         <section class="editor-shell">
-          <form id="clase-form">
+          <form id="clase-form" style="display:flex; flex-direction:column; height:100%;">
             <div class="stepper-wrap">
               <div class="stepper" id="stepper">
                 <div class="stepper-item active" data-step="1">
@@ -1083,8 +1100,6 @@
               </div>
 
               <div class="wizard-footer-right">
-                <button type="button" class="btn btn-ghost" id="clear-form-btn">Limpiar</button>
-                <a href="panel.html" class="btn btn-soft">Volver</a>
                 <button type="button" class="btn btn-soft" id="prev-step-btn">Atrás</button>
                 <button type="button" class="btn btn-primary" id="next-step-btn">Siguiente</button>
                 <button type="submit" class="btn btn-primary" id="submit-step-btn" style="display:none;">Crear contenido</button>
@@ -1179,7 +1194,6 @@
   <script>
     const fileInput = document.getElementById("archivo");
     const fileList = document.getElementById("file-list");
-    const clearFormBtn = document.getElementById("clear-form-btn");
 
     fileInput?.addEventListener("change", () => {
       fileList.innerHTML = "";
@@ -1193,31 +1207,6 @@
         item.textContent = `📄 ${file.name}`;
         fileList.appendChild(item);
       });
-    });
-
-    clearFormBtn?.addEventListener("click", () => {
-      const defaultType = document.querySelector('input[name="tipo_contenido"][value="clase"]');
-      const defaultFormat = document.querySelector('input[name="formato"][value="pizarron"]');
-
-      if (defaultType) defaultType.checked = true;
-      if (defaultFormat) defaultFormat.checked = true;
-
-      const allInputs = document.querySelectorAll("#dynamic-fields input, #dynamic-fields select, #dynamic-fields textarea");
-      allInputs.forEach((el) => {
-        if (el.tagName === "SELECT") {
-          el.selectedIndex = 0;
-        } else {
-          el.value = "";
-        }
-      });
-
-      if (fileInput) fileInput.value = "";
-      if (fileList) fileList.innerHTML = "";
-
-      renderDynamicFields();
-      updateFormatPreview();
-      syncLegacyFields();
-      goToStep(1);
     });
   </script>
 
