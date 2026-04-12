@@ -256,21 +256,15 @@
     }
 
     .workspace{
-      display:grid;
-      grid-template-columns:minmax(0, 1.1fr) 360px;
-      gap:22px;
-      align-items:start;
+      display:block;
     }
 
-    .editor-shell,
-    .summary-shell{
+    .editor-shell{
+      max-width:980px;
       background:var(--surface);
       border:1px solid var(--line);
       border-radius:28px;
       box-shadow:var(--shadow);
-    }
-
-    .editor-shell{
       overflow:hidden;
     }
 
@@ -704,112 +698,8 @@
       border:1px solid var(--line);
     }
 
-    .summary-shell{
-      position:sticky;
-      top:30px;
-      padding:20px;
-      display:grid;
-      gap:18px;
-    }
-
-    .summary-head h3{
-      font-family:"Sora",sans-serif;
-      font-size:1.08rem;
-      letter-spacing:-.02em;
-      margin-bottom:6px;
-    }
-
-    .summary-head p{
-      color:var(--muted);
-      font-size:.91rem;
-      line-height:1.6;
-    }
-
-    .summary-block{
-      display:grid;
-      gap:10px;
-      padding:16px;
-      border-radius:18px;
-      border:1px solid var(--line);
-      background:var(--surface-soft);
-    }
-
-    .summary-label{
-      color:var(--muted-2);
-      font-size:.74rem;
-      font-weight:800;
-      letter-spacing:.08em;
-      text-transform:uppercase;
-    }
-
-    .summary-value{
-      color:#18202c;
-      font-size:.96rem;
-      font-weight:800;
-      line-height:1.4;
-      letter-spacing:-.02em;
-    }
-
-    .summary-muted{
-      color:var(--muted);
-      font-size:.88rem;
-      line-height:1.55;
-    }
-
-    .summary-list{
-      display:grid;
-      gap:10px;
-    }
-
-    .summary-item{
-      display:flex;
-      align-items:flex-start;
-      gap:10px;
-      color:var(--muted);
-      font-size:.88rem;
-      line-height:1.55;
-    }
-
-    .summary-dot{
-      width:8px;
-      height:8px;
-      border-radius:50%;
-      background:var(--teal);
-      margin-top:7px;
-      flex:none;
-    }
-
-    .mini-chip-row{
-      display:flex;
-      flex-wrap:wrap;
-      gap:8px;
-    }
-
-    .mini-chip{
-      display:inline-flex;
-      align-items:center;
-      padding:8px 10px;
-      border-radius:999px;
-      background:#fff;
-      border:1px solid var(--line);
-      color:#475466;
-      font-size:.8rem;
-      font-weight:700;
-    }
-
     .hidden-legacy{
       display:none !important;
-    }
-
-    @media (max-width: 1180px){
-      .workspace{
-        grid-template-columns:1fr;
-      }
-
-      .summary-shell{
-        position:relative;
-        top:0;
-      }
     }
 
     @media (max-width: 940px){
@@ -835,8 +725,7 @@
         padding:18px;
       }
 
-      .editor-shell,
-      .summary-shell{
+      .editor-shell{
         border-radius:22px;
       }
     }
@@ -1106,59 +995,6 @@
               </div>
             </form>
           </section>
-
-          <aside class="summary-shell">
-            <div class="summary-head">
-              <h3>Resumen rápido</h3>
-              <p>Una vista simple de lo que estás armando antes de generarlo.</p>
-            </div>
-
-            <div class="summary-block">
-              <span class="summary-label">Tipo elegido</span>
-              <div class="summary-value" id="summary-type">Clase escolar</div>
-              <div class="summary-muted" id="summary-type-description">
-                Estructura orientada a materia, tema y objetivo.
-              </div>
-            </div>
-
-            <div class="summary-block">
-              <span class="summary-label">Visualización</span>
-              <div class="summary-value" id="summary-format">Pizarrón</div>
-              <div class="summary-muted" id="summary-format-description">
-                Se mostrará en un formato más visual e interactivo.
-              </div>
-            </div>
-
-            <div class="summary-block">
-              <span class="summary-label">Archivos cargados</span>
-              <div class="summary-value" id="summary-files">0 archivos</div>
-              <div class="summary-muted">Podés generar sin adjuntar nada.</div>
-            </div>
-
-            <div class="summary-block">
-              <span class="summary-label">Qué conviene hacer</span>
-              <div class="summary-list">
-                <div class="summary-item">
-                  <span class="summary-dot"></span>
-                  <span>Elegí un solo objetivo principal.</span>
-                </div>
-                <div class="summary-item">
-                  <span class="summary-dot"></span>
-                  <span>Usá un tema claro y específico.</span>
-                </div>
-                <div class="summary-item">
-                  <span class="summary-dot"></span>
-                  <span>Adjuntá material solo si suma contexto real.</span>
-                </div>
-              </div>
-            </div>
-
-            <div class="mini-chip-row">
-              <span class="mini-chip">Simple</span>
-              <span class="mini-chip">Guiado</span>
-              <span class="mini-chip">Flexible</span>
-            </div>
-          </aside>
         </div>
       </div>
     </main>
@@ -1194,10 +1030,7 @@
       fileList.innerHTML = "";
 
       const files = Array.from(fileInput.files || []);
-      if (!files.length) {
-        updateLiveSummary();
-        return;
-      }
+      if (!files.length) return;
 
       files.forEach((file) => {
         const item = document.createElement("div");
@@ -1205,8 +1038,6 @@
         item.textContent = `📄 ${file.name}`;
         fileList.appendChild(item);
       });
-
-      updateLiveSummary();
     });
 
     clearFormBtn?.addEventListener("click", () => {
@@ -1236,7 +1067,6 @@
       renderDynamicFields();
       updateFormatPreview();
       syncLegacyFields();
-      updateLiveSummary();
     });
   </script>
 
@@ -1265,8 +1095,6 @@
           </p>
         `;
       }
-
-      updateLiveSummary();
     }
 
     formatInputs.forEach((input) => {
@@ -1556,8 +1384,6 @@
           `Nivel de profundidad: ${profundidad}.\n` +
           `Resultado esperado: ${resultado || "No especificado"}.`;
       }
-
-      updateLiveSummary();
     }
 
     function bindDynamicInputs() {
@@ -1573,7 +1399,6 @@
       dynamicFields.innerHTML = fieldTemplates[selected] || fieldTemplates.clase;
       bindDynamicInputs();
       syncLegacyFields();
-      updateLiveSummary();
     }
 
     tipoInputs.forEach((input) => {
@@ -1584,65 +1409,6 @@
 
     const form = document.getElementById("clase-form");
     form?.addEventListener("submit", syncLegacyFields);
-  </script>
-
-  <script>
-    const summaryType = document.getElementById("summary-type");
-    const summaryTypeDescription = document.getElementById("summary-type-description");
-    const summaryFormat = document.getElementById("summary-format");
-    const summaryFormatDescription = document.getElementById("summary-format-description");
-    const summaryFiles = document.getElementById("summary-files");
-
-    const contentTypeMap = {
-      clase: {
-        title: "Clase escolar",
-        description: "Estructura orientada a materia, tema y objetivo."
-      },
-      resumen: {
-        title: "Resumen / explicación",
-        description: "Pensado para explicar un tema de forma clara y directa."
-      },
-      analisis: {
-        title: "Análisis de tema",
-        description: "Ideal para interpretar, comparar o profundizar una idea."
-      },
-      documento: {
-        title: "Documento de estudio",
-        description: "Más útil para apuntes, repaso y desarrollo ordenado."
-      },
-      investigacion: {
-        title: "Investigación rápida",
-        description: "Enfocado en preguntas, hallazgos y organización de información."
-      }
-    };
-
-    function updateLiveSummary() {
-      const selectedType = document.querySelector('input[name="tipo_contenido"]:checked')?.value || "clase";
-      const selectedFormat = document.querySelector('input[name="formato"]:checked')?.value || "pizarron";
-      const filesCount = Array.from(fileInput?.files || []).length;
-
-      const typeData = contentTypeMap[selectedType] || contentTypeMap.clase;
-
-      if (summaryType) summaryType.textContent = typeData.title;
-      if (summaryTypeDescription) summaryTypeDescription.textContent = typeData.description;
-
-      if (summaryFormat) {
-        summaryFormat.textContent = selectedFormat === "documento" ? "Documento" : "Pizarrón";
-      }
-
-      if (summaryFormatDescription) {
-        summaryFormatDescription.textContent =
-          selectedFormat === "documento"
-            ? "Se verá como un apunte lineal, ordenado y más cómodo para repasar."
-            : "Se verá en un formato más visual, guiado e interactivo.";
-      }
-
-      if (summaryFiles) {
-        summaryFiles.textContent = `${filesCount} archivo${filesCount === 1 ? "" : "s"}`;
-      }
-    }
-
-    updateLiveSummary();
   </script>
 </body>
 </html>
