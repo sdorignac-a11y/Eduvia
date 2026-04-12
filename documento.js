@@ -1603,6 +1603,166 @@ async function loadClase(user) {
    PRESENTATION EXPORT
 ========================= */
 
+const PRESENTATION_THEME_KEYWORDS = {
+  sport: [
+    "futbol", "fútbol", "gol", "equipo", "jugador", "cancha", "liga", "mundial",
+    "deporte", "deportivo", "torneo", "partido", "club", "entrenamiento"
+  ],
+  history: [
+    "historia", "revolucion", "revolución", "imperio", "guerra", "edad", "siglo",
+    "monarquia", "monarquía", "antigua", "roma", "grecia", "francia", "independencia",
+    "cronologia", "cronología"
+  ],
+  science: [
+    "biologia", "biología", "quimica", "química", "fisica", "física", "célula",
+    "celula", "energia", "energía", "ecosistema", "átomo", "atomo", "molécula",
+    "molecula", "sistema solar", "planeta", "cientifico", "científico"
+  ],
+  literature: [
+    "literatura", "poema", "poesía", "poesia", "novela", "cuento", "autor",
+    "personaje", "narrador", "obra", "teatro", "metafora", "metáfora", "lenguaje",
+    "análisis literario", "analisis literario"
+  ],
+  geography: [
+    "geografia", "geografía", "mapa", "territorio", "continente", "paisaje", "relieve",
+    "clima", "región", "region", "océano", "oceano", "población", "poblacion"
+  ],
+  business: [
+    "economia", "economía", "empresa", "mercado", "finanzas", "negocio", "marketing",
+    "costos", "demanda", "oferta", "administración", "administracion", "emprendimiento"
+  ],
+  tech: [
+    "tecnologia", "tecnología", "programacion", "programación", "algoritmo", "software",
+    "internet", "inteligencia artificial", "ia", "computadora", "redes", "sistema",
+    "base de datos", "codigo", "código"
+  ],
+};
+
+const PRESENTATION_THEMES = {
+  neutral: {
+    key: "neutral",
+    label: "Académico moderno",
+    bg: "F4F0E8",
+    surface: "FFFDF8",
+    surfaceAlt: "F7F1E7",
+    accent: "7C6CF2",
+    accentSoft: "E9E4FF",
+    accent2: "FFE89C",
+    text: "2B2434",
+    muted: "6F6577",
+    line: "D9D0E6",
+    coverTag: "Presentación de estudio",
+  },
+  sport: {
+    key: "sport",
+    label: "Deportivo",
+    bg: "0E1B18",
+    surface: "122A24",
+    surfaceAlt: "17352D",
+    accent: "3DDC84",
+    accentSoft: "CFF8E0",
+    accent2: "D6FF75",
+    text: "F7FFFB",
+    muted: "CBE5DA",
+    line: "255847",
+    coverTag: "Ambiente deportivo",
+  },
+  history: {
+    key: "history",
+    label: "Histórico editorial",
+    bg: "F4E9D9",
+    surface: "FFF8F1",
+    surfaceAlt: "F2E2CF",
+    accent: "8B5E3C",
+    accentSoft: "E9D7C1",
+    accent2: "C7985E",
+    text: "3B2A1E",
+    muted: "6E5A49",
+    line: "D8B996",
+    coverTag: "Contexto histórico",
+  },
+  science: {
+    key: "science",
+    label: "Científico limpio",
+    bg: "0C1726",
+    surface: "11233A",
+    surfaceAlt: "16324D",
+    accent: "4CC9F0",
+    accentSoft: "B9F0FF",
+    accent2: "90F2D2",
+    text: "F4FBFF",
+    muted: "C6D9E7",
+    line: "2A5875",
+    coverTag: "Enfoque científico",
+  },
+  literature: {
+    key: "literature",
+    label: "Editorial literario",
+    bg: "2A2135",
+    surface: "3B3047",
+    surfaceAlt: "4B3C58",
+    accent: "E8A7FF",
+    accentSoft: "F4D9FF",
+    accent2: "FFC6D6",
+    text: "FFF8FF",
+    muted: "E5D8EE",
+    line: "8E72A8",
+    coverTag: "Lectura y análisis",
+  },
+  geography: {
+    key: "geography",
+    label: "Territorial",
+    bg: "0E2430",
+    surface: "173847",
+    surfaceAlt: "1E4C5F",
+    accent: "F4B860",
+    accentSoft: "FFE2B4",
+    accent2: "8CE6C8",
+    text: "F8FCFD",
+    muted: "D5E6EA",
+    line: "487284",
+    coverTag: "Mirada territorial",
+  },
+  business: {
+    key: "business",
+    label: "Profesional",
+    bg: "101827",
+    surface: "172033",
+    surfaceAlt: "1E2A42",
+    accent: "7DD3FC",
+    accentSoft: "D8F4FF",
+    accent2: "A7F3D0",
+    text: "F7FBFF",
+    muted: "D9E3F1",
+    line: "334967",
+    coverTag: "Análisis estratégico",
+  },
+  tech: {
+    key: "tech",
+    label: "Tecnológico",
+    bg: "0A1020",
+    surface: "111A30",
+    surfaceAlt: "172544",
+    accent: "8B5CF6",
+    accentSoft: "E2D7FF",
+    accent2: "5EEAD4",
+    text: "F8F7FF",
+    muted: "D8D6F4",
+    line: "324362",
+    coverTag: "Tecnología y sistemas",
+  },
+};
+
+const PRESENTATION_STOPWORDS = new Set([
+  "de","la","el","los","las","y","en","del","un","una","unos","unas","que","se","para",
+  "con","por","como","sobre","desde","hasta","entre","sin","más","mas","muy","pero","esto",
+  "esta","este","estos","estas","esa","ese","esas","esos","son","era","eran","ser","estar",
+  "haber","tiene","tienen","puede","pueden","tema","documento","contenido","clase","materia",
+  "nivel","duracion","duración","objetivo","parte","partes","principal","principales","tipo",
+  "tipos","idea","ideas","concepto","conceptos","explica","explicación","explicacion","también",
+  "tambien","porque","donde","cuando","cada","otra","otras","otro","otros","según","segun"
+]);
+
 function normalizePresentationText(value = "") {
   return String(value || "")
     .replace(/\u00A0/g, " ")
@@ -1610,10 +1770,24 @@ function normalizePresentationText(value = "") {
     .trim();
 }
 
+function normalizePresentationComparable(value = "") {
+  return normalizePresentationText(value)
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+}
+
 function chunkArray(items = [], size = 5) {
   const chunks = [];
   for (let i = 0; i < items.length; i += size) chunks.push(items.slice(i, i + size));
   return chunks;
+}
+
+function compactPresentationText(text = "", maxChars = 220) {
+  const clean = normalizePresentationText(text);
+  if (!clean) return "";
+  if (clean.length <= maxChars) return clean;
+  return `${clean.slice(0, maxChars).trim().replace(/[,:;.\-–—]*$/, "")}…`;
 }
 
 function splitPresentationText(text = "", maxChars = 120) {
@@ -1625,7 +1799,7 @@ function splitPresentationText(text = "", maxChars = 120) {
     .map((item) => item.trim())
     .filter(Boolean);
 
-  if (!sentences.length) return [clean.slice(0, maxChars)];
+  if (!sentences.length) return [compactPresentationText(clean, maxChars)];
 
   const blocks = [];
   let current = "";
@@ -1673,6 +1847,130 @@ function splitPresentationText(text = "", maxChars = 120) {
   return blocks.filter(Boolean);
 }
 
+function splitPresentationParagraphs(text = "", maxChars = 340) {
+  return splitPresentationText(text, maxChars).slice(0, 3);
+}
+
+function dedupePresentationText(items = []) {
+  const seen = new Set();
+  return items.filter((item) => {
+    const normalized = normalizePresentationComparable(item);
+    if (!normalized || seen.has(normalized)) return false;
+    seen.add(normalized);
+    return true;
+  });
+}
+
+function createEmptyPresentationSection(title = "Contenido") {
+  return {
+    title: normalizePresentationText(title) || "Contenido",
+    subtitles: [],
+    paragraphs: [],
+    bullets: [],
+    quotes: [],
+    rawText: "",
+  };
+}
+
+function finalizePresentationSection(section) {
+  const merged = dedupePresentationText([
+    ...section.subtitles,
+    ...section.paragraphs,
+    ...section.bullets,
+    ...section.quotes,
+  ]);
+
+  const rawText = merged.join(" ");
+  return {
+    title: normalizePresentationText(section.title) || "Contenido",
+    subtitles: dedupePresentationText(section.subtitles),
+    paragraphs: dedupePresentationText(section.paragraphs),
+    bullets: dedupePresentationText(section.bullets),
+    quotes: dedupePresentationText(section.quotes),
+    rawText: normalizePresentationText(rawText),
+  };
+}
+
+function extractPresentationSectionsFromDom() {
+  if (!els.docContent) return [];
+
+  const children = Array.from(els.docContent.children || []);
+  const sections = [];
+  let currentSection = createEmptyPresentationSection("Introducción");
+
+  const pushSection = () => {
+    const finalSection = finalizePresentationSection(currentSection);
+    if (
+      finalSection.title ||
+      finalSection.paragraphs.length ||
+      finalSection.bullets.length ||
+      finalSection.quotes.length
+    ) {
+      if (finalSection.rawText) sections.push(finalSection);
+    }
+  };
+
+  if (!children.length) {
+    const fallbackText = normalizePresentationText(els.docContent.innerText || "");
+    if (!fallbackText) return [];
+
+    return [
+      {
+        title: "Contenido",
+        subtitles: [],
+        paragraphs: splitPresentationParagraphs(fallbackText, 300),
+        bullets: [],
+        quotes: [],
+        rawText: fallbackText,
+      },
+    ];
+  }
+
+  for (const child of children) {
+    const tag = (child.tagName || "").toLowerCase();
+
+    if (tag === "h1" || tag === "h2") {
+      pushSection();
+      currentSection = createEmptyPresentationSection(child.textContent || "Sección");
+      continue;
+    }
+
+    if (tag === "h3") {
+      const subtitle = normalizePresentationText(child.textContent || "");
+      if (subtitle) currentSection.subtitles.push(subtitle);
+      continue;
+    }
+
+    if (tag === "p") {
+      const text = normalizePresentationText(child.innerText || child.textContent || "");
+      if (text) currentSection.paragraphs.push(text);
+      continue;
+    }
+
+    if (tag === "blockquote") {
+      const text = normalizePresentationText(child.innerText || child.textContent || "");
+      if (text) currentSection.quotes.push(text);
+      continue;
+    }
+
+    if (tag === "ul" || tag === "ol") {
+      const items = Array.from(child.querySelectorAll(":scope > li"))
+        .map((li) => normalizePresentationText(li.innerText || li.textContent || ""))
+        .filter(Boolean);
+
+      currentSection.bullets.push(...items);
+      continue;
+    }
+
+    const fallback = normalizePresentationText(child.innerText || child.textContent || "");
+    if (fallback) currentSection.paragraphs.push(fallback);
+  }
+
+  pushSection();
+
+  return sections.filter((section) => section.rawText);
+}
+
 function getPresentationMeta() {
   const clase = state.currentClaseData || {};
   return {
@@ -1689,99 +1987,427 @@ function getPresentationMeta() {
   };
 }
 
-function extractPresentationSectionsFromDom() {
-  if (!els.docContent) return [];
+function pickPresentationKeywords(text = "", max = 6) {
+  const tokens = normalizePresentationComparable(text)
+    .replace(/[^\p{L}\p{N}\s-]/gu, " ")
+    .split(/\s+/)
+    .map((item) => item.trim())
+    .filter((item) => item.length >= 4 && !PRESENTATION_STOPWORDS.has(item));
 
-  const sections = [];
-  let currentSection = { title: "Contenido", bullets: [] };
-  const children = Array.from(els.docContent.children || []);
+  const score = new Map();
 
-  const pushSection = () => {
-    const title = normalizePresentationText(currentSection.title);
-    const bullets = currentSection.bullets
-      .map((item) => normalizePresentationText(item))
-      .filter(Boolean);
-
-    if (title || bullets.length) sections.push({ title: title || "Contenido", bullets });
-  };
-
-  if (!children.length) {
-    const fallbackText = normalizePresentationText(els.docContent.innerText || "");
-    return fallbackText
-      ? [{ title: "Contenido", bullets: splitPresentationText(fallbackText, 120) }]
-      : [];
+  for (const token of tokens) {
+    score.set(token, (score.get(token) || 0) + 1);
   }
 
-  for (const child of children) {
-    const tag = (child.tagName || "").toLowerCase();
-
-    if (tag === "h1" || tag === "h2") {
-      pushSection();
-      currentSection = {
-        title: normalizePresentationText(child.textContent || "Sección"),
-        bullets: [],
-      };
-      continue;
-    }
-
-    if (tag === "h3") {
-      const subtitle = normalizePresentationText(child.textContent || "");
-      if (subtitle) currentSection.bullets.push(subtitle);
-      continue;
-    }
-
-    if (tag === "p" || tag === "blockquote") {
-      const text = normalizePresentationText(child.innerText || child.textContent || "");
-      if (text) currentSection.bullets.push(...splitPresentationText(text, 120));
-      continue;
-    }
-
-    if (tag === "ul" || tag === "ol") {
-      const items = Array.from(child.querySelectorAll(":scope > li"))
-        .map((li) => normalizePresentationText(li.innerText || li.textContent || ""))
-        .filter(Boolean);
-
-      for (const item of items) currentSection.bullets.push(...splitPresentationText(item, 100));
-      continue;
-    }
-
-    const fallback = normalizePresentationText(child.innerText || child.textContent || "");
-    if (fallback) currentSection.bullets.push(...splitPresentationText(fallback, 120));
-  }
-
-  pushSection();
-  return sections.filter((section) => section.bullets.length);
+  return Array.from(score.entries())
+    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+    .slice(0, max)
+    .map(([token]) => token.charAt(0).toUpperCase() + token.slice(1));
 }
 
-function addPresentationCoverSlide(pptx, meta) {
+function detectPresentationTheme(meta, sections = []) {
+  const combinedText = normalizePresentationComparable(
+    [
+      meta.titulo,
+      meta.objetivo,
+      meta.materia,
+      meta.nivel,
+      sections.map((section) => `${section.title} ${section.rawText}`).join(" "),
+    ].join(" ")
+  );
+
+  let bestKey = "neutral";
+  let bestScore = 0;
+
+  for (const [themeKey, keywords] of Object.entries(PRESENTATION_THEME_KEYWORDS)) {
+    let score = 0;
+    for (const keyword of keywords) {
+      if (combinedText.includes(normalizePresentationComparable(keyword))) score += 1;
+    }
+    if (score > bestScore) {
+      bestScore = score;
+      bestKey = themeKey;
+    }
+  }
+
+  return PRESENTATION_THEMES[bestKey] || PRESENTATION_THEMES.neutral;
+}
+
+function sectionContentPool(section) {
+  return dedupePresentationText([
+    ...section.subtitles,
+    ...section.paragraphs,
+    ...section.bullets,
+    ...section.quotes,
+  ]).filter(Boolean);
+}
+
+function getSectionLeadText(section) {
+  const paragraph = section.paragraphs[0] || section.bullets[0] || section.rawText || "";
+  return compactPresentationText(paragraph, 330);
+}
+
+function getSectionSupportText(section) {
+  const supportPool = dedupePresentationText([
+    section.paragraphs[1] || "",
+    section.bullets[0] || "",
+    section.bullets[1] || "",
+    section.subtitles[0] || "",
+  ]).filter(Boolean);
+
+  return compactPresentationText(supportPool.join(" "), 210);
+}
+
+function getSectionSummaryParagraphs(section) {
+  const paragraphBase = dedupePresentationText([
+    ...section.paragraphs,
+    ...section.bullets.map((item) => compactPresentationText(item, 180)),
+  ]);
+
+  if (!paragraphBase.length && section.rawText) {
+    return splitPresentationParagraphs(section.rawText, 280).slice(0, 2);
+  }
+
+  const merged = paragraphBase
+    .slice(0, 4)
+    .join(" ");
+
+  return splitPresentationParagraphs(merged, 280).slice(0, 2);
+}
+
+function buildPresentationCardItems(section) {
+  const pool = sectionContentPool(section);
+  return pool
+    .slice(0, 4)
+    .map((item, index) => ({
+      title:
+        section.subtitles[index] ||
+        (index === 0 ? "Idea central" : `Punto ${index + 1}`),
+      body: compactPresentationText(item, 130),
+    }))
+    .filter((card) => card.body);
+}
+
+function buildPresentationTimelineItems(section) {
+  const pool = dedupePresentationText([
+    ...section.bullets,
+    ...section.paragraphs,
+    ...splitPresentationText(section.rawText, 170),
+  ]).slice(0, 4);
+
+  return pool.map((item, index) => {
+    const yearMatch = item.match(/\b(1[0-9]{3}|20[0-9]{2})\b/);
+    const stepMatch = item.match(/\b(paso|etapa|fase)\s+\d+\b/i);
+
+    return {
+      label:
+        yearMatch?.[0] ||
+        stepMatch?.[0] ||
+        `Etapa ${index + 1}`,
+      body: compactPresentationText(item, 120),
+    };
+  });
+}
+
+function buildPresentationColumns(section) {
+  const pool = sectionContentPool(section).slice(0, 6);
+
+  if (!pool.length) {
+    return {
+      leftTitle: "Idea 1",
+      leftText: compactPresentationText(section.rawText, 180),
+      rightTitle: "Idea 2",
+      rightText: compactPresentationText(section.rawText, 180),
+    };
+  }
+
+  const midpoint = Math.ceil(pool.length / 2);
+  const leftItems = pool.slice(0, midpoint);
+  const rightItems = pool.slice(midpoint);
+
+  return {
+    leftTitle: section.subtitles[0] || "Bloque A",
+    leftText: compactPresentationText(leftItems.join(" "), 220),
+    rightTitle: section.subtitles[1] || "Bloque B",
+    rightText: compactPresentationText(
+      (rightItems.length ? rightItems : leftItems.slice(1)).join(" "),
+      220
+    ),
+  };
+}
+
+function isPresentationTimelineSection(section) {
+  const title = normalizePresentationComparable(section.title);
+  const text = normalizePresentationComparable(section.rawText);
+
+  const yearMatches = text.match(/\b(1[0-9]{3}|20[0-9]{2})\b/g) || [];
+
+  return (
+    /historia|evolucion|evolución|proceso|etapas|cronologia|cronología|linea de tiempo|línea de tiempo/.test(title) ||
+    yearMatches.length >= 2
+  );
+}
+
+function isPresentationComparisonSection(section) {
+  const title = normalizePresentationComparable(section.title);
+  const text = normalizePresentationComparable(section.rawText);
+
+  return (
+    /compar|diferenc|similitud|ventajas|desventajas|tipos|clasificacion|clasificación|vs\b|versus/.test(title) ||
+    /por un lado|por otro lado|en cambio|mientras que/.test(text)
+  );
+}
+
+function isPresentationQuoteSection(section) {
+  return section.quotes.length > 0 || /cita|frase|reflexion|reflexión/.test(normalizePresentationComparable(section.title));
+}
+
+function isPresentationCardsSection(section) {
+  return section.bullets.length >= 3 || (section.paragraphs.length >= 2 && section.rawText.length < 650);
+}
+
+function buildPresentationSlides(meta, sections = []) {
+  const slides = [];
+
+  const allText = sections.map((section) => section.rawText).join(" ");
+  const keywords = pickPresentationKeywords(
+    [meta.titulo, meta.objetivo, meta.materia, allText].join(" "),
+    6
+  );
+
+  if (meta.objetivo || sections.length) {
+    const firstSection = sections[0] || createEmptyPresentationSection("Introducción");
+    slides.push({
+      type: "intro",
+      title: meta.titulo || "Introducción",
+      text:
+        compactPresentationText(meta.objetivo, 280) ||
+        compactPresentationText(firstSection.rawText, 280) ||
+        "Esta presentación organiza las ideas principales del documento en una secuencia visual clara.",
+      sideTitle: meta.materia || "Contexto",
+      sideText: compactPresentationText(
+        [
+          meta.nivel ? `Nivel: ${meta.nivel}.` : "",
+          meta.duracion ? `Duración estimada: ${meta.duracion}.` : "",
+          keywords.length ? `Palabras clave: ${keywords.slice(0, 3).join(", ")}.` : "",
+        ].filter(Boolean).join(" "),
+        180
+      ),
+    });
+  }
+
+  const MAX_DYNAMIC_SLIDES = 9;
+
+  for (const section of sections) {
+    if (slides.length >= MAX_DYNAMIC_SLIDES + 1) break;
+
+    if (isPresentationQuoteSection(section)) {
+      slides.push({
+        type: "quote",
+        title: section.title || "Idea destacada",
+        quote: compactPresentationText(section.quotes[0] || getSectionLeadText(section), 220),
+        text: compactPresentationText(
+          [getSectionLeadText(section), getSectionSupportText(section)].filter(Boolean).join(" "),
+          220
+        ),
+      });
+      continue;
+    }
+
+    if (isPresentationTimelineSection(section)) {
+      slides.push({
+        type: "timeline",
+        title: section.title || "Proceso",
+        intro: compactPresentationText(getSectionLeadText(section), 170),
+        items: buildPresentationTimelineItems(section).slice(0, 4),
+      });
+      continue;
+    }
+
+    if (isPresentationComparisonSection(section)) {
+      const columns = buildPresentationColumns(section);
+      slides.push({
+        type: "columns",
+        title: section.title || "Comparación",
+        leftTitle: columns.leftTitle,
+        leftText: columns.leftText,
+        rightTitle: columns.rightTitle,
+        rightText: columns.rightText,
+      });
+      continue;
+    }
+
+    if (isPresentationCardsSection(section)) {
+      slides.push({
+        type: "cards",
+        title: section.title || "Puntos principales",
+        intro: compactPresentationText(getSectionLeadText(section), 170),
+        cards: buildPresentationCardItems(section).slice(0, 4),
+      });
+      continue;
+    }
+
+    const paragraphs = getSectionSummaryParagraphs(section);
+
+    slides.push({
+      type: "narrative",
+      title: section.title || "Desarrollo",
+      paragraphs: paragraphs.length ? paragraphs : [compactPresentationText(section.rawText, 280)],
+      sideTitle: section.subtitles[0] || "Clave",
+      sideText: getSectionSupportText(section) || compactPresentationText(section.rawText, 170),
+    });
+  }
+
+  if (slides.length < MAX_DYNAMIC_SLIDES + 1) {
+    slides.push({
+      type: "closing",
+      title: "Cierre",
+      text: compactPresentationText(
+        [
+          meta.objetivo ? `En síntesis, el objetivo central fue ${meta.objetivo}.` : "",
+          sections[sections.length - 1]?.rawText || allText,
+        ].filter(Boolean).join(" "),
+        300
+      ),
+      chips: keywords.slice(0, 5),
+    });
+  }
+
+  return {
+    keywords,
+    slides: slides.slice(0, MAX_DYNAMIC_SLIDES + 2),
+  };
+}
+
+function getPresentationShapeType(pptx, type, fallback = "rect") {
+  return pptx?.ShapeType?.[type] || window.PptxGenJS?.ShapeType?.[type] || fallback;
+}
+
+function addPresentationBackground(slide, pptx, theme, variant = "default") {
+  slide.background = { color: theme.bg };
+
+  slide.addShape(getPresentationShapeType(pptx, "rect"), {
+    x: 0,
+    y: 0,
+    w: 13.333,
+    h: 7.5,
+    line: { color: theme.bg, transparency: 100 },
+    fill: { color: theme.bg },
+  });
+
+  slide.addShape(getPresentationShapeType(pptx, "ellipse"), {
+    x: 9.7,
+    y: -0.85,
+    w: 4.2,
+    h: 3.1,
+    line: { color: theme.accent, transparency: 100 },
+    fill: { color: theme.accentSoft, transparency: variant === "cover" ? 18 : 42 },
+  });
+
+  slide.addShape(getPresentationShapeType(pptx, "ellipse"), {
+    x: -0.9,
+    y: 5.75,
+    w: 3.6,
+    h: 2.5,
+    line: { color: theme.accent2, transparency: 100 },
+    fill: { color: theme.accent2, transparency: variant === "cover" ? 25 : 55 },
+  });
+
+  slide.addShape(getPresentationShapeType(pptx, "line"), {
+    x: 0.7,
+    y: 0.7,
+    w: 11.9,
+    h: 0,
+    line: { color: theme.line, pt: 1.1 },
+  });
+
+  if (variant !== "cover") {
+    slide.addShape(getPresentationShapeType(pptx, "roundRect"), {
+      x: 0.65,
+      y: 0.9,
+      w: 12.0,
+      h: 5.9,
+      rectRadius: 0.06,
+      line: { color: theme.line, pt: 1.1 },
+      fill: { color: theme.surface, transparency: 0 },
+    });
+  }
+}
+
+function addPresentationFooter(slide, theme, slideNumber) {
+  slide.addText(String(slideNumber), {
+    x: 12.1,
+    y: 7.03,
+    w: 0.55,
+    h: 0.2,
+    fontFace: "Inter",
+    fontSize: 8,
+    color: theme.muted,
+    bold: true,
+    align: "right",
+    margin: 0,
+  });
+}
+
+function addPresentationCoverSlide(pptx, meta, theme, keywords = []) {
   const slide = pptx.addSlide();
-  slide.background = { color: "F8F4EC" };
+  addPresentationBackground(slide, pptx, theme, "cover");
+
+  slide.addShape(getPresentationShapeType(pptx, "roundRect"), {
+    x: 0.8,
+    y: 0.95,
+    w: 2.45,
+    h: 0.42,
+    rectRadius: 0.08,
+    line: { color: theme.accent, transparency: 100 },
+    fill: { color: theme.accentSoft, transparency: 0 },
+  });
+
+  slide.addText(theme.coverTag || "Presentación", {
+    x: 0.95,
+    y: 1.03,
+    w: 2.1,
+    h: 0.18,
+    fontFace: "Inter",
+    fontSize: 10,
+    bold: true,
+    color: theme.accent,
+    margin: 0,
+  });
 
   slide.addText(meta.titulo || "Presentación", {
-    x: 0.65,
-    y: 0.8,
-    w: 11.8,
-    h: 1.0,
-    fontFace: "Inter",
+    x: 0.8,
+    y: 1.65,
+    w: 8.25,
+    h: 1.45,
+    fontFace: "Sora",
     fontSize: 24,
     bold: true,
-    color: "2B2434",
+    color: theme.text,
     margin: 0,
+    breakLine: false,
     valign: "mid",
   });
 
-  if (meta.objetivo) {
-    slide.addText(meta.objetivo, {
-      x: 0.65,
-      y: 1.95,
-      w: 11.3,
-      h: 0.8,
+  slide.addText(
+    compactPresentationText(
+      meta.objetivo ||
+        `Una presentación visual y mejor estructurada sobre ${meta.titulo || "el tema analizado"}.`,
+      220
+    ),
+    {
+      x: 0.82,
+      y: 3.05,
+      w: 6.75,
+      h: 0.9,
       fontFace: "Inter",
-      fontSize: 12,
-      color: "6F6577",
+      fontSize: 14,
+      color: theme.muted,
       margin: 0,
-    });
-  }
+      valign: "mid",
+    }
+  );
 
   const chips = [
     meta.materia ? `Materia: ${meta.materia}` : "",
@@ -1789,97 +2415,716 @@ function addPresentationCoverSlide(pptx, meta) {
     meta.duracion ? `Duración: ${meta.duracion}` : "",
   ].filter(Boolean);
 
-  let chipX = 0.65;
-
-  for (const chip of chips) {
-    slide.addText(chip, {
-      x: chipX,
-      y: 3.0,
+  let chipY = 4.25;
+  for (const chip of chips.slice(0, 3)) {
+    slide.addShape(getPresentationShapeType(pptx, "roundRect"), {
+      x: 0.82,
+      y: chipY,
       w: 2.35,
-      h: 0.38,
+      h: 0.42,
+      rectRadius: 0.08,
+      line: { color: theme.line, pt: 1 },
+      fill: { color: theme.surfaceAlt },
+    });
+
+    slide.addText(chip, {
+      x: 0.98,
+      y: chipY + 0.1,
+      w: 2.0,
+      h: 0.16,
       fontFace: "Inter",
       fontSize: 9,
       bold: true,
-      color: "5A4FCF",
-      align: "center",
-      valign: "mid",
-      margin: 0.06,
-      fill: { color: "EFEAFF" },
-      line: { color: "EFEAFF" },
-      radius: 0.1,
+      color: theme.text,
+      margin: 0,
     });
-    chipX += 2.5;
+
+    chipY += 0.55;
   }
 
-  slide.addText("Eduvia", {
-    x: 0.68,
-    y: 6.65,
-    w: 1.1,
+  slide.addShape(getPresentationShapeType(pptx, "roundRect"), {
+    x: 8.8,
+    y: 1.7,
+    w: 3.4,
+    h: 3.55,
+    rectRadius: 0.08,
+    line: { color: theme.line, pt: 1.1 },
+    fill: { color: theme.surfaceAlt },
+  });
+
+  slide.addText("Enfoque visual", {
+    x: 9.08,
+    y: 2.0,
+    w: 2.2,
     h: 0.2,
     fontFace: "Inter",
-    fontSize: 9,
+    fontSize: 10,
     bold: true,
-    color: "8E7FE8",
+    color: theme.accent,
     margin: 0,
   });
-}
 
-function addPresentationContentSlide(pptx, title, bullets = [], slideNumber = 1) {
-  const slide = pptx.addSlide();
-  slide.background = { color: "FFFDF8" };
-
-  slide.addText(title || "Contenido", {
-    x: 0.65,
-    y: 0.45,
-    w: 11.6,
+  slide.addText(theme.label || "Estilo", {
+    x: 9.08,
+    y: 2.35,
+    w: 2.4,
     h: 0.5,
-    fontFace: "Inter",
-    fontSize: 20,
+    fontFace: "Sora",
+    fontSize: 17,
     bold: true,
-    color: "2B2434",
+    color: theme.text,
     margin: 0,
   });
 
   slide.addText(
-    bullets.map((item) => `• ${normalizePresentationText(item)}`).join("\n") || "• Contenido",
+    compactPresentationText(
+      keywords.length
+        ? `Palabras guía: ${keywords.slice(0, 4).join(", ")}.`
+        : "La composición se adapta al tema y al tipo de contenido del documento.",
+      135
+    ),
     {
-      x: 0.85,
-      y: 1.25,
-      w: 11.25,
-      h: 5.25,
+      x: 9.08,
+      y: 2.95,
+      w: 2.45,
+      h: 0.8,
       fontFace: "Inter",
-      fontSize: 15,
-      color: "3C3547",
-      breakLine: false,
+      fontSize: 11,
+      color: theme.muted,
       margin: 0,
-      valign: "top",
-      paraSpaceAfterPt: 14,
     }
   );
 
-  slide.addText(String(slideNumber), {
-    x: 12.2,
-    y: 6.85,
-    w: 0.35,
-    h: 0.18,
+  slide.addShape(getPresentationShapeType(pptx, "line"), {
+    x: 9.08,
+    y: 4.0,
+    w: 2.45,
+    h: 0,
+    line: { color: theme.line, pt: 1 },
+  });
+
+  slide.addText("Eduvia", {
+    x: 9.08,
+    y: 4.23,
+    w: 2.0,
+    h: 0.22,
     fontFace: "Inter",
-    fontSize: 8,
-    color: "9A90A8",
-    align: "right",
+    fontSize: 10,
+    bold: true,
+    color: theme.text,
     margin: 0,
   });
-}
 
-function addPresentationSourcesSlide(pptx, sources = [], slideNumber = 1) {
-  if (!sources.length) return;
-
-  const bullets = sources.slice(0, 8).map((source, index) => {
-    const title = normalizePresentationText(source.title || `Fuente ${index + 1}`);
-    const url = normalizePresentationText((source.url || "").replace(/^https?:\/\//, ""));
-    return url ? `${title} — ${url}` : title;
+  slide.addText("Documento convertido en una narrativa visual más rica.", {
+    x: 9.08,
+    y: 4.55,
+    w: 2.55,
+    h: 0.55,
+    fontFace: "Inter",
+    fontSize: 10,
+    color: theme.muted,
+    margin: 0,
   });
 
-  addPresentationContentSlide(pptx, "Fuentes consultadas", bullets, slideNumber);
+  addPresentationFooter(slide, theme, 1);
+}
+
+function addPresentationIntroSlide(pptx, theme, slideData, slideNumber) {
+  const slide = pptx.addSlide();
+  addPresentationBackground(slide, pptx, theme);
+
+  slide.addText(slideData.title || "Introducción", {
+    x: 1.0,
+    y: 1.15,
+    w: 6.7,
+    h: 0.52,
+    fontFace: "Sora",
+    fontSize: 21,
+    bold: true,
+    color: theme.text,
+    margin: 0,
+  });
+
+  slide.addText(compactPresentationText(slideData.text, 300), {
+    x: 1.0,
+    y: 1.95,
+    w: 6.45,
+    h: 2.4,
+    fontFace: "Inter",
+    fontSize: 14,
+    color: theme.text,
+    margin: 0,
+    breakLine: false,
+    valign: "top",
+    paraSpaceAfterPt: 10,
+  });
+
+  slide.addShape(getPresentationShapeType(pptx, "roundRect"), {
+    x: 8.15,
+    y: 1.55,
+    w: 3.6,
+    h: 2.9,
+    rectRadius: 0.06,
+    line: { color: theme.line, pt: 1 },
+    fill: { color: theme.surfaceAlt },
+  });
+
+  slide.addText(slideData.sideTitle || "Contexto", {
+    x: 8.45,
+    y: 1.9,
+    w: 2.8,
+    h: 0.26,
+    fontFace: "Inter",
+    fontSize: 10,
+    bold: true,
+    color: theme.accent,
+    margin: 0,
+  });
+
+  slide.addText(compactPresentationText(slideData.sideText, 180), {
+    x: 8.45,
+    y: 2.3,
+    w: 2.75,
+    h: 1.55,
+    fontFace: "Inter",
+    fontSize: 11,
+    color: theme.text,
+    margin: 0,
+  });
+
+  addPresentationFooter(slide, theme, slideNumber);
+}
+
+function addPresentationNarrativeSlide(pptx, theme, slideData, slideNumber) {
+  const slide = pptx.addSlide();
+  addPresentationBackground(slide, pptx, theme);
+
+  slide.addText(slideData.title || "Desarrollo", {
+    x: 1.0,
+    y: 1.12,
+    w: 6.9,
+    h: 0.52,
+    fontFace: "Sora",
+    fontSize: 21,
+    bold: true,
+    color: theme.text,
+    margin: 0,
+  });
+
+  const text = (slideData.paragraphs || [])
+    .map((paragraph) => compactPresentationText(paragraph, 240))
+    .filter(Boolean)
+    .join("\n\n");
+
+  slide.addText(text || "No hay contenido suficiente para esta sección.", {
+    x: 1.0,
+    y: 1.9,
+    w: 6.5,
+    h: 3.5,
+    fontFace: "Inter",
+    fontSize: 13,
+    color: theme.text,
+    margin: 0,
+    breakLine: false,
+    valign: "top",
+    paraSpaceAfterPt: 9,
+  });
+
+  slide.addShape(getPresentationShapeType(pptx, "roundRect"), {
+    x: 8.05,
+    y: 1.78,
+    w: 3.75,
+    h: 2.8,
+    rectRadius: 0.06,
+    line: { color: theme.line, pt: 1 },
+    fill: { color: theme.surfaceAlt },
+  });
+
+  slide.addText(slideData.sideTitle || "Dato clave", {
+    x: 8.32,
+    y: 2.08,
+    w: 2.75,
+    h: 0.24,
+    fontFace: "Inter",
+    fontSize: 10,
+    bold: true,
+    color: theme.accent,
+    margin: 0,
+  });
+
+  slide.addText(compactPresentationText(slideData.sideText, 180), {
+    x: 8.32,
+    y: 2.45,
+    w: 2.95,
+    h: 1.55,
+    fontFace: "Inter",
+    fontSize: 11,
+    color: theme.text,
+    margin: 0,
+  });
+
+  addPresentationFooter(slide, theme, slideNumber);
+}
+
+function addPresentationCardsSlide(pptx, theme, slideData, slideNumber) {
+  const slide = pptx.addSlide();
+  addPresentationBackground(slide, pptx, theme);
+
+  slide.addText(slideData.title || "Puntos principales", {
+    x: 1.0,
+    y: 1.1,
+    w: 7.0,
+    h: 0.52,
+    fontFace: "Sora",
+    fontSize: 21,
+    bold: true,
+    color: theme.text,
+    margin: 0,
+  });
+
+  slide.addText(compactPresentationText(slideData.intro, 160), {
+    x: 1.0,
+    y: 1.78,
+    w: 7.3,
+    h: 0.5,
+    fontFace: "Inter",
+    fontSize: 12,
+    color: theme.muted,
+    margin: 0,
+  });
+
+  const cards = (slideData.cards || []).slice(0, 4);
+  const positions = [
+    { x: 1.0, y: 2.45 },
+    { x: 6.25, y: 2.45 },
+    { x: 1.0, y: 4.6 },
+    { x: 6.25, y: 4.6 },
+  ];
+
+  cards.forEach((card, index) => {
+    const pos = positions[index];
+    slide.addShape(getPresentationShapeType(pptx, "roundRect"), {
+      x: pos.x,
+      y: pos.y,
+      w: 4.7,
+      h: 1.6,
+      rectRadius: 0.05,
+      line: { color: theme.line, pt: 1 },
+      fill: { color: index % 2 === 0 ? theme.surfaceAlt : theme.surface },
+    });
+
+    slide.addText(card.title || `Punto ${index + 1}`, {
+      x: pos.x + 0.24,
+      y: pos.y + 0.22,
+      w: 3.4,
+      h: 0.22,
+      fontFace: "Inter",
+      fontSize: 10,
+      bold: true,
+      color: theme.accent,
+      margin: 0,
+    });
+
+    slide.addText(compactPresentationText(card.body, 110), {
+      x: pos.x + 0.24,
+      y: pos.y + 0.56,
+      w: 4.05,
+      h: 0.72,
+      fontFace: "Inter",
+      fontSize: 11,
+      color: theme.text,
+      margin: 0,
+    });
+  });
+
+  addPresentationFooter(slide, theme, slideNumber);
+}
+
+function addPresentationColumnsSlide(pptx, theme, slideData, slideNumber) {
+  const slide = pptx.addSlide();
+  addPresentationBackground(slide, pptx, theme);
+
+  slide.addText(slideData.title || "Comparación", {
+    x: 1.0,
+    y: 1.1,
+    w: 7.0,
+    h: 0.52,
+    fontFace: "Sora",
+    fontSize: 21,
+    bold: true,
+    color: theme.text,
+    margin: 0,
+  });
+
+  [
+    {
+      x: 1.0,
+      title: slideData.leftTitle || "Bloque A",
+      text: compactPresentationText(slideData.leftText, 220),
+    },
+    {
+      x: 6.5,
+      title: slideData.rightTitle || "Bloque B",
+      text: compactPresentationText(slideData.rightText, 220),
+    },
+  ].forEach((column) => {
+    slide.addShape(getPresentationShapeType(pptx, "roundRect"), {
+      x: column.x,
+      y: 2.0,
+      w: 4.8,
+      h: 3.2,
+      rectRadius: 0.05,
+      line: { color: theme.line, pt: 1 },
+      fill: { color: theme.surfaceAlt },
+    });
+
+    slide.addText(column.title, {
+      x: column.x + 0.25,
+      y: 2.3,
+      w: 3.6,
+      h: 0.24,
+      fontFace: "Inter",
+      fontSize: 11,
+      bold: true,
+      color: theme.accent,
+      margin: 0,
+    });
+
+    slide.addText(column.text, {
+      x: column.x + 0.25,
+      y: 2.75,
+      w: 4.0,
+      h: 1.95,
+      fontFace: "Inter",
+      fontSize: 12,
+      color: theme.text,
+      margin: 0,
+    });
+  });
+
+  addPresentationFooter(slide, theme, slideNumber);
+}
+
+function addPresentationQuoteSlide(pptx, theme, slideData, slideNumber) {
+  const slide = pptx.addSlide();
+  addPresentationBackground(slide, pptx, theme);
+
+  slide.addText(slideData.title || "Idea destacada", {
+    x: 1.0,
+    y: 1.05,
+    w: 7.0,
+    h: 0.52,
+    fontFace: "Sora",
+    fontSize: 21,
+    bold: true,
+    color: theme.text,
+    margin: 0,
+  });
+
+  slide.addShape(getPresentationShapeType(pptx, "roundRect"), {
+    x: 1.0,
+    y: 1.95,
+    w: 10.8,
+    h: 2.3,
+    rectRadius: 0.05,
+    line: { color: theme.line, pt: 1 },
+    fill: { color: theme.surfaceAlt },
+  });
+
+  slide.addText(`“${compactPresentationText(slideData.quote, 170)}”`, {
+    x: 1.35,
+    y: 2.35,
+    w: 10.0,
+    h: 1.0,
+    fontFace: "Sora",
+    fontSize: 18,
+    italic: true,
+    color: theme.text,
+    margin: 0,
+    align: "center",
+    valign: "mid",
+  });
+
+  slide.addText(compactPresentationText(slideData.text, 210), {
+    x: 1.3,
+    y: 4.8,
+    w: 10.1,
+    h: 0.8,
+    fontFace: "Inter",
+    fontSize: 12,
+    color: theme.muted,
+    margin: 0,
+    align: "center",
+  });
+
+  addPresentationFooter(slide, theme, slideNumber);
+}
+
+function addPresentationTimelineSlide(pptx, theme, slideData, slideNumber) {
+  const slide = pptx.addSlide();
+  addPresentationBackground(slide, pptx, theme);
+
+  slide.addText(slideData.title || "Proceso", {
+    x: 1.0,
+    y: 1.05,
+    w: 7.0,
+    h: 0.52,
+    fontFace: "Sora",
+    fontSize: 21,
+    bold: true,
+    color: theme.text,
+    margin: 0,
+  });
+
+  slide.addText(compactPresentationText(slideData.intro, 160), {
+    x: 1.0,
+    y: 1.72,
+    w: 7.2,
+    h: 0.45,
+    fontFace: "Inter",
+    fontSize: 12,
+    color: theme.muted,
+    margin: 0,
+  });
+
+  slide.addShape(getPresentationShapeType(pptx, "line"), {
+    x: 1.3,
+    y: 3.5,
+    w: 10.2,
+    h: 0,
+    line: { color: theme.accent, pt: 1.8 },
+  });
+
+  const items = (slideData.items || []).slice(0, 4);
+  const startX = 1.15;
+  const gap = 2.55;
+
+  items.forEach((item, index) => {
+    const x = startX + gap * index;
+
+    slide.addShape(getPresentationShapeType(pptx, "ellipse"), {
+      x,
+      y: 3.18,
+      w: 0.42,
+      h: 0.42,
+      line: { color: theme.accent, pt: 1 },
+      fill: { color: theme.accent },
+    });
+
+    slide.addShape(getPresentationShapeType(pptx, "roundRect"), {
+      x: x - 0.15,
+      y: 4.0,
+      w: 2.15,
+      h: 1.55,
+      rectRadius: 0.04,
+      line: { color: theme.line, pt: 1 },
+      fill: { color: theme.surfaceAlt },
+    });
+
+    slide.addText(item.label || `Etapa ${index + 1}`, {
+      x: x - 0.02,
+      y: 4.18,
+      w: 1.75,
+      h: 0.22,
+      fontFace: "Inter",
+      fontSize: 10,
+      bold: true,
+      color: theme.accent,
+      margin: 0,
+    });
+
+    slide.addText(compactPresentationText(item.body, 72), {
+      x: x - 0.02,
+      y: 4.48,
+      w: 1.76,
+      h: 0.7,
+      fontFace: "Inter",
+      fontSize: 9.5,
+      color: theme.text,
+      margin: 0,
+    });
+  });
+
+  addPresentationFooter(slide, theme, slideNumber);
+}
+
+function addPresentationClosingSlide(pptx, theme, slideData, slideNumber) {
+  const slide = pptx.addSlide();
+  addPresentationBackground(slide, pptx, theme);
+
+  slide.addText(slideData.title || "Cierre", {
+    x: 1.0,
+    y: 1.1,
+    w: 6.5,
+    h: 0.52,
+    fontFace: "Sora",
+    fontSize: 21,
+    bold: true,
+    color: theme.text,
+    margin: 0,
+  });
+
+  slide.addText(compactPresentationText(slideData.text, 300), {
+    x: 1.0,
+    y: 1.95,
+    w: 7.0,
+    h: 2.0,
+    fontFace: "Inter",
+    fontSize: 14,
+    color: theme.text,
+    margin: 0,
+    paraSpaceAfterPt: 10,
+  });
+
+  slide.addShape(getPresentationShapeType(pptx, "roundRect"), {
+    x: 8.0,
+    y: 1.85,
+    w: 3.85,
+    h: 2.95,
+    rectRadius: 0.06,
+    line: { color: theme.line, pt: 1 },
+    fill: { color: theme.surfaceAlt },
+  });
+
+  slide.addText("Conceptos para recordar", {
+    x: 8.28,
+    y: 2.16,
+    w: 2.9,
+    h: 0.22,
+    fontFace: "Inter",
+    fontSize: 10,
+    bold: true,
+    color: theme.accent,
+    margin: 0,
+  });
+
+  const chips = (slideData.chips || []).slice(0, 5);
+  let chipX = 8.28;
+  let chipY = 2.58;
+
+  chips.forEach((chip, index) => {
+    const width = Math.min(1.65, Math.max(1.05, chip.length * 0.085));
+
+    if (chipX + width > 11.35) {
+      chipX = 8.28;
+      chipY += 0.52;
+    }
+
+    slide.addShape(getPresentationShapeType(pptx, "roundRect"), {
+      x: chipX,
+      y: chipY,
+      w: width,
+      h: 0.34,
+      rectRadius: 0.07,
+      line: { color: theme.line, pt: 1 },
+      fill: { color: theme.surface },
+    });
+
+    slide.addText(chip, {
+      x: chipX + 0.1,
+      y: chipY + 0.09,
+      w: width - 0.18,
+      h: 0.14,
+      fontFace: "Inter",
+      fontSize: 8.5,
+      bold: true,
+      color: theme.text,
+      align: "center",
+      margin: 0,
+    });
+
+    chipX += width + 0.12;
+  });
+
+  addPresentationFooter(slide, theme, slideNumber);
+}
+
+function addPresentationSourcesSlide(pptx, theme, sources = [], slideNumber = 1) {
+  if (!sources.length) return;
+
+  const slide = pptx.addSlide();
+  addPresentationBackground(slide, pptx, theme);
+
+  slide.addText("Fuentes consultadas", {
+    x: 1.0,
+    y: 1.12,
+    w: 7.0,
+    h: 0.52,
+    fontFace: "Sora",
+    fontSize: 21,
+    bold: true,
+    color: theme.text,
+    margin: 0,
+  });
+
+  const rows = sources.slice(0, 8).map((source, index) => {
+    const title = compactPresentationText(source.title || `Fuente ${index + 1}`, 85);
+    const domain = compactPresentationText(
+      (source.url || "").replace(/^https?:\/\//, "") || source.site || source.author || "",
+      50
+    );
+
+    return `${index + 1}. ${title}${domain ? ` — ${domain}` : ""}`;
+  });
+
+  const columns = chunkArray(rows, 4);
+
+  columns.forEach((colItems, colIndex) => {
+    slide.addShape(getPresentationShapeType(pptx, "roundRect"), {
+      x: colIndex === 0 ? 1.0 : 6.55,
+      y: 2.0,
+      w: 4.75,
+      h: 3.65,
+      rectRadius: 0.05,
+      line: { color: theme.line, pt: 1 },
+      fill: { color: theme.surfaceAlt },
+    });
+
+    slide.addText(colItems.join("\n\n"), {
+      x: colIndex === 0 ? 1.28 : 6.83,
+      y: 2.35,
+      w: 4.1,
+      h: 2.9,
+      fontFace: "Inter",
+      fontSize: 11,
+      color: theme.text,
+      margin: 0,
+      paraSpaceAfterPt: 10,
+    });
+  });
+
+  addPresentationFooter(slide, theme, slideNumber);
+}
+
+function renderPresentationSlides(pptx, meta, theme, presentationPlan, sources = []) {
+  addPresentationCoverSlide(pptx, meta, theme, presentationPlan.keywords || []);
+
+  let slideNumber = 2;
+
+  for (const slideData of presentationPlan.slides || []) {
+    if (slideData.type === "intro") {
+      addPresentationIntroSlide(pptx, theme, slideData, slideNumber);
+    } else if (slideData.type === "narrative") {
+      addPresentationNarrativeSlide(pptx, theme, slideData, slideNumber);
+    } else if (slideData.type === "cards") {
+      addPresentationCardsSlide(pptx, theme, slideData, slideNumber);
+    } else if (slideData.type === "columns") {
+      addPresentationColumnsSlide(pptx, theme, slideData, slideNumber);
+    } else if (slideData.type === "quote") {
+      addPresentationQuoteSlide(pptx, theme, slideData, slideNumber);
+    } else if (slideData.type === "timeline") {
+      addPresentationTimelineSlide(pptx, theme, slideData, slideNumber);
+    } else if (slideData.type === "closing") {
+      addPresentationClosingSlide(pptx, theme, slideData, slideNumber);
+    } else {
+      addPresentationNarrativeSlide(pptx, theme, slideData, slideNumber);
+    }
+    slideNumber += 1;
+  }
+
+  if (sources.length) {
+    addPresentationSourcesSlide(pptx, theme, sources, slideNumber);
+  }
 }
 
 function getPresentationFileName(title = "presentacion-eduvia") {
@@ -1909,11 +3154,15 @@ async function exportDocumentToPresentation() {
   }
 
   const targetLabel = els.exportPptBtn?.querySelector?.(".more-item-title");
-  const originalText = targetLabel?.textContent || els.exportPptBtn?.textContent || "Pasar a presentación";
+  const originalText =
+    targetLabel?.textContent ||
+    els.exportPptBtn?.textContent ||
+    "Pasar a presentación";
 
   try {
     window.closeMoreDropdown?.();
-    setMoreStatus("Generando presentación...");
+    setMoreStatus("Armando una presentación más visual...");
+    setLastSaveLabel("Preparando presentación...");
 
     if (els.exportPptBtn) {
       els.exportPptBtn.disabled = true;
@@ -1924,6 +3173,8 @@ async function exportDocumentToPresentation() {
     const meta = getPresentationMeta();
     const sections = extractPresentationSectionsFromDom();
     const sources = getFuentesDocumento(state.currentClaseData || {});
+    const theme = detectPresentationTheme(meta, sections);
+    const presentationPlan = buildPresentationSlides(meta, sections);
 
     const pptx = new PptxGenJS();
     pptx.layout = "LAYOUT_WIDE";
@@ -1932,53 +3183,23 @@ async function exportDocumentToPresentation() {
     pptx.subject = meta.titulo || "Documento convertido a presentación";
     pptx.title = meta.titulo || "Presentación";
     pptx.lang = "es-AR";
+    pptx.theme = {
+      headFontFace: "Sora",
+      bodyFontFace: "Inter",
+      lang: "es-AR",
+    };
 
-    addPresentationCoverSlide(pptx, meta);
-
-    const MAX_CONTENT_SLIDES = 8;
-    const MAX_BULLETS_PER_SLIDE = 4;
-    const MAX_BULLET_LENGTH = 120;
-
-    let slideNumber = 2;
-    let createdSlides = 0;
-
-    for (const section of sections) {
-      if (createdSlides >= MAX_CONTENT_SLIDES) break;
-
-      const bullets = toArray(section.bullets)
-        .map((item) => normalizePresentationText(item))
-        .filter(Boolean)
-        .map((item) =>
-          item.length > MAX_BULLET_LENGTH ? `${item.slice(0, MAX_BULLET_LENGTH).trim()}...` : item
-        );
-
-      const grouped = chunkArray(bullets, MAX_BULLETS_PER_SLIDE);
-
-      for (let i = 0; i < grouped.length; i++) {
-        if (createdSlides >= MAX_CONTENT_SLIDES) break;
-
-        addPresentationContentSlide(
-          pptx,
-          i === 0 ? section.title : `${section.title} (cont.)`,
-          grouped[i],
-          slideNumber
-        );
-
-        slideNumber += 1;
-        createdSlides += 1;
-      }
-    }
-
-    if (sources.length && createdSlides < MAX_CONTENT_SLIDES + 1) {
-      addPresentationSourcesSlide(pptx, sources, slideNumber);
-    }
+    renderPresentationSlides(pptx, meta, theme, presentationPlan, sources);
 
     await pptx.writeFile({ fileName: getPresentationFileName(meta.titulo) });
-    setMoreStatus("Presentación generada.");
+
+    setMoreStatus(`Presentación generada con estilo "${theme.label}".`);
+    setLastSaveLabel("Guardado automático");
   } catch (error) {
     console.error("Error exportando a presentación:", error);
     alert("No se pudo generar la presentación.");
     setMoreStatus("No se pudo generar la presentación.");
+    setLastSaveLabel("Guardado automático");
   } finally {
     if (els.exportPptBtn) {
       els.exportPptBtn.disabled = false;
