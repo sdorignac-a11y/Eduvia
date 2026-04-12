@@ -510,6 +510,64 @@ async function investigarTemaConWeb({
   objetivo,
   contenidoBase,
 }) {
+  try {
+    const researchResponse = await client.responses.create({
+      model: RESEARCH_MODEL,
+      reasoning: { effort: "low" },
+      tools: [{ type: "web_search" }],
+      tool_choice: "auto",
+      include: ["web_search_call.action.sources"],
+      truncation: "auto",
+      instructions: `
+Sos el investigador de Eduvia.
+Investigás con web y organizás la información.
+No redactes todavía el documento final.
+Respondé en español.
+Devolvé SOLO JSON válido.
+      `.trim(),
+      input: buildResearchPrompt({
+        materia,
+        tema,
+        nivel,
+        duracion,
+        objetivo,
+        contenidoBase,
+      }),
+      text: {
+        format: {
+          type: "json_schema",
+          name: "research_eduvia",
+          strict: true,
+          schema: RESEARCH_SCHEMA,
+        },
+      },
+    });
+
+    console.log("investigarTemaConWeb ok:", {
+      model: RESEARCH_MODEL,
+      hasOutputText: Boolean(researchResponse?.output_text),
+      outputTextLen: String(researchResponse?.output_text || "").length,
+    });
+
+    const research = parseResearchDesdeResponse(researchResponse);
+    const investigacionCompacta = construirInvestigacionCompacta(research);
+    const fuentes = extractWebSources(researchResponse);
+
+    console.log("investigarTemaConWeb parsed:", {
+      investigacionLen: investigacionCompacta.length,
+      fuentesCount: fuentes.length,
+    });
+
+    return {
+      investigacionCompacta,
+      fuentes,
+    };
+  } catch (error) {
+    console.error("Error en investigarTemaConWeb:", error?.message || error);
+    console.error("Stack investigarTemaConWeb:", error?.stack || "sin stack");
+    throw error;
+  }
+} {
   const researchResponse = await client.responses.create({
     model: RESEARCH_MODEL,
     reasoning: { effort: "low" },
@@ -592,6 +650,79 @@ async function generarDocumentoConIA({
   fuentesTexto,
   intento = 1,
 }) {
+  const refuerzo =
+    intento > 1
+      ? `
+Ajuste adicional para este intento:
+- El contenidoHtml anterior quedó corto o incompleto.
+- Esta vez devolvé un documento más desarrollado y mejor explicado.
+- Asegurate de que haya desarrollo real del tema en varias secciones.
+      `.trim()
+      : "";
+
+  try {
+    const documentoResponse = await client.responses.create({
+      model: DOCUMENT_MODEL,
+      truncation: "auto",
+      instructions: `
+Sos un profesor excelente de Eduvia.
+Tu tarea es convertir una base de investigación en un documento de estudio claro, serio y útil.
+
+Reglas:
+- Escribí en español claro.
+- Adaptá la profundidad al alumno.
+- No inventes contenido fuera del contexto.
+- El resultado debe sentirse como un apunte limpio y bien redactado.
+- Devolvé SOLO JSON válido.
+- El campo contenidoHtml debe contener HTML seguro y limpio.
+- Usá únicamente estas etiquetas: h1, h2, h3, p, ul, ol, li, blockquote, strong, em.
+- No uses style, script, iframe ni atributos inline.
+- No agregues las fuentes dentro de contenidoHtml.
+${refuerzo ? `- ${refuerzo.replace(/\n/g, "\n- ")}` : ""}
+      `.trim(),
+      input: buildDocumentoPrompt({
+        materia,
+        tema,
+        nivel,
+        duracion,
+        objetivo,
+        investigacionFinal,
+        contenidoBase,
+        fuentesTexto,
+      }),
+      text: {
+        format: {
+          type: "json_schema",
+          name: "documento_eduvia",
+          strict: true,
+          schema: DOCUMENTO_SCHEMA,
+        },
+      },
+      max_output_tokens: 2200,
+    });
+
+    const outputText = limpiarTexto(documentoResponse?.output_text || "");
+
+    console.log("generarDocumentoConIA ok:", {
+      model: DOCUMENT_MODEL,
+      intento,
+      hasOutputText: Boolean(outputText),
+      outputTextLen: outputText.length,
+      preview: outputText.slice(0, 300),
+    });
+
+    if (!outputText) {
+      console.error("documentoResponse sin output_text:", documentoResponse);
+      throw new Error("OpenAI no devolvió output_text en la generación del documento.");
+    }
+
+    return parseDocumentoDesdeResponse(documentoResponse);
+  } catch (error) {
+    console.error(`Error en generarDocumentoConIA (intento ${intento}):`, error?.message || error);
+    console.error(`Stack generarDocumentoConIA (intento ${intento}):`, error?.stack || "sin stack");
+    throw error;
+  }
+} {
   const refuerzo =
     intento > 1
       ? `
@@ -768,14 +899,15 @@ export default async function handler(req, res) {
         }
 
         throw new Error("El documento generado quedó demasiado corto.");
-      } catch (error) {
-        ultimoErrorDocumento = error;
-        console.error(`Intento ${intento} de documento falló:`, error?.message || error);
+} catch (error) {
+  ultimoErrorDocumento = error;
+  console.error(`Intento ${intento} de documento falló:`, error?.message || error);
+  console.error(`Stack intento ${intento}:`, error?.stack || "sin stack");
 
-        if (intento === MAX_RETRY_DOCUMENTO) {
-          throw error;
-        }
-      }
+  if (intento === MAX_RETRY_DOCUMENTO) {
+    throw error;
+  }
+}
     }
 
     console.timeEnd("documento_ia");
@@ -792,16 +924,14 @@ export default async function handler(req, res) {
       investigacion: investigacionFinal,
       fuentes: fuentesFinales,
     });
-  } catch (error) {
-    console.error("Error en /api/generar-documento:", error);
+} catch (error) {
+  console.error("Error en /api/generar-documento:", error);
+  console.error("STACK:", error?.stack || "sin stack");
 
-    return res.status(500).json({
-      ok: false,
-      error: "No se pudo generar el documento.",
-      detail:
-        process.env.NODE_ENV !== "production"
-          ? limpiarTexto(error?.message || "Error desconocido")
-          : undefined,
-    });
-  }
+  return res.status(500).json({
+    ok: false,
+    error: "No se pudo generar el documento.",
+    detail: limpiarTexto(error?.message || "Error desconocido"),
+  });
+}
 }
