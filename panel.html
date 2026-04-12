@@ -11,38 +11,39 @@
 
   <style>
     :root{
-      --bg:#f8f3e8;
-      --paper:#fffdf8;
-      --paper-2:#fff7ea;
-      --paper-3:#fffaf2;
-      --text:#2a2532;
-      --muted:#6f6577;
+      --bg:#f6f7fb;
+      --bg-soft:#fbfcff;
+      --panel:#ffffff;
+      --panel-2:#fcfcfe;
+      --panel-3:#f8f9fd;
+      --text:#111827;
+      --muted:#6b7280;
+      --muted-2:#94a3b8;
+      --line:#e8ebf2;
+      --line-strong:#dfe4ee;
 
-      --violet:#7d6bf2;
-      --violet-2:#6c59eb;
-      --violet-soft:#efeaff;
+      --primary:#6d5df6;
+      --primary-soft:#f1efff;
+      --primary-soft-2:#ebe8ff;
 
-      --yellow:#ffe796;
-      --yellow-soft:#fff5cf;
+      --blue:#3b82f6;
+      --blue-soft:#eff6ff;
 
-      --mint:#d9f0a1;
-      --mint-soft:#eff8d1;
+      --gold:#c7a86b;
+      --gold-soft:#f7f1e7;
 
-      --sky:#d9f1ff;
-      --sky-soft:#ecf8ff;
+      --success:#10b981;
+      --success-soft:#ecfdf5;
 
-      --orange:#ffb46d;
-      --orange-soft:#fff0df;
+      --danger:#ef4444;
 
-      --board:#28564a;
-      --board-2:#21483e;
-      --board-3:#19382f;
+      --shadow:0 20px 60px rgba(15, 23, 42, .07);
+      --shadow-soft:0 12px 30px rgba(15, 23, 42, .05);
 
-      --line:rgba(124,108,242,.12);
-      --line-soft:rgba(124,108,242,.08);
-
-      --shadow:0 18px 40px rgba(63,72,138,.08);
-      --shadow-soft:0 10px 24px rgba(63,72,138,.06);
+      --radius-xl:32px;
+      --radius-lg:24px;
+      --radius-md:18px;
+      --radius-sm:14px;
 
       --sidebar:250px;
     }
@@ -60,11 +61,11 @@
     body{
       font-family:"Inter",sans-serif;
       color:var(--text);
-      background:
-        radial-gradient(circle at top left, rgba(255,255,255,.78), transparent 28%),
-        radial-gradient(circle at bottom right, rgba(255,231,150,.22), transparent 24%),
-        var(--bg);
       min-height:100vh;
+      background:
+        radial-gradient(circle at top left, rgba(109,93,246,.08), transparent 26%),
+        radial-gradient(circle at 85% 15%, rgba(59,130,246,.07), transparent 22%),
+        linear-gradient(180deg, #ffffff 0%, #f7f8fc 100%);
       overflow-x:hidden;
     }
 
@@ -73,26 +74,14 @@
       position:fixed;
       inset:0;
       background-image:
-        linear-gradient(rgba(124,108,242,.04) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(124,108,242,.04) 1px, transparent 1px);
-      background-size:28px 28px;
+        linear-gradient(rgba(17,24,39,.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(17,24,39,.025) 1px, transparent 1px);
+      background-size:32px 32px;
       pointer-events:none;
+      opacity:.35;
       z-index:0;
-      opacity:.65;
-    }
-
-    body::after{
-      content:"";
-      position:fixed;
-      inset:0;
-      background:
-        radial-gradient(circle at 10% 18%, rgba(255,255,255,.45) 0 2px, transparent 2px),
-        radial-gradient(circle at 82% 24%, rgba(255,255,255,.38) 0 2px, transparent 2px),
-        radial-gradient(circle at 28% 84%, rgba(255,255,255,.3) 0 2px, transparent 2px);
-      background-size:180px 180px, 220px 220px, 250px 250px;
-      pointer-events:none;
-      opacity:.4;
-      z-index:0;
+      -webkit-mask-image:radial-gradient(circle at center, black 45%, transparent 90%);
+      mask-image:radial-gradient(circle at center, black 45%, transparent 90%);
     }
 
     .app{
@@ -103,13 +92,14 @@
       min-height:100vh;
     }
 
+    /* SIDEBAR: se mantiene como base */
     .sidebar{
       position:sticky;
       top:0;
       height:100vh;
-      background:rgba(255,252,245,.92);
+      background:rgba(255,255,255,.86);
       backdrop-filter:blur(14px);
-      border-right:2px dashed rgba(124,108,242,.14);
+      border-right:1px solid rgba(109,93,246,.10);
       padding:22px 18px;
       display:flex;
       flex-direction:column;
@@ -121,7 +111,7 @@
       align-items:center;
       gap:12px;
       padding:8px 6px 16px;
-      border-bottom:1px dashed rgba(124,108,242,.16);
+      border-bottom:1px solid rgba(109,93,246,.10);
     }
 
     .brand-mark{
@@ -133,8 +123,8 @@
       font-family:"Sora",sans-serif;
       font-weight:800;
       color:#fff;
-      background:linear-gradient(135deg, var(--violet), var(--orange));
-      box-shadow:0 12px 24px rgba(124,108,242,.2);
+      background:linear-gradient(135deg, var(--primary), #8b7cff);
+      box-shadow:0 12px 24px rgba(109,93,246,.20);
       flex:none;
     }
 
@@ -163,623 +153,115 @@
       border:none;
       background:transparent;
       text-align:left;
-      color:#4b425a;
+      color:#4b5563;
       padding:13px 14px;
       border-radius:15px;
       font-weight:700;
       font-family:inherit;
       font-size:1rem;
       cursor:pointer;
-      transition:.2s ease;
+      transition:.22s ease;
     }
 
     .menu a:hover,
     .menu button:hover{
-      background:#f7efff;
-      color:#6b5ee8;
+      background:#f5f4ff;
+      color:var(--primary);
       transform:translateX(4px);
     }
 
     .menu a.active{
-      background:linear-gradient(135deg, rgba(124,108,242,.14), rgba(255,179,107,.16));
-      color:#6b5ee8;
+      background:linear-gradient(135deg, rgba(109,93,246,.12), rgba(139,124,255,.08));
+      color:var(--primary);
       box-shadow:var(--shadow-soft);
     }
 
     .menu button:focus{
       outline:none;
-      box-shadow:0 0 0 4px rgba(124,108,242,.08);
+      box-shadow:0 0 0 4px rgba(109,93,246,.08);
     }
 
     .sidebar-note{
       margin-top:auto;
-      background:linear-gradient(180deg, #fff1ad, #ffe291);
-      border:1px solid rgba(255,179,107,.24);
+      background:linear-gradient(180deg, #ffffff, #f8faff);
+      border:1px solid #e9edf5;
       border-radius:20px;
       padding:15px;
       box-shadow:var(--shadow-soft);
-      transform:rotate(-1deg);
     }
 
     .sidebar-note strong{
       display:block;
       margin-bottom:6px;
       font-size:.95rem;
+      color:#1f2937;
     }
 
     .sidebar-note p{
-      color:#635869;
+      color:#6b7280;
       font-size:.88rem;
       line-height:1.55;
     }
 
+    /* MAIN NUEVO */
     .main{
       padding:28px;
     }
 
     .page{
-      max-width:1200px;
+      max-width:1260px;
       margin:0 auto;
       display:grid;
       gap:22px;
     }
 
-    /* HERO PREMIUM */
-    .hero-craft{
-      position:relative;
-      overflow:hidden;
-      background:linear-gradient(180deg, var(--paper) 0%, var(--paper-2) 100%);
-      border:2px solid rgba(124,108,242,.08);
-      border-radius:34px;
-      padding:24px 28px 26px;
-      box-shadow:var(--shadow);
-    }
-
-    .hero-craft::before{
-      content:"";
-      position:absolute;
-      inset:0;
-      background:
-        radial-gradient(circle at 12% 18%, rgba(255,255,255,.78), transparent 20%),
-        radial-gradient(circle at 88% 82%, rgba(255,231,150,.14), transparent 18%);
-      pointer-events:none;
-    }
-
-    .craft-stage{
-      position:relative;
-      z-index:1;
-    }
-
-    .board-header{
+    .topbar{
       display:flex;
       align-items:center;
       justify-content:space-between;
-      gap:14px;
+      gap:18px;
       flex-wrap:wrap;
-      margin-bottom:14px;
+      padding:4px 2px;
     }
 
-    .board-frame-label{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      padding:9px 14px;
-      border-radius:999px;
-      background:#f6f0ff;
-      color:#6b5ee8;
-      font-size:.78rem;
-      font-weight:800;
-      letter-spacing:.12em;
-      text-transform:uppercase;
-      border:1px solid rgba(124,108,242,.12);
-      box-shadow:0 8px 18px rgba(124,108,242,.06);
-    }
-
-    .board-tabs{
-      display:flex;
-      flex-wrap:wrap;
-      gap:10px;
-    }
-
-    .board-tab{
-      padding:10px 14px;
-      border-radius:999px;
-      font-size:.85rem;
-      font-weight:800;
-      border:1px solid var(--line);
-      background:rgba(255,255,255,.72);
-      color:#5f5670;
-      box-shadow:0 8px 16px rgba(63,72,138,.04);
-    }
-
-    .board-tab.active{
-      background:linear-gradient(135deg, rgba(124,108,242,.16), rgba(255,179,107,.14));
-      color:#5e4fe0;
-    }
-
-    .board-wrap{
-      position:relative;
-    }
-
-    .modern-board{
-      position:relative;
-      background:
-        radial-gradient(circle at 18% 18%, rgba(255,255,255,.05), transparent 20%),
-        radial-gradient(circle at 72% 30%, rgba(255,255,255,.04), transparent 22%),
-        linear-gradient(180deg, var(--board) 0%, var(--board-2) 54%, var(--board-3) 100%);
-      border:12px solid #c99661;
-      border-bottom-width:16px;
-      border-radius:30px;
-      padding:20px 22px 22px;
-      box-shadow:
-        inset 0 0 0 2px rgba(255,255,255,.04),
-        inset 0 20px 40px rgba(255,255,255,.03),
-        0 22px 30px rgba(35,34,58,.12);
-      overflow:hidden;
-    }
-
-    .modern-board::before{
-      content:"";
-      position:absolute;
-      inset:0;
-      background:
-        linear-gradient(transparent 43px, rgba(255,255,255,.018) 44px),
-        radial-gradient(circle at top left, rgba(255,255,255,.04), transparent 30%);
-      background-size:100% 44px, auto;
-      opacity:.45;
-      pointer-events:none;
-    }
-
-    .board-topbar{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:14px;
-      margin-bottom:20px;
-      position:relative;
-      z-index:2;
-    }
-
-    .board-dots{
-      display:flex;
-      gap:8px;
-    }
-
-    .board-dot{
-      width:10px;
-      height:10px;
-      border-radius:50%;
-      background:rgba(255,255,255,.22);
-    }
-
-    .board-status{
+    .topbar-copy span{
       display:inline-flex;
       align-items:center;
       gap:8px;
       padding:8px 12px;
       border-radius:999px;
-      border:1px solid rgba(255,255,255,.12);
-      background:rgba(255,255,255,.06);
-      color:#e8f8f0;
+      background:rgba(255,255,255,.8);
+      border:1px solid var(--line);
+      color:var(--primary);
       font-size:.78rem;
       font-weight:800;
       letter-spacing:.08em;
       text-transform:uppercase;
+      margin-bottom:10px;
+      box-shadow:var(--shadow-soft);
     }
 
-    .board-status::before{
-      content:"";
-      width:8px;
-      height:8px;
-      border-radius:50%;
-      background:#9cf1c4;
-      box-shadow:0 0 0 4px rgba(156,241,196,.14);
-    }
-
-    .board-content{
-      position:relative;
-      z-index:2;
-      display:grid;
-      grid-template-columns:1.1fr .9fr;
-      gap:18px;
-      align-items:stretch;
-    }
-
-    .chalk-note.clean{
-      max-width:none;
-    }
-
-    .chalk-note.clean .mini-label{
-      display:inline-block;
-      margin-bottom:14px;
-      padding:8px 12px;
-      border-radius:999px;
-      border:1px solid rgba(255,255,255,.14);
-      background:rgba(255,255,255,.06);
-      color:#e0f3ea;
-      font-size:.78rem;
-      font-weight:800;
-      letter-spacing:.11em;
-    }
-
-    .chalk-note.clean h1{
+    .topbar-copy h1{
       font-family:"Sora",sans-serif;
-      font-size:clamp(2rem,4vw,3.05rem);
-      line-height:1.03;
-      letter-spacing:-.05em;
-      color:#f7fff9;
-      margin-bottom:14px;
-      max-width:640px;
+      font-size:clamp(2rem, 4vw, 3.2rem);
+      line-height:1.02;
+      letter-spacing:-.06em;
+      max-width:760px;
     }
 
-    .chalk-note.clean p{
-      color:rgba(235,248,241,.88);
-      line-height:1.85;
-      font-size:1rem;
-      max-width:610px;
-      margin-bottom:18px;
-    }
-
-    .board-feature-row{
-      display:flex;
-      flex-wrap:wrap;
-      gap:10px;
-    }
-
-    .board-feature{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      padding:11px 14px;
-      border-radius:15px;
-      border:1px solid rgba(255,255,255,.12);
-      background:rgba(255,255,255,.075);
-      color:#eefcf4;
-      font-size:.9rem;
-      font-weight:800;
-      box-shadow:0 8px 18px rgba(0,0,0,.05);
-    }
-
-    .board-side-cards{
-      display:grid;
-      gap:12px;
-      align-self:stretch;
-    }
-
-    .side-card{
-      background:rgba(255,255,255,.075);
-      border:1px solid rgba(255,255,255,.1);
-      border-radius:18px;
-      padding:16px;
-      backdrop-filter:blur(4px);
-      box-shadow:0 10px 18px rgba(0,0,0,.06);
-    }
-
-    .side-card span{
-      display:block;
-      color:rgba(226,239,233,.72);
-      font-size:.78rem;
-      font-weight:700;
-      margin-bottom:6px;
-      letter-spacing:.03em;
-    }
-
-    .side-card strong{
-      display:block;
-      color:#f4fff8;
-      font-size:1rem;
-      line-height:1.4;
-      letter-spacing:-.02em;
-      margin-bottom:6px;
-    }
-
-    .side-card p{
-      color:rgba(235,248,241,.76);
-      font-size:.9rem;
-      line-height:1.6;
-    }
-
-    .board-bottom{
-      position:relative;
-      z-index:2;
-      margin-top:22px;
-    }
-
-    .chalk-shelf{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:14px;
-      flex-wrap:wrap;
-    }
-
-    .chalk-tools{
-      display:flex;
-      gap:8px;
-      align-items:center;
-    }
-
-    .chalk{
-      width:26px;
-      height:8px;
-      border-radius:999px;
-      display:inline-block;
-      box-shadow:0 2px 6px rgba(0,0,0,.15);
-    }
-
-    .chalk.white{ background:#f9fbff; }
-    .chalk.yellow{ background:#ffe796; }
-    .chalk.blue{ background:#c9e7ff; }
-
-    .board-bottom-line{
-      flex:1;
-      min-width:180px;
-      height:6px;
-      border-radius:999px;
-      background:linear-gradient(90deg, rgba(255,255,255,.18), rgba(255,255,255,.04));
-    }
-
-    /* SECCIONES */
-    .section{
-      background:rgba(255,252,247,.92);
-      border:1px solid rgba(255,255,255,.8);
-      border-radius:30px;
-      padding:24px;
-      box-shadow:var(--shadow);
-    }
-
-    .section-head{
-      display:flex;
-      align-items:flex-end;
-      justify-content:space-between;
-      gap:16px;
-      margin-bottom:18px;
-      flex-wrap:wrap;
-    }
-
-    .section-head h2{
-      font-family:"Sora",sans-serif;
-      font-size:1.55rem;
-      letter-spacing:-.04em;
-    }
-
-    .section-head p{
-      color:var(--muted);
-      max-width:700px;
-      line-height:1.75;
-    }
-
-    .guide-grid{
-      display:grid;
-      grid-template-columns:repeat(3,1fr);
-      gap:18px;
-    }
-
-    .guide-card{
-      position:relative;
-      border-radius:22px;
-      padding:22px;
-      box-shadow:0 14px 26px rgba(63,72,138,.08);
-      overflow:hidden;
-      border:2px solid rgba(0,0,0,.05);
-      transition:.2s ease;
-    }
-
-    .guide-card:hover{
-      transform:translateY(-4px);
-    }
-
-    .guide-card:nth-child(1){
-      background:#fff1a8;
-      transform:rotate(-1deg);
-    }
-
-    .guide-card:nth-child(2){
-      background:#d9f0ff;
-      transform:rotate(.8deg);
-    }
-
-    .guide-card:nth-child(3){
-      background:#eadfff;
-      transform:rotate(-.8deg);
-    }
-
-    .guide-card::before{
-      content:"";
-      position:absolute;
-      inset:0;
-      background-image:linear-gradient(transparent 31px, rgba(124,108,242,.045) 32px);
-      background-size:100% 32px;
-      pointer-events:none;
-      opacity:.9;
-    }
-
-    .guide-card::after{
-      content:"";
-      position:absolute;
-      left:20px;
-      top:0;
-      bottom:0;
-      width:2px;
-      background:rgba(255,90,110,.22);
-      pointer-events:none;
-    }
-
-    .guide-card .tape{
-      position:absolute;
-      top:14px;
-      right:18px;
-      width:64px;
-      height:16px;
-      border-radius:5px;
-      background:rgba(255,255,255,.34);
-      transform:rotate(8deg);
-      box-shadow:0 2px 6px rgba(0,0,0,.04);
-      z-index:2;
-    }
-
-    .guide-inner{
-      position:relative;
-      z-index:1;
-      padding-left:18px;
-      padding-top:10px;
-    }
-
-    .step-badge{
-      width:46px;
-      height:46px;
-      border-radius:15px;
-      display:grid;
-      place-items:center;
-      font-family:"Sora",sans-serif;
-      font-weight:800;
-      color:var(--violet);
-      background:#fff;
-      border:2px solid var(--violet);
-      margin-bottom:14px;
-      box-shadow:0 8px 18px rgba(124,108,242,.08);
-    }
-
-    .guide-card h3{
-      font-family:"Sora",sans-serif;
-      font-size:1.08rem;
-      margin-bottom:8px;
-      letter-spacing:-.03em;
-    }
-
-    .guide-card p{
-      color:#4f5a6f;
-      line-height:1.75;
-      font-size:.95rem;
-    }
-
-    .quick-grid{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:18px;
-    }
-
-    .prep-card{
-      position:relative;
-      border-radius:22px;
-      padding:22px;
-      box-shadow:0 14px 26px rgba(63,72,138,.08);
-      overflow:hidden;
-      border:2px solid rgba(0,0,0,.05);
-      transition:.2s ease;
-    }
-
-    .prep-card:hover{
-      transform:translateY(-4px);
-    }
-
-    .prep-card:nth-child(1){
-      background:#fff1a8;
-      transform:rotate(-1deg);
-    }
-
-    .prep-card:nth-child(2){
-      background:#d9f0ff;
-      transform:rotate(.8deg);
-    }
-
-    .prep-card::before{
-      content:"";
-      position:absolute;
-      inset:0;
-      background-image:linear-gradient(transparent 31px, rgba(124,108,242,.045) 32px);
-      background-size:100% 32px;
-      pointer-events:none;
-      opacity:.9;
-    }
-
-    .prep-card::after{
-      content:"";
-      position:absolute;
-      left:20px;
-      top:0;
-      bottom:0;
-      width:2px;
-      background:rgba(255,90,110,.22);
-      pointer-events:none;
-    }
-
-    .prep-card .tape{
-      position:absolute;
-      top:14px;
-      right:18px;
-      width:64px;
-      height:16px;
-      border-radius:5px;
-      background:rgba(255,255,255,.34);
-      transform:rotate(8deg);
-      box-shadow:0 2px 6px rgba(0,0,0,.04);
-      z-index:2;
-    }
-
-    .prep-inner{
-      position:relative;
-      z-index:1;
-      padding-left:18px;
-      padding-top:10px;
-    }
-
-    .prep-badge{
-      width:46px;
-      height:46px;
-      border-radius:15px;
-      display:grid;
-      place-items:center;
-      font-family:"Sora",sans-serif;
-      font-weight:800;
-      color:var(--violet);
-      background:#fff;
-      border:2px solid var(--violet);
-      margin-bottom:14px;
-      box-shadow:0 8px 18px rgba(124,108,242,.08);
-    }
-
-    .prep-card h3{
-      font-family:"Sora",sans-serif;
-      font-size:1.08rem;
-      margin-bottom:8px;
-      letter-spacing:-.03em;
-    }
-
-    .prep-card p{
-      color:#4f5a6f;
-      line-height:1.75;
-      font-size:.95rem;
-      margin-bottom:14px;
-    }
-
-    .prep-list{
-      display:grid;
-      gap:10px;
-      margin-top:12px;
-    }
-
-    .prep-list div{
-      padding:13px 14px;
-      border-radius:16px;
-      background:rgba(255,255,255,.78);
-      border:1px solid rgba(124,108,242,.12);
-      color:#465067;
-      font-size:.94rem;
-      font-weight:600;
-      line-height:1.6;
-    }
-
-    .prep-tip{
+    .topbar-copy p{
       margin-top:14px;
-      padding:14px 15px;
-      border-radius:16px;
-      background:rgba(255,255,255,.62);
-      border:1px solid rgba(255,179,107,.24);
-      color:#5a4f49;
-      line-height:1.6;
-      font-size:.92rem;
-      font-weight:600;
+      max-width:760px;
+      color:var(--muted);
+      font-size:1.02rem;
+      line-height:1.8;
+    }
+
+    .topbar-actions{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      align-self:flex-start;
     }
 
     .btn{
@@ -794,7 +276,8 @@
       font-weight:800;
       border-radius:999px;
       padding:14px 20px;
-      transition:.2s ease;
+      transition:.22s ease;
+      white-space:nowrap;
     }
 
     .btn:hover{
@@ -803,40 +286,432 @@
 
     .btn-primary{
       color:#fff;
-      background:linear-gradient(135deg, var(--violet), var(--orange));
-      box-shadow:0 14px 28px rgba(124,108,242,.16);
+      background:linear-gradient(135deg, var(--primary), #8573ff);
+      box-shadow:0 14px 28px rgba(109,93,246,.18);
     }
 
-    .btn-soft{
-      color:var(--violet);
-      background:#efeaff;
+    .btn-light{
+      color:#1f2937;
+      background:rgba(255,255,255,.86);
+      border:1px solid var(--line);
+      box-shadow:var(--shadow-soft);
+    }
+
+    .hero{
+      position:relative;
+      overflow:hidden;
+      background:
+        radial-gradient(circle at top left, rgba(109,93,246,.10), transparent 28%),
+        radial-gradient(circle at bottom right, rgba(59,130,246,.10), transparent 24%),
+        linear-gradient(180deg, rgba(255,255,255,.96), rgba(248,249,253,.96));
+      border:1px solid rgba(255,255,255,.9);
+      border-radius:var(--radius-xl);
+      padding:30px;
+      box-shadow:var(--shadow);
+    }
+
+    .hero-grid{
+      display:grid;
+      grid-template-columns:1.15fr .85fr;
+      gap:22px;
+      align-items:stretch;
+    }
+
+    .hero-panel{
+      background:rgba(255,255,255,.84);
+      border:1px solid var(--line);
+      border-radius:28px;
+      padding:24px;
+      box-shadow:var(--shadow-soft);
+    }
+
+    .eyebrow{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 12px;
+      border-radius:999px;
+      background:var(--primary-soft);
+      color:var(--primary);
+      font-size:.78rem;
+      font-weight:800;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      margin-bottom:14px;
+    }
+
+    .hero-panel h2{
+      font-family:"Sora",sans-serif;
+      font-size:clamp(1.8rem, 3vw, 2.6rem);
+      line-height:1.08;
+      letter-spacing:-.05em;
+      margin-bottom:14px;
+      max-width:620px;
+    }
+
+    .hero-panel p{
+      color:var(--muted);
+      line-height:1.85;
+      font-size:1rem;
+      max-width:620px;
+    }
+
+    .hero-points{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-top:22px;
+    }
+
+    .hero-points span{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:11px 14px;
+      border-radius:14px;
+      background:#fff;
+      border:1px solid var(--line);
+      color:#334155;
+      font-weight:700;
+      font-size:.92rem;
+      box-shadow:var(--shadow-soft);
     }
 
     .hero-actions{
       display:flex;
       gap:12px;
       flex-wrap:wrap;
+      margin-top:24px;
+    }
+
+    .hero-side{
+      display:grid;
+      gap:14px;
+    }
+
+    .stat-card,
+    .preview-card{
+      background:rgba(255,255,255,.86);
+      border:1px solid var(--line);
+      border-radius:24px;
+      padding:20px;
+      box-shadow:var(--shadow-soft);
+    }
+
+    .stat-card .label{
+      display:block;
+      color:var(--muted-2);
+      font-size:.8rem;
+      font-weight:700;
+      margin-bottom:8px;
+      text-transform:uppercase;
+      letter-spacing:.08em;
+    }
+
+    .stat-card strong{
+      display:block;
+      font-family:"Sora",sans-serif;
+      font-size:2rem;
+      letter-spacing:-.05em;
+      margin-bottom:6px;
+    }
+
+    .stat-card p{
+      color:var(--muted);
+      line-height:1.7;
+      font-size:.95rem;
+    }
+
+    .mini-metrics{
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:14px;
+    }
+
+    .metric-box{
+      background:var(--panel);
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:18px;
+      box-shadow:var(--shadow-soft);
+    }
+
+    .metric-box span{
+      display:block;
+      color:var(--muted-2);
+      font-size:.78rem;
+      font-weight:700;
+      margin-bottom:7px;
+      text-transform:uppercase;
+      letter-spacing:.08em;
+    }
+
+    .metric-box strong{
+      display:block;
+      font-family:"Sora",sans-serif;
+      font-size:1.35rem;
+      letter-spacing:-.04em;
+      margin-bottom:4px;
+    }
+
+    .metric-box p{
+      color:var(--muted);
+      font-size:.92rem;
+      line-height:1.6;
+    }
+
+    .preview-card{
+      display:grid;
+      gap:14px;
+    }
+
+    .preview-head{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+
+    .preview-head strong{
+      font-size:1rem;
+      letter-spacing:-.02em;
+    }
+
+    .preview-head span{
+      padding:8px 10px;
+      border-radius:999px;
+      background:var(--blue-soft);
+      color:var(--blue);
+      font-size:.78rem;
+      font-weight:800;
+      text-transform:uppercase;
+      letter-spacing:.06em;
+    }
+
+    .preview-surface{
+      background:linear-gradient(180deg, #ffffff 0%, #f9fbff 100%);
+      border:1px solid var(--line);
+      border-radius:20px;
+      padding:18px;
+      display:grid;
+      gap:12px;
+    }
+
+    .preview-line{
+      height:12px;
+      border-radius:999px;
+      background:linear-gradient(90deg, #eceffd 0%, #f2f5fb 100%);
+    }
+
+    .preview-line.w-90{ width:90%; }
+    .preview-line.w-78{ width:78%; }
+    .preview-line.w-66{ width:66%; }
+    .preview-line.w-54{ width:54%; }
+
+    .section{
+      background:rgba(255,255,255,.82);
+      border:1px solid rgba(255,255,255,.92);
+      border-radius:var(--radius-xl);
+      padding:26px;
+      box-shadow:var(--shadow);
+    }
+
+    .section-head{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-end;
+      gap:16px;
+      flex-wrap:wrap;
+      margin-bottom:18px;
+    }
+
+    .section-head h2{
+      font-family:"Sora",sans-serif;
+      font-size:1.65rem;
+      letter-spacing:-.05em;
+      margin-bottom:8px;
+    }
+
+    .section-head p{
+      color:var(--muted);
+      max-width:760px;
+      line-height:1.8;
+    }
+
+    .feature-grid{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:18px;
+    }
+
+    .feature-card{
+      background:linear-gradient(180deg, #ffffff 0%, #fafbff 100%);
+      border:1px solid var(--line);
+      border-radius:24px;
+      padding:22px;
+      box-shadow:var(--shadow-soft);
+      transition:.22s ease;
+    }
+
+    .feature-card:hover{
+      transform:translateY(-4px);
+    }
+
+    .feature-icon{
+      width:52px;
+      height:52px;
+      border-radius:16px;
+      display:grid;
+      place-items:center;
+      margin-bottom:16px;
+      font-size:1.2rem;
+      box-shadow:var(--shadow-soft);
+    }
+
+    .feature-card:nth-child(1) .feature-icon{
+      background:var(--primary-soft);
+    }
+
+    .feature-card:nth-child(2) .feature-icon{
+      background:var(--blue-soft);
+    }
+
+    .feature-card:nth-child(3) .feature-icon{
+      background:var(--gold-soft);
+    }
+
+    .feature-card h3{
+      font-family:"Sora",sans-serif;
+      font-size:1.06rem;
+      letter-spacing:-.03em;
+      margin-bottom:10px;
+    }
+
+    .feature-card p{
+      color:var(--muted);
+      line-height:1.75;
+      font-size:.95rem;
+    }
+
+    .double-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:18px;
+    }
+
+    .flow-card{
+      background:linear-gradient(180deg, #ffffff 0%, #fafcff 100%);
+      border:1px solid var(--line);
+      border-radius:26px;
+      padding:24px;
+      box-shadow:var(--shadow-soft);
+    }
+
+    .flow-number{
+      width:42px;
+      height:42px;
+      border-radius:14px;
+      display:grid;
+      place-items:center;
+      background:var(--primary-soft);
+      color:var(--primary);
+      font-family:"Sora",sans-serif;
+      font-weight:800;
+      margin-bottom:14px;
+    }
+
+    .flow-card h3{
+      font-family:"Sora",sans-serif;
+      font-size:1.15rem;
+      letter-spacing:-.03em;
+      margin-bottom:10px;
+    }
+
+    .flow-card p{
+      color:var(--muted);
+      line-height:1.8;
+      margin-bottom:16px;
+    }
+
+    .flow-list{
+      display:grid;
+      gap:10px;
+    }
+
+    .flow-list div{
+      padding:13px 14px;
+      border-radius:16px;
+      background:#fff;
+      border:1px solid var(--line);
+      color:#374151;
+      font-size:.94rem;
+      font-weight:600;
+      line-height:1.6;
+      box-shadow:var(--shadow-soft);
+    }
+
+    .highlight{
+      background:linear-gradient(135deg, rgba(109,93,246,.08), rgba(59,130,246,.06));
+      border:1px solid rgba(109,93,246,.10);
+      border-radius:24px;
+      padding:20px;
       margin-top:18px;
     }
 
-    @media (max-width: 1080px){
-      .guide-grid,
-      .quick-grid{
+    .highlight strong{
+      display:block;
+      font-size:1rem;
+      margin-bottom:8px;
+      letter-spacing:-.02em;
+    }
+
+    .highlight p{
+      color:var(--muted);
+      line-height:1.75;
+      font-size:.95rem;
+    }
+
+    .bottom-cta{
+      position:relative;
+      overflow:hidden;
+      background:
+        radial-gradient(circle at 0% 0%, rgba(109,93,246,.12), transparent 25%),
+        radial-gradient(circle at 100% 100%, rgba(59,130,246,.10), transparent 22%),
+        linear-gradient(180deg, #ffffff 0%, #f8faff 100%);
+      border:1px solid var(--line);
+      border-radius:var(--radius-xl);
+      padding:28px;
+      box-shadow:var(--shadow);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:20px;
+      flex-wrap:wrap;
+    }
+
+    .bottom-cta h2{
+      font-family:"Sora",sans-serif;
+      font-size:clamp(1.6rem, 3vw, 2.3rem);
+      letter-spacing:-.05em;
+      margin-bottom:10px;
+    }
+
+    .bottom-cta p{
+      color:var(--muted);
+      max-width:720px;
+      line-height:1.8;
+    }
+
+    @media (max-width: 1140px){
+      .hero-grid,
+      .feature-grid,
+      .double-grid{
         grid-template-columns:1fr;
       }
     }
 
-    @media (max-width: 980px){
-      .board-content{
-        grid-template-columns:1fr;
-      }
-
-      .board-side-cards{
-        grid-template-columns:1fr;
-      }
-    }
-
-    @media (max-width: 820px){
+    @media (max-width: 860px){
       .app{
         grid-template-columns:1fr;
       }
@@ -845,44 +720,38 @@
         position:relative;
         height:auto;
         border-right:none;
-        border-bottom:2px dashed rgba(124,108,242,.12);
+        border-bottom:1px solid rgba(109,93,246,.10);
       }
 
       .main{
         padding:18px;
       }
 
-      .hero-craft,
-      .section{
-        padding:20px;
+      .hero,
+      .section,
+      .bottom-cta{
+        padding:22px;
         border-radius:24px;
       }
     }
 
-    @media (max-width: 720px){
+    @media (max-width: 680px){
+      .topbar-actions,
       .hero-actions{
-        flex-direction:column;
+        width:100%;
       }
 
+      .topbar-actions .btn,
       .hero-actions .btn{
         width:100%;
       }
-    }
 
-    @media (max-width: 640px){
-      .modern-board{
-        border-width:9px;
-        border-bottom-width:12px;
-        border-radius:22px;
-        padding:18px;
+      .mini-metrics{
+        grid-template-columns:1fr;
       }
 
-      .chalk-note.clean h1{
-        font-size:2rem;
-      }
-
-      .board-header{
-        align-items:flex-start;
+      .topbar-copy h1{
+        font-size:2.25rem;
       }
     }
   </style>
@@ -911,8 +780,8 @@
       <div class="sidebar-note">
         <strong>Idea principal</strong>
         <p>
-          Un panel que se sienta como tu espacio de estudio: claro, visual y con herramientas
-          para seguir aprendiendo sin vueltas.
+          Un panel que se sienta claro, premium y moderno: simple para entrar,
+          agradable para estudiar y con IA lista para acompañarte.
         </p>
       </div>
     </aside>
@@ -920,85 +789,86 @@
     <main class="main">
       <div class="page">
 
-        <section class="hero-craft">
-          <div class="craft-stage">
-            <div class="board-header">
-              <div class="board-frame-label">EDUVIA</div>
+        <section class="topbar">
+          <div class="topbar-copy">
+            <span>Panel principal</span>
+            <h1>Una experiencia de estudio más limpia, guiada y premium.</h1>
+            <p>
+              Eduvia organiza tus clases, apuntes y herramientas en un solo lugar.
+              La idea no es llenar la pantalla de cosas, sino darte un entorno visual
+              más claro para estudiar mejor y entender más rápido.
+            </p>
+          </div>
 
-              <div class="board-tabs">
-                <span class="board-tab active">Panel principal</span>
-                <span class="board-tab">Clases</span>
-                <span class="board-tab">Apuntes</span>
-                <span class="board-tab">IA</span>
+          <div class="topbar-actions">
+            <a href="crear-clase.html" class="btn btn-primary">Crear nueva clase</a>
+            <a href="mis-clases.html" class="btn btn-light">Ver mis clases</a>
+          </div>
+        </section>
+
+        <section class="hero">
+          <div class="hero-grid">
+            <div class="hero-panel">
+              <span class="eyebrow">Eduvia Premium White</span>
+              <h2>Estudiar también puede sentirse ordenado, elegante y fácil de seguir.</h2>
+              <p>
+                Esta versión del panel está pensada para que todo se vea más profesional
+                y respirado. Menos ruido visual, mejores bloques, jerarquía más clara
+                y una sensación mucho más moderna para que Eduvia se vea como un producto fuerte.
+              </p>
+
+              <div class="hero-points">
+                <span>IA guiada</span>
+                <span>Clases más visuales</span>
+                <span>Entorno limpio</span>
+                <span>Mejor concentración</span>
+              </div>
+
+              <div class="hero-actions">
+                <a href="crear-clase.html" class="btn btn-primary">Empezar ahora</a>
+                <a href="#guia" class="btn btn-light">Ver funcionamiento</a>
               </div>
             </div>
 
-            <div class="board-wrap">
-              <div class="board modern-board">
-                <div class="board-topbar">
-                  <div class="board-dots">
-                    <span class="board-dot"></span>
-                    <span class="board-dot"></span>
-                    <span class="board-dot"></span>
-                  </div>
+            <div class="hero-side">
+              <article class="stat-card">
+                <span class="label">Experiencia</span>
+                <strong>Más clara</strong>
+                <p>
+                  El panel prioriza lectura, orden visual y foco. Todo está distribuido
+                  para que la vista descanse más y el contenido principal tenga presencia.
+                </p>
+              </article>
 
-                  <div class="board-status">Estudio activo</div>
-                </div>
+              <div class="mini-metrics">
+                <article class="metric-box">
+                  <span>Modo</span>
+                  <strong>Guiado</strong>
+                  <p>La IA acompaña paso a paso.</p>
+                </article>
 
-                <div class="board-content">
-                  <div class="chalk-note clean">
-                    <span class="mini-label">Espacio de estudio</span>
-                    <h1>Aprendé con una experiencia más clara, visual y bien guiada.</h1>
-                    <p>
-                      Eduvia convierte el estudio en algo más ordenado y más fácil de seguir.
-                      La IA explica paso a paso, adapta el ritmo según lo que necesites
-                      y acompaña el proceso con apoyo visual para que cada tema quede más claro.
-                    </p>
-
-                    <div class="board-feature-row">
-                      <span class="board-feature">✏️ Explicación guiada</span>
-                      <span class="board-feature">📘 Apoyo visual</span>
-                      <span class="board-feature">🧠 A tu ritmo</span>
-                    </div>
-
-                    <div class="hero-actions">
-                      <a href="crear-clase.html" class="btn btn-primary">Crear nueva clase</a>
-                      <a href="mis-clases.html" class="btn btn-soft">Ver mis clases</a>
-                    </div>
-                  </div>
-
-                  <div class="board-side-cards">
-                    <div class="side-card">
-                      <span>Modalidad</span>
-                      <strong>Clase guiada con IA</strong>
-                      <p>Explicaciones más claras y adaptadas al tema que quieras estudiar.</p>
-                    </div>
-
-                    <div class="side-card">
-                      <span>Apoyo visual</span>
-                      <strong>Pizarra interactiva</strong>
-                      <p>Ideal para procedimientos, ejemplos y explicaciones paso a paso.</p>
-                    </div>
-
-                    <div class="side-card">
-                      <span>Objetivo</span>
-                      <strong>Entender mejor</strong>
-                      <p>No solo avanzar, sino comprender con una lógica mucho más clara.</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="board-bottom">
-                  <div class="chalk-shelf">
-                    <div class="chalk-tools">
-                      <span class="chalk white"></span>
-                      <span class="chalk yellow"></span>
-                      <span class="chalk blue"></span>
-                    </div>
-                    <div class="board-bottom-line"></div>
-                  </div>
-                </div>
+                <article class="metric-box">
+                  <span>Estilo</span>
+                  <strong>Premium</strong>
+                  <p>Visual limpio y moderno.</p>
+                </article>
               </div>
+
+              <article class="preview-card">
+                <div class="preview-head">
+                  <strong>Vista del entorno</strong>
+                  <span>Preview</span>
+                </div>
+
+                <div class="preview-surface">
+                  <div class="preview-line w-54"></div>
+                  <div class="preview-line w-90"></div>
+                  <div class="preview-line w-78"></div>
+                  <div class="preview-line w-66"></div>
+                  <div class="preview-line w-90"></div>
+                  <div class="preview-line w-54"></div>
+                </div>
+              </article>
             </div>
           </div>
         </section>
@@ -1008,47 +878,38 @@
             <div>
               <h2>Cómo funciona Eduvia</h2>
               <p>
-                Todo está pensado para que la experiencia se sienta simple, visual y cercana,
-                como si alguien hubiese preparado tu espacio de estudio antes de empezar.
+                La lógica del panel está pensada para que el alumno entre, ubique rápido
+                lo importante y pueda pasar de una idea general a una clase concreta sin perderse.
               </p>
             </div>
           </div>
 
-          <div class="guide-grid">
-            <article class="guide-card">
-              <span class="tape"></span>
-              <div class="guide-inner">
-                <div class="step-badge">1</div>
-                <h3>Elegí qué querés estudiar</h3>
-                <p>
-                  Podés entrar con una materia concreta, un tema puntual o incluso con una duda específica
-                  para que la clase ya empiece enfocada.
-                </p>
-              </div>
+          <div class="feature-grid">
+            <article class="feature-card">
+              <div class="feature-icon">✦</div>
+              <h3>Entrás con una idea clara</h3>
+              <p>
+                Desde el inicio, el panel prioriza acciones importantes como crear una clase,
+                revisar clases anteriores y entender rápido qué podés hacer dentro de Eduvia.
+              </p>
             </article>
 
-            <article class="guide-card">
-              <span class="tape"></span>
-              <div class="guide-inner">
-                <div class="step-badge">2</div>
-                <h3>Organizá tu espacio</h3>
-                <p>
-                  Eduvia reúne tus clases, materiales y explicaciones dentro del mismo entorno,
-                  para que estudiar se sienta más ordenado y natural.
-                </p>
-              </div>
+            <article class="feature-card">
+              <div class="feature-icon">⌘</div>
+              <h3>La IA organiza el recorrido</h3>
+              <p>
+                En lugar de sentirse como una herramienta suelta, la IA pasa a ser parte del
+                entorno y acompaña la experiencia con más naturalidad.
+              </p>
             </article>
 
-            <article class="guide-card">
-              <span class="tape"></span>
-              <div class="guide-inner">
-                <div class="step-badge">3</div>
-                <h3>La IA te acompaña</h3>
-                <p>
-                  La IA explica, responde preguntas y usa apoyo visual para mostrar ejercicios,
-                  procedimientos y ejemplos de una forma mucho más clara.
-                </p>
-              </div>
+            <article class="feature-card">
+              <div class="feature-icon">◎</div>
+              <h3>Todo se siente más profesional</h3>
+              <p>
+                El diseño blanco premium hace que Eduvia se vea más confiable, más moderno
+                y mucho más listo para crecer como producto real.
+              </p>
             </article>
           </div>
         </section>
@@ -1056,60 +917,77 @@
         <section class="section">
           <div class="section-head">
             <div>
-              <h2>Antes de empezar</h2>
+              <h2>Antes de empezar a estudiar</h2>
               <p>
-                Antes de ponerte a estudiar, Eduvia te da un entorno más simple y más claro
-                para que aproveches mejor la clase desde el primer minuto.
+                Este panel busca preparar el contexto correcto. No es solo mostrar botones:
+                es darle al alumno una sensación de orden, dirección y confianza.
               </p>
             </div>
           </div>
 
-          <div class="quick-grid">
-            <article class="prep-card">
-              <span class="tape"></span>
-              <div class="prep-inner">
-                <div class="prep-badge">1</div>
-                <h3>Qué vas a encontrar</h3>
+          <div class="double-grid">
+            <article class="flow-card">
+              <div class="flow-number">1</div>
+              <h3>Qué encuentra el usuario</h3>
+              <p>
+                Una estructura clara, moderna y liviana, donde las acciones principales están
+                bien marcadas y el contenido no compite visualmente con el resto.
+              </p>
+
+              <div class="flow-list">
+                <div>Acceso rápido a crear nuevas clases</div>
+                <div>Secciones más respiradas y fáciles de leer</div>
+                <div>Diseño elegante sin verse frío</div>
+                <div>Jerarquía visual más fuerte y profesional</div>
+              </div>
+
+              <div class="highlight">
+                <strong>Resultado</strong>
                 <p>
-                  La clase está pensada como una sesión de estudio guiada: visual, clara y flexible,
-                  para que no solo leas, sino que realmente entiendas.
+                  El usuario entiende más rápido el producto y siente que está dentro de una
+                  plataforma sólida, no solo en una página con bloques sueltos.
                 </p>
-
-                <div class="prep-list">
-                  <div>Explicaciones paso a paso, sin que todo vaya demasiado rápido</div>
-                  <div>Pizarra visual para ejemplos, cuentas y procedimientos</div>
-                  <div>La IA puede repetir, simplificar o cambiar la forma de explicar</div>
-                  <div>Podés empezar con una duda puntual o con una materia completa</div>
-                </div>
-
-                <div class="prep-tip">
-                  Consejo: arrancá con una pregunta concreta o con el tema que más te cuesta. Así la explicación sale mucho más enfocada.
-                </div>
               </div>
             </article>
 
-            <article class="prep-card">
-              <span class="tape"></span>
-              <div class="prep-inner">
-                <div class="prep-badge">2</div>
-                <h3>Cómo aprovecharlo mejor</h3>
+            <article class="flow-card">
+              <div class="flow-number">2</div>
+              <h3>Qué transmite la marca</h3>
+              <p>
+                Eduvia puede posicionarse como una plataforma educativa moderna, adaptable
+                a secundaria, universidad o estudio independiente, sin verse infantil.
+              </p>
+
+              <div class="flow-list">
+                <div>Más premium que escolar</div>
+                <div>Más limpia que recargada</div>
+                <div>Más actual que una web educativa clásica</div>
+                <div>Más confiable para presentar a otros</div>
+              </div>
+
+              <div class="highlight">
+                <strong>Idea visual</strong>
                 <p>
-                  Eduvia está pensado para alumnos que quieren una experiencia más cercana,
-                  más visual y mucho más fácil de seguir que una plataforma común.
+                  Blanco, grises suaves, violeta elegante y mucho espacio. Esa mezcla hace
+                  que Eduvia se sienta tecnológica, académica y refinada al mismo tiempo.
                 </p>
-
-                <div class="prep-list">
-                  <div>Ideal para entender un tema desde cero</div>
-                  <div>Muy útil para practicar antes de una prueba</div>
-                  <div>Perfecto si aprendés mejor viendo pasos escritos</div>
-                  <div>Podés preguntar sin presión y avanzar a tu propio ritmo</div>
-                </div>
-
-                <div class="prep-tip">
-                  La idea es que el panel se sienta como una mesa de estudio digital: ordenada, viva y agradable de usar.
-                </div>
               </div>
             </article>
+          </div>
+        </section>
+
+        <section class="bottom-cta">
+          <div>
+            <h2>Un panel más premium puede hacer que todo Eduvia se sienta mejor.</h2>
+            <p>
+              Esta dirección visual sirve muy bien como base para después diseñar también
+              crear clase, mis clases, documento y aula bajo la misma identidad.
+            </p>
+          </div>
+
+          <div class="topbar-actions">
+            <a href="crear-clase.html" class="btn btn-primary">Crear clase</a>
+            <a href="mis-clases.html" class="btn btn-light">Abrir mis clases</a>
           </div>
         </section>
 
