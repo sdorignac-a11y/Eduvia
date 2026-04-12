@@ -11,14 +11,14 @@ const CLASE_SCHEMA = {
     resumen: { type: "string" },
     palabrasClave: {
       type: "array",
-      minItems: 5,
-      maxItems: 10,
+      minItems: 4,
+      maxItems: 8,
       items: { type: "string" },
     },
     secciones: {
       type: "array",
-      minItems: 4,
-      maxItems: 8,
+      minItems: 2,
+      maxItems: 6,
       items: {
         type: "object",
         properties: {
@@ -37,7 +37,7 @@ const CLASE_SCHEMA = {
     },
     cardsDerecha: {
       type: "array",
-      minItems: 3,
+      minItems: 0,
       maxItems: 3,
       items: {
         type: "object",
@@ -61,8 +61,8 @@ const CLASE_SCHEMA = {
     },
     imagenesContenido: {
       type: "array",
-      minItems: 2,
-      maxItems: 4,
+      minItems: 0,
+      maxItems: 3,
       items: {
         type: "object",
         properties: {
@@ -96,7 +96,7 @@ const CLASE_SCHEMA = {
 };
 
 function limpiarTexto(value = "") {
-  return String(value).trim();
+  return String(value || "").trim();
 }
 
 function buildSearchPrompt({ materia, tema, nivel, duracion, objetivo }) {
@@ -116,15 +116,18 @@ Instrucciones:
 - Evitá foros, contenido pobre, clickbait o páginas repetidas.
 - No escribas una clase final todavía.
 - Entregá una investigación breve y útil en español.
+- No fuerces una plantilla fija.
+- Incluí solo lo que realmente aplique al tema.
 
-Quiero que armes un informe con estas partes:
-1. Definición o idea central del tema.
-2. Conceptos clave.
-3. Fórmulas, fechas, reglas o procedimientos si aplican.
-4. Ejemplos concretos si aplican.
-5. Errores comunes o confusiones frecuentes si aplican.
-6. Relación con otros conceptos importantes.
-7. Qué sería lo más importante para estudiar para una prueba.
+Quiero una investigación breve que pueda incluir, según corresponda:
+- definición o idea central
+- conceptos clave
+- fechas, reglas, fórmulas o procedimientos si aplican
+- causas y consecuencias si aplican
+- comparaciones o relaciones con otros conceptos si sirven
+- ejemplos concretos si sirven
+- errores comunes o confusiones frecuentes si existen
+- lo más importante para estudiar para una prueba
 
 Sé claro, concreto y útil.
 `.trim();
@@ -215,6 +218,24 @@ function extractWebSources(response) {
   return Array.from(encontrados.values()).slice(0, 8);
 }
 
+function parseJsonSeguro(text) {
+  const raw = limpiarTexto(text);
+  if (!raw) return null;
+
+  try {
+    return JSON.parse(raw);
+  } catch {
+    const match = raw.match(/\{[\s\S]*\}$/);
+    if (!match) return null;
+
+    try {
+      return JSON.parse(match[0]);
+    } catch {
+      return null;
+    }
+  }
+}
+
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({
@@ -239,7 +260,6 @@ export default async function handler(req, res) {
       });
     }
 
-    // 1) INVESTIGACIÓN CON WEB SEARCH
     const researchResponse = await client.responses.create({
       model: process.env.OPENAI_RESEARCH_MODEL || "gpt-5.4-mini",
       reasoning: { effort: "low" },
@@ -251,6 +271,8 @@ Sos un investigador académico de Eduvia.
 Tu trabajo es investigar primero y explicar después.
 No hagas relleno.
 No inventes fuentes.
+No fuerces estructuras fijas.
+Incluí solo la información que realmente sirva para este tema.
 `.trim(),
       input: buildSearchPrompt({
         materia,
@@ -272,7 +294,6 @@ No inventes fuentes.
 
     const fuentes = extractWebSources(researchResponse);
 
-    // 2) GENERACIÓN FINAL EN JSON ESTRICTO
     const lessonResponse = await client.responses.create({
       model: process.env.OPENAI_MODEL || "gpt-5.4",
       instructions: `
@@ -295,52 +316,45 @@ REGLAS:
 
 MUY IMPORTANTE:
 - No uses una estructura fija.
-- Elegí las secciones según lo que el tema necesite.
-- Si el tema requiere fórmulas, incluilas.
-- Si el tema requiere causas y consecuencias, incluilas.
-- Si el tema requiere pasos, procedimiento, fechas, comparaciones o errores comunes, incluilos.
-- Si el tema es más teórico, priorizá explicación, ideas clave, relaciones y ejemplos.
+- Elegí las secciones según lo que el tema realmente necesite.
+- No metas fórmulas si el tema no las necesita.
+- No metas pasos si el tema no los necesita.
+- No metas comparaciones, fechas, causas o errores comunes si no aportan valor real.
+- Si el tema es más teórico, priorizá explicación, contexto, relaciones, ideas clave y ejemplos.
 - Si el tema es más práctico, priorizá reglas, procedimiento, aplicación y errores comunes.
+- Si el tema es histórico o social, priorizá contexto, causas, consecuencias, relaciones y debates importantes.
+- Las secciones deben surgir del contenido, no de una plantilla.
 
 QUÉ TENÉS QUE DEVOLVER:
+
 1. "titulo"
 - Claro y específico.
 
 2. "resumen"
-- Un resumen principal más completo, claro y útil.
+- Un resumen principal claro y útil.
 - Debe explicar bien de qué trata el tema y por qué importa.
 
 3. "palabrasClave"
-- Entre 5 y 10 palabras o frases cortas que sean esenciales para este tema.
-- Sirven para resaltarlas visualmente.
+- Entre 4 y 8 palabras o frases cortas esenciales para este tema.
 
 4. "secciones"
-- Entre 4 y 8 secciones.
+- Entre 2 y 6 secciones.
 - Cada sección debe tener:
   - "titulo"
   - "texto"
   - "bullets"
-- Las secciones deben surgir del tema, no de una plantilla fija.
-- "texto" debe explicar.
-- "bullets" debe resumir puntos fuertes si hace falta.
+- "texto" explica la idea.
+- "bullets" solo resume puntos fuertes si realmente suma.
 
 5. "cardsDerecha"
-- 3 cards visuales pensadas para estar a la derecha.
-- Cada una debe tener:
-  - "titulo"
-  - "lineas" (2 a 4)
-  - "caption"
-  - "estilo" (blue, green, yellow o red)
-- Deben ser visuales, claras y realmente útiles para estudiar.
+- De 0 a 3 cards visuales.
+- Incluilas solo si aportan valor real para estudiar.
+- No las completes por obligación.
 
 6. "imagenesContenido"
-- Entre 2 y 4 apoyos visuales para intercalar entre secciones.
-- Cada uno debe tener:
-  - "titulo"
-  - "lineas" (2 a 4)
-  - "caption"
-  - "estilo" (blue, green, yellow o red)
-- Deben representar ideas importantes del contenido, no decoración vacía.
+- De 0 a 3 apoyos visuales para intercalar.
+- Incluilos solo si ayudan a entender o recordar mejor.
+- No agregues decoración vacía.
 
 ESTILO:
 - Claro
@@ -368,11 +382,18 @@ ESTILO:
       },
     });
 
-    const clase = JSON.parse(lessonResponse.output_text);
+    const parsed = parseJsonSeguro(lessonResponse.output_text);
+
+    if (!parsed) {
+      return res.status(500).json({
+        ok: false,
+        error: "La IA respondió con un JSON inválido.",
+      });
+    }
 
     return res.status(200).json({
       ok: true,
-      clase,
+      clase: parsed,
       fuentes,
       investigacion,
     });
@@ -383,7 +404,9 @@ ESTILO:
       ok: false,
       error: "No se pudo generar la clase.",
       detalle:
-        process.env.NODE_ENV === "development" ? String(error?.message || error) : undefined,
+        process.env.NODE_ENV === "development"
+          ? String(error?.message || error)
+          : undefined,
     });
   }
 }
