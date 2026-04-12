@@ -206,7 +206,10 @@ function limpiarContenidoBase(value = "") {
 function combinarContextoBase({ investigacion = "", contenidoBase = "" }) {
   const partes = [];
 
-  const investigacionLimpia = limitarTexto(investigacion, MAX_INVESTIGACION_CHARS);
+  const investigacionLimpia = limitarTexto(
+    investigacion,
+    MAX_INVESTIGACION_CHARS
+  );
   const contenidoBaseLimpio = limpiarContenidoBase(contenidoBase);
 
   if (investigacionLimpia) {
@@ -214,13 +217,22 @@ function combinarContextoBase({ investigacion = "", contenidoBase = "" }) {
   }
 
   if (contenidoBaseLimpio) {
-    partes.push(`Contenido base ya analizado o redactado previamente:\n${contenidoBaseLimpio}`);
+    partes.push(
+      `Contenido base ya analizado o redactado previamente:\n${contenidoBaseLimpio}`
+    );
   }
 
   return partes.join("\n\n").trim();
 }
 
-function buildResearchPrompt({ materia, tema, nivel, duracion, objetivo, contenidoBase }) {
+function buildResearchPrompt({
+  materia,
+  tema,
+  nivel,
+  duracion,
+  objetivo,
+  contenidoBase,
+}) {
   return `
 Investigá este tema para preparar un documento de estudio completo y serio.
 
@@ -355,15 +367,18 @@ function sanitizeContenidoHtml(html = "") {
     "em",
   ]);
 
-  output = output.replace(/<\s*(\/?)\s*([a-z0-9-]+)([^>]*)>/gi, (_, closing, tagName) => {
-    const tag = String(tagName || "").toLowerCase();
+  output = output.replace(
+    /<\s*(\/?)\s*([a-z0-9-]+)([^>]*)>/gi,
+    (_, closing, tagName) => {
+      const tag = String(tagName || "").toLowerCase();
 
-    if (!allowedTags.has(tag)) {
-      return "";
+      if (!allowedTags.has(tag)) {
+        return "";
+      }
+
+      return closing ? `</${tag}>` : `<${tag}>`;
     }
-
-    return closing ? `</${tag}>` : `<${tag}>`;
-  });
+  );
 
   output = output.replace(/\n{3,}/g, "\n\n");
   return output.trim();
@@ -443,7 +458,9 @@ function parseDocumentoDesdeResponse(response) {
 
   if (!raw) {
     console.error("Respuesta completa del documento sin output_text:", response);
-    throw new Error("OpenAI no devolvió output_text en la generación del documento.");
+    throw new Error(
+      "OpenAI no devolvió output_text en la generación del documento."
+    );
   }
 
   const parsed = extraerJsonDesdeTexto(raw);
@@ -564,50 +581,12 @@ Devolvé SOLO JSON válido.
     };
   } catch (error) {
     console.error("Error en investigarTemaConWeb:", error?.message || error);
-    console.error("Stack investigarTemaConWeb:", error?.stack || "sin stack");
+    console.error(
+      "Stack investigarTemaConWeb:",
+      error?.stack || "sin stack"
+    );
     throw error;
   }
-} {
-  const researchResponse = await client.responses.create({
-    model: RESEARCH_MODEL,
-    reasoning: { effort: "low" },
-    tools: [{ type: "web_search" }],
-    tool_choice: "auto",
-    include: ["web_search_call.action.sources"],
-    truncation: "auto",
-    instructions: `
-Sos el investigador de Eduvia.
-Investigás con web y organizás la información.
-No redactes todavía el documento final.
-Respondé en español.
-Devolvé SOLO JSON válido.
-    `.trim(),
-    input: buildResearchPrompt({
-      materia,
-      tema,
-      nivel,
-      duracion,
-      objetivo,
-      contenidoBase,
-    }),
-    text: {
-      format: {
-        type: "json_schema",
-        name: "research_eduvia",
-        strict: true,
-        schema: RESEARCH_SCHEMA,
-      },
-    },
-  });
-
-  const research = parseResearchDesdeResponse(researchResponse);
-  const investigacionCompacta = construirInvestigacionCompacta(research);
-  const fuentes = extractWebSources(researchResponse);
-
-  return {
-    investigacionCompacta,
-    fuentes,
-  };
 }
 
 async function buscarFuentesConWeb({
@@ -713,67 +692,23 @@ ${refuerzo ? `- ${refuerzo.replace(/\n/g, "\n- ")}` : ""}
 
     if (!outputText) {
       console.error("documentoResponse sin output_text:", documentoResponse);
-      throw new Error("OpenAI no devolvió output_text en la generación del documento.");
+      throw new Error(
+        "OpenAI no devolvió output_text en la generación del documento."
+      );
     }
 
     return parseDocumentoDesdeResponse(documentoResponse);
   } catch (error) {
-    console.error(`Error en generarDocumentoConIA (intento ${intento}):`, error?.message || error);
-    console.error(`Stack generarDocumentoConIA (intento ${intento}):`, error?.stack || "sin stack");
+    console.error(
+      `Error en generarDocumentoConIA (intento ${intento}):`,
+      error?.message || error
+    );
+    console.error(
+      `Stack generarDocumentoConIA (intento ${intento}):`,
+      error?.stack || "sin stack"
+    );
     throw error;
   }
-} {
-  const refuerzo =
-    intento > 1
-      ? `
-Ajuste adicional para este intento:
-- El contenidoHtml anterior quedó corto o incompleto.
-- Esta vez devolvé un documento más desarrollado y mejor explicado.
-- Asegurate de que haya desarrollo real del tema en varias secciones.
-      `.trim()
-      : "";
-
-  const documentoResponse = await client.responses.create({
-    model: DOCUMENT_MODEL,
-    truncation: "auto",
-    instructions: `
-Sos un profesor excelente de Eduvia.
-Tu tarea es convertir una base de investigación en un documento de estudio claro, serio y útil.
-
-Reglas:
-- Escribí en español claro.
-- Adaptá la profundidad al alumno.
-- No inventes contenido fuera del contexto.
-- El resultado debe sentirse como un apunte limpio y bien redactado.
-- Devolvé SOLO JSON válido.
-- El campo contenidoHtml debe contener HTML seguro y limpio.
-- Usá únicamente estas etiquetas: h1, h2, h3, p, ul, ol, li, blockquote, strong, em.
-- No uses style, script, iframe ni atributos inline.
-- No agregues las fuentes dentro de contenidoHtml.
-${refuerzo ? `- ${refuerzo.replace(/\n/g, "\n- ")}` : ""}
-    `.trim(),
-    input: buildDocumentoPrompt({
-      materia,
-      tema,
-      nivel,
-      duracion,
-      objetivo,
-      investigacionFinal,
-      contenidoBase,
-      fuentesTexto,
-    }),
-    text: {
-      format: {
-        type: "json_schema",
-        name: "documento_eduvia",
-        strict: true,
-        schema: DOCUMENTO_SCHEMA,
-      },
-    },
-    max_output_tokens: 2200,
-  });
-
-  return parseDocumentoDesdeResponse(documentoResponse);
 }
 
 export default async function handler(req, res) {
@@ -819,7 +754,10 @@ export default async function handler(req, res) {
       });
     }
 
-    let investigacionFinal = limitarTexto(investigacion, MAX_INVESTIGACION_CHARS);
+    let investigacionFinal = limitarTexto(
+      investigacion,
+      MAX_INVESTIGACION_CHARS
+    );
     let fuentesFinales = limpiarFuentes(fuentes);
 
     const faltaInvestigacion = !investigacionFinal;
@@ -837,7 +775,8 @@ export default async function handler(req, res) {
         contenidoBase: contenidoBaseLimpio,
       });
 
-      investigacionFinal = researchData.investigacionCompacta || investigacionFinal;
+      investigacionFinal =
+        researchData.investigacionCompacta || investigacionFinal;
 
       if (faltanFuentes) {
         fuentesFinales = limpiarFuentes(researchData.fuentes);
@@ -899,21 +838,30 @@ export default async function handler(req, res) {
         }
 
         throw new Error("El documento generado quedó demasiado corto.");
-} catch (error) {
-  ultimoErrorDocumento = error;
-  console.error(`Intento ${intento} de documento falló:`, error?.message || error);
-  console.error(`Stack intento ${intento}:`, error?.stack || "sin stack");
+      } catch (error) {
+        ultimoErrorDocumento = error;
+        console.error(
+          `Intento ${intento} de documento falló:`,
+          error?.message || error
+        );
+        console.error(
+          `Stack intento ${intento}:`,
+          error?.stack || "sin stack"
+        );
 
-  if (intento === MAX_RETRY_DOCUMENTO) {
-    throw error;
-  }
-}
+        if (intento === MAX_RETRY_DOCUMENTO) {
+          throw error;
+        }
+      }
     }
 
     console.timeEnd("documento_ia");
 
     if (!documento) {
-      throw ultimoErrorDocumento || new Error("No se pudo construir el documento.");
+      throw (
+        ultimoErrorDocumento ||
+        new Error("No se pudo construir el documento.")
+      );
     }
 
     console.timeEnd("generar_documento_total");
@@ -924,14 +872,14 @@ export default async function handler(req, res) {
       investigacion: investigacionFinal,
       fuentes: fuentesFinales,
     });
-} catch (error) {
-  console.error("Error en /api/generar-documento:", error);
-  console.error("STACK:", error?.stack || "sin stack");
+  } catch (error) {
+    console.error("Error en /api/generar-documento:", error);
+    console.error("STACK:", error?.stack || "sin stack");
 
-  return res.status(500).json({
-    ok: false,
-    error: "No se pudo generar el documento.",
-    detail: limpiarTexto(error?.message || "Error desconocido"),
-  });
-}
+    return res.status(500).json({
+      ok: false,
+      error: "No se pudo generar el documento.",
+      detail: limpiarTexto(error?.message || "Error desconocido"),
+    });
+  }
 }
