@@ -166,6 +166,7 @@
       gap:8px;
       margin-left:auto;
       flex:none;
+      flex-wrap:wrap;
     }
 
     .btn{
@@ -472,7 +473,7 @@
       line-height:1.9;
       color:#202124;
       outline:none;
-      min-height:640px;
+      min-height:520px;
     }
 
     .doc-content:focus{
@@ -524,6 +525,128 @@
     .doc-editable[contenteditable="true"]:empty:before{
       content:attr(data-placeholder);
       color:#9aa0a6;
+    }
+
+    .references-panel{
+      margin-top:42px;
+      padding-top:28px;
+      border-top:1px solid #eceff1;
+    }
+
+    .references-top{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:18px;
+      flex-wrap:wrap;
+    }
+
+    .references-title{
+      font-family:"Sora",sans-serif;
+      font-size:1.35rem;
+      font-weight:700;
+      letter-spacing:-.03em;
+      color:#202124;
+    }
+
+    .references-sub{
+      color:#5f6368;
+      font-size:.92rem;
+      line-height:1.6;
+      margin-bottom:18px;
+    }
+
+    .reference-list{
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+    }
+
+    .reference-item{
+      padding:0 0 0 22px;
+      position:relative;
+      color:#202124;
+      line-height:1.8;
+      font-size:.97rem;
+    }
+
+    .reference-item::before{
+      content:"";
+      position:absolute;
+      left:0;
+      top:.85em;
+      width:8px;
+      height:8px;
+      border-radius:999px;
+      background:#d0d7de;
+      transform:translateY(-50%);
+    }
+
+    .reference-item.apa{
+      padding-left:26px;
+      text-indent:-26px;
+    }
+
+    .reference-link{
+      color:#0b57d0;
+      word-break:break-word;
+    }
+
+    .view-toggle{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+
+    .toggle-chip{
+      border:none;
+      background:#eef2f7;
+      color:#334155;
+      padding:8px 12px;
+      border-radius:999px;
+      font-size:.84rem;
+      font-weight:700;
+      cursor:pointer;
+      transition:.15s ease;
+    }
+
+    .toggle-chip:hover{
+      background:#e5ebf2;
+    }
+
+    .toggle-chip.is-active{
+      background:#e8f0fe;
+      color:#0b57d0;
+      box-shadow:inset 0 0 0 1px rgba(26,115,232,.14);
+    }
+
+    .citation-chip{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-width:22px;
+      height:22px;
+      padding:0 8px;
+      border-radius:999px;
+      background:#eef4ff;
+      color:#0b57d0;
+      font-size:.76rem;
+      font-weight:700;
+      vertical-align:middle;
+      margin-left:4px;
+      white-space:nowrap;
+    }
+
+    .apa-inline-citation{
+      color:#5f6368;
+      font-size:.95em;
+      white-space:nowrap;
+    }
+
+    .hidden{
+      display:none !important;
     }
 
     .share-modal-backdrop{
@@ -774,7 +897,6 @@
         width:100%;
         justify-content:flex-start;
         margin-left:0;
-        flex-wrap:wrap;
       }
 
       .doc-menu{
@@ -914,6 +1036,7 @@
 
         <div class="topbar-actions">
           <a href="crear-clase.html" class="btn btn-outline">← Volver</a>
+          <button type="button" class="btn btn-soft" id="toggle-reference-view-btn">APA</button>
           <button type="button" class="btn btn-soft" id="open-more-btn">Más ▾</button>
           <button type="button" class="btn btn-primary" id="open-share-btn">🔒 Compartir</button>
         </div>
@@ -1081,6 +1204,24 @@
               spellcheck="true"
               data-placeholder="Acá la IA o el usuario pueden escribir el contenido del documento..."
             ></section>
+
+            <section class="references-panel" id="references-section">
+              <div class="references-top">
+                <div>
+                  <h2 class="references-title" id="references-title">Referencias</h2>
+                  <p class="references-sub" id="references-sub">
+                    Fuentes utilizadas por Eduvia para construir este documento.
+                  </p>
+                </div>
+
+                <div class="view-toggle">
+                  <button type="button" class="toggle-chip is-active" id="simple-view-btn">Vista simple</button>
+                  <button type="button" class="toggle-chip" id="apa-view-btn">Vista APA</button>
+                </div>
+              </div>
+
+              <div class="reference-list" id="references-list"></div>
+            </section>
           </div>
         </article>
       </div>
@@ -1237,9 +1378,70 @@
     const undoBtn = document.getElementById("undo-btn");
     const redoBtn = document.getElementById("redo-btn");
 
+    const referencesList = document.getElementById("references-list");
+    const referencesTitle = document.getElementById("references-title");
+    const referencesSub = document.getElementById("references-sub");
+    const simpleViewBtn = document.getElementById("simple-view-btn");
+    const apaViewBtn = document.getElementById("apa-view-btn");
+    const topToggleReferenceViewBtn = document.getElementById("toggle-reference-view-btn");
+
     let activeEditable = editor;
     let savedRange = null;
     let saveTimer = null;
+    let referenceMode = "simple";
+
+    const documentSources = [
+      {
+        id: 1,
+        author: "Starbucks",
+        year: "2012",
+        title: "On a First Name Basis",
+        site: "Starbucks Stories & News",
+        url: "https://about.starbucks.com/history/on-a-first-name-basis/"
+      },
+      {
+        id: 2,
+        author: "Harvard Business School",
+        year: "2001",
+        title: "What Starbucks Says About Its Consumers",
+        site: "HBS News",
+        url: "https://www.hbs.edu/news/releases/Pages/koehnonstarbucks.aspx"
+      },
+      {
+        id: 3,
+        author: "Wang, Y.",
+        year: "2023",
+        title: "Brand symbolism and consumer perception of Starbucks",
+        site: "MDPI",
+        url: "https://www.mdpi.com/"
+      }
+    ];
+
+    const sampleContent = `
+      <h2>La estrategia de Starbucks con los nombres en los vasos</h2>
+
+      <p>
+        La estrategia de Starbucks de escribir el nombre del cliente en el vaso puede entenderse como una forma de
+        personalización del servicio que busca volver la experiencia más cercana, memorable y humana
+        <span class="citation-slot" data-sources="1"></span>
+      </p>
+
+      <p>
+        Esta práctica no solo cumple una función operativa dentro del local, sino que también fortalece la experiencia
+        del cliente y la relación emocional con la marca
+        <span class="citation-slot" data-sources="1,2"></span>
+      </p>
+
+      <p>
+        Además, distintas investigaciones muestran que Starbucks no vende solamente café, sino también una imagen de
+        identidad, estilo de vida y valor simbólico para ciertos consumidores
+        <span class="citation-slot" data-sources="2,3"></span>
+      </p>
+    `;
+
+    if (editor && !editor.innerHTML.trim()) {
+      editor.innerHTML = sampleContent;
+    }
 
     if (docLink) {
       docLink.value = window.location.href;
@@ -1322,9 +1524,7 @@
     }
 
     function focusEditable() {
-      if (!activeEditable) {
-        activeEditable = editor;
-      }
+      if (!activeEditable) activeEditable = editor;
       activeEditable.focus({ preventScroll: true });
       restoreSelection();
     }
@@ -1365,6 +1565,128 @@
           btn.classList.remove("is-active");
         }
       });
+    }
+
+    function escapeHtml(value = "") {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function getSourceById(id) {
+      return documentSources.find((source) => String(source.id) === String(id));
+    }
+
+    function formatAPAReference(source) {
+      if (!source) return "";
+      const author = source.author || "Autor desconocido";
+      const year = source.year || "s.f.";
+      const title = source.title || "Sin título";
+      const site = source.site || "";
+      const url = source.url || "";
+
+      return `
+        <span>${escapeHtml(author)}. (${escapeHtml(year)}). <em>${escapeHtml(title)}</em>${site ? `. ${escapeHtml(site)}` : ""}.</span>
+        ${url ? `<a class="reference-link" href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(url)}</a>` : ""}
+      `;
+    }
+
+    function formatSimpleReference(source) {
+      if (!source) return "";
+      const author = source.author || "Autor desconocido";
+      const year = source.year || "s.f.";
+      const title = source.title || "Sin título";
+      const site = source.site || "";
+      const url = source.url || "";
+
+      return `
+        <strong>${escapeHtml(title)}</strong><br>
+        <span>${escapeHtml(author)} · ${escapeHtml(year)}${site ? ` · ${escapeHtml(site)}` : ""}</span>
+        ${url ? `<br><a class="reference-link" href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(url)}</a>` : ""}
+      `;
+    }
+
+    function formatInlineCitation(source) {
+      if (!source) return "";
+      const author = source.author || "Autor desconocido";
+      const year = source.year || "s.f.";
+      const shortAuthor = author.split(",")[0].trim();
+      return `(${escapeHtml(shortAuthor)}, ${escapeHtml(year)})`;
+    }
+
+    function renderReferences() {
+      if (!referencesList) return;
+
+      referencesTitle.textContent = referenceMode === "apa" ? "Referencias (APA)" : "Fuentes utilizadas";
+      referencesSub.textContent =
+        referenceMode === "apa"
+          ? "Listado académico en estilo APA para entregar o estudiar."
+          : "Vista simple para leer rápido y revisar de dónde salió la información.";
+
+      if (!documentSources.length) {
+        referencesList.innerHTML = `
+          <div class="reference-item">
+            Todavía no hay fuentes cargadas para este documento.
+          </div>
+        `;
+        return;
+      }
+
+      const html = documentSources.map((source) => `
+        <div class="reference-item ${referenceMode === "apa" ? "apa" : ""}">
+          ${referenceMode === "apa" ? formatAPAReference(source) : formatSimpleReference(source)}
+        </div>
+      `).join("");
+
+      referencesList.innerHTML = html;
+    }
+
+    function renderInlineCitations() {
+      const slots = editor.querySelectorAll(".citation-slot");
+
+      slots.forEach((slot) => {
+        const ids = (slot.dataset.sources || "")
+          .split(",")
+          .map((id) => id.trim())
+          .filter(Boolean);
+
+        const sources = ids.map(getSourceById).filter(Boolean);
+
+        if (!sources.length) {
+          slot.innerHTML = "";
+          return;
+        }
+
+        if (referenceMode === "apa") {
+          slot.innerHTML = `
+            <span class="apa-inline-citation">
+              ${sources.map(formatInlineCitation).join("; ")}
+            </span>
+          `;
+        } else {
+          slot.innerHTML = ids.map((id) => {
+            return `<span class="citation-chip">${escapeHtml(id)}</span>`;
+          }).join("");
+        }
+      });
+    }
+
+    function setReferenceMode(mode) {
+      referenceMode = mode === "apa" ? "apa" : "simple";
+
+      simpleViewBtn?.classList.toggle("is-active", referenceMode === "simple");
+      apaViewBtn?.classList.toggle("is-active", referenceMode === "apa");
+
+      if (topToggleReferenceViewBtn) {
+        topToggleReferenceViewBtn.textContent = referenceMode === "apa" ? "Simple" : "APA";
+      }
+
+      renderInlineCitations();
+      renderReferences();
+      fakeAutosave();
     }
 
     editableAreas.forEach((area) => {
@@ -1464,9 +1786,7 @@
     closeShareBtn?.addEventListener("click", closeShareModal);
 
     shareModal?.addEventListener("click", (e) => {
-      if (e.target === shareModal) {
-        closeShareModal();
-      }
+      if (e.target === shareModal) closeShareModal();
     });
 
     copyLinkBtn?.addEventListener("click", async () => {
@@ -1515,9 +1835,9 @@
       setMoreStatus("La opción de abrir chat ya quedó lista en la interfaz.");
     });
 
- actionPresentation?.addEventListener("click", () => {
-  setMoreStatus("Generando presentación...");
-});
+    actionPresentation?.addEventListener("click", () => {
+      setMoreStatus("Generando presentación...");
+    });
 
     actionPdf?.addEventListener("click", () => {
       setMoreStatus("Se abrió la impresión para guardarlo como PDF.");
@@ -1537,9 +1857,18 @@
       closeMoreDropdown();
       openShareModal();
     });
+
+    simpleViewBtn?.addEventListener("click", () => setReferenceMode("simple"));
+    apaViewBtn?.addEventListener("click", () => setReferenceMode("apa"));
+    topToggleReferenceViewBtn?.addEventListener("click", () => {
+      setReferenceMode(referenceMode === "apa" ? "simple" : "apa");
+    });
+
+    renderInlineCitations();
+    renderReferences();
   </script>
 
   <script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
-<script type="module" src="documento.js"></script>
+  <script type="module" src="documento.js"></script>
 </body>
 </html>
