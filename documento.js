@@ -386,27 +386,38 @@ function canEdit() {
   return state.currentRole === "owner" || state.currentRole === "editor";
 }
 
-function hideLoading() {
+function setLoadingStage(stage, message = "") {
+  window.EduviaDocLoading?.setStage?.(stage, message);
+}
+
+function keepLoadingVisible() {
+  els.docLoading?.classList.add("show");
+  els.documentApp?.classList.add("hidden");
+}
+
+function finishLoadingAndShowDocument() {
+  els.accessGuard?.classList.remove("show");
+  els.documentApp?.classList.remove("hidden");
+  window.EduviaDocLoading?.finish?.();
   els.docLoading?.classList.remove("show");
+  setSelectionAssistantVisibility(true);
 }
 
 function showDenied() {
-  hideLoading();
-  if (els.documentApp) els.documentApp.style.display = "none";
+  window.EduviaDocLoading?.stopAutoFlow?.();
+  els.docLoading?.classList.remove("show");
+  els.documentApp?.classList.add("hidden");
   els.accessGuard?.classList.add("show");
   setSelectionAssistantVisibility(false);
 }
 
-function showDocument() {
-  hideLoading();
-  els.accessGuard?.classList.remove("show");
-  if (els.documentApp) els.documentApp.style.display = "";
-  setSelectionAssistantVisibility(true);
-}
-
 function renderError(message) {
-  hideLoading();
-  showDocument();
+  window.EduviaDocLoading?.showError?.(message || "No se pudo cargar el documento.");
+  window.EduviaDocLoading?.stopAutoFlow?.();
+
+  els.accessGuard?.classList.remove("show");
+  els.docLoading?.classList.remove("show");
+  els.documentApp?.classList.remove("hidden");
   clearSupportPanel();
 
   if (els.docContent) {
@@ -419,6 +430,7 @@ function renderError(message) {
   }
 
   applyRoleUi("viewer");
+  setSelectionAssistantVisibility(true);
 }
 
 function updateTopbarTitleFromEditor() {
@@ -1366,13 +1378,17 @@ async function generarDocumentoSiFalta(clase = {}) {
       hasRealStructuredDoc(clase.contenidoDocumento) ||
       hasRealStructuredDoc(clase.contenido);
 
-    if (alreadyExists) return clase;
+    if (alreadyExists) {
+      setLoadingStage("writing", "Cargando el contenido guardado del documento.");
+      return clase;
+    }
 
     if (!clase?.materia || !clase?.tema || !clase?.nivel) {
       throw new Error("Faltan materia, tema o nivel para generar el documento.");
     }
 
     renderGeneratingDocument(clase);
+    setLoadingStage("sources", "Estamos buscando fuentes confiables para construir el documento.");
 
     const payload = {
       materia: clase.materia || "",
@@ -1392,6 +1408,8 @@ async function generarDocumentoSiFalta(clase = {}) {
       body: JSON.stringify(payload),
     });
 
+    setLoadingStage("analysis", "Ordenando la investigación y preparando la mejor versión del contenido.");
+
     if (!response.ok || !data?.ok || !data?.documento) {
       throw new Error(data?.error || "No se pudo generar el documento.");
     }
@@ -1400,6 +1418,8 @@ async function generarDocumentoSiFalta(clase = {}) {
     if (!safeHtml) {
       throw new Error("La IA respondió, pero no devolvió contenido utilizable.");
     }
+
+    setLoadingStage("writing", "Pegando el contenido final y terminando el documento.");
 
     const merged = {
       ...clase,
@@ -1527,6 +1547,8 @@ async function resolveClaseFromFirestoreOrLocal(user) {
 
 async function loadClase(user) {
   try {
+    setLoadingStage("access", "Estamos validando tu acceso y buscando el documento.");
+
     const result = await resolveClaseFromFirestoreOrLocal(user);
 
     if (result?.denied) {
@@ -1537,11 +1559,30 @@ async function loadClase(user) {
     const claseBase = result?.clase;
     if (!claseBase) throw new Error("No se encontró información de la clase.");
 
-    showDocument();
+    els.accessGuard?.classList.remove("show");
+    keepLoadingVisible();
+
     bindAutosave();
     bindShareUi();
     ensureSelectionAssistantUi();
     setupPresentationExport();
+
+    const tieneDocumentoReal =
+      hasRealHtml(claseBase.contenidoHtml) ||
+      hasRealHtml(claseBase.documentoHtml) ||
+      hasRealHtml(claseBase.htmlDocumento) ||
+      hasRealText(claseBase.documentoTexto) ||
+      hasRealText(claseBase.textoDocumento) ||
+      hasRealText(claseBase.contenidoTexto) ||
+      hasRealStructuredDoc(claseBase.documento) ||
+      hasRealStructuredDoc(claseBase.contenidoDocumento) ||
+      hasRealStructuredDoc(claseBase.contenido);
+
+    if (tieneDocumentoReal) {
+      setLoadingStage("writing", "Cargando el documento guardado.");
+    } else {
+      setLoadingStage("sources", "Todavía no hay contenido final, así que vamos a generarlo.");
+    }
 
     const claseFinal = await generarDocumentoSiFalta(claseBase);
 
@@ -1551,6 +1592,7 @@ async function loadClase(user) {
     renderClase(claseFinal);
     applyRoleUi(state.currentRole);
     setLastSaveLabel("Guardado automático");
+    finishLoadingAndShowDocument();
   } catch (error) {
     console.error("Error al cargar la clase:", error);
     renderError(error?.message || "Hubo un problema al cargar la clase.");
@@ -2652,9 +2694,10 @@ function ensureSelectionAssistantUi() {
    INIT
 ========================= */
 
-if (els.documentApp) els.documentApp.style.display = "";
+els.documentApp?.classList.add("hidden");
 els.accessGuard?.classList.remove("show");
 els.docLoading?.classList.add("show");
+setLoadingStage("access", "Estamos validando acceso y preparando el documento.");
 
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
