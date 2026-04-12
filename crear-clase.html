@@ -32,16 +32,8 @@
       --sidebar:#f7f8fa;
       --sidebar-border:#e6e9ee;
 
-      --success:#1f8f68;
-      --danger:#d35b5b;
-
       --shadow:0 14px 34px rgba(15, 23, 42, 0.05);
       --shadow-soft:0 8px 24px rgba(15, 23, 42, 0.04);
-
-      --radius-xl:26px;
-      --radius-lg:20px;
-      --radius-md:16px;
-      --radius-sm:12px;
 
       --sidebar-width:248px;
     }
@@ -183,28 +175,22 @@
     }
 
     .page{
-      max-width:1320px;
+      max-width:1180px;
       margin:0 auto;
       display:grid;
-      gap:22px;
+      gap:20px;
     }
 
     .page-header{
-      display:flex;
-      align-items:flex-end;
-      justify-content:space-between;
-      gap:18px;
-      flex-wrap:wrap;
-    }
-
-    .page-header-copy{
-      max-width:760px;
+      display:grid;
+      gap:10px;
+      max-width:700px;
     }
 
     .eyebrow{
       display:inline-flex;
       align-items:center;
-      gap:8px;
+      width:max-content;
       padding:7px 12px;
       border-radius:999px;
       background:var(--teal-soft);
@@ -213,50 +199,19 @@
       font-weight:800;
       letter-spacing:.08em;
       text-transform:uppercase;
-      margin-bottom:12px;
     }
 
     .page-header h1{
       font-family:"Sora",sans-serif;
-      font-size:clamp(2rem, 3vw, 2.8rem);
+      font-size:clamp(2rem, 3vw, 2.6rem);
       line-height:1.02;
       letter-spacing:-.05em;
-      margin-bottom:10px;
     }
 
     .page-header p{
-      max-width:760px;
       color:var(--muted);
-      line-height:1.72;
+      line-height:1.68;
       font-size:1rem;
-    }
-
-    .header-pill{
-      display:inline-flex;
-      align-items:center;
-      gap:10px;
-      padding:12px 14px;
-      border-radius:16px;
-      background:#fff;
-      border:1px solid var(--line);
-      color:#425063;
-      font-size:.9rem;
-      font-weight:700;
-      box-shadow:var(--shadow-soft);
-      white-space:nowrap;
-    }
-
-    .header-pill::before{
-      content:"";
-      width:9px;
-      height:9px;
-      border-radius:50%;
-      background:var(--teal);
-      box-shadow:0 0 0 4px rgba(17,169,187,.12);
-    }
-
-    .workspace{
-      display:block;
     }
 
     .editor-shell{
@@ -268,54 +223,144 @@
       overflow:hidden;
     }
 
-    .editor-section{
-      padding:24px 24px 26px;
+    .stepper-wrap{
+      padding:24px 24px 18px;
       border-bottom:1px solid var(--line);
+      background:linear-gradient(180deg, #ffffff 0%, #fcfdfe 100%);
     }
 
-    .editor-section:last-child{
-      border-bottom:none;
+    .stepper{
+      display:grid;
+      grid-template-columns:repeat(4, 1fr);
+      gap:10px;
+      align-items:start;
+    }
+
+    .stepper-item{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      min-width:0;
+      cursor:pointer;
+      user-select:none;
+    }
+
+    .stepper-item:not(:last-child){
+      position:relative;
+    }
+
+    .stepper-item:not(:last-child)::after{
+      content:"";
+      position:absolute;
+      top:16px;
+      left:42px;
+      right:-8px;
+      height:1.5px;
+      background:var(--line-strong);
+      z-index:0;
+    }
+
+    .stepper-dot{
+      position:relative;
+      z-index:1;
+      width:32px;
+      height:32px;
+      border-radius:999px;
+      border:1.5px solid var(--line-strong);
+      background:#fff;
+      display:grid;
+      place-items:center;
+      font-size:.82rem;
+      font-weight:800;
+      color:#657083;
+      flex:none;
+      transition:.18s ease;
+    }
+
+    .stepper-copy{
+      min-width:0;
+      padding-top:3px;
+    }
+
+    .stepper-copy strong{
+      display:block;
+      font-size:.9rem;
+      color:#7a8392;
+      font-weight:800;
+      transition:.18s ease;
+    }
+
+    .stepper-copy span{
+      display:block;
+      margin-top:2px;
+      font-size:.78rem;
+      color:#9aa2af;
+      line-height:1.35;
+    }
+
+    .stepper-item.active .stepper-dot{
+      background:var(--teal);
+      border-color:var(--teal);
+      color:#fff;
+      box-shadow:0 0 0 5px rgba(17,169,187,.12);
+    }
+
+    .stepper-item.active .stepper-copy strong{
+      color:#142031;
+    }
+
+    .stepper-item.done .stepper-dot{
+      background:var(--teal-soft);
+      border-color:rgba(17,169,187,.35);
+      color:#0f7f8e;
+    }
+
+    .stepper-item.done .stepper-copy strong{
+      color:#324255;
+    }
+
+    .form-stage{
+      padding:26px 24px 26px;
+    }
+
+    .step-panel{
+      display:none;
+      animation:fadeUp .18s ease;
+    }
+
+    .step-panel.active{
+      display:block;
+    }
+
+    @keyframes fadeUp{
+      from{
+        opacity:0;
+        transform:translateY(6px);
+      }
+      to{
+        opacity:1;
+        transform:translateY(0);
+      }
     }
 
     .section-head{
-      display:flex;
-      align-items:flex-start;
-      justify-content:space-between;
-      gap:14px;
-      flex-wrap:wrap;
+      display:grid;
+      gap:6px;
       margin-bottom:18px;
     }
 
-    .section-copy h2{
+    .section-head h2{
       font-family:"Sora",sans-serif;
-      font-size:1.2rem;
-      line-height:1.1;
+      font-size:1.18rem;
+      line-height:1.08;
       letter-spacing:-.03em;
-      margin-bottom:6px;
     }
 
-    .section-copy p{
+    .section-head p{
       color:var(--muted);
-      line-height:1.65;
-      font-size:.95rem;
-      max-width:700px;
-    }
-
-    .section-badge{
-      flex:none;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      min-height:36px;
-      padding:8px 12px;
-      border-radius:999px;
-      border:1px solid var(--line);
-      background:var(--bg-soft);
-      color:#596272;
-      font-size:.76rem;
-      font-weight:800;
-      letter-spacing:.06em;
-      text-transform:uppercase;
+      line-height:1.6;
+      font-size:.94rem;
+      max-width:620px;
     }
 
     .type-grid{
@@ -338,8 +383,8 @@
 
     .type-card{
       height:100%;
-      min-height:108px;
-      padding:16px 16px 15px;
+      min-height:94px;
+      padding:15px;
       border-radius:18px;
       border:1px solid var(--line);
       background:#fff;
@@ -367,14 +412,14 @@
     }
 
     .type-icon{
-      width:36px;
-      height:36px;
-      border-radius:12px;
+      width:34px;
+      height:34px;
+      border-radius:11px;
       display:grid;
       place-items:center;
       background:#f4f7f9;
       color:#0f7f8e;
-      font-size:.78rem;
+      font-size:.76rem;
       font-weight:800;
       letter-spacing:-.03em;
       flex:none;
@@ -399,22 +444,15 @@
 
     .type-card strong{
       display:block;
-      font-size:.98rem;
+      font-size:.96rem;
       color:#18202c;
       letter-spacing:-.02em;
     }
 
     .type-card p{
       color:var(--muted);
-      font-size:.9rem;
-      line-height:1.55;
-    }
-
-    .helper-row{
-      margin-top:12px;
-      color:var(--muted-2);
-      font-size:.86rem;
-      line-height:1.55;
+      font-size:.88rem;
+      line-height:1.5;
     }
 
     .dynamic-shell{
@@ -440,7 +478,7 @@
     }
 
     .field label{
-      font-size:.92rem;
+      font-size:.91rem;
       font-weight:800;
       color:#1a2230;
     }
@@ -454,7 +492,7 @@
       background:#fff;
       color:var(--text);
       font-family:inherit;
-      font-size:.98rem;
+      font-size:.97rem;
       padding:14px 15px;
       outline:none;
       transition:.18s ease;
@@ -467,7 +505,7 @@
     }
 
     .field textarea{
-      min-height:122px;
+      min-height:120px;
     }
 
     .field input::placeholder,
@@ -484,7 +522,7 @@
 
     .helper{
       color:var(--muted-2);
-      font-size:.83rem;
+      font-size:.82rem;
       line-height:1.5;
     }
 
@@ -507,7 +545,7 @@
     }
 
     .format-card{
-      min-height:88px;
+      min-height:84px;
       padding:15px;
       border-radius:18px;
       border:1px solid var(--line);
@@ -544,19 +582,19 @@
     .format-copy strong{
       display:block;
       margin-bottom:4px;
-      font-size:.96rem;
+      font-size:.95rem;
       color:#18202c;
     }
 
     .format-copy p{
       color:var(--muted);
-      font-size:.89rem;
+      font-size:.88rem;
       line-height:1.5;
     }
 
     .format-preview{
       margin-top:14px;
-      padding:16px;
+      padding:15px;
       border-radius:16px;
       background:var(--surface-soft);
       border:1px solid var(--line);
@@ -565,13 +603,13 @@
     .format-preview strong{
       display:block;
       margin-bottom:6px;
-      font-size:.92rem;
+      font-size:.91rem;
       color:#17202c;
     }
 
     .format-preview p{
       color:var(--muted);
-      font-size:.9rem;
+      font-size:.89rem;
       line-height:1.6;
     }
 
@@ -622,15 +660,15 @@
 
     .upload-inner strong{
       display:block;
-      font-size:.96rem;
+      font-size:.95rem;
       color:#18202c;
       margin-bottom:4px;
     }
 
     .upload-inner p{
       color:var(--muted);
-      line-height:1.6;
-      font-size:.9rem;
+      line-height:1.55;
+      font-size:.89rem;
     }
 
     .file-list{
@@ -652,11 +690,28 @@
       font-weight:600;
     }
 
-    .actions-bar{
+    .wizard-footer{
       display:flex;
+      align-items:center;
+      justify-content:space-between;
       gap:12px;
+      padding:18px 24px 22px;
+      border-top:1px solid var(--line);
+      background:#fff;
+    }
+
+    .wizard-footer-left,
+    .wizard-footer-right{
+      display:flex;
+      gap:10px;
+      align-items:center;
       flex-wrap:wrap;
-      padding-top:4px;
+    }
+
+    .step-counter{
+      font-size:.88rem;
+      font-weight:700;
+      color:var(--muted);
     }
 
     .btn{
@@ -667,11 +722,11 @@
       display:inline-flex;
       align-items:center;
       justify-content:center;
-      min-height:50px;
-      padding:13px 20px;
+      min-height:48px;
+      padding:13px 18px;
       border-radius:14px;
       font-family:inherit;
-      font-size:.95rem;
+      font-size:.94rem;
       font-weight:800;
       transition:.18s ease;
     }
@@ -707,6 +762,15 @@
       .form-grid{
         grid-template-columns:1fr;
       }
+
+      .stepper{
+        grid-template-columns:1fr 1fr;
+        gap:14px 12px;
+      }
+
+      .stepper-item:not(:last-child)::after{
+        display:none;
+      }
     }
 
     @media (max-width: 820px){
@@ -736,23 +800,37 @@
       }
 
       .page-header h1{
-        font-size:1.9rem;
+        font-size:1.85rem;
       }
 
-      .editor-section{
-        padding:18px;
+      .stepper-wrap,
+      .form-stage{
+        padding-left:18px;
+        padding-right:18px;
+      }
+
+      .wizard-footer{
+        padding:16px 18px 18px;
+        flex-direction:column;
+        align-items:stretch;
+      }
+
+      .wizard-footer-left,
+      .wizard-footer-right{
+        width:100%;
+      }
+
+      .wizard-footer-right .btn,
+      .wizard-footer-left .btn{
+        width:100%;
       }
 
       .format-switcher{
         grid-template-columns:1fr;
       }
 
-      .actions-bar{
-        flex-direction:column;
-      }
-
-      .actions-bar .btn{
-        width:100%;
+      .stepper{
+        grid-template-columns:1fr;
       }
     }
   </style>
@@ -789,27 +867,56 @@
     <main class="main">
       <div class="page">
         <header class="page-header">
-          <div class="page-header-copy">
-            <span class="eyebrow">Crear con Eduvia</span>
-            <h1>Generá contenido de estudio con una estructura más limpia.</h1>
-            <p>
-              Elegí qué querés crear, completá solo lo importante y definí cómo querés verlo al final.
-            </p>
-          </div>
-
-          <div class="header-pill">Flujo simple y guiado</div>
+          <span class="eyebrow">Crear con Eduvia</span>
+          <h1>Armá tu contenido paso a paso.</h1>
+          <p>
+            Elegí el tipo, completá lo importante y definí cómo querés verlo al final.
+          </p>
         </header>
 
-        <div class="workspace">
-          <section class="editor-shell">
-            <form id="clase-form">
-              <div class="editor-section">
-                <div class="section-head">
-                  <div class="section-copy">
-                    <h2>1. Tipo de contenido</h2>
-                    <p>Elegí el formato que mejor encaje con lo que necesitás crear.</p>
+        <section class="editor-shell">
+          <form id="clase-form">
+            <div class="stepper-wrap">
+              <div class="stepper" id="stepper">
+                <div class="stepper-item active" data-step="1">
+                  <div class="stepper-dot">1</div>
+                  <div class="stepper-copy">
+                    <strong>Tipo</strong>
+                    <span>Qué querés crear</span>
                   </div>
-                  <span class="section-badge">Paso 1</span>
+                </div>
+
+                <div class="stepper-item" data-step="2">
+                  <div class="stepper-dot">2</div>
+                  <div class="stepper-copy">
+                    <strong>Detalles</strong>
+                    <span>Información principal</span>
+                  </div>
+                </div>
+
+                <div class="stepper-item" data-step="3">
+                  <div class="stepper-dot">3</div>
+                  <div class="stepper-copy">
+                    <strong>Vista</strong>
+                    <span>Cómo querés verlo</span>
+                  </div>
+                </div>
+
+                <div class="stepper-item" data-step="4">
+                  <div class="stepper-dot">4</div>
+                  <div class="stepper-copy">
+                    <strong>Archivos</strong>
+                    <span>Material de apoyo</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-stage">
+              <section class="step-panel active" data-panel="1">
+                <div class="section-head">
+                  <h2>Elegí el tipo de contenido</h2>
+                  <p>Seleccioná la opción que mejor se adapte a lo que necesitás.</p>
                 </div>
 
                 <div class="type-grid" id="content-type-selector">
@@ -822,7 +929,7 @@
                       </div>
                       <div>
                         <strong>Clase escolar</strong>
-                        <p>Para materias, temas y objetivos de aprendizaje.</p>
+                        <p>Para materias, temas y objetivos.</p>
                       </div>
                     </div>
                   </label>
@@ -836,7 +943,7 @@
                       </div>
                       <div>
                         <strong>Resumen / explicación</strong>
-                        <p>Ideal para entender un tema de forma clara y rápida.</p>
+                        <p>Para entender un tema de forma clara.</p>
                       </div>
                     </div>
                   </label>
@@ -850,7 +957,7 @@
                       </div>
                       <div>
                         <strong>Análisis de tema</strong>
-                        <p>Para comparar, interpretar o profundizar una idea.</p>
+                        <p>Para comparar, interpretar o profundizar.</p>
                       </div>
                     </div>
                   </label>
@@ -864,7 +971,7 @@
                       </div>
                       <div>
                         <strong>Documento de estudio</strong>
-                        <p>Útil para apuntes, desarrollos largos y material de repaso.</p>
+                        <p>Para apuntes y desarrollos más largos.</p>
                       </div>
                     </div>
                   </label>
@@ -878,38 +985,28 @@
                       </div>
                       <div>
                         <strong>Investigación rápida</strong>
-                        <p>Para explorar una pregunta y ordenar hallazgos clave.</p>
+                        <p>Para preguntas, hallazgos e ideas clave.</p>
                       </div>
                     </div>
                   </label>
                 </div>
+              </section>
 
-                <div class="helper-row">
-                  Esta elección define qué campos se muestran abajo.
-                </div>
-              </div>
-
-              <div class="editor-section">
+              <section class="step-panel" data-panel="2">
                 <div class="section-head">
-                  <div class="section-copy">
-                    <h2>2. Información principal</h2>
-                    <p>Los campos cambian automáticamente según el tipo de contenido elegido.</p>
-                  </div>
-                  <span class="section-badge">Paso 2</span>
+                  <h2>Completá la información principal</h2>
+                  <p>Los campos cambian automáticamente según el tipo que elegiste.</p>
                 </div>
 
                 <div class="dynamic-shell">
                   <div id="dynamic-fields" class="form-grid"></div>
                 </div>
-              </div>
+              </section>
 
-              <div class="editor-section">
+              <section class="step-panel" data-panel="3">
                 <div class="section-head">
-                  <div class="section-copy">
-                    <h2>3. Visualización final</h2>
-                    <p>Esta elección modifica la forma de ver el resultado, no el contenido.</p>
-                  </div>
-                  <span class="section-badge">Paso 3</span>
+                  <h2>Elegí la visualización final</h2>
+                  <p>Esto cambia la forma de ver el resultado, no el contenido.</p>
                 </div>
 
                 <div class="format-switcher">
@@ -919,7 +1016,7 @@
                       <div class="format-icon">PZ</div>
                       <div class="format-copy">
                         <strong>Modo Pizarrón</strong>
-                        <p>Más visual, guiado e interactivo.</p>
+                        <p>Más visual y guiado.</p>
                       </div>
                     </div>
                   </label>
@@ -930,7 +1027,7 @@
                       <div class="format-icon">DC</div>
                       <div class="format-copy">
                         <strong>Modo Documento</strong>
-                        <p>Más lineal, prolijo y cómodo para repasar.</p>
+                        <p>Más lineal y ordenado.</p>
                       </div>
                     </div>
                   </label>
@@ -942,15 +1039,12 @@
                     El contenido se mostrará en una experiencia más visual, tipo aula interactiva.
                   </p>
                 </div>
-              </div>
+              </section>
 
-              <div class="editor-section">
+              <section class="step-panel" data-panel="4">
                 <div class="section-head">
-                  <div class="section-copy">
-                    <h2>4. Material de apoyo</h2>
-                    <p>Podés sumar archivos para darle más contexto a la IA.</p>
-                  </div>
-                  <span class="section-badge">Opcional</span>
+                  <h2>Agregá material de apoyo</h2>
+                  <p>Podés subir archivos para darle más contexto a la IA.</p>
                 </div>
 
                 <div class="field full">
@@ -963,39 +1057,41 @@
                       <div>
                         <strong>Subí apuntes, PDFs, guías o imágenes</strong>
                         <p>
-                          Si el archivo realmente aporta contexto, la respuesta suele salir mucho mejor.
+                          Sumá solo material que realmente ayude a construir mejor el contenido.
                         </p>
                       </div>
                     </div>
                   </div>
 
-                  <span class="helper">
-                    Admití solo material que ayude de verdad a construir el contenido.
-                  </span>
-
                   <div id="file-list" class="file-list"></div>
                 </div>
+              </section>
+
+              <div class="hidden-legacy" aria-hidden="true">
+                <input type="hidden" id="tipo_contenido_hidden" name="tipo_contenido_hidden" value="clase" />
+                <input type="hidden" id="materia" name="materia" />
+                <input type="hidden" id="tema" name="tema" />
+                <input type="hidden" id="nivel" name="nivel" />
+                <input type="hidden" id="duracion" name="duracion" />
+                <textarea id="objetivo" name="objetivo"></textarea>
+              </div>
+            </div>
+
+            <div class="wizard-footer">
+              <div class="wizard-footer-left">
+                <span class="step-counter" id="step-counter">Paso 1 de 4</span>
               </div>
 
-              <div class="editor-section">
-                <div class="hidden-legacy" aria-hidden="true">
-                  <input type="hidden" id="tipo_contenido_hidden" name="tipo_contenido_hidden" value="clase" />
-                  <input type="hidden" id="materia" name="materia" />
-                  <input type="hidden" id="tema" name="tema" />
-                  <input type="hidden" id="nivel" name="nivel" />
-                  <input type="hidden" id="duracion" name="duracion" />
-                  <textarea id="objetivo" name="objetivo"></textarea>
-                </div>
-
-                <div class="actions-bar">
-                  <button type="submit" class="btn btn-primary">Crear contenido</button>
-                  <a href="panel.html" class="btn btn-soft">Volver al panel</a>
-                  <button type="button" class="btn btn-ghost" id="clear-form-btn">Limpiar selección</button>
-                </div>
+              <div class="wizard-footer-right">
+                <button type="button" class="btn btn-ghost" id="clear-form-btn">Limpiar</button>
+                <a href="panel.html" class="btn btn-soft">Volver</a>
+                <button type="button" class="btn btn-soft" id="prev-step-btn">Atrás</button>
+                <button type="button" class="btn btn-primary" id="next-step-btn">Siguiente</button>
+                <button type="submit" class="btn btn-primary" id="submit-step-btn" style="display:none;">Crear contenido</button>
               </div>
-            </form>
-          </section>
-        </div>
+            </div>
+          </form>
+        </section>
       </div>
     </main>
   </div>
@@ -1019,6 +1115,65 @@
         alert("No se pudo cerrar sesión. Intentá de nuevo.");
       }
     });
+  </script>
+
+  <script>
+    const TOTAL_STEPS = 4;
+    let currentStep = 1;
+
+    const stepperItems = Array.from(document.querySelectorAll(".stepper-item"));
+    const stepPanels = Array.from(document.querySelectorAll(".step-panel"));
+    const prevStepBtn = document.getElementById("prev-step-btn");
+    const nextStepBtn = document.getElementById("next-step-btn");
+    const submitStepBtn = document.getElementById("submit-step-btn");
+    const stepCounter = document.getElementById("step-counter");
+
+    function goToStep(step) {
+      currentStep = Math.min(Math.max(step, 1), TOTAL_STEPS);
+
+      stepPanels.forEach((panel) => {
+        panel.classList.toggle("active", Number(panel.dataset.panel) === currentStep);
+      });
+
+      stepperItems.forEach((item) => {
+        const itemStep = Number(item.dataset.step);
+        item.classList.toggle("active", itemStep === currentStep);
+        item.classList.toggle("done", itemStep < currentStep);
+      });
+
+      if (stepCounter) {
+        stepCounter.textContent = `Paso ${currentStep} de ${TOTAL_STEPS}`;
+      }
+
+      if (prevStepBtn) {
+        prevStepBtn.style.display = currentStep === 1 ? "none" : "inline-flex";
+      }
+
+      if (nextStepBtn) {
+        nextStepBtn.style.display = currentStep === TOTAL_STEPS ? "none" : "inline-flex";
+      }
+
+      if (submitStepBtn) {
+        submitStepBtn.style.display = currentStep === TOTAL_STEPS ? "inline-flex" : "none";
+      }
+    }
+
+    prevStepBtn?.addEventListener("click", () => {
+      goToStep(currentStep - 1);
+    });
+
+    nextStepBtn?.addEventListener("click", () => {
+      goToStep(currentStep + 1);
+    });
+
+    stepperItems.forEach((item) => {
+      item.addEventListener("click", () => {
+        const step = Number(item.dataset.step);
+        goToStep(step);
+      });
+    });
+
+    goToStep(1);
   </script>
 
   <script>
@@ -1056,17 +1211,13 @@
         }
       });
 
-      if (fileInput) {
-        fileInput.value = "";
-      }
-
-      if (fileList) {
-        fileList.innerHTML = "";
-      }
+      if (fileInput) fileInput.value = "";
+      if (fileList) fileList.innerHTML = "";
 
       renderDynamicFields();
       updateFormatPreview();
       syncLegacyFields();
+      goToStep(1);
     });
   </script>
 
@@ -1120,7 +1271,7 @@
         <div class="field">
           <label for="clase_materia">Materia</label>
           <input id="clase_materia" placeholder="Ejemplo: Historia" />
-          <span class="helper">Materia principal de la clase.</span>
+          <span class="helper">Materia principal.</span>
         </div>
 
         <div class="field">
@@ -1136,7 +1287,7 @@
             <option value="Secundaria">Secundaria</option>
             <option value="Universidad">Universidad</option>
           </select>
-          <span class="helper">Adapta la dificultad de la explicación.</span>
+          <span class="helper">Ajusta dificultad y lenguaje.</span>
         </div>
 
         <div class="field">
@@ -1147,13 +1298,13 @@
             <option value="45 min">45 minutos</option>
             <option value="60 min">60 minutos</option>
           </select>
-          <span class="helper">Organiza mejor la estructura.</span>
+          <span class="helper">Ordena mejor la estructura.</span>
         </div>
 
         <div class="field full">
-          <label for="clase_objetivo">Objetivo de la clase</label>
+          <label for="clase_objetivo">Objetivo</label>
           <textarea id="clase_objetivo" placeholder="Ejemplo: Que el alumno entienda las causas y consecuencias principales."></textarea>
-          <span class="helper">Mientras más claro sea, mejor va a responder la IA.</span>
+          <span class="helper">Cuanto más claro sea, mejor responde la IA.</span>
         </div>
       `,
 
@@ -1161,13 +1312,13 @@
         <div class="field full">
           <label for="resumen_tema">Tema principal</label>
           <input id="resumen_tema" placeholder="Ejemplo: Arquitectura de Roma" />
-          <span class="helper">Tema central que querés entender o resumir.</span>
+          <span class="helper">Tema central a resumir o explicar.</span>
         </div>
 
         <div class="field">
           <label for="resumen_enfoque">Enfoque</label>
           <input id="resumen_enfoque" placeholder="Ejemplo: características, materiales y legado" />
-          <span class="helper">Qué lado del tema querés que desarrolle.</span>
+          <span class="helper">Qué lado del tema querés desarrollar.</span>
         </div>
 
         <div class="field">
@@ -1181,7 +1332,7 @@
         </div>
 
         <div class="field">
-          <label for="resumen_profundidad">Nivel de profundidad</label>
+          <label for="resumen_profundidad">Profundidad</label>
           <select id="resumen_profundidad">
             <option value="Breve">Breve</option>
             <option value="Media">Media</option>
@@ -1201,13 +1352,13 @@
         <div class="field full">
           <label for="analisis_tema">Tema / obra / concepto</label>
           <input id="analisis_tema" placeholder="Ejemplo: Arquitectura de Roma" />
-          <span class="helper">Podés analizar un tema, una obra, una corriente o una idea.</span>
+          <span class="helper">Podés analizar una idea, una obra o un tema.</span>
         </div>
 
         <div class="field">
           <label for="analisis_tipo">Tipo de análisis</label>
           <input id="analisis_tipo" placeholder="Ejemplo: histórico, comparativo o crítico" />
-          <span class="helper">Define el estilo del análisis.</span>
+          <span class="helper">Define el enfoque general.</span>
         </div>
 
         <div class="field">
@@ -1223,7 +1374,7 @@
         <div class="field full">
           <label for="analisis_eje">Eje principal</label>
           <textarea id="analisis_eje" placeholder="Ejemplo: Analizar cómo la arquitectura romana reflejaba el poder del imperio."></textarea>
-          <span class="helper">La IA usa esto como línea central del desarrollo.</span>
+          <span class="helper">La IA toma esto como línea central.</span>
         </div>
       `,
 
@@ -1231,7 +1382,7 @@
         <div class="field full">
           <label for="documento_titulo">Título del documento</label>
           <input id="documento_titulo" placeholder="Ejemplo: Apunte sobre arquitectura romana" />
-          <span class="helper">Nombre del contenido que querés generar.</span>
+          <span class="helper">Nombre del contenido.</span>
         </div>
 
         <div class="field">
@@ -1251,50 +1402,50 @@
         </div>
 
         <div class="field">
-          <label for="documento_estructura">Estructura deseada</label>
+          <label for="documento_estructura">Estructura</label>
           <select id="documento_estructura">
             <option value="Apunte">Apunte</option>
             <option value="Resumen largo">Resumen largo</option>
             <option value="Esquema">Esquema</option>
             <option value="Desarrollo completo">Desarrollo completo</option>
           </select>
-          <span class="helper">Organiza cómo se presentará el contenido.</span>
+          <span class="helper">Organiza cómo se presenta.</span>
         </div>
 
         <div class="field full">
           <label for="documento_incluir">Qué querés incluir</label>
           <textarea id="documento_incluir" placeholder="Ejemplo: Introducción, características, ejemplos de edificios y conclusión."></textarea>
-          <span class="helper">Podés indicar exactamente qué bloques querés dentro del documento.</span>
+          <span class="helper">Indicá los bloques importantes.</span>
         </div>
       `,
 
       investigacion: `
         <div class="field full">
-          <label for="investigacion_pregunta">Pregunta o tema a investigar</label>
+          <label for="investigacion_pregunta">Pregunta o tema</label>
           <input id="investigacion_pregunta" placeholder="Ejemplo: ¿Cómo influyó la arquitectura romana en la arquitectura occidental?" />
-          <span class="helper">Puede ser una pregunta concreta o un tema general.</span>
+          <span class="helper">Puede ser una pregunta o un tema general.</span>
         </div>
 
         <div class="field">
           <label for="investigacion_objetivo">Objetivo</label>
           <input id="investigacion_objetivo" placeholder="Ejemplo: Encontrar ideas clave y organizar la información" />
-          <span class="helper">Qué querés conseguir con la investigación.</span>
+          <span class="helper">Qué querés lograr con la investigación.</span>
         </div>
 
         <div class="field">
-          <label for="investigacion_profundidad">Nivel de profundidad</label>
+          <label for="investigacion_profundidad">Profundidad</label>
           <select id="investigacion_profundidad">
             <option value="Rápido">Rápido</option>
             <option value="Intermedio">Intermedio</option>
             <option value="Completo">Completo</option>
           </select>
-          <span class="helper">Define cuánto querés que investigue la IA.</span>
+          <span class="helper">Define cuánto querés investigar.</span>
         </div>
 
         <div class="field full">
           <label for="investigacion_resultado">Resultado esperado</label>
           <textarea id="investigacion_resultado" placeholder="Ejemplo: Un texto ordenado con hallazgos principales, ejemplos y conclusión breve."></textarea>
-          <span class="helper">Esto guía el formato final de salida.</span>
+          <span class="helper">Esto guía el formato final.</span>
         </div>
       `
     };
