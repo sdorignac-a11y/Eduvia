@@ -27,9 +27,10 @@ const docContent = document.getElementById("doc-content");
 const documentApp = document.getElementById("document-app");
 const accessGuard = document.getElementById("access-guard");
 const docLoading = document.getElementById("doc-loading");
-const toolbarWrap = document.querySelector(".toolbar-wrap");
+
+const toolbarWrap = document.querySelector(".subbar");
 const toolbarControls = document.querySelectorAll(
-  ".toolbar button, .toolbar select, .toolbar input"
+  '.subbar button, .subbar select, .subbar input'
 );
 
 const shareModal = document.getElementById("share-modal");
@@ -37,6 +38,10 @@ const shareEmailInput = document.getElementById("share-email");
 const shareRoleSelect = document.getElementById("share-role");
 const shareStatus = document.getElementById("share-status");
 const docLinkInput = document.getElementById("doc-link");
+const openShareBtn = document.getElementById("open-share-btn");
+const closeShareBtn = document.getElementById("close-share-btn");
+const copyLinkBtn = document.getElementById("copy-link-btn");
+const sendShareBtn = document.getElementById("send-share-btn");
 
 const params = new URLSearchParams(window.location.search);
 const claseIdFromUrl = params.get("id") || params.get("doc");
@@ -44,6 +49,8 @@ const ownerUidFromUrl = params.get("owner");
 
 const SHARED_DOC_KEY = "eduvia_shared_doc_access";
 const SUPPORT_PANEL_ID = "document-support-panel";
+const SAVE_DEBOUNCE_MS = 900;
+const GENERATE_TIMEOUT_MS = 90000;
 
 let currentUser = null;
 let currentClaseId = claseIdFromUrl || null;
@@ -54,6 +61,9 @@ let currentRole = "viewer";
 let saveTimer = null;
 let saveInFlight = false;
 let shareUiInitialized = false;
+let autosaveListenersAttached = false;
+let generationPromise = null;
+let lastSavedSignature = "";
 
 if (documentApp) {
   documentApp.style.display = "";
@@ -74,8 +84,12 @@ function escapeHtml(value = "") {
     .replaceAll("'", "&#039;");
 }
 
+function limpiarTexto(value = "") {
+  return String(value || "").trim();
+}
+
 function normalizeEmail(email = "") {
-  return String(email || "").trim().toLowerCase();
+  return limpiarTexto(email).toLowerCase();
 }
 
 function emailToKey(email = "") {
@@ -90,28 +104,30 @@ function canEdit() {
   return currentRole === "owner" || currentRole === "editor";
 }
 
-function setSharedDocSession(role, user, ownerUid, claseId) {
-  if (!user || !ownerUid || !claseId) return;
-
-  if (role === "owner") {
-    sessionStorage.removeItem(SHARED_DOC_KEY);
-    return;
-  }
-
-  sessionStorage.setItem(
-    SHARED_DOC_KEY,
-    JSON.stringify({
-      userUid: user.uid,
-      userEmail: normalizeEmail(user.email || ""),
-      ownerUid,
-      claseId,
-      role
-    })
-  );
+function stripObjectivePrefix(value = "") {
+  return String(value || "")
+    .replace(/^objetivo:\s*/i, "")
+    .trim();
 }
 
-function clearSharedDocSession() {
-  sessionStorage.removeItem(SHARED_DOC_KEY);
+function sanitizeUrl(value = "") {
+  try {
+    const url = new URL(String(value), window.location.origin);
+    if (url.protocol === "http:" || url.protocol === "https:") {
+      return url.href;
+    }
+    return "";
+  } catch {
+    return "";
+  }
+}
+
+function safeJsonParse(value, fallback = null) {
+  try {
+    return JSON.parse(value);
+  } catch {
+    return fallback;
+  }
 }
 
 function localStorageKey(ownerUid, claseId) {
@@ -122,10 +138,16 @@ function readClaseFromLocalStorage(ownerUid, claseId) {
   try {
     const specificKey = localStorageKey(ownerUid, claseId);
     const specific = localStorage.getItem(specificKey);
-    if (specific) return JSON.parse(specific);
+    if (specific) {
+      const parsed = safeJsonParse(specific, null);
+      if (parsed && typeof parsed === "object") return parsed;
+    }
 
     const legacy = localStorage.getItem("claseActual");
-    if (legacy) return JSON.parse(legacy);
+    if (legacy) {
+      const parsed = safeJsonParse(legacy, null);
+      if (parsed && typeof parsed === "object") return parsed;
+    }
 
     return null;
   } catch {
@@ -143,30 +165,45 @@ function writeClaseToLocalStorage(clase, ownerUid, claseId) {
   }
 }
 
-function stripObjectivePrefix(value = "") {
-  return String(value || "")
-    .replace(/^objetivo:\s*/i, "")
-    .trim();
-}
+function setSharedDocSession(role, user, ownerUid, claseId) {
+  if (!user || !ownerUid || !claseId) return;
 
-function limpiarTexto(value = "") {
-  return String(value || "").trim();
-}
+  if (role === "owner") {
+    sessionStorage.removeItem(SHARED_DOC_KEY);
+    return;
+  }
 
-function sanitizeUrl(value = "") {
   try {
-    const url = new URL(String(value), window.location.origin);
-    if (url.protocol === "http:" || url.protocol === "https:") {
-      return url.href;
-    }
-    return "";
+    sessionStorage.setItem(
+      SHARED_DOC_KEY,
+      JSON.stringify({
+        userUid: user.uid,
+        userEmail: normalizeEmail(user.email || ""),
+        ownerUid,
+        claseId,
+        role
+      })
+    );
   } catch {
-    return "";
+    // no-op
+  }
+}
+
+function clearSharedDocSession() {
+  try {
+    sessionStorage.removeItem(SHARED_DOC_KEY);
+  } catch {
+    // no-op
   }
 }
 
 function getDocumentoTitle(clase = {}) {
-  return clase.tituloDocumento || clase.tema || "Documento sin título";
+  return (
+    clase.tituloDocumento ||
+    clase.tema ||
+    clase.titulo ||
+    "Documento sin título"
+  );
 }
 
 function getDocumentoObjective(clase = {}) {
@@ -242,6 +279,190 @@ function splitResearchParagraphs(text = "") {
       return acc;
     }, [])
     .filter(Boolean);
+}
+
+function hasRealHtml(value = "") {
+  return typeof value === "string" && value.trim().length > 30;
+}
+
+function hasRealText(value = "") {
+  return typeof value === "string" && value.trim().length > 30;
+}
+
+function hasRealStructuredDoc(obj) {
+  if (!obj || typeof obj !== "object" || Array.isArray(obj)) return false;
+
+  const puntosClave = Array.isArray(obj.puntosClave)
+    ? obj.puntosClave.filter((item) => limpiarTexto(item))
+    : [];
+
+  const preguntas = Array.isArray(obj.preguntas)
+    ? obj.preguntas.filter((item) => limpiarTexto(item))
+    : [];
+
+  return Boolean(
+    limpiarTexto(obj.resumen) ||
+    limpiarTexto(obj.explicacion) ||
+    limpiarTexto(obj.ejemplo) ||
+    limpiarTexto(obj.cierre) ||
+    puntosClave.length ||
+    preguntas.length
+  );
+}
+
+function sanitizeCssStyle(styleText = "") {
+  if (!styleText || typeof styleText !== "string") return "";
+
+  const allowedProps = new Set([
+    "color",
+    "background-color",
+    "text-align",
+    "font-weight",
+    "font-style",
+    "text-decoration"
+  ]);
+
+  const safeDeclarations = [];
+  const declarations = styleText.split(";");
+
+  for (const declaration of declarations) {
+    const [rawProp, ...rest] = declaration.split(":");
+    const prop = limpiarTexto(rawProp).toLowerCase();
+    const value = limpiarTexto(rest.join(":"));
+
+    if (!prop || !value) continue;
+    if (!allowedProps.has(prop)) continue;
+
+    const lowerValue = value.toLowerCase();
+    if (
+      lowerValue.includes("url(") ||
+      lowerValue.includes("expression") ||
+      lowerValue.includes("javascript:") ||
+      lowerValue.includes("behavior:")
+    ) {
+      continue;
+    }
+
+    const validTextAlign = ["left", "center", "right", "justify"];
+    const validFontWeight = ["normal", "bold", "500", "600", "700", "800"];
+    const validFontStyle = ["normal", "italic"];
+    const validTextDecoration = ["none", "underline", "line-through"];
+    const genericColorRegex =
+      /^(#[0-9a-f]{3,8}|rgba?\([\d\s.,%]+\)|hsla?\([\d\s.,%]+\)|[a-z\s-]+)$/i;
+
+    let isValid = false;
+
+    if (prop === "text-align") {
+      isValid = validTextAlign.includes(lowerValue);
+    } else if (prop === "font-weight") {
+      isValid = validFontWeight.includes(lowerValue);
+    } else if (prop === "font-style") {
+      isValid = validFontStyle.includes(lowerValue);
+    } else if (prop === "text-decoration") {
+      isValid = validTextDecoration.includes(lowerValue);
+    } else if (prop === "color" || prop === "background-color") {
+      isValid = genericColorRegex.test(value);
+    }
+
+    if (!isValid) continue;
+
+    safeDeclarations.push(`${prop}: ${value}`);
+  }
+
+  return safeDeclarations.join("; ");
+}
+
+function sanitizeHtml(inputHtml = "") {
+  if (!inputHtml || typeof inputHtml !== "string") return "";
+
+  const allowedTags = new Set([
+    "H1",
+    "H2",
+    "H3",
+    "P",
+    "UL",
+    "OL",
+    "LI",
+    "BLOCKQUOTE",
+    "STRONG",
+    "EM",
+    "U",
+    "A",
+    "BR",
+    "DIV",
+    "SPAN",
+    "FONT"
+  ]);
+
+  const parser = new DOMParser();
+  const parsed = parser.parseFromString(`<div>${inputHtml}</div>`, "text/html");
+  const sourceRoot = parsed.body.firstElementChild;
+
+  const cleanDoc = document.implementation.createHTMLDocument("");
+  const cleanRoot = cleanDoc.createElement("div");
+
+  function cleanNode(node) {
+    if (node.nodeType === Node.TEXT_NODE) {
+      return cleanDoc.createTextNode(node.textContent || "");
+    }
+
+    if (node.nodeType !== Node.ELEMENT_NODE) {
+      return cleanDoc.createDocumentFragment();
+    }
+
+    const tag = node.tagName.toUpperCase();
+
+    if (["SCRIPT", "STYLE", "IFRAME", "OBJECT", "EMBED", "META", "LINK"].includes(tag)) {
+      return cleanDoc.createDocumentFragment();
+    }
+
+    if (!allowedTags.has(tag)) {
+      const fragment = cleanDoc.createDocumentFragment();
+      for (const child of Array.from(node.childNodes)) {
+        fragment.appendChild(cleanNode(child));
+      }
+      return fragment;
+    }
+
+    const targetTag = tag === "FONT" ? "span" : tag.toLowerCase();
+    const cleanEl = cleanDoc.createElement(targetTag);
+
+    if (tag === "A") {
+      const href = sanitizeUrl(node.getAttribute("href") || "");
+      if (href) {
+        cleanEl.setAttribute("href", href);
+        cleanEl.setAttribute("target", "_blank");
+        cleanEl.setAttribute("rel", "noopener noreferrer");
+      }
+    }
+
+    const rawStyle = node.getAttribute("style") || "";
+    const safeStyle = sanitizeCssStyle(rawStyle);
+    if (safeStyle) {
+      cleanEl.setAttribute("style", safeStyle);
+    }
+
+    if (tag === "FONT") {
+      const colorAttr = node.getAttribute("color") || "";
+      const colorStyle = sanitizeCssStyle(`color:${colorAttr}`);
+      const mergedStyle = [safeStyle, colorStyle].filter(Boolean).join("; ");
+      if (mergedStyle) {
+        cleanEl.setAttribute("style", mergedStyle);
+      }
+    }
+
+    for (const child of Array.from(node.childNodes)) {
+      cleanEl.appendChild(cleanNode(child));
+    }
+
+    return cleanEl;
+  }
+
+  for (const child of Array.from(sourceRoot.childNodes)) {
+    cleanRoot.appendChild(cleanNode(child));
+  }
+
+  return cleanRoot.innerHTML.trim();
 }
 
 function ensureSupportPanel() {
@@ -377,22 +598,48 @@ function hideLoading() {
   }
 }
 
+function showDenied() {
+  hideLoading();
+  if (documentApp) documentApp.style.display = "none";
+  if (accessGuard) accessGuard.classList.add("show");
+}
+
+function showDocument() {
+  hideLoading();
+  if (accessGuard) accessGuard.classList.remove("show");
+  if (documentApp) documentApp.style.display = "";
+}
+
 function renderError(message) {
   clearSupportPanel();
   hideLoading();
+
+  if (docContent) {
+    docContent.innerHTML = `
+      <div class="doc-placeholder">
+        <p><strong>No se pudo cargar el documento.</strong></p>
+        <p>${escapeHtml(message)}</p>
+      </div>
+    `;
+  }
+
+  if (documentApp) {
+    documentApp.style.display = "";
+  }
+}
+
+function renderGeneratingDocument(clase = {}) {
+  setBasicMeta(clase);
 
   if (!docContent) return;
 
   docContent.innerHTML = `
     <div class="doc-placeholder">
-      <p><strong>No se pudo cargar el documento.</strong></p>
-      <p>${escapeHtml(message)}</p>
+      <p><strong>Generando documento...</strong></p>
+      <p>Estamos investigando y armando el contenido completo de esta clase.</p>
+      <p>Cuando termine, el apunte se pega automáticamente acá.</p>
     </div>
   `;
-
-  if (documentApp) {
-    documentApp.style.display = "";
-  }
 }
 
 function renderGeneratedStructure(clase = {}) {
@@ -426,13 +673,7 @@ function renderGeneratedStructure(clase = {}) {
 
     <h2>Desarrollo del tema</h2>
     <p>
-      En esta sección la IA va a volcar la explicación principal del tema. La idea es que
-      se vea como un apunte serio: limpio, entendible y útil para repasar después.
-    </p>
-
-    <p>
-      Según la materia y el nivel, acá después pueden aparecer fórmulas, conceptos,
-      definiciones, reglas, vocabulario, fechas importantes, procesos, ejemplos o análisis.
+      En esta sección debería aparecer la explicación principal del tema.
     </p>
 
     ${
@@ -452,24 +693,11 @@ function renderGeneratedStructure(clase = {}) {
       <li>La clase está centrada en el tema: <strong>${tema}</strong>.</li>
       <li>El contenido debe estar adaptado al nivel: <strong>${nivel}</strong>.</li>
       <li>El objetivo principal es: <strong>${objetivo}</strong>.</li>
-      <li>Este formato documento sirve para leer, repasar y estudiar con más claridad.</li>
     </ul>
-
-    <h2>Ejemplo o aplicación</h2>
-    <p>
-      Más adelante, esta parte puede mostrar un ejemplo guiado o una aplicación concreta
-      del contenido para que el alumno no solo lea teoría, sino que también vea cómo se usa.
-    </p>
-
-    <blockquote>
-      Este documento es una base visual. El próximo paso es conectar la generación real
-      del contenido con IA para que acá aparezca la explicación completa automáticamente.
-    </blockquote>
 
     <h2>Cierre</h2>
     <p>
-      Al final de la clase, este mismo documento puede resumir lo más importante y servir
-      como punto de partida para crear ejercicios, tarjetas de memoria o un resumen más corto.
+      Este documento quedó como base visual, pero no se recibió contenido HTML completo.
     </p>
   `;
 }
@@ -477,17 +705,20 @@ function renderGeneratedStructure(clase = {}) {
 function renderRichHtmlDocumento(clase = {}) {
   if (!docContent) return false;
 
-  const html =
+  const rawHtml =
     clase.contenidoHtml ||
     clase.documentoHtml ||
     clase.htmlDocumento ||
     "";
 
-  if (!html || typeof html !== "string" || !html.trim()) {
+  if (!rawHtml || typeof rawHtml !== "string" || !rawHtml.trim()) {
     return false;
   }
 
-  docContent.innerHTML = html;
+  const safeHtml = sanitizeHtml(rawHtml);
+  if (!safeHtml) return false;
+
+  docContent.innerHTML = safeHtml;
   return true;
 }
 
@@ -496,7 +727,7 @@ function renderStructuredDocumento(clase = {}) {
 
   const contenido = clase.documento || clase.contenidoDocumento || clase.contenido || null;
 
-  if (!contenido || typeof contenido !== "object" || Array.isArray(contenido)) {
+  if (!hasRealStructuredDoc(contenido)) {
     return false;
   }
 
@@ -525,9 +756,9 @@ function renderStructuredDocumento(clase = {}) {
   }
 
   if (puntosClave.length) {
-    html += `<h2>Puntos clave</h2><ul>`;
+    html += "<h2>Puntos clave</h2><ul>";
     html += puntosClave.map((item) => `<li>${escapeHtml(item)}</li>`).join("");
-    html += `</ul>`;
+    html += "</ul>";
   }
 
   if (ejemplo) {
@@ -538,9 +769,9 @@ function renderStructuredDocumento(clase = {}) {
   }
 
   if (preguntas.length) {
-    html += `<h2>Preguntas para practicar</h2><ol>`;
+    html += "<h2>Preguntas para practicar</h2><ol>";
     html += preguntas.map((item) => `<li>${escapeHtml(item)}</li>`).join("");
-    html += `</ol>`;
+    html += "</ol>";
   }
 
   if (cierre) {
@@ -565,7 +796,7 @@ function renderPlainTextDocumento(clase = {}) {
     clase.contenidoTexto ||
     "";
 
-  if (!rawText || typeof rawText !== "string") return false;
+  if (!hasRealText(rawText)) return false;
 
   const blocks = rawText
     .split(/\n{2,}/)
@@ -591,21 +822,25 @@ function renderClase(clase = {}) {
 
   if (renderRichHtmlDocumento(clase)) {
     renderSupportPanel(clase);
+    syncSavedSignatureFromDom();
     return;
   }
 
   if (renderStructuredDocumento(clase)) {
     renderSupportPanel(clase);
+    syncSavedSignatureFromDom();
     return;
   }
 
   if (renderPlainTextDocumento(clase)) {
     renderSupportPanel(clase);
+    syncSavedSignatureFromDom();
     return;
   }
 
   renderGeneratedStructure(clase);
   renderSupportPanel(clase);
+  syncSavedSignatureFromDom();
 }
 
 function setEditableState(element, editable) {
@@ -629,22 +864,9 @@ function applyRoleUi(role) {
     toolbarWrap.style.pointerEvents = editable ? "auto" : "none";
   }
 
-  const openShareBtn = document.getElementById("open-share-btn");
   if (openShareBtn) {
     openShareBtn.style.display = role === "owner" ? "" : "none";
   }
-}
-
-function showDenied() {
-  hideLoading();
-  if (documentApp) documentApp.style.display = "none";
-  if (accessGuard) accessGuard.classList.add("show");
-}
-
-function showDocument() {
-  hideLoading();
-  if (accessGuard) accessGuard.classList.remove("show");
-  if (documentApp) documentApp.style.display = "";
 }
 
 function resolveUserRole(clase, user, ownerUid) {
@@ -693,115 +915,160 @@ function resolveUserRole(clase, user, ownerUid) {
   return null;
 }
 
-async function generarDocumentoSiFalta(clase = {}) {
-  const yaExiste =
-    limpiarTexto(clase.contenidoHtml) ||
-    limpiarTexto(clase.documentoHtml) ||
-    limpiarTexto(clase.htmlDocumento) ||
-    limpiarTexto(clase.documentoTexto) ||
-    limpiarTexto(clase.textoDocumento) ||
-    limpiarTexto(clase.contenidoTexto) ||
-    (clase.documento && typeof clase.documento === "object") ||
-    (clase.contenidoDocumento && typeof clase.contenidoDocumento === "object") ||
-    (clase.contenido && typeof clase.contenido === "object");
+async function fetchJsonWithTimeout(url, options = {}, timeoutMs = GENERATE_TIMEOUT_MS) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
 
-  if (yaExiste) {
-    return clase;
-  }
-
-  if (!clase?.materia || !clase?.tema || !clase?.nivel) {
-    return clase;
-  }
-
-  const payload = {
-    materia: clase.materia || "",
-    tema: clase.tema || "",
-    nivel: clase.nivel || "",
-    duracion: clase.duracion || "",
-    objetivo: clase.objetivo || "",
-    investigacion: clase.investigacion || "",
-    fuentes: Array.isArray(clase.fuentes) ? clase.fuentes : [],
-  };
-
-  const response = await fetch("/api/generar-documento", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(payload),
-  });
-
-  let data;
   try {
-    data = await response.json();
-  } catch {
-    throw new Error("El servidor devolvió un formato inválido al generar el documento.");
-  }
+    const response = await fetch(url, {
+      ...options,
+      signal: controller.signal
+    });
 
-  if (!response.ok || !data?.ok || !data?.documento) {
-    throw new Error(data?.error || "No se pudo generar el documento.");
-  }
-
-  const merged = {
-    ...clase,
-    tituloDocumento:
-      data.documento.tituloDocumento ||
-      clase.tituloDocumento ||
-      clase.tema ||
-      "Documento",
-    objetivoDocumento:
-      data.documento.objetivoDocumento ||
-      clase.objetivoDocumento ||
-      clase.objetivo ||
-      "",
-    contenidoHtml: data.documento.contenidoHtml || "",
-    resumenDocumento: data.documento.resumenCorto || "",
-    investigacion: data.investigacion || clase.investigacion || "",
-    fuentes: Array.isArray(data.fuentes)
-      ? data.fuentes
-      : Array.isArray(clase.fuentes)
-        ? clase.fuentes
-        : [],
-    updatedAt: new Date().toISOString()
-  };
-
-  if (currentClaseRef && canEdit()) {
+    let data = null;
     try {
-      await setDoc(
-        currentClaseRef,
-        {
-          tituloDocumento: merged.tituloDocumento,
-          objetivoDocumento: merged.objetivoDocumento,
-          contenidoHtml: merged.contenidoHtml,
-          resumenDocumento: merged.resumenDocumento,
-          investigacion: merged.investigacion,
-          fuentes: merged.fuentes,
-          updatedAt: serverTimestamp()
-        },
-        { merge: true }
-      );
-    } catch (error) {
-      console.error("Error guardando documento generado:", error);
+      data = await response.json();
+    } catch {
+      throw new Error("El servidor devolvió un JSON inválido.");
     }
+
+    return { response, data };
+  } catch (error) {
+    if (error.name === "AbortError") {
+      throw new Error("La generación tardó demasiado y fue cancelada.");
+    }
+    throw error;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+async function generarDocumentoSiFalta(clase = {}) {
+  if (generationPromise) {
+    return generationPromise;
   }
 
-  currentClaseData = merged;
-  writeClaseToLocalStorage(merged, currentOwnerUid, currentClaseId);
+  generationPromise = (async () => {
+    const yaExiste =
+      hasRealHtml(clase.contenidoHtml) ||
+      hasRealHtml(clase.documentoHtml) ||
+      hasRealHtml(clase.htmlDocumento) ||
+      hasRealText(clase.documentoTexto) ||
+      hasRealText(clase.textoDocumento) ||
+      hasRealText(clase.contenidoTexto) ||
+      hasRealStructuredDoc(clase.documento) ||
+      hasRealStructuredDoc(clase.contenidoDocumento) ||
+      hasRealStructuredDoc(clase.contenido);
 
-  return merged;
+    if (yaExiste) {
+      return clase;
+    }
+
+    if (!clase?.materia || !clase?.tema || !clase?.nivel) {
+      throw new Error("Faltan materia, tema o nivel para generar el documento.");
+    }
+
+    renderGeneratingDocument(clase);
+
+    const payload = {
+      materia: clase.materia || "",
+      tema: clase.tema || "",
+      nivel: clase.nivel || "",
+      duracion: clase.duracion || "",
+      objetivo: clase.objetivo || "",
+      investigacion: clase.investigacion || "",
+      fuentes: Array.isArray(clase.fuentes) ? clase.fuentes : [],
+    };
+
+    const { response, data } = await fetchJsonWithTimeout(
+      "/api/generar-documento",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      },
+      GENERATE_TIMEOUT_MS
+    );
+
+    if (!response.ok || !data?.ok || !data?.documento) {
+      throw new Error(data?.error || "No se pudo generar el documento.");
+    }
+
+    const safeHtml = sanitizeHtml(data.documento.contenidoHtml || "");
+    if (!safeHtml) {
+      throw new Error("La IA respondió, pero no devolvió contenido utilizable.");
+    }
+
+    const merged = {
+      ...clase,
+      tituloDocumento:
+        data.documento.tituloDocumento ||
+        clase.tituloDocumento ||
+        clase.tema ||
+        "Documento",
+      objetivoDocumento:
+        data.documento.objetivoDocumento ||
+        clase.objetivoDocumento ||
+        clase.objetivo ||
+        "",
+      contenidoHtml: safeHtml,
+      resumenDocumento: data.documento.resumenCorto || "",
+      investigacion: data.investigacion || clase.investigacion || "",
+      fuentes: Array.isArray(data.fuentes)
+        ? data.fuentes
+        : Array.isArray(clase.fuentes)
+          ? clase.fuentes
+          : [],
+      updatedAt: new Date().toISOString()
+    };
+
+    if (currentClaseRef && canEdit()) {
+      try {
+        await setDoc(
+          currentClaseRef,
+          {
+            tituloDocumento: merged.tituloDocumento,
+            objetivoDocumento: merged.objetivoDocumento,
+            contenidoHtml: merged.contenidoHtml,
+            resumenDocumento: merged.resumenDocumento,
+            investigacion: merged.investigacion,
+            fuentes: merged.fuentes,
+            updatedAt: serverTimestamp()
+          },
+          { merge: true }
+        );
+      } catch (error) {
+        console.error("Error guardando documento generado:", error);
+      }
+    }
+
+    currentClaseData = merged;
+    writeClaseToLocalStorage(merged, currentOwnerUid, currentClaseId);
+
+    return merged;
+  })();
+
+  try {
+    return await generationPromise;
+  } finally {
+    generationPromise = null;
+  }
 }
 
 function updateTopbarTitleFromEditor() {
   if (!topbarTitle || !docTitle) return;
-  const value = docTitle.textContent.trim();
+  const value = limpiarTexto(docTitle.textContent);
   topbarTitle.textContent = value || "Documento sin título";
 }
 
 function getCurrentDocumentPayload() {
-  const titulo = docTitle?.textContent?.trim() || "Documento sin título";
-  const objetivoRaw = docObjective?.textContent?.trim() || "";
+  const titulo = limpiarTexto(docTitle?.textContent || "") || "Documento sin título";
+  const objetivoRaw = limpiarTexto(docObjective?.textContent || "");
   const objetivo = stripObjectivePrefix(objetivoRaw);
-  const contenidoHtml = docContent?.innerHTML || "";
+  const contenidoHtmlRaw = docContent?.innerHTML || "";
+  const contenidoHtml = sanitizeHtml(contenidoHtmlRaw);
 
   return {
     tituloDocumento: titulo,
@@ -813,46 +1080,73 @@ function getCurrentDocumentPayload() {
   };
 }
 
+function getPayloadSignature(payloadLike = {}) {
+  return JSON.stringify({
+    tituloDocumento: payloadLike.tituloDocumento || "",
+    objetivoDocumento: payloadLike.objetivoDocumento || "",
+    contenidoHtml: payloadLike.contenidoHtml || ""
+  });
+}
+
+function syncSavedSignatureFromDom() {
+  const payload = getCurrentDocumentPayload();
+  lastSavedSignature = getPayloadSignature(payload);
+}
+
 function scheduleSave() {
   if (!currentClaseRef || !canEdit()) return;
 
   clearTimeout(saveTimer);
   saveTimer = setTimeout(() => {
     saveDocumentEdits();
-  }, 700);
+  }, SAVE_DEBOUNCE_MS);
 }
 
 async function saveDocumentEdits(force = false) {
   if (!currentClaseRef || !canEdit()) return;
   if (saveInFlight && !force) return;
 
+  const payload = getCurrentDocumentPayload();
+  const signature = getPayloadSignature(payload);
+
+  if (!force && signature === lastSavedSignature) {
+    return;
+  }
+
   saveInFlight = true;
 
   try {
-    const payload = getCurrentDocumentPayload();
-
     await updateDoc(currentClaseRef, payload);
 
     currentClaseData = {
       ...(currentClaseData || {}),
-      ...payload,
+      tituloDocumento: payload.tituloDocumento,
+      objetivoDocumento: payload.objetivoDocumento,
+      contenidoHtml: payload.contenidoHtml,
+      ultimoEditorUid: payload.ultimoEditorUid,
+      ultimoEditorEmail: payload.ultimoEditorEmail,
       updatedAt: new Date().toISOString()
     };
 
+    lastSavedSignature = signature;
     writeClaseToLocalStorage(currentClaseData, currentOwnerUid, currentClaseId);
   } catch (error) {
     console.error("Error guardando documento:", error);
 
     try {
-      const payload = getCurrentDocumentPayload();
       await setDoc(currentClaseRef, payload, { merge: true });
 
       currentClaseData = {
         ...(currentClaseData || {}),
-        ...payload,
+        tituloDocumento: payload.tituloDocumento,
+        objetivoDocumento: payload.objetivoDocumento,
+        contenidoHtml: payload.contenidoHtml,
+        ultimoEditorUid: payload.ultimoEditorUid,
+        ultimoEditorEmail: payload.ultimoEditorEmail,
         updatedAt: new Date().toISOString()
       };
 
+      lastSavedSignature = signature;
       writeClaseToLocalStorage(currentClaseData, currentOwnerUid, currentClaseId);
     } catch (secondError) {
       console.error("Error secundario guardando documento:", secondError);
@@ -862,7 +1156,18 @@ async function saveDocumentEdits(force = false) {
   }
 }
 
+function handlePlainTextPaste(e) {
+  if (!canEdit()) return;
+
+  e.preventDefault();
+  const text = e.clipboardData?.getData("text/plain") || "";
+  document.execCommand("insertText", false, text);
+}
+
 function attachAutosaveListeners() {
+  if (autosaveListenersAttached) return;
+  autosaveListenersAttached = true;
+
   const onInput = () => {
     updateTopbarTitleFromEditor();
     scheduleSave();
@@ -872,11 +1177,20 @@ function attachAutosaveListeners() {
   docObjective?.addEventListener("input", onInput);
   docContent?.addEventListener("input", onInput);
 
+  docTitle?.addEventListener("paste", handlePlainTextPaste);
+  docObjective?.addEventListener("paste", handlePlainTextPaste);
+  docContent?.addEventListener("paste", handlePlainTextPaste);
+
   document.addEventListener("visibilitychange", () => {
     if (document.hidden) {
       clearTimeout(saveTimer);
-      saveDocumentEdits(true);
+      void saveDocumentEdits(true);
     }
+  });
+
+  window.addEventListener("pagehide", () => {
+    clearTimeout(saveTimer);
+    void saveDocumentEdits(true);
   });
 }
 
@@ -889,22 +1203,9 @@ function getShareUrl() {
   return url.toString();
 }
 
-function replaceElementToClearOldListeners(id) {
-  const oldEl = document.getElementById(id);
-  if (!oldEl || !oldEl.parentNode) return oldEl;
-  const clone = oldEl.cloneNode(true);
-  oldEl.parentNode.replaceChild(clone, oldEl);
-  return clone;
-}
-
 function setupShareUi() {
   if (!shareModal || shareUiInitialized) return;
   shareUiInitialized = true;
-
-  const openShareBtn = replaceElementToClearOldListeners("open-share-btn");
-  const closeShareBtn = replaceElementToClearOldListeners("close-share-btn");
-  const copyLinkBtn = replaceElementToClearOldListeners("copy-link-btn");
-  const sendShareBtn = replaceElementToClearOldListeners("send-share-btn");
 
   if (docLinkInput) {
     docLinkInput.value = getShareUrl();
@@ -948,7 +1249,7 @@ function setupShareUi() {
     const email = normalizeEmail(shareEmailInput?.value || "");
     const role = normalizeRole(shareRoleSelect?.value || "viewer");
 
-    if (!email) {
+    if (!email || !email.includes("@")) {
       if (shareStatus) shareStatus.textContent = "Escribí un email válido.";
       return;
     }
@@ -1035,7 +1336,7 @@ function setupShareUi() {
   });
 }
 
-async function loadClase(user) {
+async function resolveClaseFromFirestoreOrLocal(user) {
   const fallbackOwner = ownerUidFromUrl || user.uid;
   const localClase = readClaseFromLocalStorage(fallbackOwner, claseIdFromUrl);
 
@@ -1047,6 +1348,10 @@ async function loadClase(user) {
     currentOwnerUid = ownerUidFromUrl || localClase?.ownerUid || user.uid;
   }
 
+  if (!currentClaseId && localClase?.id) {
+    currentClaseId = localClase.id;
+  }
+
   if (!currentClaseId) {
     if (localClase) {
       currentClaseData = localClase;
@@ -1055,38 +1360,30 @@ async function loadClase(user) {
       if (currentRole === "owner") {
         clearSharedDocSession();
       } else {
-        setSharedDocSession(
-          currentRole,
-          user,
-          currentOwnerUid,
-          localClase.id || currentClaseId
-        );
+        setSharedDocSession(currentRole, user, currentOwnerUid, localClase.id || currentClaseId);
       }
 
       if (currentClaseId && currentOwnerUid) {
         currentClaseRef = doc(db, "usuarios", currentOwnerUid, "clases", currentClaseId);
       }
 
-      showDocument();
-      setupShareUi();
-
-      const claseLista = await generarDocumentoSiFalta(localClase);
-      renderClase(claseLista);
-      applyRoleUi(currentRole);
-      return;
+      return {
+        clase: localClase,
+        origin: "local"
+      };
     }
 
-    renderError("No se encontró el identificador de la clase.");
-    showDocument();
-    return;
+    throw new Error("No se encontró el identificador de la clase.");
   }
 
+  const claseRef = doc(db, "usuarios", currentOwnerUid, "clases", currentClaseId);
+
   try {
-    const claseRef = doc(db, "usuarios", currentOwnerUid, "clases", currentClaseId);
     const claseSnap = await getDoc(claseRef);
 
     if (!claseSnap.exists()) {
       if (localClase) {
+        currentClaseRef = claseRef;
         currentClaseData = localClase;
         currentRole = currentOwnerUid === user.uid ? "owner" : "viewer";
 
@@ -1096,20 +1393,13 @@ async function loadClase(user) {
           setSharedDocSession(currentRole, user, currentOwnerUid, currentClaseId);
         }
 
-        currentClaseRef = claseRef;
-
-        showDocument();
-        setupShareUi();
-
-        const claseLista = await generarDocumentoSiFalta(localClase);
-        renderClase(claseLista);
-        applyRoleUi(currentRole);
-        return;
+        return {
+          clase: localClase,
+          origin: "local"
+        };
       }
 
-      renderError("La clase no existe o no se pudo encontrar en Firestore.");
-      showDocument();
-      return;
+      throw new Error("La clase no existe o no se pudo encontrar en Firestore.");
     }
 
     const claseData = {
@@ -1121,28 +1411,23 @@ async function loadClase(user) {
     const role = resolveUserRole(claseData, user, currentOwnerUid);
 
     if (!role) {
-      showDenied();
-      return;
+      return {
+        denied: true
+      };
     }
-
-    setSharedDocSession(role, user, currentOwnerUid, currentClaseId);
 
     currentClaseRef = claseRef;
     currentClaseData = claseData;
     currentRole = role;
+    setSharedDocSession(role, user, currentOwnerUid, currentClaseId);
 
-    showDocument();
-    setupShareUi();
-
-    const claseLista = await generarDocumentoSiFalta(claseData);
-
-    writeClaseToLocalStorage(claseLista, currentOwnerUid, currentClaseId);
-    renderClase(claseLista);
-    applyRoleUi(role);
+    return {
+      clase: claseData,
+      origin: "firestore"
+    };
   } catch (error) {
-    console.error("Error al cargar la clase:", error);
-
     if (localClase) {
+      currentClaseRef = claseRef;
       currentClaseData = localClase;
       currentRole = currentOwnerUid === user.uid ? "owner" : "viewer";
 
@@ -1152,31 +1437,48 @@ async function loadClase(user) {
         setSharedDocSession(currentRole, user, currentOwnerUid, currentClaseId);
       }
 
-      if (currentClaseId && currentOwnerUid) {
-        currentClaseRef = doc(db, "usuarios", currentOwnerUid, "clases", currentClaseId);
-      }
-
-      showDocument();
-      setupShareUi();
-
-      try {
-        const claseLista = await generarDocumentoSiFalta(localClase);
-        renderClase(claseLista);
-      } catch (innerError) {
-        console.error("Error generando documento desde local:", innerError);
-        renderClase(localClase);
-      }
-
-      applyRoleUi(currentRole);
-      return;
+      return {
+        clase: localClase,
+        origin: "local"
+      };
     }
 
-    renderError(error.message || "Hubo un problema al cargar la clase.");
-    showDocument();
+    throw error;
   }
 }
 
-attachAutosaveListeners();
+async function loadClase(user) {
+  try {
+    const result = await resolveClaseFromFirestoreOrLocal(user);
+
+    if (result?.denied) {
+      showDenied();
+      return;
+    }
+
+    const claseBase = result?.clase;
+    if (!claseBase) {
+      throw new Error("No se encontró información de la clase.");
+    }
+
+    showDocument();
+    setupShareUi();
+    attachAutosaveListeners();
+
+    const claseFinal = await generarDocumentoSiFalta(claseBase);
+
+    currentClaseData = claseFinal;
+    writeClaseToLocalStorage(claseFinal, currentOwnerUid, currentClaseId);
+
+    renderClase(claseFinal);
+    applyRoleUi(currentRole);
+  } catch (error) {
+    console.error("Error al cargar la clase:", error);
+    showDocument();
+    renderError(error?.message || "Hubo un problema al cargar la clase.");
+    applyRoleUi("viewer");
+  }
+}
 
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
