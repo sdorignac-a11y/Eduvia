@@ -1339,12 +1339,11 @@
     </div>
   </div>
 
-  <script>
-    const editableAreas = document.querySelectorAll(".doc-editable");
+<script>
+  (() => {
+    const editableAreas = Array.from(document.querySelectorAll(".doc-editable"));
     const editor = document.getElementById("doc-content");
     const titleEditor = document.getElementById("doc-title");
-    const topbarTitleEl = document.getElementById("topbar-title");
-    const lastSaveEl = document.getElementById("topbar-last-save");
 
     const formatBlock = document.getElementById("format-block");
     const fontFamilySelect = document.getElementById("font-family-select");
@@ -1352,25 +1351,18 @@
     const textColor = document.getElementById("text-color");
     const highlightColor = document.getElementById("highlight-color");
 
-    const openShareBtn = document.getElementById("open-share-btn");
-    const closeShareBtn = document.getElementById("close-share-btn");
-    const shareModal = document.getElementById("share-modal");
-    const copyLinkBtn = document.getElementById("copy-link-btn");
-    const sendShareBtn = document.getElementById("send-share-btn");
-    const shareStatus = document.getElementById("share-status");
-    const docLink = document.getElementById("doc-link");
-
     const openMoreBtn = document.getElementById("open-more-btn");
     const moreDropdown = document.getElementById("more-dropdown");
     const moreBackdrop = document.getElementById("more-backdrop");
     const moreStatus = document.getElementById("more-status");
 
     const actionChat = document.getElementById("action-chat");
-    const actionPresentation = document.getElementById("action-presentation");
     const actionPdf = document.getElementById("action-pdf");
     const actionPrint = document.getElementById("action-print");
     const actionDuplicate = document.getElementById("action-duplicate");
     const actionSharePanel = document.getElementById("action-share-panel");
+
+    const openShareBtn = document.getElementById("open-share-btn");
 
     const linkBtn = document.getElementById("link-btn");
     const imageBtn = document.getElementById("image-btn");
@@ -1378,103 +1370,38 @@
     const undoBtn = document.getElementById("undo-btn");
     const redoBtn = document.getElementById("redo-btn");
 
-    const referencesList = document.getElementById("references-list");
-    const referencesTitle = document.getElementById("references-title");
-    const referencesSub = document.getElementById("references-sub");
-    const simpleViewBtn = document.getElementById("simple-view-btn");
-    const apaViewBtn = document.getElementById("apa-view-btn");
-    const topToggleReferenceViewBtn = document.getElementById("toggle-reference-view-btn");
-
     let activeEditable = editor;
     let savedRange = null;
-    let saveTimer = null;
-    let referenceMode = "simple";
 
-    const documentSources = [
-      {
-        id: 1,
-        author: "Starbucks",
-        year: "2012",
-        title: "On a First Name Basis",
-        site: "Starbucks Stories & News",
-        url: "https://about.starbucks.com/history/on-a-first-name-basis/"
-      },
-      {
-        id: 2,
-        author: "Harvard Business School",
-        year: "2001",
-        title: "What Starbucks Says About Its Consumers",
-        site: "HBS News",
-        url: "https://www.hbs.edu/news/releases/Pages/koehnonstarbucks.aspx"
-      },
-      {
-        id: 3,
-        author: "Wang, Y.",
-        year: "2023",
-        title: "Brand symbolism and consumer perception of Starbucks",
-        site: "MDPI",
-        url: "https://www.mdpi.com/"
+    function canEditCurrentArea() {
+      return (
+        activeEditable &&
+        activeEditable.getAttribute("contenteditable") === "true" &&
+        !activeEditable.isContentEditable === false
+      );
+    }
+
+    function normalizeUrl(value = "") {
+      try {
+        const url = new URL(String(value).trim(), window.location.origin);
+        if (url.protocol === "http:" || url.protocol === "https:") {
+          return url.href;
+        }
+        return "";
+      } catch {
+        return "";
       }
-    ];
-
-    const sampleContent = `
-      <h2>La estrategia de Starbucks con los nombres en los vasos</h2>
-
-      <p>
-        La estrategia de Starbucks de escribir el nombre del cliente en el vaso puede entenderse como una forma de
-        personalización del servicio que busca volver la experiencia más cercana, memorable y humana
-        <span class="citation-slot" data-sources="1"></span>
-      </p>
-
-      <p>
-        Esta práctica no solo cumple una función operativa dentro del local, sino que también fortalece la experiencia
-        del cliente y la relación emocional con la marca
-        <span class="citation-slot" data-sources="1,2"></span>
-      </p>
-
-      <p>
-        Además, distintas investigaciones muestran que Starbucks no vende solamente café, sino también una imagen de
-        identidad, estilo de vida y valor simbólico para ciertos consumidores
-        <span class="citation-slot" data-sources="2,3"></span>
-      </p>
-    `;
-
-    if (editor && !editor.innerHTML.trim()) {
-      editor.innerHTML = sampleContent;
-    }
-
-    if (docLink) {
-      docLink.value = window.location.href;
-    }
-
-    function setLastSaveText(text) {
-      if (lastSaveEl) lastSaveEl.textContent = text;
-    }
-
-    function fakeAutosave() {
-      setLastSaveText("Guardando...");
-      clearTimeout(saveTimer);
-      saveTimer = setTimeout(() => {
-        setLastSaveText("Guardado automático");
-      }, 500);
     }
 
     function setMoreStatus(message = "") {
       if (moreStatus) moreStatus.textContent = message;
     }
 
-    function openShareModal() {
-      shareModal?.classList.add("show");
-      shareStatus.textContent = "";
-    }
-
-    function closeShareModal() {
-      shareModal?.classList.remove("show");
-      shareStatus.textContent = "";
-    }
+    window.setMoreStatus = setMoreStatus;
 
     function positionMoreDropdown() {
       if (!openMoreBtn || !moreDropdown) return;
+
       const rect = openMoreBtn.getBoundingClientRect();
       const dropdownWidth = Math.min(360, window.innerWidth - 24);
       let left = rect.right - dropdownWidth;
@@ -1491,9 +1418,10 @@
     }
 
     function openMoreDropdown() {
+      if (!moreDropdown || !moreBackdrop) return;
       positionMoreDropdown();
-      moreDropdown?.classList.add("show");
-      moreBackdrop?.classList.add("show");
+      moreDropdown.classList.add("show");
+      moreBackdrop.classList.add("show");
       openMoreBtn?.setAttribute("aria-expanded", "true");
       setMoreStatus("");
     }
@@ -1505,11 +1433,13 @@
       setMoreStatus("");
     }
 
-    function saveSelection() {
-      const sel = window.getSelection();
-      if (!sel || !sel.rangeCount || !activeEditable) return;
+    window.closeMoreDropdown = closeMoreDropdown;
 
-      const range = sel.getRangeAt(0);
+    function saveSelection() {
+      const selection = window.getSelection();
+      if (!selection || !selection.rangeCount || !activeEditable) return;
+
+      const range = selection.getRangeAt(0);
       if (activeEditable.contains(range.commonAncestorContainer)) {
         savedRange = range.cloneRange();
       }
@@ -1517,28 +1447,41 @@
 
     function restoreSelection() {
       if (!savedRange) return;
-      const sel = window.getSelection();
-      if (!sel) return;
-      sel.removeAllRanges();
-      sel.addRange(savedRange);
+      const selection = window.getSelection();
+      if (!selection) return;
+      selection.removeAllRanges();
+      selection.addRange(savedRange);
+    }
+
+    function triggerEditorInput() {
+      if (!activeEditable) return;
+      activeEditable.dispatchEvent(new Event("input", { bubbles: true }));
     }
 
     function focusEditable() {
       if (!activeEditable) activeEditable = editor;
+      if (!activeEditable) return;
       activeEditable.focus({ preventScroll: true });
       restoreSelection();
     }
 
     function exec(command, value = null) {
+      if (!activeEditable) return;
       focusEditable();
-      document.execCommand(command, false, value);
+
+      try {
+        document.execCommand(command, false, value);
+      } catch {
+        return;
+      }
+
       saveSelection();
       refreshToolbarState();
-      fakeAutosave();
+      triggerEditorInput();
     }
 
     function refreshToolbarState() {
-      const commands = [
+      const commands = new Set([
         "bold",
         "italic",
         "underline",
@@ -1548,12 +1491,12 @@
         "justifyRight",
         "justifyFull",
         "insertOrderedList",
-        "insertUnorderedList"
-      ];
+        "insertUnorderedList",
+      ]);
 
       document.querySelectorAll("[data-command]").forEach((btn) => {
         const command = btn.dataset.command;
-        if (!commands.includes(command)) {
+        if (!commands.has(command)) {
           btn.classList.remove("is-active");
           return;
         }
@@ -1567,128 +1510,6 @@
       });
     }
 
-    function escapeHtml(value = "") {
-      return String(value)
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
-    }
-
-    function getSourceById(id) {
-      return documentSources.find((source) => String(source.id) === String(id));
-    }
-
-    function formatAPAReference(source) {
-      if (!source) return "";
-      const author = source.author || "Autor desconocido";
-      const year = source.year || "s.f.";
-      const title = source.title || "Sin título";
-      const site = source.site || "";
-      const url = source.url || "";
-
-      return `
-        <span>${escapeHtml(author)}. (${escapeHtml(year)}). <em>${escapeHtml(title)}</em>${site ? `. ${escapeHtml(site)}` : ""}.</span>
-        ${url ? `<a class="reference-link" href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(url)}</a>` : ""}
-      `;
-    }
-
-    function formatSimpleReference(source) {
-      if (!source) return "";
-      const author = source.author || "Autor desconocido";
-      const year = source.year || "s.f.";
-      const title = source.title || "Sin título";
-      const site = source.site || "";
-      const url = source.url || "";
-
-      return `
-        <strong>${escapeHtml(title)}</strong><br>
-        <span>${escapeHtml(author)} · ${escapeHtml(year)}${site ? ` · ${escapeHtml(site)}` : ""}</span>
-        ${url ? `<br><a class="reference-link" href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(url)}</a>` : ""}
-      `;
-    }
-
-    function formatInlineCitation(source) {
-      if (!source) return "";
-      const author = source.author || "Autor desconocido";
-      const year = source.year || "s.f.";
-      const shortAuthor = author.split(",")[0].trim();
-      return `(${escapeHtml(shortAuthor)}, ${escapeHtml(year)})`;
-    }
-
-    function renderReferences() {
-      if (!referencesList) return;
-
-      referencesTitle.textContent = referenceMode === "apa" ? "Referencias (APA)" : "Fuentes utilizadas";
-      referencesSub.textContent =
-        referenceMode === "apa"
-          ? "Listado académico en estilo APA para entregar o estudiar."
-          : "Vista simple para leer rápido y revisar de dónde salió la información.";
-
-      if (!documentSources.length) {
-        referencesList.innerHTML = `
-          <div class="reference-item">
-            Todavía no hay fuentes cargadas para este documento.
-          </div>
-        `;
-        return;
-      }
-
-      const html = documentSources.map((source) => `
-        <div class="reference-item ${referenceMode === "apa" ? "apa" : ""}">
-          ${referenceMode === "apa" ? formatAPAReference(source) : formatSimpleReference(source)}
-        </div>
-      `).join("");
-
-      referencesList.innerHTML = html;
-    }
-
-    function renderInlineCitations() {
-      const slots = editor.querySelectorAll(".citation-slot");
-
-      slots.forEach((slot) => {
-        const ids = (slot.dataset.sources || "")
-          .split(",")
-          .map((id) => id.trim())
-          .filter(Boolean);
-
-        const sources = ids.map(getSourceById).filter(Boolean);
-
-        if (!sources.length) {
-          slot.innerHTML = "";
-          return;
-        }
-
-        if (referenceMode === "apa") {
-          slot.innerHTML = `
-            <span class="apa-inline-citation">
-              ${sources.map(formatInlineCitation).join("; ")}
-            </span>
-          `;
-        } else {
-          slot.innerHTML = ids.map((id) => {
-            return `<span class="citation-chip">${escapeHtml(id)}</span>`;
-          }).join("");
-        }
-      });
-    }
-
-    function setReferenceMode(mode) {
-      referenceMode = mode === "apa" ? "apa" : "simple";
-
-      simpleViewBtn?.classList.toggle("is-active", referenceMode === "simple");
-      apaViewBtn?.classList.toggle("is-active", referenceMode === "apa");
-
-      if (topToggleReferenceViewBtn) {
-        topToggleReferenceViewBtn.textContent = referenceMode === "apa" ? "Simple" : "APA";
-      }
-
-      renderInlineCitations();
-      renderReferences();
-      fakeAutosave();
-    }
-
     editableAreas.forEach((area) => {
       area.addEventListener("focus", () => {
         activeEditable = area;
@@ -1696,20 +1517,18 @@
         refreshToolbarState();
       });
 
-      area.addEventListener("keyup", () => {
+      area.addEventListener("mouseup", () => {
         saveSelection();
         refreshToolbarState();
-        fakeAutosave();
       });
 
-      area.addEventListener("mouseup", () => {
+      area.addEventListener("keyup", () => {
         saveSelection();
         refreshToolbarState();
       });
 
       area.addEventListener("input", () => {
         saveSelection();
-        fakeAutosave();
       });
     });
 
@@ -1718,16 +1537,10 @@
       refreshToolbarState();
     });
 
-    titleEditor?.addEventListener("input", () => {
-      const value = titleEditor.textContent.trim();
-      if (topbarTitleEl) {
-        topbarTitleEl.textContent = value || "Documento sin título";
-      }
-    });
-
     document.querySelectorAll("[data-command]").forEach((btn) => {
       btn.addEventListener("click", () => {
         const command = btn.dataset.command;
+        if (!command) return;
         exec(command);
       });
     });
@@ -1737,8 +1550,9 @@
         p: "P",
         h2: "H2",
         h3: "H3",
-        blockquote: "BLOCKQUOTE"
+        blockquote: "BLOCKQUOTE",
       };
+
       exec("formatBlock", map[formatBlock.value] || "P");
     });
 
@@ -1759,14 +1573,28 @@
     });
 
     linkBtn?.addEventListener("click", () => {
-      const url = prompt("Pegá el link que querés insertar:");
-      if (!url) return;
+      const raw = prompt("Pegá el link que querés insertar:");
+      if (!raw) return;
+
+      const url = normalizeUrl(raw);
+      if (!url) {
+        alert("Ingresá una URL válida que empiece con http:// o https://");
+        return;
+      }
+
       exec("createLink", url);
     });
 
     imageBtn?.addEventListener("click", () => {
-      const url = prompt("Pegá la URL de la imagen:");
-      if (!url) return;
+      const raw = prompt("Pegá la URL de la imagen:");
+      if (!raw) return;
+
+      const url = normalizeUrl(raw);
+      if (!url) {
+        alert("Ingresá una URL válida que empiece con http:// o https://");
+        return;
+      }
+
       exec("insertImage", url);
     });
 
@@ -1780,34 +1608,6 @@
 
     redoBtn?.addEventListener("click", () => {
       exec("redo");
-    });
-
-    openShareBtn?.addEventListener("click", openShareModal);
-    closeShareBtn?.addEventListener("click", closeShareModal);
-
-    shareModal?.addEventListener("click", (e) => {
-      if (e.target === shareModal) closeShareModal();
-    });
-
-    copyLinkBtn?.addEventListener("click", async () => {
-      try {
-        await navigator.clipboard.writeText(window.location.href);
-        shareStatus.textContent = "Link copiado.";
-      } catch {
-        shareStatus.textContent = "No se pudo copiar el link.";
-      }
-    });
-
-    sendShareBtn?.addEventListener("click", () => {
-      const email = document.getElementById("share-email")?.value?.trim();
-      const role = document.getElementById("share-role")?.value || "viewer";
-
-      if (!email) {
-        shareStatus.textContent = "Ingresá un email.";
-        return;
-      }
-
-      shareStatus.textContent = `Invitación preparada para ${email} con permiso de ${role === "editor" ? "edición" : "lectura"}.`;
     });
 
     openMoreBtn?.addEventListener("click", () => {
@@ -1824,49 +1624,40 @@
       }
     });
 
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape") {
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") {
         closeMoreDropdown();
-        closeShareModal();
       }
     });
 
     actionChat?.addEventListener("click", () => {
-      setMoreStatus("La opción de abrir chat ya quedó lista en la interfaz.");
-    });
-
-    actionPresentation?.addEventListener("click", () => {
-      setMoreStatus("Generando presentación...");
+      setMoreStatus("El chat se abre desde la lógica principal del documento.");
     });
 
     actionPdf?.addEventListener("click", () => {
+      closeMoreDropdown();
       setMoreStatus("Se abrió la impresión para guardarlo como PDF.");
       window.print();
     });
 
     actionPrint?.addEventListener("click", () => {
+      closeMoreDropdown();
       setMoreStatus("Abriendo impresión...");
       window.print();
     });
 
     actionDuplicate?.addEventListener("click", () => {
-      setMoreStatus("La interfaz de duplicar ya está lista para conectarla con Firebase.");
+      setMoreStatus("La duplicación se conecta desde documento.js o Firebase.");
     });
 
     actionSharePanel?.addEventListener("click", () => {
       closeMoreDropdown();
-      openShareModal();
+      openShareBtn?.click();
     });
 
-    simpleViewBtn?.addEventListener("click", () => setReferenceMode("simple"));
-    apaViewBtn?.addEventListener("click", () => setReferenceMode("apa"));
-    topToggleReferenceViewBtn?.addEventListener("click", () => {
-      setReferenceMode(referenceMode === "apa" ? "simple" : "apa");
-    });
-
-    renderInlineCitations();
-    renderReferences();
-  </script>
+    refreshToolbarState();
+  })();
+</script>
 
   <script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
   <script type="module" src="documento.js"></script>
