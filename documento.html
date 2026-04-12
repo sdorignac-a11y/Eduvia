@@ -928,7 +928,7 @@
         <button class="menu-link" type="button">Herramientas</button>
       </div>
 
-      <div class="toolbar-shell">
+      <div class="toolbar-shell subbar">
         <div class="toolbar">
           <div class="toolbar-group">
             <button type="button" class="tool-btn" id="undo-btn" title="Deshacer">
@@ -1515,9 +1515,9 @@
       setMoreStatus("La opción de abrir chat ya quedó lista en la interfaz.");
     });
 
-    actionPresentation?.addEventListener("click", () => {
-      setMoreStatus("La conversión a presentación quedó lista para conectarla después.");
-    });
+ actionPresentation?.addEventListener("click", () => {
+  setMoreStatus("Generando presentación...");
+});
 
     actionPdf?.addEventListener("click", () => {
       setMoreStatus("Se abrió la impresión para guardarlo como PDF.");
@@ -1539,6 +1539,7 @@
     });
   </script>
 
-  <script type="module" src="documento.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
+<script type="module" src="documento.js"></script>
 </body>
 </html>
