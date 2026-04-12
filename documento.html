@@ -181,7 +181,7 @@
       display:flex;
       align-items:center;
       gap:0;
-      padding:6px 14px 10px;
+      padding:10px 14px 12px;
       overflow-x:auto;
       border-top:1px solid #f3f4f6;
     }
@@ -189,110 +189,117 @@
     .toolbar-track{
       display:flex;
       align-items:center;
-      gap:0;
+      gap:12px;
       min-width:max-content;
     }
 
     .toolbar-group{
       display:flex;
       align-items:center;
-      gap:2px;
-      padding:0 8px;
+      gap:10px;
+      padding:8px;
+      border-radius:18px;
+      background:linear-gradient(180deg,#ffffff 0%, #f8fafc 100%);
+      border:1px solid #e6eaef;
+      box-shadow:0 6px 16px rgba(60,64,67,.06);
       flex:none;
     }
 
-    .toolbar-group + .toolbar-group{
-      border-left:1px solid #e5e7eb;
-    }
-
     .toolbar-group.meta-group{
-      padding-right:12px;
-      gap:8px;
+      padding:8px 10px;
     }
 
     .chip{
       display:inline-flex;
       align-items:center;
-      padding:7px 12px;
+      gap:8px;
+      padding:9px 14px;
       border-radius:999px;
-      background:#f1f3f4;
+      background:linear-gradient(180deg,#ffffff 0%, #f7f9fc 100%);
+      border:1px solid #e6eaef;
       color:#3c4043;
-      font-size:.82rem;
-      font-weight:600;
-      white-space:nowrap;
+      font-size:.85rem;
+      font-weight:700;
+      box-shadow:0 1px 2px rgba(60,64,67,.08);
       flex:none;
+      white-space:nowrap;
     }
 
     .tool-btn{
-      min-width:34px;
-      height:34px;
+      min-width:42px;
+      height:42px;
       border:none;
-      border-radius:8px;
-      background:transparent;
+      border-radius:13px;
+      background:linear-gradient(180deg,#ffffff 0%, #f6f8fb 100%);
       color:#202124;
       font-weight:700;
       cursor:pointer;
-      transition:.14s ease;
-      padding:0 8px;
+      transition:.16s ease;
+      padding:0 12px;
       display:inline-flex;
       align-items:center;
       justify-content:center;
+      gap:6px;
+      border:1px solid #e6eaef;
+      box-shadow:0 1px 2px rgba(60,64,67,.08);
       flex:none;
     }
 
     .tool-btn:hover{
-      background:#f1f3f4;
+      background:#eef3fd;
+      border-color:#d7e3fd;
+      transform:translateY(-1px);
     }
 
     .tool-btn.is-active{
       background:#e8f0fe;
       color:var(--blue);
+      border-color:#d7e3fd;
     }
 
     .tool-select{
-      height:34px;
-      border:none;
-      border-radius:8px;
-      background:transparent;
-      padding:0 10px;
+      height:42px;
+      border:1px solid #e6eaef;
+      border-radius:13px;
+      background:linear-gradient(180deg,#ffffff 0%, #f6f8fb 100%);
+      padding:0 14px;
       color:#202124;
-      min-width:148px;
+      min-width:190px;
       outline:none;
-      font-weight:500;
+      font-weight:600;
+      box-shadow:0 1px 2px rgba(60,64,67,.08);
       flex:none;
     }
 
-    .tool-select:hover,
     .tool-select:focus{
-      background:#f1f3f4;
+      border-color:#c7dafc;
+      box-shadow:0 0 0 4px rgba(26,115,232,.10);
     }
 
     .color-pill{
       display:inline-flex;
       align-items:center;
       gap:8px;
-      height:34px;
-      padding:0 10px;
-      border-radius:8px;
-      background:transparent;
+      height:42px;
+      padding:0 10px 0 12px;
+      border-radius:13px;
+      background:linear-gradient(180deg,#ffffff 0%, #f6f8fb 100%);
+      border:1px solid #e6eaef;
+      box-shadow:0 1px 2px rgba(60,64,67,.08);
       font-size:.82rem;
-      font-weight:600;
+      font-weight:700;
       color:#3c4043;
       cursor:pointer;
       flex:none;
     }
 
-    .color-pill:hover{
-      background:#f1f3f4;
-    }
-
     .color-wrap{
       position:relative;
       overflow:hidden;
-      width:18px;
-      height:18px;
-      border-radius:4px;
-      border:1px solid #cfd4da;
+      width:26px;
+      height:26px;
+      border-radius:8px;
+      border:1px solid #d7dce2;
       background:#fff;
       flex:none;
     }
@@ -760,15 +767,19 @@
       }
 
       .subbar{
-        padding:6px 10px 10px;
+        padding:10px 10px 12px;
+      }
+
+      .toolbar-track{
+        gap:10px;
       }
 
       .toolbar-group{
-        padding:0 8px;
+        padding:7px;
       }
 
       .tool-select{
-        min-width:140px;
+        min-width:170px;
       }
 
       .workspace{
@@ -794,6 +805,37 @@
 
       .share-row{
         grid-template-columns:1fr;
+      }
+    }
+
+    @media print{
+      body{
+        background:#fff;
+      }
+
+      .app-header,
+      .sidepanel,
+      .sidepanel-backdrop,
+      .share-modal-backdrop,
+      #doc-loading,
+      #access-guard{
+        display:none !important;
+      }
+
+      .workspace{
+        padding:0;
+      }
+
+      .paper{
+        max-width:none;
+        width:100%;
+        border:none;
+        box-shadow:none;
+        margin:0;
+      }
+
+      .paper-inner{
+        padding:28px;
       }
     }
 
@@ -1106,6 +1148,14 @@
     const textColor = document.getElementById("text-color");
     const highlightColor = document.getElementById("highlight-color");
 
+    const shareModal = document.getElementById("share-modal");
+    const openShareBtn = document.getElementById("open-share-btn");
+    const closeShareBtn = document.getElementById("close-share-btn");
+    const copyLinkBtn = document.getElementById("copy-link-btn");
+    const sendShareBtn = document.getElementById("send-share-btn");
+    const docLinkInput = document.getElementById("doc-link");
+    const shareStatus = document.getElementById("share-status");
+
     const sidepanel = document.getElementById("sidepanel");
     const sidepanelBackdrop = document.getElementById("sidepanel-backdrop");
     const openSidepanelBtn = document.getElementById("open-sidepanel-btn");
@@ -1118,7 +1168,6 @@
     const actionPrint = document.getElementById("action-print");
     const actionDuplicate = document.getElementById("action-duplicate");
     const actionSharePanel = document.getElementById("action-share-panel");
-    const openShareBtn = document.getElementById("open-share-btn");
 
     function focusEditor() {
       editor?.focus({ preventScroll: true });
@@ -1129,20 +1178,43 @@
       document.execCommand(command, false, value);
     }
 
+    function updateBodyLock() {
+      const modalOpen = shareModal?.classList.contains("show");
+      const panelOpen = sidepanel?.classList.contains("show");
+      document.body.style.overflow = modalOpen || panelOpen ? "hidden" : "";
+    }
+
+    function setShareStatus(message = "") {
+      if (shareStatus) shareStatus.textContent = message;
+    }
+
     function setPanelStatus(message = "") {
       if (panelStatus) panelStatus.textContent = message;
+    }
+
+    function openShareModal() {
+      shareModal?.classList.add("show");
+      updateBodyLock();
+      setShareStatus("");
+    }
+
+    function closeShareModal() {
+      shareModal?.classList.remove("show");
+      updateBodyLock();
+      setShareStatus("");
     }
 
     function openSidepanel() {
       sidepanel?.classList.add("show");
       sidepanelBackdrop?.classList.add("show");
-      document.body.style.overflow = "hidden";
+      updateBodyLock();
+      setPanelStatus("");
     }
 
     function closeSidepanel() {
       sidepanel?.classList.remove("show");
       sidepanelBackdrop?.classList.remove("show");
-      document.body.style.overflow = "";
+      updateBodyLock();
       setPanelStatus("");
     }
 
@@ -1169,6 +1241,11 @@
       }));
 
       return false;
+    }
+
+    function updateDocLink() {
+      if (!docLinkInput) return;
+      docLinkInput.value = window.location.href;
     }
 
     document.querySelectorAll("[data-command]").forEach((btn) => {
@@ -1203,6 +1280,29 @@
       }
     });
 
+    openShareBtn?.addEventListener("click", openShareModal);
+    closeShareBtn?.addEventListener("click", closeShareModal);
+
+    shareModal?.addEventListener("click", (e) => {
+      if (e.target === shareModal) {
+        closeShareModal();
+      }
+    });
+
+    copyLinkBtn?.addEventListener("click", async () => {
+      try {
+        updateDocLink();
+        await navigator.clipboard.writeText(docLinkInput.value);
+        setShareStatus("Link copiado correctamente.");
+      } catch {
+        setShareStatus("No se pudo copiar el link.");
+      }
+    });
+
+    sendShareBtn?.addEventListener("click", () => {
+      setShareStatus("La interfaz ya quedó lista. Después conectamos el envío real con Firebase.");
+    });
+
     openSidepanelBtn?.addEventListener("click", openSidepanel);
     closeSidepanelBtn?.addEventListener("click", closeSidepanel);
     sidepanelBackdrop?.addEventListener("click", closeSidepanel);
@@ -1210,6 +1310,7 @@
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape") {
         closeSidepanel();
+        closeShareModal();
       }
     });
 
@@ -1224,12 +1325,12 @@
     });
 
     actionPdf?.addEventListener("click", () => {
-      setPanelStatus("Se abrió la impresión para guardarlo como PDF.");
+      closeSidepanel();
       window.print();
     });
 
     actionPrint?.addEventListener("click", () => {
-      setPanelStatus("Abriendo impresión...");
+      closeSidepanel();
       window.print();
     });
 
@@ -1239,8 +1340,10 @@
 
     actionSharePanel?.addEventListener("click", () => {
       closeSidepanel();
-      openShareBtn?.click();
+      openShareModal();
     });
+
+    updateDocLink();
   </script>
 
   <script type="module" src="documento.js"></script>
