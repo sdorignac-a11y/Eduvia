@@ -986,7 +986,7 @@
       position:fixed;
       top:78px;
       right:20px;
-      width:min(360px, calc(100vw - 24px));
+      width:min(380px, calc(100vw - 24px));
       background:#fff;
       border:1px solid #e5e7eb;
       border-radius:20px;
@@ -1025,6 +1025,8 @@
 
     .more-list{
       padding:8px;
+      max-height:420px;
+      overflow:auto;
     }
 
     .more-item{
@@ -1100,6 +1102,185 @@
       line-height:1.4;
     }
 
+    .study-modal-backdrop{
+      position:fixed;
+      inset:0;
+      z-index:140;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:18px;
+      background:rgba(15,23,42,.42);
+    }
+
+    .study-modal-backdrop.show{
+      display:flex;
+    }
+
+    .study-modal{
+      width:min(100%, 860px);
+      max-height:88vh;
+      overflow:auto;
+      background:#fff;
+      border:1px solid #e5e7eb;
+      border-radius:26px;
+      box-shadow:0 28px 80px rgba(15,23,42,.22);
+      padding:22px;
+    }
+
+    .study-modal-head{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:14px;
+      margin-bottom:14px;
+    }
+
+    .study-badge{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:7px 12px;
+      border-radius:999px;
+      background:#e8f0fe;
+      color:#0b57d0;
+      font-size:.78rem;
+      font-weight:800;
+      margin-bottom:10px;
+    }
+
+    .study-modal-head h3{
+      font-size:1.35rem;
+      margin-bottom:6px;
+      color:#202124;
+    }
+
+    .study-modal-head p{
+      color:#5f6368;
+      line-height:1.6;
+    }
+
+    .study-close-btn{
+      width:40px;
+      height:40px;
+      border:none;
+      border-radius:999px;
+      background:#f1f3f4;
+      color:#202124;
+      font-size:1.4rem;
+      cursor:pointer;
+      flex:none;
+    }
+
+    .study-actions-bar{
+      display:flex;
+      justify-content:flex-end;
+      margin-bottom:16px;
+    }
+
+    .study-secondary-btn{
+      border:none;
+      border-radius:12px;
+      background:#eef2f7;
+      color:#334155;
+      padding:10px 14px;
+      font-size:.88rem;
+      font-weight:700;
+      cursor:pointer;
+    }
+
+    .study-content{
+      display:grid;
+      gap:14px;
+    }
+
+    .study-grid{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:14px;
+    }
+
+    .study-card{
+      border:1px solid #e7ebf0;
+      border-radius:20px;
+      background:#fbfcff;
+      padding:16px;
+    }
+
+    .study-card h4{
+      font-size:1rem;
+      margin-bottom:10px;
+      color:#202124;
+    }
+
+    .study-card p,
+    .study-card li{
+      color:#4b5563;
+      line-height:1.65;
+    }
+
+    .study-card ul,
+    .study-card ol{
+      margin-left:18px;
+    }
+
+    .flashcard-front{
+      font-weight:800;
+      color:#202124;
+      margin-bottom:10px;
+    }
+
+    .flashcard-back{
+      color:#5f6368;
+      line-height:1.7;
+    }
+
+    .study-qa{
+      border:1px solid #e7ebf0;
+      border-radius:18px;
+      padding:14px;
+      background:#fff;
+    }
+
+    .study-qa strong{
+      display:block;
+      margin-bottom:8px;
+      color:#202124;
+      line-height:1.55;
+    }
+
+    .study-answer{
+      margin-top:8px;
+      padding:10px 12px;
+      border-radius:12px;
+      background:#f7f9fc;
+      color:#475569;
+      line-height:1.65;
+    }
+
+    .study-pill{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:6px 10px;
+      border-radius:999px;
+      background:#eef2ff;
+      color:#4338ca;
+      font-size:.76rem;
+      font-weight:800;
+      margin-right:8px;
+      margin-bottom:8px;
+    }
+
+    .study-empty{
+      padding:18px;
+      border-radius:18px;
+      background:#f8fafc;
+      color:#5f6368;
+      line-height:1.7;
+      border:1px dashed #d7dee7;
+    }
+
     @media (max-width: 900px){
       .paper-inner{
         padding:42px 28px 50px;
@@ -1107,6 +1288,17 @@
 
       .doc-title{
         font-size:1.8rem;
+      }
+    }
+
+    @media (max-width: 760px){
+      .study-modal{
+        padding:16px;
+        border-radius:20px;
+      }
+
+      .study-grid{
+        grid-template-columns:1fr;
       }
     }
 
@@ -1223,6 +1415,7 @@
       .share-modal-backdrop,
       .more-dropdown,
       .more-backdrop,
+      .study-modal-backdrop,
       #doc-loading,
       #access-guard{
         display:none !important;
@@ -1245,12 +1438,15 @@
     }
 
     .doc-menu::-webkit-scrollbar,
-    .toolbar::-webkit-scrollbar{
+    .toolbar::-webkit-scrollbar,
+    .more-list::-webkit-scrollbar{
       height:8px;
+      width:8px;
     }
 
     .doc-menu::-webkit-scrollbar-thumb,
-    .toolbar::-webkit-scrollbar-thumb{
+    .toolbar::-webkit-scrollbar-thumb,
+    .more-list::-webkit-scrollbar-thumb{
       background:#d7dce2;
       border-radius:999px;
     }
@@ -1585,16 +1781,61 @@
 
   <div class="more-dropdown" id="more-dropdown" aria-hidden="true">
     <div class="more-header">
-      <h3>Más opciones</h3>
-      <p>Acciones rápidas y mejor organizadas para este documento.</p>
+      <h3>Herramientas de estudio</h3>
+      <p>Convertí este documento en materiales para repasar, practicar y estudiar mejor.</p>
     </div>
 
     <div class="more-list">
-      <button type="button" class="more-item" id="action-chat">
-        <span class="more-item-icon">💬</span>
+      <button type="button" class="more-item" id="action-flashcards">
+        <span class="more-item-icon">🧠</span>
         <span class="more-item-main">
-          <span class="more-item-title">Abrir chat</span>
-          <span class="more-item-desc">Usar el asistente para seguir trabajando sobre este documento.</span>
+          <span class="more-item-title">Tarjetas de memoria</span>
+          <span class="more-item-desc">Genera tarjetas rápidas con conceptos importantes del documento.</span>
+        </span>
+        <span class="more-item-arrow">›</span>
+      </button>
+
+      <button type="button" class="more-item" id="action-quiz">
+        <span class="more-item-icon">❓</span>
+        <span class="more-item-main">
+          <span class="more-item-title">Quiz rápido</span>
+          <span class="more-item-desc">Crea preguntas para practicar con base en el contenido actual.</span>
+        </span>
+        <span class="more-item-arrow">›</span>
+      </button>
+
+      <button type="button" class="more-item" id="action-truefalse">
+        <span class="more-item-icon">✅</span>
+        <span class="more-item-main">
+          <span class="more-item-title">Verdadero o falso</span>
+          <span class="more-item-desc">Arma afirmaciones para comprobar si entendiste el tema.</span>
+        </span>
+        <span class="more-item-arrow">›</span>
+      </button>
+
+      <button type="button" class="more-item" id="action-complete">
+        <span class="more-item-icon">✍️</span>
+        <span class="more-item-main">
+          <span class="more-item-title">Completar conceptos</span>
+          <span class="more-item-desc">Oculta palabras clave del texto para practicar memoria activa.</span>
+        </span>
+        <span class="more-item-arrow">›</span>
+      </button>
+
+      <button type="button" class="more-item" id="action-summary">
+        <span class="more-item-icon">⚡</span>
+        <span class="more-item-main">
+          <span class="more-item-title">Resumen express</span>
+          <span class="more-item-desc">Reduce el documento a una versión corta para repasar antes de estudiar.</span>
+        </span>
+        <span class="more-item-arrow">›</span>
+      </button>
+
+      <button type="button" class="more-item" id="action-keywords">
+        <span class="more-item-icon">🔎</span>
+        <span class="more-item-main">
+          <span class="more-item-title">Palabras clave</span>
+          <span class="more-item-desc">Extrae los términos más importantes del documento.</span>
         </span>
         <span class="more-item-arrow">›</span>
       </button>
@@ -1603,7 +1844,7 @@
         <span class="more-item-icon">🎞️</span>
         <span class="more-item-main">
           <span class="more-item-title">Pasar a presentación</span>
-          <span class="more-item-desc">Convertir este contenido en una versión tipo diapositivas.</span>
+          <span class="more-item-desc">Convierte el contenido en una versión tipo diapositivas.</span>
         </span>
         <span class="more-item-arrow">›</span>
       </button>
@@ -1612,34 +1853,7 @@
         <span class="more-item-icon">PDF</span>
         <span class="more-item-main">
           <span class="more-item-title">Descargar PDF</span>
-          <span class="more-item-desc">Abrir impresión para guardar el documento en PDF.</span>
-        </span>
-        <span class="more-item-arrow">›</span>
-      </button>
-
-      <button type="button" class="more-item" id="action-print">
-        <span class="more-item-icon">🖨️</span>
-        <span class="more-item-main">
-          <span class="more-item-title">Imprimir</span>
-          <span class="more-item-desc">Abrir la impresión del navegador.</span>
-        </span>
-        <span class="more-item-arrow">›</span>
-      </button>
-
-      <button type="button" class="more-item" id="action-duplicate">
-        <span class="more-item-icon">📄</span>
-        <span class="more-item-main">
-          <span class="more-item-title">Duplicar documento</span>
-          <span class="more-item-desc">Crear una copia visual del contenido actual.</span>
-        </span>
-        <span class="more-item-arrow">›</span>
-      </button>
-
-      <button type="button" class="more-item" id="action-share-panel">
-        <span class="more-item-icon">🔒</span>
-        <span class="more-item-main">
-          <span class="more-item-title">Compartir</span>
-          <span class="more-item-desc">Abrir permisos e invitaciones del documento.</span>
+          <span class="more-item-desc">Abre impresión para guardar el documento como PDF.</span>
         </span>
         <span class="more-item-arrow">›</span>
       </button>
@@ -1647,6 +1861,26 @@
 
     <div class="more-footer">
       <div class="more-status" id="more-status"></div>
+    </div>
+  </div>
+
+  <div class="study-modal-backdrop" id="study-modal">
+    <div class="study-modal">
+      <div class="study-modal-head">
+        <div>
+          <span class="study-badge" id="study-badge">Herramienta</span>
+          <h3 id="study-title">Práctica</h3>
+          <p id="study-subtitle">Generado automáticamente a partir del documento actual.</p>
+        </div>
+
+        <button type="button" class="study-close-btn" id="close-study-btn">×</button>
+      </div>
+
+      <div class="study-actions-bar">
+        <button type="button" class="study-secondary-btn" id="study-regenerate-btn">Regenerar</button>
+      </div>
+
+      <div class="study-content" id="study-content"></div>
     </div>
   </div>
 
@@ -1759,11 +1993,21 @@
       const moreBackdrop = document.getElementById("more-backdrop");
       const moreStatus = document.getElementById("more-status");
 
-      const actionChat = document.getElementById("action-chat");
+      const actionFlashcards = document.getElementById("action-flashcards");
+      const actionQuiz = document.getElementById("action-quiz");
+      const actionTrueFalse = document.getElementById("action-truefalse");
+      const actionComplete = document.getElementById("action-complete");
+      const actionSummary = document.getElementById("action-summary");
+      const actionKeywords = document.getElementById("action-keywords");
       const actionPdf = document.getElementById("action-pdf");
-      const actionPrint = document.getElementById("action-print");
-      const actionDuplicate = document.getElementById("action-duplicate");
-      const actionSharePanel = document.getElementById("action-share-panel");
+
+      const studyModal = document.getElementById("study-modal");
+      const studyBadge = document.getElementById("study-badge");
+      const studyTitle = document.getElementById("study-title");
+      const studySubtitle = document.getElementById("study-subtitle");
+      const studyContent = document.getElementById("study-content");
+      const closeStudyBtn = document.getElementById("close-study-btn");
+      const studyRegenerateBtn = document.getElementById("study-regenerate-btn");
 
       const openShareBtn = document.getElementById("open-share-btn");
 
@@ -1775,6 +2019,18 @@
 
       let activeEditable = editor;
       let savedRange = null;
+      let currentStudyTool = "";
+
+      const STOPWORDS = new Set([
+        "este","esta","estos","estas","sobre","desde","hasta","entre","para","porque","como",
+        "donde","cuando","tambien","segun","puede","pueden","tener","tiene","hacer","hacia",
+        "cada","solo","unos","unas","ellos","ellas","nosotros","vosotros","usted",
+        "ustedes","ser","estar","haber","tema","documento","contenido","principal","clase",
+        "materia","nivel","duracion","objetivo","texto","idea","ideas","concepto","conceptos",
+        "explica","explicacion","desarrollo","resumen","parte","partes","más","menos","muy",
+        "con","sin","por","del","las","los","una","uno","unos","unas","que","pero",
+        "para","esto","eso","esa","ese","sus","son","fue","han","hay","será","eran","sea"
+      ]);
 
       function normalizeUrl(value = "") {
         try {
@@ -1798,7 +2054,7 @@
         if (!openMoreBtn || !moreDropdown) return;
 
         const rect = openMoreBtn.getBoundingClientRect();
-        const dropdownWidth = Math.min(360, window.innerWidth - 24);
+        const dropdownWidth = Math.min(380, window.innerWidth - 24);
         let left = rect.right - dropdownWidth;
         const top = rect.bottom + 10;
 
@@ -1903,6 +2159,326 @@
             btn.classList.remove("is-active");
           }
         });
+      }
+
+      function cleanText(value = "") {
+        return String(value || "").replace(/\s+/g, " ").trim();
+      }
+
+      function splitSentences(text = "") {
+        return cleanText(text)
+          .split(/(?<=[.!?])\s+/)
+          .map((s) => s.trim())
+          .filter((s) => s.length > 35);
+      }
+
+      function collectDocumentSections() {
+        const sections = [];
+        if (!editor) return sections;
+
+        const children = Array.from(editor.children || []);
+        let current = { title: "Introducción", items: [] };
+
+        const pushSection = () => {
+          const title = cleanText(current.title);
+          const items = current.items.map(cleanText).filter(Boolean);
+          if (items.length) sections.push({ title: title || "Contenido", items });
+        };
+
+        if (!children.length) {
+          const fallback = cleanText(editor.innerText || "");
+          return fallback ? [{ title: "Contenido", items: [fallback] }] : [];
+        }
+
+        children.forEach((child) => {
+          const tag = (child.tagName || "").toLowerCase();
+
+          if (tag === "h2" || tag === "h3") {
+            pushSection();
+            current = {
+              title: cleanText(child.innerText || child.textContent || "Sección"),
+              items: []
+            };
+            return;
+          }
+
+          if (tag === "ul" || tag === "ol") {
+            const lis = Array.from(child.querySelectorAll(":scope > li"))
+              .map((li) => cleanText(li.innerText || li.textContent || ""))
+              .filter(Boolean);
+
+            current.items.push(...lis);
+            return;
+          }
+
+          const text = cleanText(child.innerText || child.textContent || "");
+          if (text) current.items.push(text);
+        });
+
+        pushSection();
+        return sections;
+      }
+
+      function pickKeyword(text = "") {
+        const words = cleanText(text)
+          .toLowerCase()
+          .replace(/[.,;:()¿?¡!"]/g, "")
+          .split(/\s+/)
+          .filter((word) => word.length >= 5 && !STOPWORDS.has(word));
+
+        const unique = [...new Set(words)];
+        unique.sort((a, b) => b.length - a.length);
+        return unique[0] || "";
+      }
+
+      function negateSentence(sentence = "") {
+        let result = sentence;
+        const replacements = [
+          [/\bes\b/i, "no es"],
+          [/\bson\b/i, "no son"],
+          [/\bfue\b/i, "no fue"],
+          [/\bfueron\b/i, "no fueron"],
+          [/\btiene\b/i, "no tiene"],
+          [/\btienen\b/i, "no tienen"],
+          [/\bpermite\b/i, "no permite"],
+          [/\bse usa\b/i, "no se usa"],
+        ];
+
+        for (const [pattern, replacement] of replacements) {
+          if (pattern.test(result)) {
+            return result.replace(pattern, replacement);
+          }
+        }
+
+        return `No ${result.charAt(0).toLowerCase()}${result.slice(1)}`;
+      }
+
+      function getStudyData() {
+        const title = cleanText(document.getElementById("doc-title")?.innerText || "Documento");
+        const objective = cleanText(
+          (document.getElementById("doc-objective")?.innerText || "").replace(/^Objetivo:\s*/i, "")
+        );
+        const sections = collectDocumentSections();
+        const allText = cleanText(editor?.innerText || "");
+        const sentences = splitSentences(allText);
+
+        return { title, objective, sections, allText, sentences };
+      }
+
+      function openStudyModal() {
+        studyModal?.classList.add("show");
+      }
+
+      function closeStudyModal() {
+        studyModal?.classList.remove("show");
+      }
+
+      function renderFlashcards(data) {
+        const cards = data.sections.slice(0, 8).map((section, index) => ({
+          front: section.title === "Introducción"
+            ? "¿Cuál es la idea principal del documento?"
+            : `¿Qué explica la sección "${section.title}"?`,
+          back: section.items.slice(0, 2).join(" ")
+        }));
+
+        if (!cards.length) {
+          studyContent.innerHTML = `<div class="study-empty">No hay suficiente contenido para crear tarjetas todavía.</div>`;
+          return;
+        }
+
+        studyContent.innerHTML = `
+          <div class="study-grid">
+            ${cards.map((card, index) => `
+              <article class="study-card">
+                <h4>Tarjeta ${index + 1}</h4>
+                <div class="flashcard-front">${card.front}</div>
+                <div class="flashcard-back">${card.back}</div>
+              </article>
+            `).join("")}
+          </div>
+        `;
+      }
+
+      function renderQuiz(data) {
+        const questions = data.sections.slice(0, 6).map((section, index) => ({
+          question: `Pregunta ${index + 1}: explicá con tus palabras "${section.title}".`,
+          answer: section.items.slice(0, 2).join(" ")
+        }));
+
+        if (!questions.length) {
+          studyContent.innerHTML = `<div class="study-empty">No hay suficiente contenido para generar preguntas.</div>`;
+          return;
+        }
+
+        studyContent.innerHTML = questions.map((item) => `
+          <div class="study-qa">
+            <strong>${item.question}</strong>
+            <div class="study-answer">${item.answer}</div>
+          </div>
+        `).join("");
+      }
+
+      function renderTrueFalse(data) {
+        const statements = data.sentences.slice(0, 6).map((sentence, index) => {
+          const isTrue = index % 2 === 0;
+          return {
+            text: isTrue ? sentence : negateSentence(sentence),
+            answer: isTrue ? "Verdadero" : "Falso"
+          };
+        });
+
+        if (!statements.length) {
+          studyContent.innerHTML = `<div class="study-empty">No hay suficiente texto para crear este ejercicio.</div>`;
+          return;
+        }
+
+        studyContent.innerHTML = statements.map((item, index) => `
+          <div class="study-qa">
+            <strong>${index + 1}. ${item.text}</strong>
+            <div class="study-answer">Respuesta: ${item.answer}</div>
+          </div>
+        `).join("");
+      }
+
+      function renderComplete(data) {
+        const items = data.sentences.slice(0, 6).map((sentence) => {
+          const keyword = pickKeyword(sentence);
+          if (!keyword) return null;
+
+          const regex = new RegExp(`\\b${keyword}\\b`, "i");
+          return {
+            question: sentence.replace(regex, "_____"),
+            answer: keyword
+          };
+        }).filter(Boolean);
+
+        if (!items.length) {
+          studyContent.innerHTML = `<div class="study-empty">No se encontraron palabras clave suficientes para completar conceptos.</div>`;
+          return;
+        }
+
+        studyContent.innerHTML = items.map((item, index) => `
+          <div class="study-qa">
+            <strong>${index + 1}. ${item.question}</strong>
+            <div class="study-answer">Respuesta: ${item.answer}</div>
+          </div>
+        `).join("");
+      }
+
+      function renderSummary(data) {
+        const bullets = [];
+
+        if (data.objective) bullets.push(`Objetivo principal: ${data.objective}`);
+        data.sections.slice(0, 5).forEach((section) => {
+          const first = section.items[0];
+          if (first) bullets.push(`${section.title}: ${first}`);
+        });
+
+        if (!bullets.length && data.allText) {
+          bullets.push(...data.sentences.slice(0, 5));
+        }
+
+        if (!bullets.length) {
+          studyContent.innerHTML = `<div class="study-empty">Todavía no hay contenido suficiente para resumir.</div>`;
+          return;
+        }
+
+        studyContent.innerHTML = `
+          <article class="study-card">
+            <h4>Resumen express</h4>
+            <ul>
+              ${bullets.map((item) => `<li>${item}</li>`).join("")}
+            </ul>
+          </article>
+        `;
+      }
+
+      function renderKeywords(data) {
+        const words = new Set();
+
+        data.sections.forEach((section) => {
+          const source = `${section.title} ${section.items.join(" ")}`;
+          const keyword = pickKeyword(source);
+          if (keyword) words.add(keyword);
+        });
+
+        if (words.size < 6) {
+          data.sentences.forEach((sentence) => {
+            const keyword = pickKeyword(sentence);
+            if (keyword) words.add(keyword);
+          });
+        }
+
+        const finalWords = [...words].slice(0, 12);
+
+        if (!finalWords.length) {
+          studyContent.innerHTML = `<div class="study-empty">No se detectaron palabras clave todavía.</div>`;
+          return;
+        }
+
+        studyContent.innerHTML = `
+          <article class="study-card">
+            <h4>Palabras clave del documento</h4>
+            <div>
+              ${finalWords.map((word) => `<span class="study-pill">${word}</span>`).join("")}
+            </div>
+          </article>
+        `;
+      }
+
+      function runStudyTool(tool) {
+        const data = getStudyData();
+        currentStudyTool = tool;
+
+        const config = {
+          flashcards: {
+            badge: "Memoria",
+            title: "Tarjetas de memoria",
+            subtitle: "Tarjetas generadas automáticamente a partir de las secciones del documento.",
+            render: renderFlashcards
+          },
+          quiz: {
+            badge: "Práctica",
+            title: "Quiz rápido",
+            subtitle: "Preguntas rápidas para comprobar si entendiste el contenido.",
+            render: renderQuiz
+          },
+          truefalse: {
+            badge: "Juego",
+            title: "Verdadero o falso",
+            subtitle: "Afirmaciones para revisar comprensión del tema.",
+            render: renderTrueFalse
+          },
+          complete: {
+            badge: "Repaso",
+            title: "Completar conceptos",
+            subtitle: "Ejercicios con huecos para entrenar memoria activa.",
+            render: renderComplete
+          },
+          summary: {
+            badge: "Resumen",
+            title: "Resumen express",
+            subtitle: "Versión corta del contenido para repaso rápido.",
+            render: renderSummary
+          },
+          keywords: {
+            badge: "Claves",
+            title: "Palabras clave",
+            subtitle: "Términos más importantes detectados en el documento.",
+            render: renderKeywords
+          }
+        };
+
+        const selected = config[tool];
+        if (!selected) return;
+
+        studyBadge.textContent = selected.badge;
+        studyTitle.textContent = selected.title;
+        studySubtitle.textContent = selected.subtitle;
+        selected.render(data);
+        openStudyModal();
+        closeMoreDropdown();
+        setMoreStatus(`${selected.title} generado.`);
       }
 
       editableAreas.forEach((area) => {
@@ -2022,12 +2598,16 @@
       document.addEventListener("keydown", (event) => {
         if (event.key === "Escape") {
           closeMoreDropdown();
+          closeStudyModal();
         }
       });
 
-      actionChat?.addEventListener("click", () => {
-        setMoreStatus("El chat se abre desde la lógica principal del documento.");
-      });
+      actionFlashcards?.addEventListener("click", () => runStudyTool("flashcards"));
+      actionQuiz?.addEventListener("click", () => runStudyTool("quiz"));
+      actionTrueFalse?.addEventListener("click", () => runStudyTool("truefalse"));
+      actionComplete?.addEventListener("click", () => runStudyTool("complete"));
+      actionSummary?.addEventListener("click", () => runStudyTool("summary"));
+      actionKeywords?.addEventListener("click", () => runStudyTool("keywords"));
 
       actionPdf?.addEventListener("click", () => {
         closeMoreDropdown();
@@ -2035,19 +2615,15 @@
         window.print();
       });
 
-      actionPrint?.addEventListener("click", () => {
-        closeMoreDropdown();
-        setMoreStatus("Abriendo impresión...");
-        window.print();
+      closeStudyBtn?.addEventListener("click", closeStudyModal);
+
+      studyModal?.addEventListener("click", (event) => {
+        if (event.target === studyModal) closeStudyModal();
       });
 
-      actionDuplicate?.addEventListener("click", () => {
-        setMoreStatus("La duplicación se conecta desde documento.js o Firebase.");
-      });
-
-      actionSharePanel?.addEventListener("click", () => {
-        closeMoreDropdown();
-        openShareBtn?.click();
+      studyRegenerateBtn?.addEventListener("click", () => {
+        if (!currentStudyTool) return;
+        runStudyTool(currentStudyTool);
       });
 
       refreshToolbarState();
