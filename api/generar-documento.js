@@ -6,9 +6,10 @@ const client = new OpenAI({
 
 const RESEARCH_MODEL = process.env.OPENAI_RESEARCH_MODEL || "gpt-5.4-mini";
 const DOCUMENT_MODEL = process.env.OPENAI_MODEL || "gpt-5.4";
+
 const MAX_SOURCE_COUNT = 10;
-const MAX_INVESTIGACION_CHARS = 14000;
-const MAX_FUENTES_TEXTO_CHARS = 6000;
+const MAX_INVESTIGACION_CHARS = 3500;
+const MAX_FUENTES_TEXTO_CHARS = 900;
 
 const DOCUMENTO_SCHEMA = {
   type: "object",
@@ -19,7 +20,55 @@ const DOCUMENTO_SCHEMA = {
     contenidoHtml: { type: "string" },
     resumenCorto: { type: "string" },
   },
-  required: ["tituloDocumento", "objetivoDocumento", "contenidoHtml", "resumenCorto"],
+  required: [
+    "tituloDocumento",
+    "objetivoDocumento",
+    "contenidoHtml",
+    "resumenCorto",
+  ],
+};
+
+const RESEARCH_SCHEMA = {
+  type: "object",
+  additionalProperties: false,
+  properties: {
+    ideaCentral: { type: "string" },
+    conceptosClave: {
+      type: "array",
+      items: { type: "string" },
+      maxItems: 8,
+    },
+    puntosImportantes: {
+      type: "array",
+      items: { type: "string" },
+      maxItems: 8,
+    },
+    ejemplos: {
+      type: "array",
+      items: { type: "string" },
+      maxItems: 5,
+    },
+    erroresComunes: {
+      type: "array",
+      items: { type: "string" },
+      maxItems: 5,
+    },
+    paraLaPrueba: {
+      type: "array",
+      items: { type: "string" },
+      maxItems: 6,
+    },
+    resumenInvestigacion: { type: "string" },
+  },
+  required: [
+    "ideaCentral",
+    "conceptosClave",
+    "puntosImportantes",
+    "ejemplos",
+    "erroresComunes",
+    "paraLaPrueba",
+    "resumenInvestigacion",
+  ],
 };
 
 function limpiarTexto(value = "") {
@@ -40,6 +89,31 @@ function sanitizeUrl(value = "") {
   } catch {
     return "";
   }
+}
+
+function extraerDominio(url = "") {
+  try {
+    return new URL(url).hostname.replace(/^www\./, "");
+  } catch {
+    return "";
+  }
+}
+
+function limpiarListaStrings(value, maxItems = 8, maxItemChars = 220) {
+  if (!Array.isArray(value)) return [];
+
+  const seen = new Set();
+
+  return value
+    .map((item) => limitarTexto(item, maxItemChars))
+    .filter(Boolean)
+    .filter((item) => {
+      const key = item.toLowerCase();
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    })
+    .slice(0, maxItems);
 }
 
 function limpiarFuentes(value) {
@@ -138,18 +212,37 @@ Instrucciones:
 - Buscá información confiable y útil para estudiar.
 - Priorizá contenido educativo, académico o enciclopédico.
 - Evitá foros, páginas pobres o contenido repetido.
-- No hagas todavía el documento final.
-- Entregá una investigación clara en español.
+- No redactes todavía el documento final.
+- Respondé en español.
+- Organizá la investigación de forma clara y compacta.
 - Explicá el contenido como base de estudio para un alumno.
-- Incluí datos concretos cuando aporten valor.
+- Incluí datos concretos solo cuando aporten valor real.
 
-Quiero:
+Necesito:
 1. idea central del tema
 2. conceptos clave
-3. reglas, fechas, fórmulas o procedimientos si aplican
+3. puntos importantes que el alumno tiene que entender
 4. ejemplos concretos si aplican
-5. errores comunes o confusiones frecuentes si aplican
+5. errores comunes o confusiones frecuentes
 6. qué es lo más importante para estudiar para una prueba
+7. un resumen final breve y útil
+  `.trim();
+}
+
+function buildFuentesOnlyPrompt({ materia, tema, nivel }) {
+  return `
+Buscá fuentes confiables para estudiar este tema.
+
+Datos:
+- Materia: ${materia}
+- Tema: ${tema}
+- Nivel: ${nivel}
+
+Instrucciones:
+- Priorizá contenido educativo, académico o enciclopédico.
+- Evitá foros, resultados duplicados o páginas débiles.
+- Respondé en español con una síntesis muy breve del tema.
+- Lo importante es encontrar buenas fuentes.
   `.trim();
 }
 
@@ -163,36 +256,34 @@ function buildDocumentoPrompt({
   fuentesTexto,
 }) {
   return `
-Generá un documento de estudio con estos datos:
+Creá un documento de estudio en español.
 
+Datos:
 - Materia: ${materia}
 - Tema: ${tema}
 - Nivel: ${nivel}
 - Duración: ${duracion || "No especificada"}
 - Objetivo: ${objetivo || "No especificado"}
 
-Investigación previa:
+Base de investigación:
 ${investigacionFinal || "No disponible"}
 
-Fuentes:
+Fuentes consultadas:
 ${fuentesTexto}
 
-Requisitos del documento:
-- Hacé una introducción clara.
-- Desarrollá el tema por secciones.
-- Incluí puntos importantes.
-- Sumá ejemplos o aplicaciones si corresponde.
-- Cerrá con un repaso final útil para estudiar.
+Requisitos:
+- Hacé una introducción breve y clara.
+- Desarrollá el tema por secciones bien organizadas.
+- Explicá de forma útil para estudiar.
+- Incluí ejemplos o aplicaciones si corresponde.
+- Cerrá con un repaso final.
 - Adaptá la profundidad al nivel indicado.
 - No pongas relleno.
-- No repitas el mismo concepto demasiadas veces.
+- No repitas demasiado las mismas ideas.
 - No agregues las fuentes dentro del HTML.
 
-El JSON debe tener:
-- tituloDocumento
-- objetivoDocumento
-- contenidoHtml
-- resumenCorto
+Devolvé SOLO JSON válido con:
+tituloDocumento, objetivoDocumento, contenidoHtml, resumenCorto
   `.trim();
 }
 
@@ -202,8 +293,14 @@ function sanitizeContenidoHtml(html = "") {
   if (!output.trim()) return "";
 
   output = output.replace(/<!--[\s\S]*?-->/g, "");
-  output = output.replace(/<(script|style|iframe|object|embed|meta|link)[^>]*>[\s\S]*?<\/\1>/gi, "");
-  output = output.replace(/<(script|style|iframe|object|embed|meta|link)[^>]*\/?>/gi, "");
+  output = output.replace(
+    /<(script|style|iframe|object|embed|meta|link)[^>]*>[\s\S]*?<\/\1>/gi,
+    ""
+  );
+  output = output.replace(
+    /<(script|style|iframe|object|embed|meta|link)[^>]*\/?>/gi,
+    ""
+  );
 
   output = output.replace(/<\s*b\s*>/gi, "<strong>");
   output = output.replace(/<\s*\/\s*b\s*>/gi, "</strong>");
@@ -271,6 +368,22 @@ function validarDocumento(documento) {
   };
 }
 
+function validarResearch(research) {
+  if (!research || typeof research !== "object" || Array.isArray(research)) {
+    throw new Error("La investigación no tiene formato válido.");
+  }
+
+  return {
+    ideaCentral: limitarTexto(research.ideaCentral, 350),
+    conceptosClave: limpiarListaStrings(research.conceptosClave, 8, 180),
+    puntosImportantes: limpiarListaStrings(research.puntosImportantes, 8, 220),
+    ejemplos: limpiarListaStrings(research.ejemplos, 5, 220),
+    erroresComunes: limpiarListaStrings(research.erroresComunes, 5, 220),
+    paraLaPrueba: limpiarListaStrings(research.paraLaPrueba, 6, 220),
+    resumenInvestigacion: limitarTexto(research.resumenInvestigacion, 1400),
+  };
+}
+
 function parseDocumentoDesdeResponse(response) {
   const raw = limpiarTexto(response?.output_text || "");
 
@@ -282,20 +395,146 @@ function parseDocumentoDesdeResponse(response) {
   try {
     parsed = JSON.parse(raw);
   } catch (error) {
-    console.error("No se pudo parsear output_text:", raw);
+    console.error("No se pudo parsear output_text del documento:", raw);
     throw new Error("La respuesta del modelo no fue JSON válido.");
   }
 
   return validarDocumento(parsed);
 }
 
-function construirFuentesTexto(fuentes) {
+function parseResearchDesdeResponse(response) {
+  const raw = limpiarTexto(response?.output_text || "");
+
+  if (!raw) {
+    throw new Error("OpenAI no devolvió output_text en la investigación.");
+  }
+
+  let parsed;
+  try {
+    parsed = JSON.parse(raw);
+  } catch (error) {
+    console.error("No se pudo parsear output_text de research:", raw);
+    throw new Error("La investigación no vino en JSON válido.");
+  }
+
+  return validarResearch(parsed);
+}
+
+function construirInvestigacionCompacta(data) {
+  if (!data || typeof data !== "object") return "";
+
+  const bloques = [
+    data.ideaCentral ? `Idea central: ${data.ideaCentral}` : "",
+    data.conceptosClave?.length
+      ? `Conceptos clave: ${data.conceptosClave.join("; ")}`
+      : "",
+    data.puntosImportantes?.length
+      ? `Puntos importantes: ${data.puntosImportantes.join("; ")}`
+      : "",
+    data.ejemplos?.length ? `Ejemplos: ${data.ejemplos.join("; ")}` : "",
+    data.erroresComunes?.length
+      ? `Errores comunes: ${data.erroresComunes.join("; ")}`
+      : "",
+    data.paraLaPrueba?.length
+      ? `Para la prueba: ${data.paraLaPrueba.join("; ")}`
+      : "",
+    data.resumenInvestigacion
+      ? `Resumen: ${data.resumenInvestigacion}`
+      : "",
+  ];
+
+  return limitarTexto(
+    bloques.filter(Boolean).join("\n"),
+    MAX_INVESTIGACION_CHARS
+  );
+}
+
+function construirFuentesTextoParaModelo(fuentes) {
   const texto = (Array.isArray(fuentes) ? fuentes : [])
-    .slice(0, MAX_SOURCE_COUNT)
-    .map((f, i) => `${i + 1}. ${f.title}${f.url ? ` — ${f.url}` : ""}`)
+    .slice(0, 6)
+    .map((f, i) => {
+      const title = limitarTexto(f?.title || "Fuente", 120);
+      const dominio = extraerDominio(f?.url || "");
+      return `${i + 1}. ${title}${dominio ? ` (${dominio})` : ""}`;
+    })
     .join("\n");
 
   return texto.slice(0, MAX_FUENTES_TEXTO_CHARS) || "No disponibles";
+}
+
+async function investigarTemaConWeb({
+  materia,
+  tema,
+  nivel,
+  duracion,
+  objetivo,
+}) {
+  const researchResponse = await client.responses.create({
+    model: RESEARCH_MODEL,
+    reasoning: { effort: "low" },
+    tools: [{ type: "web_search" }],
+    tool_choice: "auto",
+    include: ["web_search_call.action.sources"],
+    truncation: "auto",
+    instructions: `
+Sos el investigador de Eduvia.
+Investigás con web y organizás la información.
+No redactes todavía el documento final.
+Respondé en español.
+Devolvé SOLO JSON válido.
+    `.trim(),
+    input: buildResearchPrompt({
+      materia,
+      tema,
+      nivel,
+      duracion,
+      objetivo,
+    }),
+    text: {
+      format: {
+        type: "json_schema",
+        name: "research_eduvia",
+        strict: true,
+        schema: RESEARCH_SCHEMA,
+      },
+    },
+  });
+
+  const research = parseResearchDesdeResponse(researchResponse);
+  const investigacionCompacta = construirInvestigacionCompacta(research);
+  const fuentes = extractWebSources(researchResponse);
+
+  return {
+    investigacionCompacta,
+    fuentes,
+  };
+}
+
+async function buscarFuentesConWeb({
+  materia,
+  tema,
+  nivel,
+}) {
+  const response = await client.responses.create({
+    model: RESEARCH_MODEL,
+    reasoning: { effort: "low" },
+    tools: [{ type: "web_search" }],
+    tool_choice: "auto",
+    include: ["web_search_call.action.sources"],
+    truncation: "auto",
+    instructions: `
+Sos el investigador de Eduvia.
+Tu objetivo principal es encontrar buenas fuentes web.
+Respondé en español, breve.
+    `.trim(),
+    input: buildFuentesOnlyPrompt({
+      materia,
+      tema,
+      nivel,
+    }),
+  });
+
+  return extractWebSources(response);
 }
 
 export default async function handler(req, res) {
@@ -314,6 +553,8 @@ export default async function handler(req, res) {
   }
 
   try {
+    console.time("generar_documento_total");
+
     const {
       materia = "",
       tema = "",
@@ -340,56 +581,58 @@ export default async function handler(req, res) {
     let investigacionFinal = limitarTexto(investigacion, MAX_INVESTIGACION_CHARS);
     let fuentesFinales = limpiarFuentes(fuentes);
 
-    if (!investigacionFinal || !fuentesFinales.length) {
-      const researchResponse = await client.responses.create({
-        model: RESEARCH_MODEL,
-        reasoning: { effort: "low" },
-        tools: [{ type: "web_search" }],
-        tool_choice: "auto",
-        include: ["web_search_call.action.sources"],
-        truncation: "auto",
-        instructions: `
-Sos el investigador de Eduvia.
-Primero investigás y ordenás la información.
-No escribas todavía el documento final.
-Respondé en español.
-        `.trim(),
-        input: buildResearchPrompt({
-          materia: materiaLimpia,
-          tema: temaLimpio,
-          nivel: nivelLimpio,
-          duracion: duracionLimpia,
-          objetivo: objetivoLimpio,
-        }),
+    const faltaInvestigacion = !investigacionFinal;
+    const faltanFuentes = !fuentesFinales.length;
+
+    if (faltaInvestigacion) {
+      console.time("research_web");
+
+      const researchData = await investigarTemaConWeb({
+        materia: materiaLimpia,
+        tema: temaLimpio,
+        nivel: nivelLimpio,
+        duracion: duracionLimpia,
+        objetivo: objetivoLimpio,
       });
 
-      investigacionFinal = limitarTexto(
-        researchResponse?.output_text || investigacionFinal,
-        MAX_INVESTIGACION_CHARS
-      );
+      investigacionFinal = researchData.investigacionCompacta || investigacionFinal;
 
-      if (!fuentesFinales.length) {
-        fuentesFinales = extractWebSources(researchResponse);
+      if (faltanFuentes) {
+        fuentesFinales = researchData.fuentes;
       }
+
+      console.timeEnd("research_web");
+    } else if (faltanFuentes) {
+      console.time("buscar_fuentes_web");
+
+      fuentesFinales = await buscarFuentesConWeb({
+        materia: materiaLimpia,
+        tema: temaLimpio,
+        nivel: nivelLimpio,
+      });
+
+      console.timeEnd("buscar_fuentes_web");
     }
 
-    const fuentesTexto = construirFuentesTexto(fuentesFinales);
+    const fuentesTexto = construirFuentesTextoParaModelo(fuentesFinales);
+
+    console.time("documento_ia");
 
     const documentoResponse = await client.responses.create({
       model: DOCUMENT_MODEL,
       truncation: "auto",
       instructions: `
 Sos un profesor excelente de Eduvia.
-Tu tarea es transformar una investigación previa en un documento de estudio claro, largo, serio y útil.
+Tu tarea es convertir una base de investigación en un documento de estudio claro, serio y útil.
 
 Reglas:
 - Escribí en español claro.
-- Adaptá el nivel al alumno.
-- No inventes temas fuera del contexto.
-- El resultado tiene que sentirse como un apunte limpio y bien redactado.
+- Adaptá la profundidad al alumno.
+- No inventes contenido fuera del contexto.
+- El resultado debe sentirse como un apunte limpio y bien redactado.
 - Devolvé SOLO JSON válido.
 - El campo contenidoHtml debe contener HTML seguro y limpio.
-- Usá únicamente etiquetas como: h1, h2, h3, p, ul, ol, li, blockquote, strong, em.
+- Usá únicamente estas etiquetas: h1, h2, h3, p, ul, ol, li, blockquote, strong, em.
 - No uses style, script, iframe ni atributos inline.
 - No agregues las fuentes dentro de contenidoHtml.
       `.trim(),
@@ -410,10 +653,14 @@ Reglas:
           schema: DOCUMENTO_SCHEMA,
         },
       },
-      max_output_tokens: 4000,
+      max_output_tokens: 2200,
     });
 
+    console.timeEnd("documento_ia");
+
     const documento = parseDocumentoDesdeResponse(documentoResponse);
+
+    console.timeEnd("generar_documento_total");
 
     return res.status(200).json({
       ok: true,
