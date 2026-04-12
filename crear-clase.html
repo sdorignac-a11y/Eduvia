@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Eduvia | Crear clase</title>
+  <title>Eduvia | Crear contenido</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -230,7 +230,6 @@
       gap:22px;
     }
 
-    /* HERO */
     .hero-craft{
       position:relative;
       overflow:hidden;
@@ -521,7 +520,6 @@
       background:linear-gradient(90deg, rgba(255,255,255,.18), rgba(255,255,255,.04));
     }
 
-    /* CONTENT */
     .content-grid{
       display:grid;
       grid-template-columns:1.12fr .88fr;
@@ -673,6 +671,13 @@
       color:#756b80;
       line-height:1.55;
       font-weight:600;
+    }
+
+    .content-type-selector{
+      display:grid;
+      grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));
+      gap:14px;
+      margin-top:4px;
     }
 
     .mode-selector{
@@ -981,6 +986,10 @@
       box-shadow:var(--shadow-soft);
     }
 
+    .hidden-legacy{
+      display:none !important;
+    }
+
     @media (max-width: 1080px){
       .content-grid{
         grid-template-columns:1fr;
@@ -1051,7 +1060,8 @@
         font-size:2rem;
       }
 
-      .mode-selector{
+      .mode-selector,
+      .content-type-selector{
         grid-template-columns:1fr;
       }
 
@@ -1074,7 +1084,7 @@
 
       <nav class="menu">
         <a href="panel.html">Inicio</a>
-        <a href="crear-clase.html" class="active">Crear nueva clase</a>
+        <a href="crear-clase.html" class="active">Crear contenido</a>
         <a href="panel.html#guia">Cómo funciona</a>
         <a href="mis-clases.html">Mis clases</a>
         <a href="#">Historial</a>
@@ -1084,7 +1094,7 @@
 
       <div class="sidebar-note">
         <strong>Consejo rápido</strong>
-        <p>Cuanto más clara sea la materia, el tema y el nivel, mejor puede prepararse la clase con IA.</p>
+        <p>Cuanto más claro sea el pedido, mejor puede organizarlo la IA, ya sea una clase, un resumen o una investigación.</p>
       </div>
     </aside>
 
@@ -1097,7 +1107,7 @@
               <div class="board-frame-label">EDUVIA</div>
 
               <div class="board-tabs">
-                <span class="board-tab active">Crear clase</span>
+                <span class="board-tab active">Crear contenido</span>
                 <span class="board-tab">Configuración</span>
                 <span class="board-tab">Formato</span>
                 <span class="board-tab">Materiales</span>
@@ -1117,39 +1127,40 @@
 
               <div class="board-content">
                 <div class="chalk-note">
-                  <span class="mini-label">Crear una clase</span>
-                  <h1>Prepará una clase clara desde el principio.</h1>
+                  <span class="mini-label">Crear con IA</span>
+                  <h1>Generá el tipo de contenido que necesites.</h1>
                   <p>
-                    Definí la materia, el tema, el nivel y el objetivo para que la explicación
-                    empiece mucho más enfocada. También podés sumar material para que la IA tenga
-                    mejor contexto antes de arrancar.
+                    Ya no estás limitado solo a una clase escolar. Ahora podés preparar
+                    un resumen, una explicación, un análisis, un documento de estudio
+                    o una investigación rápida según lo que necesites.
                   </p>
 
                   <div class="board-feature-row">
-                    <span class="board-feature">📘 Materia</span>
-                    <span class="board-feature">📝 Tema puntual</span>
-                    <span class="board-feature">🎓 Nivel</span>
-                    <span class="board-feature">📎 Material</span>
+                    <span class="board-feature">📘 Clase</span>
+                    <span class="board-feature">📝 Resumen</span>
+                    <span class="board-feature">🔍 Análisis</span>
+                    <span class="board-feature">📄 Documento</span>
+                    <span class="board-feature">🌐 Investigación</span>
                   </div>
                 </div>
 
                 <div class="board-side-cards">
                   <div class="side-card">
-                    <span>Enfoque</span>
-                    <strong>Clase más precisa</strong>
-                    <p>Cuanto mejor esté configurada, más clara y útil va a ser la explicación.</p>
+                    <span>Flexibilidad</span>
+                    <strong>Más que una clase</strong>
+                    <p>Podés generar contenido escolar o temas más libres sin que el formulario se sienta raro.</p>
                   </div>
 
                   <div class="side-card">
                     <span>Formato</span>
                     <strong>Pizarrón o documento</strong>
-                    <p>Podés elegir una experiencia más visual o una más tipo apunte.</p>
+                    <p>Elegí una experiencia más visual o una más ordenada, según cómo quieras estudiar.</p>
                   </div>
 
                   <div class="side-card">
                     <span>Material extra</span>
                     <strong>Más contexto para la IA</strong>
-                    <p>Subir archivos ayuda a que la clase use mejor ejemplos y contenido real.</p>
+                    <p>Subir archivos ayuda a que la respuesta use mejor ejemplos, textos y contenido real.</p>
                   </div>
                 </div>
               </div>
@@ -1174,50 +1185,114 @@
               <div class="editor-inner">
                 <div class="editor-head">
                   <span class="section-badge yellow">✏️ Configuración principal</span>
-                  <h2>Prepará la clase</h2>
+                  <h2>Prepará tu contenido</h2>
                   <p>
-                    Completá esta base para que la IA tenga claro qué explicar,
-                    cómo explicarlo y con qué material acompañar la clase.
+                    Elegí qué querés crear y completá solo los campos que realmente tengan sentido
+                    para ese tipo de contenido.
                   </p>
                 </div>
 
                 <form id="clase-form">
                   <div class="form-grid">
-                    <div class="field">
-                      <label for="materia">Materia</label>
-                      <input id="materia" placeholder="Ejemplo: Matemática" />
-                      <span class="helper">Elegí la materia principal.</span>
+                    <div class="field full">
+                      <label>Tipo de contenido</label>
+
+                      <div class="content-type-selector" id="content-type-selector">
+                        <label class="mode-option">
+                          <input type="radio" name="tipo_contenido" value="clase" checked />
+                          <div class="mode-card">
+                            <div class="mode-top">
+                              <div class="mode-icon">📘</div>
+                              <div class="mode-check"></div>
+                            </div>
+                            <h4>Clase escolar</h4>
+                            <p>Ideal para materias como matemática, historia, biología o inglés.</p>
+                            <div class="mode-mini">
+                              <span>Materia</span>
+                              <span>Nivel</span>
+                              <span>Objetivo</span>
+                            </div>
+                          </div>
+                        </label>
+
+                        <label class="mode-option">
+                          <input type="radio" name="tipo_contenido" value="resumen" />
+                          <div class="mode-card">
+                            <div class="mode-top">
+                              <div class="mode-icon">📝</div>
+                              <div class="mode-check"></div>
+                            </div>
+                            <h4>Resumen / explicación</h4>
+                            <p>Para entender un tema puntual de forma clara, sin formato escolar rígido.</p>
+                            <div class="mode-mini">
+                              <span>Tema libre</span>
+                              <span>Enfoque</span>
+                              <span>Profundidad</span>
+                            </div>
+                          </div>
+                        </label>
+
+                        <label class="mode-option">
+                          <input type="radio" name="tipo_contenido" value="analisis" />
+                          <div class="mode-card">
+                            <div class="mode-top">
+                              <div class="mode-icon">🔍</div>
+                              <div class="mode-check"></div>
+                            </div>
+                            <h4>Análisis de tema</h4>
+                            <p>Perfecto para interpretar, comparar o desarrollar una mirada más profunda.</p>
+                            <div class="mode-mini">
+                              <span>Comparación</span>
+                              <span>Crítico</span>
+                              <span>Interpretación</span>
+                            </div>
+                          </div>
+                        </label>
+
+                        <label class="mode-option">
+                          <input type="radio" name="tipo_contenido" value="documento" />
+                          <div class="mode-card">
+                            <div class="mode-top">
+                              <div class="mode-icon">📄</div>
+                              <div class="mode-check"></div>
+                            </div>
+                            <h4>Documento de estudio</h4>
+                            <p>Para crear apuntes, desarrollos largos o material de repaso más ordenado.</p>
+                            <div class="mode-mini">
+                              <span>Apunte</span>
+                              <span>Esquema</span>
+                              <span>Repaso</span>
+                            </div>
+                          </div>
+                        </label>
+
+                        <label class="mode-option">
+                          <input type="radio" name="tipo_contenido" value="investigacion" />
+                          <div class="mode-card">
+                            <div class="mode-top">
+                              <div class="mode-icon">🌐</div>
+                              <div class="mode-check"></div>
+                            </div>
+                            <h4>Investigación rápida</h4>
+                            <p>Para buscar ideas clave, organizar hallazgos y explorar un tema puntual.</p>
+                            <div class="mode-mini">
+                              <span>Pregunta</span>
+                              <span>Búsqueda</span>
+                              <span>Hallazgos</span>
+                            </div>
+                          </div>
+                        </label>
+                      </div>
+
+                      <span class="helper">
+                        Elegí el formato que mejor se adapte a lo que querés crear.
+                      </span>
                     </div>
 
-                    <div class="field">
-                      <label for="tema">Tema</label>
-                      <input id="tema" placeholder="Ejemplo: Fracciones" />
-                      <span class="helper">Podés poner un tema puntual o una unidad.</span>
-                    </div>
-
-                    <div class="field">
-                      <label for="nivel">Nivel</label>
-                      <select id="nivel">
-                        <option value="Primaria">Primaria</option>
-                        <option value="Secundaria">Secundaria</option>
-                        <option value="Universidad">Universidad</option>
-                      </select>
-                      <span class="helper">Ayuda a adaptar la dificultad.</span>
-                    </div>
-
-                    <div class="field">
-                      <label for="duracion">Duración estimada</label>
-                      <select id="duracion">
-                        <option value="20 min">20 minutos</option>
-                        <option value="30 min">30 minutos</option>
-                        <option value="45 min">45 minutos</option>
-                        <option value="60 min">60 minutos</option>
-                      </select>
-                      <span class="helper">Sirve para ordenar mejor la sesión.</span>
-                    </div>
+                    <div id="dynamic-fields" class="form-grid field full"></div>
 
                     <div class="field full">
-                      <label>Formato de la clase</label>
+                      <label>Formato del contenido</label>
 
                       <div class="mode-selector">
                         <label class="mode-option">
@@ -1230,7 +1305,7 @@
 
                             <h4>Modo Pizarrón</h4>
                             <p>
-                              Ideal para clases más visuales, dinámicas e interactivas.
+                              Ideal para una experiencia más visual, explicativa y guiada.
                             </p>
 
                             <div class="mode-mini">
@@ -1251,7 +1326,7 @@
 
                             <h4>Modo Documento</h4>
                             <p>
-                              Pensado para estudiantes más grandes, apuntes claros y estudio más serio.
+                              Pensado para apuntes claros, lectura ordenada y estudio más tranquilo.
                             </p>
 
                             <div class="mode-mini">
@@ -1266,31 +1341,25 @@
                       <div id="format-preview" class="format-preview">
                         <strong>Vista elegida: Pizarrón</strong>
                         <p>
-                          La clase se mostrará en una experiencia más visual, tipo aula interactiva.
+                          El contenido se mostrará en una experiencia más visual, tipo aula interactiva.
                         </p>
                       </div>
 
                       <span class="helper">
-                        Elegí el formato según la edad del alumno y la forma en la que querés estudiar.
+                        Elegí el formato según cómo quieras estudiar o presentar la información.
                       </span>
                     </div>
 
                     <div class="field full">
-                      <label for="objetivo">Objetivo de la clase</label>
-                      <textarea id="objetivo" placeholder="Ejemplo: Que el alumno entienda cómo sumar y restar fracciones con distinto denominador."></textarea>
-                      <span class="helper">Mientras más concreto sea, mejor puede explicar la IA.</span>
-                    </div>
-
-                    <div class="field full">
-                      <label for="archivo">Material de estudio</label>
+                      <label for="archivo">Material de apoyo</label>
 
                       <div class="upload-box">
                         <input id="archivo" type="file" multiple accept=".pdf,.doc,.docx,.txt,.png,.jpg,.jpeg" />
                         <div class="upload-inner">
                           <div class="upload-icon">📎</div>
                           <div>
-                            <strong>Subí archivos para usar dentro de la clase</strong>
-                            <p>Apuntes, guías, PDFs, imágenes de ejercicios o resúmenes.</p>
+                            <strong>Subí archivos para usar dentro del contenido</strong>
+                            <p>Apuntes, guías, PDFs, imágenes, textos o cualquier material que sume contexto.</p>
                           </div>
                         </div>
                       </div>
@@ -1303,8 +1372,17 @@
                     </div>
                   </div>
 
+                  <div class="hidden-legacy" aria-hidden="true">
+                    <input type="hidden" id="tipo_contenido_hidden" name="tipo_contenido_hidden" value="clase" />
+                    <input type="hidden" id="materia" name="materia" />
+                    <input type="hidden" id="tema" name="tema" />
+                    <input type="hidden" id="nivel" name="nivel" />
+                    <input type="hidden" id="duracion" name="duracion" />
+                    <textarea id="objetivo" name="objetivo"></textarea>
+                  </div>
+
                   <div class="form-actions">
-                    <button type="submit" class="btn btn-primary">Crear clase</button>
+                    <button type="submit" class="btn btn-primary">Crear contenido</button>
                     <a href="panel.html" class="btn btn-soft">Volver al panel</a>
                   </div>
                 </form>
@@ -1317,26 +1395,26 @@
               <div class="support-inner">
                 <div class="support-head">
                   <span class="section-badge blue">💡 Guía rápida</span>
-                  <h3>Qué conviene definir bien</h3>
+                  <h3>Cómo elegir bien el tipo</h3>
                   <p>
-                    Esta parte te ayuda a preparar una clase más clara antes de crearla.
+                    No todos los pedidos necesitan la misma estructura. Elegí la opción que mejor encaje.
                   </p>
                 </div>
 
                 <div class="support-list">
                   <div class="support-item">
-                    <strong>Elegí un tema concreto</strong>
-                    <p>No pongas solo “Matemática”. Mejor “Fracciones equivalentes” o “Regla de tres”.</p>
+                    <strong>Clase escolar</strong>
+                    <p>Usala cuando haya materia, nivel y un objetivo de aprendizaje más típico.</p>
                   </div>
 
                   <div class="support-item">
-                    <strong>Marcá bien el nivel</strong>
-                    <p>Eso cambia la forma de explicar, el vocabulario y el tipo de ejemplo.</p>
+                    <strong>Resumen o explicación</strong>
+                    <p>Ideal para temas libres como arquitectura, historia del arte o conceptos generales.</p>
                   </div>
 
                   <div class="support-item">
-                    <strong>Definí el objetivo</strong>
-                    <p>Entender desde cero, repasar, preparar una prueba o resolver una duda puntual.</p>
+                    <strong>Análisis o investigación</strong>
+                    <p>Sirve para desarrollar ideas, comparar temas o buscar información de forma más profunda.</p>
                   </div>
                 </div>
               </div>
@@ -1345,22 +1423,22 @@
             <div class="support-card">
               <div class="support-inner">
                 <div class="support-head">
-                  <span class="section-badge violet">📚 Materias frecuentes</span>
-                  <h3>Ideas para empezar</h3>
+                  <span class="section-badge violet">📚 Ideas para empezar</span>
+                  <h3>Ejemplos de pedidos</h3>
                   <p>
-                    Algunas materias comunes para crear una clase rápida dentro de Eduvia.
+                    Algunos temas que encajan muy bien con este nuevo sistema.
                   </p>
                 </div>
 
                 <div class="tag-cloud">
-                  <span>Matemática</span>
-                  <span>Lengua</span>
-                  <span>Historia</span>
-                  <span>Biología</span>
-                  <span>Química</span>
-                  <span>Inglés</span>
-                  <span>Física</span>
-                  <span>Geografía</span>
+                  <span>Arquitectura de Roma</span>
+                  <span>Revolución Francesa</span>
+                  <span>Fotosíntesis</span>
+                  <span>La casa de Bernarda Alba</span>
+                  <span>Funciones cuadráticas</span>
+                  <span>Sistema solar</span>
+                  <span>Barroco</span>
+                  <span>Marketing digital</span>
                 </div>
               </div>
             </div>
@@ -1423,7 +1501,7 @@
         formatPreview.innerHTML = `
           <strong>Vista elegida: Documento</strong>
           <p>
-            La clase se mostrará como un apunte ordenado, con bloques claros para leer,
+            El contenido se mostrará como un apunte ordenado, con bloques claros para leer,
             estudiar y repasar el tema.
           </p>
         `;
@@ -1431,7 +1509,7 @@
         formatPreview.innerHTML = `
           <strong>Vista elegida: Pizarrón</strong>
           <p>
-            La clase se mostrará en una experiencia más visual, tipo aula interactiva.
+            El contenido se mostrará en una experiencia más visual, tipo aula interactiva.
           </p>
         `;
       }
@@ -1442,6 +1520,313 @@
     });
 
     updateFormatPreview();
+  </script>
+
+  <script>
+    const dynamicFields = document.getElementById("dynamic-fields");
+    const tipoInputs = document.querySelectorAll('input[name="tipo_contenido"]');
+
+    const legacyTipo = document.getElementById("tipo_contenido_hidden");
+    const legacyMateria = document.getElementById("materia");
+    const legacyTema = document.getElementById("tema");
+    const legacyNivel = document.getElementById("nivel");
+    const legacyDuracion = document.getElementById("duracion");
+    const legacyObjetivo = document.getElementById("objetivo");
+
+    const fieldTemplates = {
+      clase: `
+        <div class="field">
+          <label for="clase_materia">Materia</label>
+          <input id="clase_materia" placeholder="Ejemplo: Historia" />
+          <span class="helper">Materia principal de la clase.</span>
+        </div>
+
+        <div class="field">
+          <label for="clase_tema">Tema</label>
+          <input id="clase_tema" placeholder="Ejemplo: Revolución Francesa" />
+          <span class="helper">Tema puntual o unidad.</span>
+        </div>
+
+        <div class="field">
+          <label for="clase_nivel">Nivel</label>
+          <select id="clase_nivel">
+            <option value="Primaria">Primaria</option>
+            <option value="Secundaria">Secundaria</option>
+            <option value="Universidad">Universidad</option>
+          </select>
+          <span class="helper">Adapta la dificultad de la explicación.</span>
+        </div>
+
+        <div class="field">
+          <label for="clase_duracion">Duración estimada</label>
+          <select id="clase_duracion">
+            <option value="20 min">20 minutos</option>
+            <option value="30 min">30 minutos</option>
+            <option value="45 min">45 minutos</option>
+            <option value="60 min">60 minutos</option>
+          </select>
+          <span class="helper">Organiza mejor la estructura de la clase.</span>
+        </div>
+
+        <div class="field full">
+          <label for="clase_objetivo">Objetivo de la clase</label>
+          <textarea id="clase_objetivo" placeholder="Ejemplo: Que el alumno entienda las causas y consecuencias principales."></textarea>
+          <span class="helper">Mientras más claro sea, mejor va a responder la IA.</span>
+        </div>
+      `,
+
+      resumen: `
+        <div class="field full">
+          <label for="resumen_tema">Tema principal</label>
+          <input id="resumen_tema" placeholder="Ejemplo: Arquitectura de Roma" />
+          <span class="helper">Tema central que querés entender o resumir.</span>
+        </div>
+
+        <div class="field">
+          <label for="resumen_enfoque">Enfoque</label>
+          <input id="resumen_enfoque" placeholder="Ejemplo: características, materiales y legado" />
+          <span class="helper">Qué lado del tema querés que desarrolle.</span>
+        </div>
+
+        <div class="field">
+          <label for="resumen_publico">Dirigido a</label>
+          <select id="resumen_publico">
+            <option value="General">General</option>
+            <option value="Secundaria">Secundaria</option>
+            <option value="Universidad">Universidad</option>
+          </select>
+          <span class="helper">Ajusta lenguaje y complejidad.</span>
+        </div>
+
+        <div class="field">
+          <label for="resumen_profundidad">Nivel de profundidad</label>
+          <select id="resumen_profundidad">
+            <option value="Breve">Breve</option>
+            <option value="Media">Media</option>
+            <option value="Profunda">Profunda</option>
+          </select>
+          <span class="helper">Define cuánto detalle querés.</span>
+        </div>
+
+        <div class="field full">
+          <label for="resumen_pedido">Qué querés que explique</label>
+          <textarea id="resumen_pedido" placeholder="Ejemplo: Quiero un texto claro con ejemplos, partes principales y por qué fue importante."></textarea>
+          <span class="helper">Podés pedir ejemplos, contexto histórico o una explicación simple.</span>
+        </div>
+      `,
+
+      analisis: `
+        <div class="field full">
+          <label for="analisis_tema">Tema / obra / concepto</label>
+          <input id="analisis_tema" placeholder="Ejemplo: Arquitectura de Roma" />
+          <span class="helper">Podés analizar un tema, una obra, una corriente o una idea.</span>
+        </div>
+
+        <div class="field">
+          <label for="analisis_tipo">Tipo de análisis</label>
+          <input id="analisis_tipo" placeholder="Ejemplo: histórico, comparativo o crítico" />
+          <span class="helper">Define el estilo del análisis.</span>
+        </div>
+
+        <div class="field">
+          <label for="analisis_publico">Dirigido a</label>
+          <select id="analisis_publico">
+            <option value="Secundaria">Secundaria</option>
+            <option value="Universidad">Universidad</option>
+            <option value="General">General</option>
+          </select>
+          <span class="helper">Ajusta nivel y vocabulario.</span>
+        </div>
+
+        <div class="field full">
+          <label for="analisis_eje">Eje principal</label>
+          <textarea id="analisis_eje" placeholder="Ejemplo: Analizar cómo la arquitectura romana reflejaba el poder del imperio."></textarea>
+          <span class="helper">La IA usa esto como línea central del desarrollo.</span>
+        </div>
+      `,
+
+      documento: `
+        <div class="field full">
+          <label for="documento_titulo">Título del documento</label>
+          <input id="documento_titulo" placeholder="Ejemplo: Apunte sobre arquitectura romana" />
+          <span class="helper">Nombre del contenido que querés generar.</span>
+        </div>
+
+        <div class="field">
+          <label for="documento_tema">Tema central</label>
+          <input id="documento_tema" placeholder="Ejemplo: Arquitectura de Roma" />
+          <span class="helper">Tema base del documento.</span>
+        </div>
+
+        <div class="field">
+          <label for="documento_publico">Público</label>
+          <select id="documento_publico">
+            <option value="Secundaria">Secundaria</option>
+            <option value="Universidad">Universidad</option>
+            <option value="General">General</option>
+          </select>
+          <span class="helper">Define complejidad y estilo.</span>
+        </div>
+
+        <div class="field">
+          <label for="documento_estructura">Estructura deseada</label>
+          <select id="documento_estructura">
+            <option value="Apunte">Apunte</option>
+            <option value="Resumen largo">Resumen largo</option>
+            <option value="Esquema">Esquema</option>
+            <option value="Desarrollo completo">Desarrollo completo</option>
+          </select>
+          <span class="helper">Organiza cómo se presentará el contenido.</span>
+        </div>
+
+        <div class="field full">
+          <label for="documento_incluir">Qué querés incluir</label>
+          <textarea id="documento_incluir" placeholder="Ejemplo: Introducción, características, ejemplos de edificios y conclusión."></textarea>
+          <span class="helper">Podés indicar exactamente qué bloques querés dentro del documento.</span>
+        </div>
+      `,
+
+      investigacion: `
+        <div class="field full">
+          <label for="investigacion_pregunta">Pregunta o tema a investigar</label>
+          <input id="investigacion_pregunta" placeholder="Ejemplo: ¿Cómo influyó la arquitectura romana en la arquitectura occidental?" />
+          <span class="helper">Puede ser una pregunta concreta o un tema general.</span>
+        </div>
+
+        <div class="field">
+          <label for="investigacion_objetivo">Objetivo</label>
+          <input id="investigacion_objetivo" placeholder="Ejemplo: Encontrar ideas clave y organizar la información" />
+          <span class="helper">Qué querés conseguir con la investigación.</span>
+        </div>
+
+        <div class="field">
+          <label for="investigacion_profundidad">Nivel de profundidad</label>
+          <select id="investigacion_profundidad">
+            <option value="Rápido">Rápido</option>
+            <option value="Intermedio">Intermedio</option>
+            <option value="Completo">Completo</option>
+          </select>
+          <span class="helper">Define cuánto querés que investigue la IA.</span>
+        </div>
+
+        <div class="field full">
+          <label for="investigacion_resultado">Resultado esperado</label>
+          <textarea id="investigacion_resultado" placeholder="Ejemplo: Un texto ordenado con hallazgos principales, ejemplos y conclusión breve."></textarea>
+          <span class="helper">Esto guía el formato final de salida.</span>
+        </div>
+      `
+    };
+
+    function valueOf(id) {
+      return document.getElementById(id)?.value?.trim() || "";
+    }
+
+    function renderDynamicFields() {
+      const selected = document.querySelector('input[name="tipo_contenido"]:checked')?.value || "clase";
+      dynamicFields.innerHTML = fieldTemplates[selected] || fieldTemplates.clase;
+      syncLegacyFields();
+      bindDynamicInputs();
+    }
+
+    function syncLegacyFields() {
+      const selected = document.querySelector('input[name="tipo_contenido"]:checked')?.value || "clase";
+
+      legacyTipo.value = selected;
+
+      if (selected === "clase") {
+        legacyMateria.value = valueOf("clase_materia");
+        legacyTema.value = valueOf("clase_tema");
+        legacyNivel.value = document.getElementById("clase_nivel")?.value || "Secundaria";
+        legacyDuracion.value = document.getElementById("clase_duracion")?.value || "30 min";
+        legacyObjetivo.value = valueOf("clase_objetivo");
+      }
+
+      if (selected === "resumen") {
+        const tema = valueOf("resumen_tema");
+        const enfoque = valueOf("resumen_enfoque");
+        const publico = document.getElementById("resumen_publico")?.value || "General";
+        const profundidad = document.getElementById("resumen_profundidad")?.value || "Media";
+        const pedido = valueOf("resumen_pedido");
+
+        legacyMateria.value = "Resumen / explicación";
+        legacyTema.value = tema;
+        legacyNivel.value = publico;
+        legacyDuracion.value = profundidad;
+        legacyObjetivo.value =
+          `Tipo de contenido: Resumen / explicación.\n` +
+          `Enfoque: ${enfoque || "No especificado"}.\n` +
+          `Nivel de profundidad: ${profundidad}.\n` +
+          `Pedido del usuario: ${pedido || "No especificado"}.`;
+      }
+
+      if (selected === "analisis") {
+        const tema = valueOf("analisis_tema");
+        const tipo = valueOf("analisis_tipo");
+        const publico = document.getElementById("analisis_publico")?.value || "General";
+        const eje = valueOf("analisis_eje");
+
+        legacyMateria.value = "Análisis de tema";
+        legacyTema.value = tema;
+        legacyNivel.value = publico;
+        legacyDuracion.value = "Profundo";
+        legacyObjetivo.value =
+          `Tipo de contenido: Análisis de tema.\n` +
+          `Tipo de análisis: ${tipo || "No especificado"}.\n` +
+          `Eje principal: ${eje || "No especificado"}.`;
+      }
+
+      if (selected === "documento") {
+        const titulo = valueOf("documento_titulo");
+        const tema = valueOf("documento_tema");
+        const publico = document.getElementById("documento_publico")?.value || "General";
+        const estructura = document.getElementById("documento_estructura")?.value || "Apunte";
+        const incluir = valueOf("documento_incluir");
+
+        legacyMateria.value = "Documento de estudio";
+        legacyTema.value = tema || titulo;
+        legacyNivel.value = publico;
+        legacyDuracion.value = estructura;
+        legacyObjetivo.value =
+          `Tipo de contenido: Documento de estudio.\n` +
+          `Título sugerido: ${titulo || "Sin título"}.\n` +
+          `Estructura deseada: ${estructura}.\n` +
+          `Qué incluir: ${incluir || "No especificado"}.`;
+      }
+
+      if (selected === "investigacion") {
+        const pregunta = valueOf("investigacion_pregunta");
+        const objetivo = valueOf("investigacion_objetivo");
+        const profundidad = document.getElementById("investigacion_profundidad")?.value || "Intermedio";
+        const resultado = valueOf("investigacion_resultado");
+
+        legacyMateria.value = "Investigación rápida";
+        legacyTema.value = pregunta;
+        legacyNivel.value = "General";
+        legacyDuracion.value = profundidad;
+        legacyObjetivo.value =
+          `Tipo de contenido: Investigación rápida.\n` +
+          `Objetivo: ${objetivo || "No especificado"}.\n` +
+          `Nivel de profundidad: ${profundidad}.\n` +
+          `Resultado esperado: ${resultado || "No especificado"}.`;
+      }
+    }
+
+    function bindDynamicInputs() {
+      const inputs = dynamicFields.querySelectorAll("input, select, textarea");
+      inputs.forEach((input) => {
+        input.addEventListener("input", syncLegacyFields);
+        input.addEventListener("change", syncLegacyFields);
+      });
+    }
+
+    tipoInputs.forEach((input) => {
+      input.addEventListener("change", renderDynamicFields);
+    });
+
+    renderDynamicFields();
+
+    const form = document.getElementById("clase-form");
+    form?.addEventListener("submit", syncLegacyFields);
   </script>
 </body>
 </html>
