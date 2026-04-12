@@ -541,7 +541,9 @@ function normalizeSourceItem(item, index = 0) {
   const title = txt(item.title || item.titulo || item.name || item.nombre || `Fuente ${index + 1}`);
   const year = txt(item.year || item.año || item.anio || extractYear(item.date || item.fecha || ""));
   const site = txt(item.site || item.sitio || item.publisher || item.publicacion || getDomainLabel(url));
-  const author = txt(item.author || item.autor || item.authors?.[0] || item.autores?.[0] || site || "Autor desconocido");
+  const author = txt(
+    item.author || item.autor || item.authors?.[0] || item.autores?.[0] || site || "Autor desconocido"
+  );
 
   if (!title && !url) return null;
 
@@ -576,6 +578,108 @@ function getFuentesDocumento(clase = {}) {
       return true;
     })
     .slice(0, CONFIG.maxSources);
+}
+
+function getDocumentoHtmlRaw(clase = {}) {
+  return txt(
+    clase.contenidoHtml ||
+      clase.documentoHtml ||
+      clase.htmlDocumento ||
+      clase.htmlGenerado ||
+      clase.documentoGeneradoHtml ||
+      ""
+  );
+}
+
+function getDocumentoStructuredRaw(clase = {}) {
+  const genericContenido =
+    clase.contenido && typeof clase.contenido === "object" && !Array.isArray(clase.contenido)
+      ? clase.contenido
+      : null;
+
+  const structured =
+    clase.documento ||
+    clase.contenidoDocumento ||
+    clase.documentoGenerado ||
+    genericContenido ||
+    null;
+
+  return hasRealStructuredDoc(structured) ? structured : null;
+}
+
+function getDocumentoPlainTextRaw(clase = {}) {
+  const genericContenido = typeof clase.contenido === "string" ? clase.contenido : "";
+
+  const candidates = [
+    clase.documentoTexto,
+    clase.textoDocumento,
+    clase.contenidoTexto,
+    clase.contenidoGenerado,
+    clase.textoGenerado,
+    clase.documentoGeneradoTexto,
+    clase.respuestaFinal,
+    genericContenido,
+  ];
+
+  return txt(candidates.find((value) => txt(value)) || "");
+}
+
+function hasDocumentoReal(clase = {}) {
+  return (
+    hasRealHtml(getDocumentoHtmlRaw(clase)) ||
+    hasRealText(getDocumentoPlainTextRaw(clase)) ||
+    hasRealStructuredDoc(getDocumentoStructuredRaw(clase))
+  );
+}
+
+function normalizeGeneratedDocumentResult(apiDocumento = {}, claseBase = {}) {
+  const rawHtml = txt(
+    apiDocumento.contenidoHtml ||
+      apiDocumento.documentoHtml ||
+      apiDocumento.htmlDocumento ||
+      apiDocumento.html ||
+      ""
+  );
+
+  const safeHtml = sanitizeHtml(rawHtml);
+
+  const structuredCandidate =
+    apiDocumento.documento ||
+    apiDocumento.contenidoDocumento ||
+    apiDocumento.estructura ||
+    (apiDocumento && typeof apiDocumento === "object" && !Array.isArray(apiDocumento)
+      ? apiDocumento
+      : null);
+
+  const structured = hasRealStructuredDoc(structuredCandidate) ? structuredCandidate : null;
+
+  const plainText = txt(
+    apiDocumento.documentoTexto ||
+      apiDocumento.textoDocumento ||
+      apiDocumento.contenidoTexto ||
+      apiDocumento.texto ||
+      apiDocumento.respuesta ||
+      apiDocumento.resultado ||
+      (typeof apiDocumento.contenido === "string" ? apiDocumento.contenido : "") ||
+      ""
+  );
+
+  return {
+    tituloDocumento:
+      txt(apiDocumento.tituloDocumento) ||
+      txt(claseBase.tituloDocumento) ||
+      txt(claseBase.tema) ||
+      "Documento",
+    objetivoDocumento:
+      txt(apiDocumento.objetivoDocumento) ||
+      txt(claseBase.objetivoDocumento) ||
+      txt(claseBase.objetivo) ||
+      "",
+    contenidoHtml: safeHtml || "",
+    documento: structured || null,
+    documentoTexto: !safeHtml && plainText ? plainText : "",
+    resumenDocumento: txt(apiDocumento.resumenCorto || apiDocumento.resumen || ""),
+  };
 }
 
 /* =========================
@@ -771,16 +875,28 @@ function formatSimpleReference(source) {
   const url = sanitizeUrl(source.url || "");
   return `
     <strong>${escapeHtml(source.title)}</strong><br>
-    <span>${escapeHtml(source.author)} · ${escapeHtml(source.year)}${source.site ? ` · ${escapeHtml(source.site)}` : ""}</span>
-    ${url ? `<br><a class="reference-link" href="${url}" target="_blank" rel="noopener noreferrer">${escapeHtml(url)}</a>` : ""}
+    <span>${escapeHtml(source.author)} · ${escapeHtml(source.year)}${
+      source.site ? ` · ${escapeHtml(source.site)}` : ""
+    }</span>
+    ${
+      url
+        ? `<br><a class="reference-link" href="${url}" target="_blank" rel="noopener noreferrer">${escapeHtml(url)}</a>`
+        : ""
+    }
   `;
 }
 
 function formatApaReference(source) {
   const url = sanitizeUrl(source.url || "");
   return `
-    <span>${escapeHtml(source.author)}. (${escapeHtml(source.year || "s.f.")}). <em>${escapeHtml(source.title)}</em>${source.site ? `. ${escapeHtml(source.site)}` : ""}.</span>
-    ${url ? `<a class="reference-link" href="${url}" target="_blank" rel="noopener noreferrer">${escapeHtml(url)}</a>` : ""}
+    <span>${escapeHtml(source.author)}. (${escapeHtml(source.year || "s.f.")}). <em>${escapeHtml(
+      source.title
+    )}</em>${source.site ? `. ${escapeHtml(source.site)}` : ""}.</span>
+    ${
+      url
+        ? `<a class="reference-link" href="${url}" target="_blank" rel="noopener noreferrer">${escapeHtml(url)}</a>`
+        : ""
+    }
   `;
 }
 
@@ -949,7 +1065,7 @@ function renderGeneratedStructure(clase = {}) {
 }
 
 function renderRichHtmlDocumento(clase = {}) {
-  const rawHtml = clase.contenidoHtml || clase.documentoHtml || clase.htmlDocumento || "";
+  const rawHtml = getDocumentoHtmlRaw(clase);
   if (!hasRealHtml(rawHtml) || !els.docContent) return false;
 
   const safeHtml = sanitizeHtml(rawHtml);
@@ -962,7 +1078,7 @@ function renderRichHtmlDocumento(clase = {}) {
 function renderStructuredDocumento(clase = {}) {
   if (!els.docContent) return false;
 
-  const content = clase.documento || clase.contenidoDocumento || clase.contenido;
+  const content = getDocumentoStructuredRaw(clase);
   if (!hasRealStructuredDoc(content)) return false;
 
   const resumen = escapeHtml(content.resumen || "");
@@ -1001,9 +1117,7 @@ function renderStructuredDocumento(clase = {}) {
 function renderPlainTextDocumento(clase = {}) {
   if (!els.docContent) return false;
 
-  const rawText =
-    clase.documentoTexto || clase.textoDocumento || clase.contenidoTexto || "";
-
+  const rawText = getDocumentoPlainTextRaw(clase);
   if (!hasRealText(rawText)) return false;
 
   const blocks = rawText
@@ -1031,7 +1145,11 @@ function syncSavedSignatureFromDom() {
 function renderClase(clase = {}) {
   setBasicMeta(clase);
 
-  if (!renderRichHtmlDocumento(clase) && !renderStructuredDocumento(clase) && !renderPlainTextDocumento(clase)) {
+  if (
+    !renderRichHtmlDocumento(clase) &&
+    !renderStructuredDocumento(clase) &&
+    !renderPlainTextDocumento(clase)
+  ) {
     renderGeneratedStructure(clase);
   }
 
@@ -1367,18 +1485,7 @@ async function generarDocumentoSiFalta(clase = {}) {
   if (state.generationPromise) return state.generationPromise;
 
   state.generationPromise = (async () => {
-    const alreadyExists =
-      hasRealHtml(clase.contenidoHtml) ||
-      hasRealHtml(clase.documentoHtml) ||
-      hasRealHtml(clase.htmlDocumento) ||
-      hasRealText(clase.documentoTexto) ||
-      hasRealText(clase.textoDocumento) ||
-      hasRealText(clase.contenidoTexto) ||
-      hasRealStructuredDoc(clase.documento) ||
-      hasRealStructuredDoc(clase.contenidoDocumento) ||
-      hasRealStructuredDoc(clase.contenido);
-
-    if (alreadyExists) {
+    if (hasDocumentoReal(clase)) {
       setLoadingStage("writing", "Cargando el contenido guardado del documento.");
       return clase;
     }
@@ -1395,10 +1502,16 @@ async function generarDocumentoSiFalta(clase = {}) {
       tema: clase.tema || "",
       nivel: clase.nivel || "",
       duracion: clase.duracion || "",
-      objetivo: clase.objetivo || "",
-      investigacion: clase.investigacion || "",
-      fuentes: toArray(clase.fuentes),
+      objetivo: clase.objetivo || clase.objetivoDocumento || "",
+      investigacion: getInvestigacionDocumento(clase),
+      fuentes: getFuentesDocumento(clase),
+      contenidoBase: getDocumentoPlainTextRaw(clase),
     };
+
+    console.log("CLASE BASE:", clase);
+    console.log("INVESTIGACION ENVIADA:", payload.investigacion);
+    console.log("FUENTES ENVIADAS:", payload.fuentes);
+    console.log("TEXTO BASE:", payload.contenidoBase);
 
     const { response, data } = await fetchJsonWithTimeout("/api/generar-documento", {
       method: "POST",
@@ -1414,8 +1527,15 @@ async function generarDocumentoSiFalta(clase = {}) {
       throw new Error(data?.error || "No se pudo generar el documento.");
     }
 
-    const safeHtml = sanitizeHtml(data.documento.contenidoHtml || "");
-    if (!safeHtml) {
+    const normalizedDoc = normalizeGeneratedDocumentResult(data.documento, clase);
+
+    const documentoGeneradoValido =
+      hasRealHtml(normalizedDoc.contenidoHtml) ||
+      hasRealText(normalizedDoc.documentoTexto) ||
+      hasRealStructuredDoc(normalizedDoc.documento);
+
+    if (!documentoGeneradoValido) {
+      console.error("Respuesta cruda del backend:", data);
       throw new Error("La IA respondió, pero no devolvió contenido utilizable.");
     }
 
@@ -1423,20 +1543,14 @@ async function generarDocumentoSiFalta(clase = {}) {
 
     const merged = {
       ...clase,
-      tituloDocumento:
-        data.documento.tituloDocumento ||
-        clase.tituloDocumento ||
-        clase.tema ||
-        "Documento",
-      objetivoDocumento:
-        data.documento.objetivoDocumento ||
-        clase.objetivoDocumento ||
-        clase.objetivo ||
-        "",
-      contenidoHtml: safeHtml,
-      resumenDocumento: data.documento.resumenCorto || "",
-      investigacion: data.investigacion || clase.investigacion || "",
-      fuentes: toArray(data.fuentes).length ? data.fuentes : toArray(clase.fuentes),
+      tituloDocumento: normalizedDoc.tituloDocumento,
+      objetivoDocumento: normalizedDoc.objetivoDocumento,
+      contenidoHtml: normalizedDoc.contenidoHtml || "",
+      documento: normalizedDoc.documento || null,
+      documentoTexto: normalizedDoc.documentoTexto || "",
+      resumenDocumento: normalizedDoc.resumenDocumento || "",
+      investigacion: txt(data.investigacion || getInvestigacionDocumento(clase)),
+      fuentes: toArray(data.fuentes).length ? data.fuentes : getFuentesDocumento(clase),
       updatedAt: new Date().toISOString(),
     };
 
@@ -1447,8 +1561,10 @@ async function generarDocumentoSiFalta(clase = {}) {
           {
             tituloDocumento: merged.tituloDocumento,
             objetivoDocumento: merged.objetivoDocumento,
-            contenidoHtml: merged.contenidoHtml,
-            resumenDocumento: merged.resumenDocumento,
+            contenidoHtml: merged.contenidoHtml || "",
+            documento: merged.documento || null,
+            documentoTexto: merged.documentoTexto || "",
+            resumenDocumento: merged.resumenDocumento || "",
             investigacion: merged.investigacion,
             fuentes: merged.fuentes,
             updatedAt: serverTimestamp(),
@@ -1567,16 +1683,7 @@ async function loadClase(user) {
     ensureSelectionAssistantUi();
     setupPresentationExport();
 
-    const tieneDocumentoReal =
-      hasRealHtml(claseBase.contenidoHtml) ||
-      hasRealHtml(claseBase.documentoHtml) ||
-      hasRealHtml(claseBase.htmlDocumento) ||
-      hasRealText(claseBase.documentoTexto) ||
-      hasRealText(claseBase.textoDocumento) ||
-      hasRealText(claseBase.contenidoTexto) ||
-      hasRealStructuredDoc(claseBase.documento) ||
-      hasRealStructuredDoc(claseBase.contenidoDocumento) ||
-      hasRealStructuredDoc(claseBase.contenido);
+    const tieneDocumentoReal = hasDocumentoReal(claseBase);
 
     if (tieneDocumentoReal) {
       setLoadingStage("writing", "Cargando el documento guardado.");
@@ -1909,7 +2016,8 @@ async function exportDocumentToPresentation() {
   }
 
   const targetLabel = els.exportPptBtn?.querySelector?.(".more-item-title");
-  const originalText = targetLabel?.textContent || els.exportPptBtn?.textContent || "Pasar a presentación";
+  const originalText =
+    targetLabel?.textContent || els.exportPptBtn?.textContent || "Pasar a presentación";
 
   try {
     window.closeMoreDropdown?.();
@@ -2159,19 +2267,6 @@ function injectSelectionAssistantStyles() {
       margin:0;
       color:#4b6177;
       line-height:1.55;
-    }
-
-    .doc-selection-mini-chip{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      padding:4px 8px;
-      border-radius:999px;
-      background:#e8f1ff;
-      color:#355d95;
-      font-size:.7rem;
-      font-weight:800;
-      text-transform:capitalize;
     }
 
     .doc-selection-example{
@@ -2544,10 +2639,18 @@ function renderSelectionResult(raw = {}, actionLabel = "Acción") {
     </div>
   `;
 
-  panel.querySelector("[data-close-selection-panel]")?.addEventListener("click", hideSelectionResult);
-  panel.querySelector("[data-copy-selection-result]")?.addEventListener("click", () => copyAssistantText(copyValue));
-  panel.querySelector("[data-insert-selection-result]")?.addEventListener("click", () => insertResultBelowSelection(data.textoPropuesto));
-  panel.querySelector("[data-replace-selection-result]")?.addEventListener("click", () => replaceSelectedTextWithResult(data.textoPropuesto));
+  panel
+    .querySelector("[data-close-selection-panel]")
+    ?.addEventListener("click", hideSelectionResult);
+  panel
+    .querySelector("[data-copy-selection-result]")
+    ?.addEventListener("click", () => copyAssistantText(copyValue));
+  panel
+    .querySelector("[data-insert-selection-result]")
+    ?.addEventListener("click", () => insertResultBelowSelection(data.textoPropuesto));
+  panel
+    .querySelector("[data-replace-selection-result]")
+    ?.addEventListener("click", () => replaceSelectedTextWithResult(data.textoPropuesto));
 
   panel.classList.add("show");
 }
@@ -2615,7 +2718,9 @@ async function runSelectionAction(action = "mejorar", label = "Mejorar") {
         </p>
       `;
 
-      panel.querySelector("[data-close-selection-panel]")?.addEventListener("click", hideSelectionResult);
+      panel
+        .querySelector("[data-close-selection-panel]")
+        ?.addEventListener("click", hideSelectionResult);
       panel.classList.add("show");
     }
   } finally {
@@ -2658,7 +2763,9 @@ function ensureSelectionAssistantUi() {
     );
   });
 
-  document.addEventListener("selectionchange", () => setTimeout(trackSelectedTextForAssistant, 0));
+  document.addEventListener("selectionchange", () =>
+    setTimeout(trackSelectedTextForAssistant, 0)
+  );
 
   document.addEventListener(
     "scroll",
