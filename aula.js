@@ -1,3 +1,12 @@
+import { auth, db } from "./firebase.js?v=7";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {
+  collection,
+  doc,
+  setDoc,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
 const board = document.getElementById("board-content");
 
 if (!board) {
@@ -17,14 +26,26 @@ const toggleSourcesBtn = document.getElementById("toggle-sources-btn");
 const closeSourcesBtn = document.getElementById("sources-close-btn");
 const sourcesList = document.getElementById("sources-list");
 
+const saveSummaryBtn = document.getElementById("save-summary-btn");
+
 const GENERAR_CLASE_TIMEOUT_MS = 90000;
 const PREGUNTA_CHAT_TIMEOUT_MS = 60000;
+
+// Si en documento.html usás otro nombre de colección, cambiá esta línea.
+const DOCUMENTOS_COLLECTION = "documentos";
 
 let claseGuardadaActual = null;
 let claseGeneradaActual = null;
 let ultimaRespuestaChat = null;
 let fuentesClaseActual = [];
 let investigacionClaseActual = "";
+
+let ultimaVistaAula = null;
+let resumenAulaDocId = sessionStorage.getItem("eduvia_aula_doc_id") || "";
+let claveResumenActual = sessionStorage.getItem("eduvia_aula_doc_key") || "";
+let ultimaFirmaGuardada = "";
+let timeoutGuardadoResumen = null;
+let guardandoResumen = false;
 
 function escapeHtml(value = "") {
   return String(value)
@@ -404,7 +425,6 @@ function fallbackCardsDerecha(clase = {}) {
   return [card1, card2, card3];
 }
 
-
 function normalizarClase(raw = {}) {
   const titulo = String(raw.titulo || "Clase generada").trim();
   const resumen = String(raw.resumen || raw.introduccion || "").trim();
@@ -419,7 +439,12 @@ function normalizarClase(raw = {}) {
     resumen: resumen || "Resumen no disponible.",
     palabrasClave,
     secciones: secciones.length ? secciones : fallbackSecciones(raw),
-    cardsDerecha,
+    cardsDerecha: cardsDerecha.length ? cardsDerecha : fallbackCardsDerecha({
+      titulo,
+      resumen,
+      palabrasClave,
+      secciones: secciones.length ? secciones : fallbackSecciones(raw),
+    }),
     imagenesContenido,
   };
 
@@ -718,6 +743,22 @@ function renderLeccion(clase, meta = {}, options = {}) {
   const badgeText = options.badgeText
     || `${meta.materia || "Eduvia"} · ${meta.nivel || "Clase"}`;
 
+  ultimaVistaAula = {
+    clase,
+    meta: {
+      materia: meta.materia || "",
+      nivel: meta.nivel || "",
+      tema: meta.tema || "",
+      objetivo: meta.objetivo || "",
+      duracion: meta.duracion || "",
+    },
+    options: {
+      badgeText,
+      pregunta: options.pregunta || "",
+      temaRelacionado: options.temaRelacionado || "",
+    },
+  };
+
   const extraTop = options.pregunta
     ? `
       <section class="board-section">
@@ -789,6 +830,7 @@ function renderClase(claseRaw, meta = {}, extras = {}) {
   ultimaRespuestaChat = null;
   renderSourcesPanel(claseGeneradaActual.fuentes);
   renderLeccion(clase, meta);
+  programarGuardadoResumen("auto");
 }
 
 function normalizarRespuestaChat(raw, pregunta = "") {
@@ -859,6 +901,9 @@ function renderRespuestaChat(respuestaRaw, pregunta) {
     {
       materia: claseGuardadaActual?.materia || "Eduvia",
       nivel: claseGuardadaActual?.nivel || "Clase",
+      tema: claseGuardadaActual?.tema || "",
+      objetivo: claseGuardadaActual?.objetivo || "",
+      duracion: claseGuardadaActual?.duracion || "",
     },
     {
       badgeText: subtitulo,
@@ -866,6 +911,8 @@ function renderRespuestaChat(respuestaRaw, pregunta) {
       temaRelacionado: claseGuardadaActual?.tema || "",
     }
   );
+
+  programarGuardadoResumen("auto");
 }
 
 function abrirChat() {
@@ -895,6 +942,267 @@ function cerrarFuentes() {
   if (!sourcesPanel) return;
   sourcesPanel.classList.remove("is-open");
   sourcesPanel.setAttribute("aria-hidden", "true");
+}
+
+function setSaveButtonState(texto, disabled = false) {
+  if (!saveSummaryBtn) return;
+  saveSummaryBtn.textContent = texto;
+  saveSummaryBtn.disabled = disabled;
+  saveSummaryBtn.style.opacity = disabled ? "0.8" : "1";
+}
+
+function esperarUsuarioActual() {
+  if (auth.currentUser) {
+    return Promise.resolve(auth.currentUser);
+  }
+
+  return new Promise((resolve) => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      unsubscribe();
+      resolve(user || null);
+    });
+  });
+}
+
+function resetearDocumentoAula() {
+  resumenAulaDocId = "";
+  ultimaFirmaGuardada = "";
+  sessionStorage.removeItem("eduvia_aula_doc_id");
+}
+
+function prepararSesionDocumento(meta = {}) {
+  const nuevaClave = JSON.stringify({
+    materia: meta.materia || "",
+    tema: meta.tema || "",
+    nivel: meta.nivel || "",
+    duracion: meta.duracion || "",
+    objetivo: meta.objetivo || "",
+  });
+
+  if (claveResumenActual && claveResumenActual !== nuevaClave) {
+    resetearDocumentoAula();
+  }
+
+  claveResumenActual = nuevaClave;
+  sessionStorage.setItem("eduvia_aula_doc_key", claveResumenActual);
+}
+
+function construirContenidoPlanoDesdeVista() {
+  if (!ultimaVistaAula?.clase) return "";
+
+  const { clase, meta, options } = ultimaVistaAula;
+  const partes = [];
+
+  if (clase.titulo) partes.push(clase.titulo);
+  if (options.badgeText) partes.push(options.badgeText);
+  if (clase.resumen) partes.push(`Resumen:\n${clase.resumen}`);
+
+  if (options.pregunta) {
+    partes.push(`Pregunta del alumno:\n${options.pregunta}`);
+  }
+
+  for (const section of clase.secciones || []) {
+    const bloque = [];
+    if (section.titulo) bloque.push(section.titulo);
+    if (section.texto) bloque.push(section.texto);
+    if (Array.isArray(section.bullets) && section.bullets.length) {
+      bloque.push(section.bullets.map((item) => `• ${item}`).join("\n"));
+    }
+    if (bloque.length) partes.push(bloque.join("\n"));
+  }
+
+  if (options.temaRelacionado) {
+    partes.push(`Conectado con la clase actual:\nEsta respuesta se relaciona con el tema: ${options.temaRelacionado}.`);
+  }
+
+  if (Array.isArray(fuentesClaseActual) && fuentesClaseActual.length) {
+    const fuentesTexto = fuentesClaseActual
+      .map((fuente, index) => {
+        const titulo = fuente?.title || fuente?.titulo || `Fuente ${index + 1}`;
+        const url = fuente?.url || "";
+        return url ? `${titulo} — ${url}` : titulo;
+      })
+      .join("\n");
+    partes.push(`Fuentes:\n${fuentesTexto}`);
+  }
+
+  if (investigacionClaseActual) {
+    partes.push(`Investigación usada:\n${investigacionClaseActual}`);
+  }
+
+  if (meta.tema) partes.push(`Tema: ${meta.tema}`);
+  if (meta.materia) partes.push(`Materia: ${meta.materia}`);
+  if (meta.nivel) partes.push(`Nivel: ${meta.nivel}`);
+  if (meta.objetivo) partes.push(`Objetivo: ${meta.objetivo}`);
+
+  return partes.filter(Boolean).join("\n\n").trim();
+}
+
+function construirContenidoHTMLDesdeVista() {
+  if (!ultimaVistaAula?.clase) return "";
+
+  const { clase, meta, options } = ultimaVistaAula;
+
+  const seccionesHtml = (clase.secciones || []).map((section) => `
+    <section>
+      <h2>${escapeHtml(section.titulo || "")}</h2>
+      ${section.texto ? `<p>${escapeHtml(section.texto)}</p>` : ""}
+      ${
+        Array.isArray(section.bullets) && section.bullets.length
+          ? `<ul>${section.bullets.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>`
+          : ""
+      }
+    </section>
+  `).join("");
+
+  const fuentesHtml = Array.isArray(fuentesClaseActual) && fuentesClaseActual.length
+    ? `
+      <section>
+        <h2>Fuentes</h2>
+        <ul>
+          ${fuentesClaseActual.map((fuente, index) => {
+            const titulo = escapeHtml(fuente?.title || fuente?.titulo || `Fuente ${index + 1}`);
+            const url = sanitizeUrl(fuente?.url || "");
+            return `
+              <li>
+                ${url ? `<a href="${url}" target="_blank" rel="noopener noreferrer">${titulo}</a>` : titulo}
+              </li>
+            `;
+          }).join("")}
+        </ul>
+      </section>
+    `
+    : "";
+
+  return `
+    <article>
+      <h1>${escapeHtml(clase.titulo || "Resumen de clase")}</h1>
+      ${options.badgeText ? `<p><strong>${escapeHtml(options.badgeText)}</strong></p>` : ""}
+      ${clase.resumen ? `<p>${escapeHtml(clase.resumen)}</p>` : ""}
+      ${options.pregunta ? `<section><h2>Pregunta del alumno</h2><p>${escapeHtml(options.pregunta)}</p></section>` : ""}
+      ${seccionesHtml}
+      ${options.temaRelacionado ? `<section><h2>Conectado con la clase actual</h2><p>${escapeHtml(`Esta respuesta se relaciona con el tema: ${options.temaRelacionado}.`)}</p></section>` : ""}
+      ${fuentesHtml}
+      ${investigacionClaseActual ? `<section><h2>Investigación usada</h2><p>${escapeHtml(investigacionClaseActual)}</p></section>` : ""}
+      ${meta.tema ? `<p><strong>Tema:</strong> ${escapeHtml(meta.tema)}</p>` : ""}
+      ${meta.materia ? `<p><strong>Materia:</strong> ${escapeHtml(meta.materia)}</p>` : ""}
+      ${meta.nivel ? `<p><strong>Nivel:</strong> ${escapeHtml(meta.nivel)}</p>` : ""}
+      ${meta.objetivo ? `<p><strong>Objetivo:</strong> ${escapeHtml(meta.objetivo)}</p>` : ""}
+    </article>
+  `.trim();
+}
+
+function obtenerTituloDocumentoAula() {
+  if (ultimaVistaAula?.clase?.titulo) return ultimaVistaAula.clase.titulo;
+
+  const tema = claseGuardadaActual?.tema || "";
+  if (tema) return `Resumen - ${tema}`;
+
+  return "Resumen de clase";
+}
+
+function obtenerFirmaDocumento() {
+  return JSON.stringify({
+    titulo: obtenerTituloDocumentoAula(),
+    contenido: construirContenidoPlanoDesdeVista(),
+    fuentes: fuentesClaseActual,
+    investigacion: investigacionClaseActual,
+    tipoVista: ultimaVistaAula?.options?.pregunta ? "respuesta_chat" : "clase",
+  });
+}
+
+async function guardarResumenAula(origen = "auto") {
+  if (!ultimaVistaAula?.clase || guardandoResumen) return;
+
+  const contenido = construirContenidoPlanoDesdeVista();
+  const contenidoHTML = construirContenidoHTMLDesdeVista();
+  const titulo = obtenerTituloDocumentoAula();
+
+  if (!contenido || contenido.length < 30) return;
+
+  const firma = obtenerFirmaDocumento();
+  if (origen !== "manual" && firma === ultimaFirmaGuardada) return;
+
+  const user = await esperarUsuarioActual();
+  if (!user) {
+    console.warn("No hay usuario autenticado para guardar el resumen.");
+    return;
+  }
+
+  guardandoResumen = true;
+  setSaveButtonState("Guardando...", true);
+
+  try {
+    const collectionRef = collection(db, "usuarios", user.uid, DOCUMENTOS_COLLECTION);
+    const esNuevo = !resumenAulaDocId;
+
+    const docRef = esNuevo
+      ? doc(collectionRef)
+      : doc(db, "usuarios", user.uid, DOCUMENTOS_COLLECTION, resumenAulaDocId);
+
+    if (esNuevo) {
+      resumenAulaDocId = docRef.id;
+      sessionStorage.setItem("eduvia_aula_doc_id", resumenAulaDocId);
+    }
+
+    const payload = {
+      titulo,
+      contenido,
+      contenidoHTML,
+      texto: contenido,
+      html: contenidoHTML,
+      preview: contenido.slice(0, 220),
+      tipo: "resumen_aula",
+      origen: "aula",
+      modo: ultimaVistaAula?.options?.pregunta ? "respuesta_chat" : "clase",
+
+      materia: claseGuardadaActual?.materia || ultimaVistaAula?.meta?.materia || "",
+      tema: claseGuardadaActual?.tema || ultimaVistaAula?.meta?.tema || "",
+      nivel: claseGuardadaActual?.nivel || ultimaVistaAula?.meta?.nivel || "",
+      duracion: claseGuardadaActual?.duracion || ultimaVistaAula?.meta?.duracion || "",
+      objetivo: claseGuardadaActual?.objetivo || ultimaVistaAula?.meta?.objetivo || "",
+
+      pregunta: ultimaVistaAula?.options?.pregunta || "",
+      badgeText: ultimaVistaAula?.options?.badgeText || "",
+      temaRelacionado: ultimaVistaAula?.options?.temaRelacionado || "",
+
+      fuentes: Array.isArray(fuentesClaseActual) ? fuentesClaseActual : [],
+      investigacion: investigacionClaseActual || "",
+
+      updatedAt: serverTimestamp(),
+      actualizadoEn: serverTimestamp(),
+    };
+
+    if (esNuevo) {
+      payload.createdAt = serverTimestamp();
+      payload.creadoEn = serverTimestamp();
+    }
+
+    await setDoc(docRef, payload, { merge: true });
+
+    ultimaFirmaGuardada = firma;
+    setSaveButtonState("Guardado", false);
+
+    setTimeout(() => {
+      setSaveButtonState("Guardar resumen", false);
+    }, 1400);
+  } catch (error) {
+    console.error("Error guardando resumen del aula:", error);
+    setSaveButtonState("Error al guardar", false);
+
+    setTimeout(() => {
+      setSaveButtonState("Guardar resumen", false);
+    }, 1800);
+  } finally {
+    guardandoResumen = false;
+  }
+}
+
+function programarGuardadoResumen(origen = "auto") {
+  clearTimeout(timeoutGuardadoResumen);
+  timeoutGuardadoResumen = setTimeout(() => {
+    guardarResumenAula(origen);
+  }, 900);
 }
 
 async function preguntarEnChat(pregunta) {
@@ -978,6 +1286,7 @@ async function manejarPreguntaChat(event) {
         nivel: claseGuardadaActual?.nivel || "",
         tema: claseGuardadaActual?.tema || "",
         objetivo: claseGuardadaActual?.objetivo || "",
+        duracion: claseGuardadaActual?.duracion || "",
       });
     } else {
       renderError(error.message || "Error al responder la pregunta.");
@@ -1024,6 +1333,8 @@ async function cargarClaseEnPizarron() {
       duracion = "",
       objetivo = "",
     } = claseGuardada || {};
+
+    prepararSesionDocumento({ materia, tema, nivel, duracion, objetivo });
 
     if (!materia || !tema || !nivel) {
       fuentesClaseActual = [];
@@ -1082,7 +1393,7 @@ async function cargarClaseEnPizarron() {
 
     renderClase(
       data.clase,
-      { materia, nivel, tema, objetivo },
+      { materia, nivel, tema, objetivo, duracion },
       {
         fuentes: fuentesClaseActual,
         investigacion: investigacionClaseActual,
@@ -1125,6 +1436,10 @@ chatInput?.addEventListener("keydown", (event) => {
     event.preventDefault();
     chatForm?.requestSubmit();
   }
+});
+
+saveSummaryBtn?.addEventListener("click", () => {
+  guardarResumenAula("manual");
 });
 
 window.addEventListener("keydown", (event) => {
