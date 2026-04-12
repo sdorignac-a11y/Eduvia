@@ -266,15 +266,14 @@ function fallbackSecciones(raw = {}) {
   const ejemplo = String(raw.ejemplo || "").trim();
   const actividad = String(raw.actividad || "").trim();
 
-  const formulas = normalizarFormulas(raw.formulas);
   const puntos = dedupeLista(normalizarLista(raw.puntos));
+  const formulas = normalizarFormulas(raw.formulas);
   const pasos = dedupeLista(normalizarLista(raw.pasos));
-  const tips = dedupeLista(normalizarLista(raw.tips));
   const errores = dedupeLista(normalizarLista(raw.errores));
 
   if (resumenBase) {
     secciones.push({
-      titulo: "Resumen general",
+      titulo: "Explicación general",
       texto: resumenBase,
       bullets: [],
     });
@@ -288,42 +287,34 @@ function fallbackSecciones(raw = {}) {
     });
   }
 
+  if (puntos.length) {
+    secciones.push({
+      titulo: "Puntos importantes",
+      texto: "Estas son las ideas clave para entender mejor este tema.",
+      bullets: puntos,
+    });
+  }
+
   if (formulas.length) {
     secciones.push({
-      titulo: "Fórmulas clave",
-      texto: "Estas fórmulas o reglas ayudan a resolver y reconocer mejor el tema.",
+      titulo: "Datos útiles",
+      texto: "En este tema aparecen estas fórmulas o reglas importantes.",
       bullets: normalizarFormulasComoBullets(formulas),
     });
   }
 
   if (pasos.length) {
     secciones.push({
-      titulo: "Cómo pensarlo",
-      texto: "Seguí este orden para entender o resolver mejor el tema.",
+      titulo: "Cómo resolverlo o pensarlo",
+      texto: "Este orden puede ayudarte a trabajar mejor el tema.",
       bullets: pasos,
-    });
-  }
-
-  if (puntos.length) {
-    secciones.push({
-      titulo: "Puntos clave",
-      texto: "Estas son las ideas más importantes para estudiar.",
-      bullets: puntos,
-    });
-  }
-
-  if (tips.length) {
-    secciones.push({
-      titulo: "Tips rápidos",
-      texto: "Estos consejos te ayudan a recordar y aplicar mejor el contenido.",
-      bullets: tips,
     });
   }
 
   if (errores.length) {
     secciones.push({
-      titulo: "Errores comunes",
-      texto: "Prestá atención a estas confusiones frecuentes.",
+      titulo: "Confusiones frecuentes",
+      texto: "Prestá atención a estas equivocaciones comunes.",
       bullets: errores,
     });
   }
@@ -338,7 +329,7 @@ function fallbackSecciones(raw = {}) {
 
   if (actividad) {
     secciones.push({
-      titulo: "Actividad",
+      titulo: "Para seguir",
       texto: actividad,
       bullets: [],
     });
@@ -346,13 +337,13 @@ function fallbackSecciones(raw = {}) {
 
   if (!secciones.length) {
     secciones.push({
-      titulo: "Resumen general",
+      titulo: "Explicación",
       texto: "No se pudo construir el contenido completo de esta clase.",
       bullets: [],
     });
   }
 
-  return secciones;
+  return secciones.slice(0, 6);
 }
 
 function partirEnLineas(text = "", maxChars = 22, maxLineas = 4) {
@@ -413,27 +404,6 @@ function fallbackCardsDerecha(clase = {}) {
   return [card1, card2, card3];
 }
 
-function fallbackImagenesContenido(clase = {}) {
-  const visuales = [];
-
-  for (let i = 0; i < (clase.secciones || []).length; i += 2) {
-    const seccion = clase.secciones[i];
-    if (!seccion) continue;
-
-    const lineas = seccion.bullets.length
-      ? seccion.bullets.slice(0, 4)
-      : partirEnLineas(seccion.texto || "", 24, 3);
-
-    visuales.push({
-      titulo: seccion.titulo,
-      lineas: lineas.length ? lineas : ["Idea importante del tema"],
-      caption: "Apoyo visual para reforzar esta parte",
-      estilo: i % 4 === 0 ? "blue" : i % 4 === 2 ? "green" : "yellow",
-    });
-  }
-
-  return visuales.slice(0, 3);
-}
 
 function normalizarClase(raw = {}) {
   const titulo = String(raw.titulo || "Clase generada").trim();
@@ -453,17 +423,10 @@ function normalizarClase(raw = {}) {
     imagenesContenido,
   };
 
-  if (!clase.cardsDerecha.length) {
-    clase.cardsDerecha = fallbackCardsDerecha(clase);
-  }
-
-  if (!clase.imagenesContenido.length) {
-    clase.imagenesContenido = fallbackImagenesContenido(clase);
-  }
-
   if (!clase.palabrasClave.length) {
     clase.palabrasClave = dedupeLista([
       clase.titulo,
+      ...clase.secciones.map((section) => section.titulo),
       ...clase.secciones.flatMap((section) => section.bullets.slice(0, 2)),
     ]).slice(0, 8);
   }
@@ -773,9 +736,14 @@ function renderLeccion(clase, meta = {}, options = {}) {
     `
     : "";
 
+  const tieneCardsDerecha = Array.isArray(clase.cardsDerecha) && clase.cardsDerecha.length > 0;
+  const layoutStyle = tieneCardsDerecha
+    ? ""
+    : 'style="grid-template-columns:minmax(0,1fr);"';
+
   board.innerHTML = `
     <div class="board-lesson">
-      <div class="board-layout">
+      <div class="board-layout" ${layoutStyle}>
         <div class="board-main">
           <div class="board-head">
             <h1 class="board-title">${escapeHtml(clase.titulo)}</h1>
@@ -791,9 +759,15 @@ function renderLeccion(clase, meta = {}, options = {}) {
           ${extraBottom}
         </div>
 
-        <aside class="board-side">
-          ${clase.cardsDerecha.map(renderRightCard).join("")}
-        </aside>
+        ${
+          tieneCardsDerecha
+            ? `
+              <aside class="board-side">
+                ${clase.cardsDerecha.map(renderRightCard).join("")}
+              </aside>
+            `
+            : ""
+        }
       </div>
     </div>
   `;
