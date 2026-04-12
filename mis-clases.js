@@ -7,7 +7,9 @@ import {
   collection,
   getDocs,
   query,
-  orderBy
+  orderBy,
+  deleteDoc,
+  doc
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const loadingState = document.getElementById("loading-state");
@@ -114,7 +116,14 @@ async function cargarClases(uid) {
 
         <div class="card-actions">
           <a href="${destino}" class="btn btn-primary">${textoBoton}</a>
-          <a href="crear-clase.html" class="btn btn-soft">Crear otra</a>
+          <button
+            type="button"
+            class="btn btn-danger delete-class-btn"
+            data-id="${claseId}"
+            data-title="${escapeHTML(tema)}"
+          >
+            Eliminar
+          </button>
         </div>
       `;
 
@@ -125,6 +134,46 @@ async function cargarClases(uid) {
     mostrarError();
   }
 }
+
+classesGrid?.addEventListener("click", async (e) => {
+  const deleteBtn = e.target.closest(".delete-class-btn");
+  if (!deleteBtn || !currentUser) return;
+
+  const classId = deleteBtn.dataset.id;
+  const classTitle = deleteBtn.dataset.title || "esta clase";
+
+  const confirmar = window.confirm(
+    `¿Seguro que querés eliminar "${classTitle}"?\n\nEsta acción no se puede deshacer.`
+  );
+
+  if (!confirmar) return;
+
+  const textoOriginal = deleteBtn.textContent;
+  deleteBtn.disabled = true;
+  deleteBtn.textContent = "Eliminando...";
+
+  try {
+    await deleteDoc(doc(db, "usuarios", currentUser.uid, "clases", classId));
+
+    const card = deleteBtn.closest(".class-card");
+    if (card) {
+      card.remove();
+    }
+
+    const totalActual = Number(totalClases.textContent || "0");
+    totalClases.textContent = String(Math.max(0, totalActual - 1));
+
+    if (!classesGrid.children.length) {
+      mostrarVacio();
+      if (totalClases) totalClases.textContent = "0";
+    }
+  } catch (error) {
+    console.error("Error al eliminar clase:", error);
+    alert("No se pudo eliminar la clase.");
+    deleteBtn.disabled = false;
+    deleteBtn.textContent = textoOriginal;
+  }
+});
 
 function mostrarCargando() {
   if (loadingState) loadingState.style.display = "block";
