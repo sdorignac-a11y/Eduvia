@@ -1,4 +1,4 @@
-chat, me podes ayudar a rediseñar la aprte de estetica de panel, html. acutlamnte siento que esta mas como para personas mas chicas y si lo ve un joven o algo va a sentir que no es serio. mira como esta actualmente la estetica <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
@@ -212,14 +212,14 @@ chat, me podes ayudar a rediseñar la aprte de estetica de panel, html. acutlamn
       gap:22px;
     }
 
-    /* HERO */
+    /* HERO NUEVO */
     .hero-craft{
       position:relative;
       overflow:hidden;
       background:linear-gradient(180deg, var(--paper) 0%, var(--paper-2) 100%);
       border:2px solid rgba(124,108,242,.08);
       border-radius:34px;
-      padding:18px 28px 22px;
+      padding:24px 28px 26px;
       box-shadow:var(--shadow);
     }
 
@@ -228,153 +228,93 @@ chat, me podes ayudar a rediseñar la aprte de estetica de panel, html. acutlamn
       position:absolute;
       inset:0;
       background:
-        radial-gradient(circle at 12% 18%, rgba(255,255,255,.8), transparent 20%),
-        radial-gradient(circle at 88% 82%, rgba(255,231,150,.18), transparent 18%);
+        radial-gradient(circle at 12% 18%, rgba(255,255,255,.78), transparent 20%),
+        radial-gradient(circle at 88% 82%, rgba(255,231,150,.14), transparent 18%);
       pointer-events:none;
     }
 
     .craft-stage{
       position:relative;
       z-index:1;
-      padding-top:6px;
     }
-
-    .string{
-      position:absolute;
-      top:0;
-      width:3px;
-      height:24px;
-      background:linear-gradient(180deg, #d6c39f, #b38d63);
-      border-radius:999px;
-      z-index:1;
-    }
-
-    .string.left{ left:13%; }
-    .string.right{ right:13%; }
 
     .board-wrap{
       position:relative;
-      padding-top:34px;
     }
 
-    .title-cutouts{
-      position:absolute;
-      top:0;
-      left:50%;
-      transform:translateX(-50%);
-      display:flex;
-      flex-wrap:wrap;
-      justify-content:center;
-      gap:8px;
-      width:min(760px, calc(100% - 60px));
-      z-index:3;
-    }
-
-    .title-cutouts span{
+    .board-frame-label{
       display:inline-flex;
       align-items:center;
       justify-content:center;
-      min-width:46px;
-      height:54px;
-      padding:0 14px;
-      border-radius:14px;
-      font-family:"Sora",sans-serif;
+      padding:9px 14px;
+      border-radius:999px;
+      background:#f6f0ff;
+      color:#6b5ee8;
+      font-size:.78rem;
       font-weight:800;
-      font-size:1.02rem;
-      letter-spacing:-.03em;
-      box-shadow:0 8px 18px rgba(0,0,0,.06);
-      border:2px solid rgba(0,0,0,.04);
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      margin-bottom:14px;
+      border:1px solid rgba(124,108,242,.12);
+      box-shadow:0 8px 18px rgba(124,108,242,.06);
     }
 
-    .title-cutouts span:nth-child(1),
-    .title-cutouts span:nth-child(4),
-    .title-cutouts span:nth-child(8),
-    .title-cutouts span:nth-child(12){
-      background:#fff1a8;
-      transform:rotate(-2deg);
-    }
-
-    .title-cutouts span:nth-child(2),
-    .title-cutouts span:nth-child(6),
-    .title-cutouts span:nth-child(10),
-    .title-cutouts span:nth-child(14){
-      background:#d9f0ff;
-      transform:rotate(2deg);
-    }
-
-    .title-cutouts span:nth-child(3),
-    .title-cutouts span:nth-child(7),
-    .title-cutouts span:nth-child(11),
-    .title-cutouts span:nth-child(15){
-      background:#eadfff;
-      transform:rotate(-1deg);
-    }
-
-    .title-cutouts span:nth-child(5),
-    .title-cutouts span:nth-child(9),
-    .title-cutouts span:nth-child(13),
-    .title-cutouts span:nth-child(16){
-      background:#dff4b9;
-      transform:rotate(1.5deg);
-    }
-
-    .title-cutouts::before,
-    .title-cutouts::after{
-      content:"";
-      position:absolute;
-      top:-10px;
-      width:68px;
-      height:18px;
-      border-radius:6px;
-      background:rgba(255,255,255,.45);
-      box-shadow:0 2px 6px rgba(0,0,0,.05);
-    }
-
-    .title-cutouts::before{
-      left:5%;
-      transform:rotate(-9deg);
-    }
-
-    .title-cutouts::after{
-      right:5%;
-      transform:rotate(8deg);
-    }
-
-    .board{
+    .modern-board{
       position:relative;
       background:
         radial-gradient(circle at 18% 18%, rgba(255,255,255,.05), transparent 20%),
         radial-gradient(circle at 72% 30%, rgba(255,255,255,.04), transparent 22%),
-        linear-gradient(180deg, var(--board) 0%, var(--board-2) 100%);
-      border:12px solid #c99560;
+        linear-gradient(180deg, #274f45 0%, #1f4038 100%);
+      border:12px solid #c99661;
       border-bottom-width:16px;
-      border-radius:26px;
-      padding:82px 34px 28px;
+      border-radius:28px;
+      padding:20px 22px 22px;
       box-shadow:
-        inset 0 0 0 2px rgba(255,255,255,.05),
-        inset 0 22px 48px rgba(255,255,255,.03),
+        inset 0 0 0 2px rgba(255,255,255,.04),
+        inset 0 20px 40px rgba(255,255,255,.03),
         0 22px 30px rgba(35,34,58,.12);
-      min-height:350px;
       overflow:hidden;
     }
 
-    .board::before{
+    .modern-board::before{
       content:"";
       position:absolute;
       inset:0;
-      background:linear-gradient(transparent 43px, rgba(255,255,255,.022) 44px);
+      background:linear-gradient(transparent 43px, rgba(255,255,255,.018) 44px);
       background-size:100% 44px;
-      opacity:.5;
+      opacity:.45;
       pointer-events:none;
     }
 
-    .chalk-note{
+    .board-topbar{
+      display:flex;
+      gap:8px;
+      margin-bottom:20px;
       position:relative;
       z-index:2;
-      max-width:680px;
     }
 
-    .chalk-note .mini-label{
+    .board-dot{
+      width:10px;
+      height:10px;
+      border-radius:50%;
+      background:rgba(255,255,255,.22);
+    }
+
+    .board-content{
+      position:relative;
+      z-index:2;
+      display:grid;
+      grid-template-columns:1.2fr .8fr;
+      gap:18px;
+      align-items:stretch;
+    }
+
+    .chalk-note.clean{
+      max-width:none;
+    }
+
+    .chalk-note.clean .mini-label{
       display:inline-block;
       margin-bottom:14px;
       padding:8px 12px;
@@ -387,105 +327,84 @@ chat, me podes ayudar a rediseñar la aprte de estetica de panel, html. acutlamn
       letter-spacing:.11em;
     }
 
-    .chalk-note h1{
+    .chalk-note.clean h1{
       font-family:"Sora",sans-serif;
-      font-size:clamp(2rem,4vw,3.15rem);
-      line-height:1.02;
+      font-size:clamp(2rem,4vw,3.05rem);
+      line-height:1.03;
       letter-spacing:-.05em;
       color:#f7fff9;
       margin-bottom:14px;
+      max-width:640px;
     }
 
-    .chalk-note p{
+    .chalk-note.clean p{
       color:rgba(235,248,241,.88);
       line-height:1.85;
       font-size:1rem;
-      max-width:620px;
+      max-width:610px;
     }
 
-    .chalk-line{
-      width:100%;
-      height:1px;
-      margin:24px 0 18px;
-      background:linear-gradient(90deg, rgba(255,255,255,.24), rgba(255,255,255,.04));
-    }
-
-    .chalk-tags{
-      display:flex;
-      flex-wrap:wrap;
+    .board-side-cards{
+      display:grid;
       gap:12px;
+      align-self:stretch;
+    }
+
+    .side-card{
+      background:rgba(255,255,255,.075);
+      border:1px solid rgba(255,255,255,.1);
+      border-radius:18px;
+      padding:16px;
+      backdrop-filter:blur(4px);
+      box-shadow:0 10px 18px rgba(0,0,0,.06);
+    }
+
+    .side-card span{
+      display:block;
+      color:rgba(226,239,233,.72);
+      font-size:.78rem;
+      font-weight:700;
+      margin-bottom:6px;
+      letter-spacing:.03em;
+    }
+
+    .side-card strong{
+      display:block;
+      color:#f4fff8;
+      font-size:1rem;
+      line-height:1.4;
+      letter-spacing:-.02em;
+    }
+
+    .board-bottom{
       position:relative;
       z-index:2;
+      margin-top:20px;
     }
 
-    .chalk-tags span{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      padding:12px 16px;
-      border-radius:16px;
-      font-weight:800;
-      font-size:.92rem;
-      box-shadow:0 8px 16px rgba(0,0,0,.05);
-      border:2px solid rgba(0,0,0,.04);
+    .chalk-tools{
+      display:flex;
+      gap:8px;
+      margin-bottom:10px;
     }
 
-    .chalk-tags span:nth-child(1){
-      background:#fff1a8;
-      color:#55411c;
-      transform:rotate(-2deg);
+    .chalk{
+      width:26px;
+      height:8px;
+      border-radius:999px;
+      display:inline-block;
+      box-shadow:0 2px 6px rgba(0,0,0,.15);
     }
 
-    .chalk-tags span:nth-child(2){
-      background:#d9f0ff;
-      color:#214d63;
-      transform:rotate(1.5deg);
-    }
+    .chalk.white{ background:#f9fbff; }
+    .chalk.yellow{ background:#ffe796; }
+    .chalk.blue{ background:#c9e7ff; }
 
-    .chalk-tags span:nth-child(3){
-      background:#e9ddff;
-      color:#4f3c78;
-      transform:rotate(-1deg);
-    }
-
-    .chalk-tags span:nth-child(4){
-      background:#dff4b9;
-      color:#40572c;
-      transform:rotate(1deg);
-    }
-
-    .doodle-star,
-    .doodle-arrow,
-    .doodle-circle{
-      position:absolute;
-      z-index:2;
-      opacity:.75;
-      pointer-events:none;
-    }
-
-    .doodle-star{
-      top:118px;
-      right:42px;
-      color:rgba(255,255,255,.88);
-      font-size:1.5rem;
-      transform:rotate(14deg);
-    }
-
-    .doodle-arrow{
-      bottom:88px;
-      right:54px;
-      color:rgba(255,255,255,.68);
-      font-size:1.35rem;
-      transform:rotate(8deg);
-    }
-
-    .doodle-circle{
-      top:168px;
-      right:82px;
-      width:54px;
-      height:54px;
-      border:2px dashed rgba(255,255,255,.3);
-      border-radius:50%;
+    .board-bottom-line{
+      width:100%;
+      height:6px;
+      border-radius:999px;
+      background:linear-gradient(90deg, rgba(255,255,255,.18), rgba(255,255,255,.04));
     }
 
     /* SECCIONES */
@@ -882,33 +801,13 @@ chat, me podes ayudar a rediseñar la aprte de estetica de panel, html. acutlamn
       }
     }
 
-    @media (max-width: 900px){
-      .title-cutouts{
-        position:relative;
-        top:auto;
-        left:auto;
-        transform:none;
-        width:100%;
-        margin-bottom:10px;
+    @media (max-width: 980px){
+      .board-content{
+        grid-template-columns:1fr;
       }
 
-      .board-wrap{
-        padding-top:0;
-      }
-
-      .board{
-        padding:24px 24px 24px;
-        min-height:auto;
-      }
-
-      .string{
-        display:none;
-      }
-
-      .doodle-star,
-      .doodle-arrow,
-      .doodle-circle{
-        display:none;
+      .board-side-cards{
+        grid-template-columns:1fr;
       }
     }
 
@@ -939,32 +838,17 @@ chat, me podes ayudar a rediseñar la aprte de estetica de panel, html. acutlamn
       .class-meta{
         grid-template-columns:1fr;
       }
-
-      .chalk-tags{
-        gap:10px;
-      }
-
-      .chalk-tags span{
-        width:100%;
-        justify-content:center;
-      }
     }
 
     @media (max-width: 640px){
-      .title-cutouts span{
-        min-width:40px;
-        height:48px;
-        font-size:.92rem;
-        padding:0 10px;
-      }
-
-      .board{
+      .modern-board{
         border-width:9px;
         border-bottom-width:12px;
-        border-radius:20px;
+        border-radius:22px;
+        padding:18px;
       }
 
-      .chalk-note h1{
+      .chalk-note.clean h1{
         font-size:2rem;
       }
     }
@@ -1002,51 +886,51 @@ chat, me podes ayudar a rediseñar la aprte de estetica de panel, html. acutlamn
 
         <section class="hero-craft">
           <div class="craft-stage">
-            <span class="string left"></span>
-            <span class="string right"></span>
-
             <div class="board-wrap">
-              <div class="title-cutouts" aria-label="Bienvenido al aula">
-                <span>B</span>
-                <span>i</span>
-                <span>e</span>
-                <span>n</span>
-                <span>v</span>
-                <span>e</span>
-                <span>n</span>
-                <span>i</span>
-                <span>d</span>
-                <span>o</span>
-                <span>al</span>
-                <span>a</span>
-                <span>u</span>
-                <span>l</span>
-                <span>a</span>
-              </div>
+              <div class="board-frame-label">EDUVIA</div>
 
-              <div class="board">
-                <div class="chalk-note">
-                  <span class="mini-label">EDUVIA</span>
-                  <h1>Entrá con una duda. Salí entendiendo.</h1>
-                  <p>
-                    Este espacio está pensado para que aprender se sienta más cercano,
-                    más visual y mucho más claro. La IA te acompaña como si fuera un profe:
-                    explica paso a paso, usa la pizarra y adapta la clase a tu ritmo.
-                  </p>
+              <div class="board modern-board">
+                <div class="board-topbar">
+                  <span class="board-dot"></span>
+                  <span class="board-dot"></span>
+                  <span class="board-dot"></span>
+                </div>
 
-                  <div class="chalk-line"></div>
+                <div class="board-content">
+                  <div class="chalk-note clean">
+                    <span class="mini-label">Espacio de estudio</span>
+                    <h1>Aprendé con una clase más clara, visual y enfocada.</h1>
+                    <p>
+                      Eduvia transforma el estudio en una experiencia más guiada y comprensible.
+                      La IA explica paso a paso, adapta el ritmo y utiliza apoyo visual para que
+                      cada tema se entienda mejor.
+                    </p>
+                  </div>
 
-                  <div class="chalk-tags">
-                    <span>🖍️ Pizarra en vivo</span>
-                    <span>🧠 Explicación a tu ritmo</span>
-                    <span>📘 Paso a paso</span>
-                    <span>🎓 Como una clase real</span>
+                  <div class="board-side-cards">
+                    <div class="side-card">
+                      <span>Modalidad</span>
+                      <strong>Clase guiada con IA</strong>
+                    </div>
+                    <div class="side-card">
+                      <span>Apoyo visual</span>
+                      <strong>Pizarra interactiva</strong>
+                    </div>
+                    <div class="side-card">
+                      <span>Objetivo</span>
+                      <strong>Entender mejor</strong>
+                    </div>
                   </div>
                 </div>
 
-                <div class="doodle-star">✦</div>
-                <div class="doodle-arrow">↘</div>
-                <div class="doodle-circle"></div>
+                <div class="board-bottom">
+                  <div class="chalk-tools">
+                    <span class="chalk white"></span>
+                    <span class="chalk yellow"></span>
+                    <span class="chalk blue"></span>
+                  </div>
+                  <div class="board-bottom-line"></div>
+                </div>
               </div>
             </div>
           </div>
@@ -1244,8 +1128,8 @@ chat, me podes ayudar a rediseñar la aprte de estetica de panel, html. acutlamn
       </div>
     </main>
   </div>
+
   <script type="module" src="panel-auth.js?v=1"></script>
   <script type="module" src="owner-access-guard.js"></script>
-<script type="module" src="panel-auth.js?v=1"></script>
 </body>
 </html>
