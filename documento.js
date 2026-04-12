@@ -312,11 +312,11 @@ function hasRealStructuredDoc(obj) {
 
   return Boolean(
     limpiarTexto(obj.resumen) ||
-    limpiarTexto(obj.explicacion) ||
-    limpiarTexto(obj.ejemplo) ||
-    limpiarTexto(obj.cierre) ||
-    puntosClave.length ||
-    preguntas.length
+      limpiarTexto(obj.explicacion) ||
+      limpiarTexto(obj.ejemplo) ||
+      limpiarTexto(obj.cierre) ||
+      puntosClave.length ||
+      preguntas.length
   );
 }
 
@@ -1756,6 +1756,7 @@ async function runSelectionAction(action = "mejorar", label = "Mejorar") {
       },
       body: JSON.stringify({
         pregunta: getDocumentAssistantQuestion(action, currentSelectedText),
+        accion: action,
         tituloDocumento: limpiarTexto(docTitle?.textContent || ""),
         objetivoDocumento: stripObjectivePrefix(
           limpiarTexto(docObjective?.textContent || "")
