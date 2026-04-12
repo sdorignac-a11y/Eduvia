@@ -1450,6 +1450,277 @@
       background:#d7dce2;
       border-radius:999px;
     }
+    .study-flip-card{
+  perspective:1200px;
+  min-height:240px;
+  cursor:pointer;
+}
+
+.study-flip-inner{
+  position:relative;
+  width:100%;
+  min-height:240px;
+  transform-style:preserve-3d;
+  transition:transform .55s ease;
+}
+
+.study-flip-card.is-flipped .study-flip-inner{
+  transform:rotateY(180deg);
+}
+
+.study-flip-face{
+  position:absolute;
+  inset:0;
+  backface-visibility:hidden;
+  border:1px solid #e7ebf0;
+  border-radius:20px;
+  background:#fff;
+  padding:18px;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  gap:14px;
+  box-shadow:0 6px 20px rgba(15,23,42,.05);
+}
+
+.study-flip-face.back{
+  transform:rotateY(180deg);
+  background:linear-gradient(180deg,#f8fbff 0%, #eef5ff 100%);
+}
+
+.study-flip-top{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+
+.study-flip-top h4{
+  margin:0;
+  font-size:1rem;
+  color:#202124;
+}
+
+.study-flip-hint{
+  font-size:.78rem;
+  font-weight:800;
+  color:#0b57d0;
+  background:#e8f0fe;
+  padding:6px 10px;
+  border-radius:999px;
+}
+
+.study-question{
+  font-size:1rem;
+  font-weight:800;
+  line-height:1.55;
+  color:#202124;
+}
+
+.study-solution{
+  font-size:.95rem;
+  line-height:1.7;
+  color:#4b5563;
+}
+
+.study-options{
+  display:grid;
+  gap:10px;
+  margin-top:10px;
+}
+
+.study-option-btn,
+.study-tf-btn,
+.study-check-btn,
+.study-reveal-btn,
+.study-keyword-btn{
+  border:none;
+  border-radius:14px;
+  padding:12px 14px;
+  font-size:.92rem;
+  font-weight:700;
+  cursor:pointer;
+  transition:.18s ease;
+}
+
+.study-option-btn,
+.study-tf-btn{
+  width:100%;
+  text-align:left;
+  background:#f8fafc;
+  color:#334155;
+  border:1px solid #e5eaf1;
+}
+
+.study-option-btn:hover,
+.study-tf-btn:hover{
+  background:#f1f5f9;
+  transform:translateY(-1px);
+}
+
+.study-option-btn.is-correct,
+.study-tf-btn.is-correct{
+  background:#ecfdf3;
+  border-color:#b7ebc6;
+  color:#166534;
+}
+
+.study-option-btn.is-wrong,
+.study-tf-btn.is-wrong{
+  background:#fef2f2;
+  border-color:#fecaca;
+  color:#b91c1c;
+}
+
+.study-feedback{
+  margin-top:12px;
+  padding:12px 14px;
+  border-radius:14px;
+  background:#f8fafc;
+  color:#475569;
+  line-height:1.65;
+  border:1px solid #e7ebf0;
+}
+
+.study-feedback strong{
+  display:block;
+  margin-bottom:6px;
+  color:#202124;
+}
+
+.study-answer-row{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:12px;
+}
+
+.study-answer-input{
+  flex:1;
+  min-width:220px;
+  height:46px;
+  border:1px solid #dbe2ea;
+  border-radius:14px;
+  padding:0 14px;
+  outline:none;
+  background:#fff;
+}
+
+.study-answer-input:focus{
+  border-color:#1a73e8;
+  box-shadow:0 0 0 4px rgba(26,115,232,.10);
+}
+
+.study-check-btn{
+  background:#1a73e8;
+  color:#fff;
+}
+
+.study-check-btn:hover{
+  background:#1565d8;
+}
+
+.study-reveal-btn{
+  background:#eef2f7;
+  color:#334155;
+}
+
+.study-reveal-btn:hover{
+  background:#e2e8f0;
+}
+
+.study-complete-result{
+  margin-top:12px;
+  padding:12px 14px;
+  border-radius:14px;
+  font-weight:700;
+  line-height:1.6;
+}
+
+.study-complete-result.ok{
+  background:#ecfdf3;
+  color:#166534;
+  border:1px solid #b7ebc6;
+}
+
+.study-complete-result.bad{
+  background:#fef2f2;
+  color:#b91c1c;
+  border:1px solid #fecaca;
+}
+
+.study-keywords-wrap{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+}
+
+.study-keyword-btn{
+  background:#eef2ff;
+  color:#4338ca;
+}
+
+.study-keyword-btn:hover{
+  background:#e0e7ff;
+  transform:translateY(-1px);
+}
+
+.study-keyword-context{
+  margin-top:14px;
+  padding:14px;
+  border-radius:16px;
+  background:#f8fafc;
+  border:1px solid #e7ebf0;
+  color:#475569;
+  line-height:1.7;
+}
+
+.study-checklist{
+  display:grid;
+  gap:10px;
+}
+
+.study-check-item{
+  display:flex;
+  align-items:flex-start;
+  gap:10px;
+  padding:12px 14px;
+  border:1px solid #e7ebf0;
+  border-radius:16px;
+  background:#fff;
+}
+
+.study-check-item input{
+  margin-top:4px;
+  width:16px;
+  height:16px;
+}
+
+.study-check-item span{
+  color:#475569;
+  line-height:1.65;
+}
+
+@media (max-width:760px){
+  .study-flip-card,
+  .study-flip-inner{
+    min-height:220px;
+  }
+
+  .study-flip-face{
+    min-height:220px;
+    padding:16px;
+  }
+
+  .study-answer-row{
+    flex-direction:column;
+  }
+
+  .study-answer-input{
+    min-width:0;
+    width:100%;
+  }
+}
   </style>
 </head>
 <body>
@@ -2131,6 +2402,127 @@
         triggerEditorInput();
       }
 
+      studyContent?.addEventListener("click", (event) => {
+  const flipCard = event.target.closest("[data-flip-card]");
+  if (flipCard) {
+    flipCard.classList.toggle("is-flipped");
+    return;
+  }
+
+  const quizOption = event.target.closest("[data-quiz-option]");
+  if (quizOption) {
+    const card = quizOption.closest("[data-quiz-card]");
+    if (!card || card.dataset.answered === "true") return;
+
+    card.dataset.answered = "true";
+
+    const allOptions = Array.from(card.querySelectorAll("[data-quiz-option]"));
+    const feedback = card.querySelector("[data-quiz-feedback]");
+    const isCorrect = quizOption.dataset.correct === "true";
+
+    allOptions.forEach((btn) => {
+      const btnCorrect = btn.dataset.correct === "true";
+      btn.disabled = true;
+      if (btnCorrect) btn.classList.add("is-correct");
+      else if (btn === quizOption && !isCorrect) btn.classList.add("is-wrong");
+    });
+
+    if (feedback) {
+      feedback.classList.remove("hidden");
+      feedback.querySelector("strong").textContent = isCorrect ? "¡Correcto!" : "Incorrecto";
+    }
+
+    return;
+  }
+
+  const tfChoice = event.target.closest("[data-tf-choice]");
+  if (tfChoice) {
+    const card = tfChoice.closest("[data-tf-card]");
+    if (!card || card.dataset.answered === "true") return;
+
+    card.dataset.answered = "true";
+
+    const answer = card.dataset.answer;
+    const choice = tfChoice.dataset.tfChoice;
+    const buttons = Array.from(card.querySelectorAll("[data-tf-choice]"));
+    const feedback = card.querySelector("[data-tf-feedback]");
+    const isCorrect = choice === answer;
+
+    buttons.forEach((btn) => {
+      btn.disabled = true;
+      if (btn.dataset.tfChoice === answer) btn.classList.add("is-correct");
+      else if (btn === tfChoice && !isCorrect) btn.classList.add("is-wrong");
+    });
+
+    if (feedback) {
+      feedback.classList.remove("hidden");
+      feedback.querySelector("strong").textContent = isCorrect ? "¡Bien!" : "No exactamente";
+    }
+
+    return;
+  }
+
+  const checkComplete = event.target.closest("[data-check-complete]");
+  if (checkComplete) {
+    const card = checkComplete.closest("[data-complete-card]");
+    if (!card) return;
+
+    const input = card.querySelector("[data-complete-input]");
+    const result = card.querySelector("[data-complete-result]");
+    const answer = normalizeCompareText(card.dataset.answer || "");
+    const guess = normalizeCompareText(input?.value || "");
+
+    if (!result) return;
+
+    result.classList.remove("hidden", "ok", "bad");
+
+    if (!guess) {
+      result.classList.add("bad");
+      result.textContent = "Escribí una respuesta antes de revisar.";
+      return;
+    }
+
+    const isCorrect =
+      guess === answer ||
+      guess.includes(answer) ||
+      answer.includes(guess);
+
+    if (isCorrect) {
+      result.classList.add("ok");
+      result.textContent = "¡Correcto! Muy bien.";
+    } else {
+      result.classList.add("bad");
+      result.textContent = "Todavía no. Probá de nuevo o tocá “Mostrar respuesta”.";
+    }
+
+    return;
+  }
+
+  const revealComplete = event.target.closest("[data-reveal-complete]");
+  if (revealComplete) {
+    const card = revealComplete.closest("[data-complete-card]");
+    if (!card) return;
+
+    const result = card.querySelector("[data-complete-result]");
+    if (!result) return;
+
+    result.classList.remove("hidden", "ok", "bad");
+    result.classList.add("ok");
+    result.textContent = `Respuesta: ${card.dataset.answer || ""}`;
+    return;
+  }
+
+  const keywordChip = event.target.closest("[data-keyword-chip]");
+  if (keywordChip) {
+    const wrap = keywordChip.closest(".study-card");
+    const preview = wrap?.querySelector("[data-keyword-preview]");
+    if (!preview) return;
+
+    preview.classList.remove("hidden");
+    preview.innerHTML = `<strong>${keywordChip.textContent}</strong><br>${keywordChip.dataset.keywordContext || ""}`;
+  }
+});
+
       function refreshToolbarState() {
         const commands = new Set([
           "bold",
@@ -2273,213 +2665,380 @@
         studyModal?.classList.remove("show");
       }
 
-      function renderFlashcards(data) {
-        const cards = data.sections.slice(0, 8).map((section, index) => ({
-          front: section.title === "Introducción"
-            ? "¿Cuál es la idea principal del documento?"
-            : `¿Qué explica la sección "${section.title}"?`,
-          back: section.items.slice(0, 2).join(" ")
-        }));
+function shuffleArray(items = []) {
+  const copy = [...items];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
 
-        if (!cards.length) {
-          studyContent.innerHTML = `<div class="study-empty">No hay suficiente contenido para crear tarjetas todavía.</div>`;
-          return;
-        }
+function normalizeCompareText(value = "") {
+  return cleanText(value)
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^\w\s]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
 
-        studyContent.innerHTML = `
-          <div class="study-grid">
-            ${cards.map((card, index) => `
-              <article class="study-card">
+function shortenText(text = "", max = 120) {
+  const value = cleanText(text);
+  if (value.length <= max) return value;
+  return `${value.slice(0, max).trim()}...`;
+}
+
+function getContentPool(data) {
+  const pool = [];
+
+  data.sections.forEach((section) => {
+    section.items.forEach((item) => {
+      const clean = cleanText(item);
+      if (clean) pool.push(clean);
+    });
+  });
+
+  data.sentences.forEach((sentence) => {
+    const clean = cleanText(sentence);
+    if (clean) pool.push(clean);
+  });
+
+  return [...new Set(pool)];
+}
+
+function buildQuizQuestions(data) {
+  const pool = getContentPool(data);
+
+  return data.sections.slice(0, 5).map((section, index) => {
+    const correctBase =
+      cleanText(section.items[0] || "") ||
+      cleanText(data.sentences[index] || "") ||
+      `La sección desarrolla ${section.title}.`;
+
+    const otherPool = pool.filter((item) => item !== correctBase);
+    const distractors = shuffleArray(otherPool)
+      .slice(0, 3)
+      .map((item) => shortenText(item, 95));
+
+    while (distractors.length < 3) {
+      distractors.push(`Opción alternativa ${distractors.length + 1}`);
+    }
+
+    const options = shuffleArray([
+      { text: shortenText(correctBase, 95), correct: true },
+      ...distractors.map((text) => ({ text, correct: false })),
+    ]);
+
+    return {
+      title: section.title || `Sección ${index + 1}`,
+      question: `¿Cuál describe mejor la sección "${section.title || `Sección ${index + 1}`}"?`,
+      explanation: correctBase,
+      options,
+    };
+  }).filter((item) => item.explanation);
+}
+
+function buildTrueFalseItems(data) {
+  return data.sentences.slice(0, 6).map((sentence, index) => {
+    const isTrue = index % 2 === 0;
+    return {
+      text: isTrue ? sentence : negateSentence(sentence),
+      answer: isTrue ? "verdadero" : "falso",
+      explanation: sentence
+    };
+  });
+}
+
+function buildCompleteItems(data) {
+  return data.sentences.slice(0, 6).map((sentence) => {
+    const keyword = pickKeyword(sentence);
+    if (!keyword) return null;
+
+    const regex = new RegExp(`\\b${keyword}\\b`, "i");
+    return {
+      prompt: sentence.replace(regex, "_____"),
+      answer: keyword,
+      original: sentence
+    };
+  }).filter(Boolean);
+}
+
+function renderFlashcards(data) {
+  const cards = data.sections.slice(0, 8).map((section, index) => ({
+    front: section.title === "Introducción"
+      ? "¿Cuál es la idea principal del documento?"
+      : `¿Qué explica la sección "${section.title}"?`,
+    back: section.items.slice(0, 2).join(" ")
+  })).filter((card) => cleanText(card.back));
+
+  if (!cards.length) {
+    studyContent.innerHTML = `<div class="study-empty">No hay suficiente contenido para crear tarjetas todavía.</div>`;
+    return;
+  }
+
+  studyContent.innerHTML = `
+    <div class="study-grid">
+      ${cards.map((card, index) => `
+        <article class="study-flip-card" data-flip-card>
+          <div class="study-flip-inner">
+            <div class="study-flip-face front">
+              <div class="study-flip-top">
                 <h4>Tarjeta ${index + 1}</h4>
-                <div class="flashcard-front">${card.front}</div>
-                <div class="flashcard-back">${card.back}</div>
-              </article>
-            `).join("")}
-          </div>
-        `;
-      }
-
-      function renderQuiz(data) {
-        const questions = data.sections.slice(0, 6).map((section, index) => ({
-          question: `Pregunta ${index + 1}: explicá con tus palabras "${section.title}".`,
-          answer: section.items.slice(0, 2).join(" ")
-        }));
-
-        if (!questions.length) {
-          studyContent.innerHTML = `<div class="study-empty">No hay suficiente contenido para generar preguntas.</div>`;
-          return;
-        }
-
-        studyContent.innerHTML = questions.map((item) => `
-          <div class="study-qa">
-            <strong>${item.question}</strong>
-            <div class="study-answer">${item.answer}</div>
-          </div>
-        `).join("");
-      }
-
-      function renderTrueFalse(data) {
-        const statements = data.sentences.slice(0, 6).map((sentence, index) => {
-          const isTrue = index % 2 === 0;
-          return {
-            text: isTrue ? sentence : negateSentence(sentence),
-            answer: isTrue ? "Verdadero" : "Falso"
-          };
-        });
-
-        if (!statements.length) {
-          studyContent.innerHTML = `<div class="study-empty">No hay suficiente texto para crear este ejercicio.</div>`;
-          return;
-        }
-
-        studyContent.innerHTML = statements.map((item, index) => `
-          <div class="study-qa">
-            <strong>${index + 1}. ${item.text}</strong>
-            <div class="study-answer">Respuesta: ${item.answer}</div>
-          </div>
-        `).join("");
-      }
-
-      function renderComplete(data) {
-        const items = data.sentences.slice(0, 6).map((sentence) => {
-          const keyword = pickKeyword(sentence);
-          if (!keyword) return null;
-
-          const regex = new RegExp(`\\b${keyword}\\b`, "i");
-          return {
-            question: sentence.replace(regex, "_____"),
-            answer: keyword
-          };
-        }).filter(Boolean);
-
-        if (!items.length) {
-          studyContent.innerHTML = `<div class="study-empty">No se encontraron palabras clave suficientes para completar conceptos.</div>`;
-          return;
-        }
-
-        studyContent.innerHTML = items.map((item, index) => `
-          <div class="study-qa">
-            <strong>${index + 1}. ${item.question}</strong>
-            <div class="study-answer">Respuesta: ${item.answer}</div>
-          </div>
-        `).join("");
-      }
-
-      function renderSummary(data) {
-        const bullets = [];
-
-        if (data.objective) bullets.push(`Objetivo principal: ${data.objective}`);
-        data.sections.slice(0, 5).forEach((section) => {
-          const first = section.items[0];
-          if (first) bullets.push(`${section.title}: ${first}`);
-        });
-
-        if (!bullets.length && data.allText) {
-          bullets.push(...data.sentences.slice(0, 5));
-        }
-
-        if (!bullets.length) {
-          studyContent.innerHTML = `<div class="study-empty">Todavía no hay contenido suficiente para resumir.</div>`;
-          return;
-        }
-
-        studyContent.innerHTML = `
-          <article class="study-card">
-            <h4>Resumen express</h4>
-            <ul>
-              ${bullets.map((item) => `<li>${item}</li>`).join("")}
-            </ul>
-          </article>
-        `;
-      }
-
-      function renderKeywords(data) {
-        const words = new Set();
-
-        data.sections.forEach((section) => {
-          const source = `${section.title} ${section.items.join(" ")}`;
-          const keyword = pickKeyword(source);
-          if (keyword) words.add(keyword);
-        });
-
-        if (words.size < 6) {
-          data.sentences.forEach((sentence) => {
-            const keyword = pickKeyword(sentence);
-            if (keyword) words.add(keyword);
-          });
-        }
-
-        const finalWords = [...words].slice(0, 12);
-
-        if (!finalWords.length) {
-          studyContent.innerHTML = `<div class="study-empty">No se detectaron palabras clave todavía.</div>`;
-          return;
-        }
-
-        studyContent.innerHTML = `
-          <article class="study-card">
-            <h4>Palabras clave del documento</h4>
-            <div>
-              ${finalWords.map((word) => `<span class="study-pill">${word}</span>`).join("")}
+                <span class="study-flip-hint">Tocá para girar</span>
+              </div>
+              <div class="study-question">${card.front}</div>
             </div>
-          </article>
-        `;
+
+            <div class="study-flip-face back">
+              <div class="study-flip-top">
+                <h4>Respuesta</h4>
+                <span class="study-flip-hint">Volver</span>
+              </div>
+              <div class="study-solution">${card.back}</div>
+            </div>
+          </div>
+        </article>
+      `).join("")}
+    </div>
+  `;
+}
+
+function renderQuiz(data) {
+  const questions = buildQuizQuestions(data);
+
+  if (!questions.length) {
+    studyContent.innerHTML = `<div class="study-empty">No hay suficiente contenido para generar preguntas.</div>`;
+    return;
+  }
+
+  studyContent.innerHTML = questions.map((item, index) => `
+    <article class="study-card" data-quiz-card>
+      <h4>Pregunta ${index + 1}</h4>
+      <div class="study-question">${item.question}</div>
+
+      <div class="study-options">
+        ${item.options.map((option) => `
+          <button
+            type="button"
+            class="study-option-btn"
+            data-quiz-option
+            data-correct="${option.correct ? "true" : "false"}"
+          >
+            ${option.text}
+          </button>
+        `).join("")}
+      </div>
+
+      <div class="study-feedback hidden" data-quiz-feedback>
+        <strong>Respuesta correcta</strong>
+        <span>${item.explanation}</span>
+      </div>
+    </article>
+  `).join("");
+}
+
+function renderTrueFalse(data) {
+  const items = buildTrueFalseItems(data);
+
+  if (!items.length) {
+    studyContent.innerHTML = `<div class="study-empty">No hay suficiente texto para crear este ejercicio.</div>`;
+    return;
+  }
+
+  studyContent.innerHTML = items.map((item, index) => `
+    <article class="study-card" data-tf-card data-answer="${item.answer}">
+      <h4>Verdadero o falso ${index + 1}</h4>
+      <div class="study-question">${item.text}</div>
+
+      <div class="study-options">
+        <button type="button" class="study-tf-btn" data-tf-choice="verdadero">Verdadero</button>
+        <button type="button" class="study-tf-btn" data-tf-choice="falso">Falso</button>
+      </div>
+
+      <div class="study-feedback hidden" data-tf-feedback>
+        <strong>Explicación</strong>
+        <span>${item.explanation}</span>
+      </div>
+    </article>
+  `).join("");
+}
+
+function renderComplete(data) {
+  const items = buildCompleteItems(data);
+
+  if (!items.length) {
+    studyContent.innerHTML = `<div class="study-empty">No se encontraron palabras clave suficientes para completar conceptos.</div>`;
+    return;
+  }
+
+  studyContent.innerHTML = items.map((item, index) => `
+    <article class="study-card" data-complete-card data-answer="${item.answer}">
+      <h4>Completar ${index + 1}</h4>
+      <div class="study-question">${item.prompt}</div>
+
+      <div class="study-answer-row">
+        <input
+          type="text"
+          class="study-answer-input"
+          placeholder="Escribí la palabra faltante"
+          data-complete-input
+        >
+        <button type="button" class="study-check-btn" data-check-complete>Revisar</button>
+        <button type="button" class="study-reveal-btn" data-reveal-complete>Mostrar respuesta</button>
+      </div>
+
+      <div class="study-complete-result hidden" data-complete-result></div>
+    </article>
+  `).join("");
+}
+
+function renderSummary(data) {
+  const bullets = [];
+
+  if (data.objective) bullets.push(`Objetivo principal: ${data.objective}`);
+
+  data.sections.slice(0, 5).forEach((section) => {
+    const first = cleanText(section.items[0] || "");
+    if (first) bullets.push(`${section.title}: ${first}`);
+  });
+
+  if (!bullets.length && data.allText) {
+    bullets.push(...data.sentences.slice(0, 5));
+  }
+
+  if (!bullets.length) {
+    studyContent.innerHTML = `<div class="study-empty">Todavía no hay contenido suficiente para resumir.</div>`;
+    return;
+  }
+
+  studyContent.innerHTML = `
+    <article class="study-card">
+      <h4>Resumen express</h4>
+      <div class="study-checklist">
+        ${bullets.map((item, index) => `
+          <label class="study-check-item">
+            <input type="checkbox">
+            <span>${index + 1}. ${item}</span>
+          </label>
+        `).join("")}
+      </div>
+    </article>
+  `;
+}
+
+function renderKeywords(data) {
+  const contexts = [];
+  const words = new Set();
+
+  data.sections.forEach((section) => {
+    const source = `${section.title} ${section.items.join(" ")}`;
+    const keyword = pickKeyword(source);
+    if (keyword && !words.has(keyword)) {
+      words.add(keyword);
+      contexts.push({
+        word: keyword,
+        context: shortenText(section.items[0] || source, 170)
+      });
+    }
+  });
+
+  if (contexts.length < 6) {
+    data.sentences.forEach((sentence) => {
+      const keyword = pickKeyword(sentence);
+      if (keyword && !words.has(keyword)) {
+        words.add(keyword);
+        contexts.push({
+          word: keyword,
+          context: shortenText(sentence, 170)
+        });
       }
+    });
+  }
 
-      function runStudyTool(tool) {
-        const data = getStudyData();
-        currentStudyTool = tool;
+  const finalItems = contexts.slice(0, 12);
 
-        const config = {
-          flashcards: {
-            badge: "Memoria",
-            title: "Tarjetas de memoria",
-            subtitle: "Tarjetas generadas automáticamente a partir de las secciones del documento.",
-            render: renderFlashcards
-          },
-          quiz: {
-            badge: "Práctica",
-            title: "Quiz rápido",
-            subtitle: "Preguntas rápidas para comprobar si entendiste el contenido.",
-            render: renderQuiz
-          },
-          truefalse: {
-            badge: "Juego",
-            title: "Verdadero o falso",
-            subtitle: "Afirmaciones para revisar comprensión del tema.",
-            render: renderTrueFalse
-          },
-          complete: {
-            badge: "Repaso",
-            title: "Completar conceptos",
-            subtitle: "Ejercicios con huecos para entrenar memoria activa.",
-            render: renderComplete
-          },
-          summary: {
-            badge: "Resumen",
-            title: "Resumen express",
-            subtitle: "Versión corta del contenido para repaso rápido.",
-            render: renderSummary
-          },
-          keywords: {
-            badge: "Claves",
-            title: "Palabras clave",
-            subtitle: "Términos más importantes detectados en el documento.",
-            render: renderKeywords
-          }
-        };
+  if (!finalItems.length) {
+    studyContent.innerHTML = `<div class="study-empty">No se detectaron palabras clave todavía.</div>`;
+    return;
+  }
 
-        const selected = config[tool];
-        if (!selected) return;
+  studyContent.innerHTML = `
+    <article class="study-card">
+      <h4>Palabras clave del documento</h4>
+      <div class="study-keywords-wrap">
+        ${finalItems.map((item) => `
+          <button
+            type="button"
+            class="study-keyword-btn"
+            data-keyword-chip
+            data-keyword-context="${item.context.replace(/"/g, "&quot;")}"
+          >
+            ${item.word}
+          </button>
+        `).join("")}
+      </div>
 
-        studyBadge.textContent = selected.badge;
-        studyTitle.textContent = selected.title;
-        studySubtitle.textContent = selected.subtitle;
-        selected.render(data);
-        openStudyModal();
-        closeMoreDropdown();
-        setMoreStatus(`${selected.title} generado.`);
-      }
+      <div class="study-keyword-context hidden" data-keyword-preview></div>
+    </article>
+  `;
+}
+
+function runStudyTool(tool) {
+  const data = getStudyData();
+  currentStudyTool = tool;
+
+  const config = {
+    flashcards: {
+      badge: "Memoria",
+      title: "Tarjetas de memoria",
+      subtitle: "Tarjetas interactivas para tocar y girar.",
+      render: renderFlashcards
+    },
+    quiz: {
+      badge: "Práctica",
+      title: "Quiz rápido",
+      subtitle: "Respondé opciones y recibí corrección instantánea.",
+      render: renderQuiz
+    },
+    truefalse: {
+      badge: "Juego",
+      title: "Verdadero o falso",
+      subtitle: "Elegí una respuesta y comprobá si entendiste bien el texto.",
+      render: renderTrueFalse
+    },
+    complete: {
+      badge: "Repaso",
+      title: "Completar conceptos",
+      subtitle: "Escribí la palabra faltante y revisá tu respuesta.",
+      render: renderComplete
+    },
+    summary: {
+      badge: "Resumen",
+      title: "Resumen express",
+      subtitle: "Checklist corto para marcar lo que ya repasaste.",
+      render: renderSummary
+    },
+    keywords: {
+      badge: "Claves",
+      title: "Palabras clave",
+      subtitle: "Tocá cada término para ver su contexto en el documento.",
+      render: renderKeywords
+    }
+  };
+
+  const selected = config[tool];
+  if (!selected) return;
+
+  studyBadge.textContent = selected.badge;
+  studyTitle.textContent = selected.title;
+  studySubtitle.textContent = selected.subtitle;
+  selected.render(data);
+  openStudyModal();
+  closeMoreDropdown();
+  setMoreStatus(`${selected.title} generado.`);
+}
 
       editableAreas.forEach((area) => {
         area.addEventListener("focus", () => {
