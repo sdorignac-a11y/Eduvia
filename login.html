@@ -8,43 +8,30 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap"
     rel="stylesheet"
   />
 
   <style>
     :root{
-      --bg:#f8f3e8;
-      --paper:#fffdf8;
-      --paper-2:#fff8ee;
-      --paper-3:#fff5e6;
+      --bg:#f6f3ee;
+      --surface:#ffffff;
+      --surface-soft:#fbfaf7;
+      --text:#1f1b24;
+      --muted:#6f6878;
+      --line:#e8e2d9;
 
-      --text:#2b2434;
-      --muted:#6f6577;
+      --primary:#6f5ef7;
+      --primary-dark:#5d4ae8;
+      --primary-soft:#f1eeff;
 
-      --violet:#7c6cf2;
-      --violet-2:#6b5be8;
-      --violet-soft:#efeaff;
+      --shadow-sm:0 8px 22px rgba(28,25,36,.05);
+      --shadow-md:0 18px 40px rgba(28,25,36,.08);
+      --radius-xl:30px;
+      --radius-lg:22px;
+      --radius-md:16px;
 
-      --yellow:#ffe89c;
-      --yellow-soft:#fff4c9;
-
-      --sky:#d8f0ff;
-      --sky-soft:#eef8ff;
-
-      --mint:#def4ba;
-      --orange:#ffb36b;
-      --pink:#ffddea;
-
-      --line:rgba(124,108,242,.12);
-      --line-strong:rgba(124,108,242,.18);
-      --red-line:rgba(255,90,110,.16);
-
-      --shadow:0 18px 40px rgba(63,72,138,.08);
-      --shadow-soft:0 10px 24px rgba(63,72,138,.06);
-      --shadow-strong:0 26px 60px rgba(63,72,138,.12);
-
-      --container:1200px;
+      --container:1180px;
     }
 
     *{
@@ -61,9 +48,8 @@
       font-family:"Inter",sans-serif;
       color:var(--text);
       background:
-        radial-gradient(circle at top left, rgba(255,255,255,.76), transparent 30%),
-        radial-gradient(circle at bottom right, rgba(255,232,156,.22), transparent 24%),
-        var(--bg);
+        radial-gradient(circle at top left, rgba(255,255,255,.85), transparent 26%),
+        linear-gradient(180deg, #faf8f4 0%, var(--bg) 100%);
       overflow-x:hidden;
     }
 
@@ -71,27 +57,12 @@
       content:"";
       position:fixed;
       inset:0;
+      pointer-events:none;
+      opacity:.5;
       background-image:
-        linear-gradient(rgba(124,108,242,.04) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(124,108,242,.04) 1px, transparent 1px);
-      background-size:28px 28px;
-      pointer-events:none;
-      z-index:0;
-      opacity:.65;
-    }
-
-    body::after{
-      content:"";
-      position:fixed;
-      inset:0;
-      background:
-        radial-gradient(circle at 10% 18%, rgba(255,255,255,.45) 0 2px, transparent 2px),
-        radial-gradient(circle at 82% 24%, rgba(255,255,255,.38) 0 2px, transparent 2px),
-        radial-gradient(circle at 28% 84%, rgba(255,255,255,.3) 0 2px, transparent 2px);
-      background-size:180px 180px, 220px 220px, 250px 250px;
-      pointer-events:none;
-      opacity:.35;
-      z-index:0;
+        linear-gradient(rgba(111,94,247,.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(111,94,247,.035) 1px, transparent 1px);
+      background-size:34px 34px;
     }
 
     a{
@@ -121,12 +92,12 @@
       align-items:center;
       justify-content:space-between;
       gap:16px;
-      background:rgba(255,252,245,.88);
-      border:1px solid rgba(255,255,255,.85);
-      box-shadow:var(--shadow-soft);
-      backdrop-filter:blur(14px);
-      border-radius:24px;
       padding:14px 16px;
+      border:1px solid rgba(255,255,255,.9);
+      border-radius:22px;
+      background:rgba(255,255,255,.72);
+      backdrop-filter:blur(12px);
+      box-shadow:var(--shadow-sm);
     }
 
     .brand{
@@ -136,16 +107,16 @@
     }
 
     .brand-mark{
-      width:46px;
-      height:46px;
+      width:44px;
+      height:44px;
       border-radius:14px;
       display:grid;
       place-items:center;
       font-family:"Sora",sans-serif;
       font-weight:800;
       color:#fff;
-      background:linear-gradient(135deg, var(--violet), var(--orange));
-      box-shadow:0 12px 24px rgba(124,108,242,.2);
+      background:linear-gradient(135deg, var(--primary), #8f7dff);
+      box-shadow:0 12px 24px rgba(111,94,247,.22);
       flex:none;
     }
 
@@ -158,9 +129,9 @@
 
     .brand-text span{
       display:block;
-      color:var(--muted);
-      font-size:.83rem;
       margin-top:2px;
+      color:var(--muted);
+      font-size:.82rem;
     }
 
     .nav-actions{
@@ -176,12 +147,12 @@
       justify-content:center;
       gap:10px;
       border:none;
-      text-decoration:none;
-      cursor:pointer;
-      font-family:inherit;
-      font-weight:800;
       border-radius:999px;
-      padding:13px 18px;
+      padding:12px 18px;
+      font-family:inherit;
+      font-size:.94rem;
+      font-weight:700;
+      cursor:pointer;
       transition:.2s ease;
       white-space:nowrap;
     }
@@ -190,362 +161,200 @@
       transform:translateY(-2px);
     }
 
-    .btn-primary{
-      color:#fff;
-      background:linear-gradient(135deg, var(--violet), var(--orange));
-      box-shadow:0 14px 28px rgba(124,108,242,.16);
+    .btn-soft{
+      color:var(--text);
+      background:#fff;
+      border:1px solid var(--line);
+      box-shadow:var(--shadow-sm);
     }
 
-    .btn-soft{
-      color:var(--violet);
-      background:#efeaff;
-      border:1px solid rgba(124,108,242,.08);
+    .btn-primary{
+      color:#fff;
+      background:linear-gradient(135deg, var(--primary), var(--primary-dark));
+      box-shadow:0 14px 28px rgba(111,94,247,.22);
     }
 
     .main{
       flex:1;
       display:flex;
       align-items:center;
-      padding:18px 0 28px;
+      padding:18px 0 32px;
     }
 
-    .auth-layout{
+    .auth-shell{
       display:grid;
-      grid-template-columns:1.02fr .98fr;
+      grid-template-columns:1.05fr .95fr;
       gap:22px;
       align-items:stretch;
     }
 
     .intro-panel,
-    .login-panel{
-      position:relative;
-      overflow:hidden;
-      border-radius:34px;
-      box-shadow:var(--shadow);
-      border:1px solid rgba(255,255,255,.84);
-      background:linear-gradient(180deg, rgba(255,253,248,.94), rgba(255,248,238,.94));
+    .form-panel{
+      border-radius:var(--radius-xl);
+      background:rgba(255,255,255,.78);
+      border:1px solid rgba(255,255,255,.92);
+      box-shadow:var(--shadow-md);
+      backdrop-filter:blur(12px);
     }
 
     .intro-panel{
-      padding:26px;
-    }
-
-    .intro-panel::before,
-    .login-panel::before{
-      content:"";
-      position:absolute;
-      inset:0;
-      pointer-events:none;
-      background:
-        radial-gradient(circle at top left, rgba(255,255,255,.82), transparent 24%),
-        radial-gradient(circle at bottom right, rgba(255,232,156,.16), transparent 20%);
-    }
-
-    .intro-inner,
-    .login-inner{
-      position:relative;
-      z-index:1;
-    }
-
-    .intro-top{
+      padding:34px;
       display:flex;
-      align-items:flex-start;
-      justify-content:space-between;
-      gap:16px;
-      flex-wrap:wrap;
-      margin-bottom:18px;
+      align-items:center;
     }
 
-    .intro-chip{
+    .intro-inner{
+      max-width:560px;
+    }
+
+    .eyebrow{
       display:inline-flex;
       align-items:center;
       gap:8px;
-      padding:10px 14px;
+      padding:9px 13px;
       border-radius:999px;
-      background:var(--violet-soft);
-      border:1px solid rgba(124,108,242,.12);
-      color:#6b5ee8;
-      font-size:.84rem;
+      background:var(--primary-soft);
+      color:var(--primary);
+      border:1px solid rgba(111,94,247,.08);
+      font-size:.83rem;
       font-weight:800;
-      box-shadow:var(--shadow-soft);
+      margin-bottom:18px;
     }
 
-    .intro-chip::before{
+    .eyebrow::before{
       content:"";
       width:8px;
       height:8px;
       border-radius:50%;
-      background:linear-gradient(135deg, var(--violet), var(--orange));
+      background:linear-gradient(135deg, var(--primary), #8f7dff);
       display:block;
     }
 
-    .mini-tags{
-      display:flex;
-      flex-wrap:wrap;
-      gap:10px;
-    }
-
-    .mini-tag{
-      padding:9px 13px;
-      border-radius:999px;
-      background:rgba(255,255,255,.8);
-      border:1px solid rgba(124,108,242,.1);
-      color:#5f5670;
-      font-size:.82rem;
-      font-weight:800;
-      box-shadow:var(--shadow-soft);
-    }
-
-    .intro-copy{
-      background:linear-gradient(180deg, #fffdf8 0%, #fff8ee 100%);
-      border:1px solid rgba(124,108,242,.08);
-      border-radius:28px;
-      padding:28px 26px;
-      box-shadow:var(--shadow-soft);
-      position:relative;
-      overflow:hidden;
-      margin-bottom:18px;
-    }
-
-    .intro-copy::before{
-      content:"";
-      position:absolute;
-      inset:0;
-      background-image:linear-gradient(transparent 35px, rgba(124,108,242,.04) 36px);
-      background-size:100% 36px;
-      pointer-events:none;
-      opacity:.92;
-    }
-
-    .intro-copy::after{
-      content:"";
-      position:absolute;
-      left:22px;
-      top:0;
-      bottom:0;
-      width:2px;
-      background:var(--red-line);
-      pointer-events:none;
-    }
-
-    .copy-inner{
-      position:relative;
-      z-index:1;
-      padding-left:16px;
-    }
-
-    .copy-inner h1{
+    .intro-title{
       font-family:"Sora",sans-serif;
-      font-size:clamp(2rem,4vw,3rem);
-      line-height:1.03;
-      letter-spacing:-.05em;
+      font-size:clamp(2rem, 4vw, 3.25rem);
+      line-height:1.02;
+      letter-spacing:-.055em;
       margin-bottom:14px;
-      max-width:620px;
     }
 
-    .copy-inner h1 span{
-      color:var(--violet);
+    .intro-title span{
+      color:var(--primary);
     }
 
-    .copy-inner p{
+    .intro-text{
       color:var(--muted);
-      line-height:1.85;
       font-size:1rem;
-      max-width:620px;
-      margin-bottom:18px;
+      line-height:1.85;
+      max-width:520px;
+      margin-bottom:24px;
     }
 
-    .feature-row{
-      display:flex;
-      flex-wrap:wrap;
-      gap:10px;
+    .feature-list{
+      display:grid;
+      gap:12px;
+      margin-bottom:24px;
     }
 
     .feature{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      padding:11px 14px;
-      border-radius:15px;
-      background:#fff;
-      border:1px solid rgba(124,108,242,.1);
-      color:#514864;
-      font-size:.9rem;
-      font-weight:800;
-      box-shadow:var(--shadow-soft);
+      display:flex;
+      align-items:flex-start;
+      gap:12px;
+      padding:14px 16px;
+      border-radius:18px;
+      background:rgba(255,255,255,.9);
+      border:1px solid var(--line);
+      box-shadow:var(--shadow-sm);
     }
 
-    .cards-grid{
-      display:grid;
-      grid-template-columns:repeat(3,1fr);
-      gap:14px;
+    .feature-dot{
+      width:11px;
+      height:11px;
+      border-radius:50%;
+      background:linear-gradient(135deg, var(--primary), #8f7dff);
+      margin-top:6px;
+      flex:none;
     }
 
-    .info-card{
-      border-radius:22px;
-      padding:20px;
-      box-shadow:0 14px 26px rgba(63,72,138,.08);
-      overflow:hidden;
-      border:2px solid rgba(0,0,0,.05);
-      position:relative;
-    }
-
-    .info-card:nth-child(1){
-      background:#fff1a8;
-      transform:rotate(-1deg);
-    }
-
-    .info-card:nth-child(2){
-      background:#d9f0ff;
-      transform:rotate(.8deg);
-    }
-
-    .info-card:nth-child(3){
-      background:#eadfff;
-      transform:rotate(-.7deg);
-    }
-
-    .info-card::before{
-      content:"";
-      position:absolute;
-      inset:0;
-      background-image:linear-gradient(transparent 31px, rgba(124,108,242,.045) 32px);
-      background-size:100% 32px;
-      pointer-events:none;
-      opacity:.9;
-    }
-
-    .info-card::after{
-      content:"";
-      position:absolute;
-      left:18px;
-      top:0;
-      bottom:0;
-      width:2px;
-      background:rgba(255,90,110,.22);
-      pointer-events:none;
-    }
-
-    .info-inner-card{
-      position:relative;
-      z-index:1;
-      padding-left:16px;
-      padding-top:6px;
-    }
-
-    .info-icon{
-      width:42px;
-      height:42px;
-      border-radius:14px;
-      display:grid;
-      place-items:center;
-      background:#fff;
-      border:2px solid rgba(124,108,242,.18);
-      color:var(--violet);
-      font-weight:800;
-      font-family:"Sora",sans-serif;
-      margin-bottom:12px;
-      box-shadow:0 8px 18px rgba(124,108,242,.08);
-    }
-
-    .info-inner-card strong{
+    .feature strong{
       display:block;
-      font-family:"Sora",sans-serif;
-      font-size:1rem;
-      line-height:1.3;
+      font-size:.95rem;
+      margin-bottom:4px;
       letter-spacing:-.02em;
-      margin-bottom:6px;
-      color:#2e2737;
     }
 
-    .info-inner-card p{
-      color:#4f5a6f;
-      font-size:.92rem;
-      line-height:1.7;
+    .feature p{
+      color:var(--muted);
+      font-size:.9rem;
+      line-height:1.6;
     }
 
-    .login-panel{
+    .intro-actions{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+
+    .form-panel{
       padding:22px;
       display:flex;
       align-items:center;
-      box-shadow:var(--shadow-strong);
     }
 
-    .login-card{
+    .form-card{
       width:100%;
-      background:linear-gradient(180deg, #fffdf8 0%, #fff8ef 100%);
-      border:1px solid rgba(124,108,242,.08);
-      border-radius:30px;
+      background:linear-gradient(180deg, #ffffff 0%, var(--surface-soft) 100%);
+      border:1px solid var(--line);
+      border-radius:26px;
       padding:28px 24px 24px;
-      box-shadow:var(--shadow-soft);
-      position:relative;
-      overflow:hidden;
+      box-shadow:var(--shadow-sm);
     }
 
-    .login-card::before{
-      content:"";
-      position:absolute;
-      inset:0;
-      background:
-        radial-gradient(circle at top right, rgba(124,108,242,.07), transparent 26%),
-        radial-gradient(circle at bottom left, rgba(255,179,107,.08), transparent 24%);
-      pointer-events:none;
-    }
-
-    .login-head{
-      position:relative;
-      z-index:1;
-      margin-bottom:18px;
-    }
-
-    .login-badge{
+    .form-badge{
       display:inline-flex;
       align-items:center;
       gap:8px;
-      padding:9px 13px;
+      padding:8px 12px;
       border-radius:999px;
       background:#fff;
-      border:1px solid rgba(124,108,242,.12);
-      color:var(--violet);
-      font-size:.83rem;
+      border:1px solid var(--line);
+      color:var(--primary);
+      font-size:.82rem;
       font-weight:800;
-      box-shadow:var(--shadow-soft);
-      margin-bottom:14px;
+      margin-bottom:16px;
     }
 
-    .login-badge::before{
+    .form-badge::before{
       content:"";
       width:8px;
       height:8px;
       border-radius:50%;
-      background:linear-gradient(135deg, var(--violet), var(--orange));
+      background:linear-gradient(135deg, var(--primary), #8f7dff);
       display:block;
     }
 
-    .login-head h2{
+    .form-title{
       font-family:"Sora",sans-serif;
-      font-size:clamp(1.8rem,3vw,2.4rem);
-      line-height:1.05;
+      font-size:clamp(1.8rem, 3vw, 2.4rem);
+      line-height:1.04;
       letter-spacing:-.05em;
       margin-bottom:10px;
     }
 
-    .login-head h2 span{
-      color:var(--violet);
+    .form-title span{
+      color:var(--primary);
     }
 
-    .login-head p{
+    .form-subtitle{
       color:var(--muted);
       line-height:1.8;
-      max-width:460px;
+      margin-bottom:22px;
+      max-width:450px;
     }
 
     .form{
-      position:relative;
-      z-index:1;
       display:grid;
       gap:14px;
-      margin-top:18px;
     }
 
     .field{
@@ -556,29 +365,28 @@
 
     .field label{
       font-size:.9rem;
-      font-weight:800;
-      color:#2d2737;
+      font-weight:700;
+      color:#2b2434;
     }
 
     .input{
       width:100%;
       height:56px;
       border-radius:18px;
-      border:1px solid rgba(124,108,242,.14);
-      background:rgba(255,255,255,.9);
+      border:1px solid var(--line);
+      background:#fff;
       padding:0 16px;
+      font-family:inherit;
       font-size:.95rem;
       color:var(--text);
       outline:none;
       transition:.2s ease;
-      box-shadow:0 8px 18px rgba(18,24,40,.03);
-      font-family:inherit;
+      box-shadow:0 6px 14px rgba(20,18,28,.03);
     }
 
     .input:focus{
-      border-color:#b9c7ff;
-      box-shadow:0 0 0 4px rgba(106,92,255,.10);
-      background:#fff;
+      border-color:#c7befd;
+      box-shadow:0 0 0 4px rgba(111,94,247,.10);
     }
 
     .input::placeholder{
@@ -600,17 +408,16 @@
       gap:9px;
       color:var(--muted);
       font-size:.88rem;
-      font-weight:600;
     }
 
     .remember input{
-      accent-color:var(--violet);
+      accent-color:var(--primary);
     }
 
     .forgot{
-      color:var(--violet);
+      color:var(--primary);
       font-size:.88rem;
-      font-weight:800;
+      font-weight:700;
     }
 
     .submit-btn{
@@ -619,10 +426,10 @@
       border:none;
       border-radius:18px;
       color:#fff;
-      font-size:.97rem;
+      font-size:.96rem;
       font-weight:800;
-      background:linear-gradient(135deg, var(--violet), var(--orange));
-      box-shadow:0 16px 34px rgba(124,108,242,.24);
+      background:linear-gradient(135deg, var(--primary), var(--primary-dark));
+      box-shadow:0 16px 30px rgba(111,94,247,.24);
       cursor:pointer;
       transition:.2s ease;
       font-family:inherit;
@@ -630,18 +437,16 @@
 
     .submit-btn:hover{
       transform:translateY(-2px);
-      box-shadow:0 20px 38px rgba(124,108,242,.28);
+      box-shadow:0 20px 36px rgba(111,94,247,.28);
     }
 
     .divider{
-      position:relative;
-      z-index:1;
       margin:18px 0;
       display:flex;
       align-items:center;
       gap:12px;
-      color:#8c8397;
-      font-size:.86rem;
+      color:#8f8799;
+      font-size:.85rem;
       font-weight:700;
     }
 
@@ -650,34 +455,29 @@
       content:"";
       flex:1;
       height:1px;
-      background:rgba(124,108,242,.12);
+      background:var(--line);
     }
 
     .alt-btn{
-      position:relative;
-      z-index:1;
       width:100%;
       height:54px;
       border-radius:18px;
-      border:1px solid rgba(124,108,242,.12);
-      background:rgba(255,255,255,.9);
+      border:1px solid var(--line);
+      background:#fff;
       font-size:.94rem;
-      font-weight:800;
-      color:#2c2533;
+      font-weight:700;
+      color:#2b2434;
       cursor:pointer;
-      box-shadow:var(--shadow-soft);
+      box-shadow:var(--shadow-sm);
       transition:.2s ease;
       font-family:inherit;
     }
 
     .alt-btn:hover{
       transform:translateY(-2px);
-      background:#fff;
     }
 
     .chips{
-      position:relative;
-      z-index:1;
       margin-top:18px;
       display:flex;
       flex-wrap:wrap;
@@ -690,12 +490,12 @@
       gap:8px;
       padding:10px 13px;
       border-radius:999px;
-      background:rgba(255,255,255,.9);
-      border:1px solid rgba(124,108,242,.12);
+      background:#fff;
+      border:1px solid var(--line);
       font-size:.84rem;
       font-weight:700;
       color:#4f5b70;
-      box-shadow:var(--shadow-soft);
+      box-shadow:var(--shadow-sm);
     }
 
     .chip::before{
@@ -703,30 +503,28 @@
       width:6px;
       height:6px;
       border-radius:50%;
-      background:linear-gradient(135deg, var(--violet), var(--orange));
+      background:linear-gradient(135deg, var(--primary), #8f7dff);
       display:block;
     }
 
-    .auth-footer{
-      position:relative;
-      z-index:1;
+    .form-footer{
       margin-top:18px;
       padding-top:18px;
-      border-top:1px solid rgba(124,108,242,.10);
+      border-top:1px solid var(--line);
       display:flex;
       justify-content:space-between;
-      gap:12px;
       align-items:center;
+      gap:12px;
       flex-wrap:wrap;
     }
 
-    .auth-footer p{
+    .form-footer p{
       color:var(--muted);
       font-size:.92rem;
     }
 
-    .auth-footer a{
-      color:var(--violet);
+    .form-footer a{
+      color:var(--primary);
       font-weight:800;
     }
 
@@ -741,34 +539,13 @@
       justify-content:space-between;
       gap:14px;
       flex-wrap:wrap;
-      border-top:1px solid rgba(124,108,242,.10);
+      border-top:1px solid rgba(232,226,217,.9);
       padding-top:18px;
     }
 
-    @media (max-width: 1080px){
-      .auth-layout{
+    @media (max-width: 1020px){
+      .auth-shell{
         grid-template-columns:1fr;
-      }
-
-      .cards-grid{
-        grid-template-columns:1fr;
-      }
-    }
-
-    @media (max-width: 820px){
-      .main{
-        padding:12px 0 24px;
-      }
-
-      .intro-panel,
-      .login-panel{
-        border-radius:24px;
-        padding:20px;
-      }
-
-      .intro-copy,
-      .login-card{
-        border-radius:24px;
       }
     }
 
@@ -795,28 +572,27 @@
         display:none;
       }
 
-      .intro-top{
-        align-items:flex-start;
+      .intro-panel,
+      .form-panel{
+        border-radius:24px;
+        padding:20px;
       }
 
-      .login-card{
+      .form-card{
+        border-radius:22px;
         padding:22px 18px 20px;
       }
 
-      .copy-inner{
-        padding-left:12px;
+      .intro-panel{
+        padding:24px 20px;
       }
 
-      .intro-copy::after{
-        left:18px;
+      .intro-actions{
+        flex-direction:column;
       }
 
-      .cards-grid{
-        gap:12px;
-      }
-
-      .info-card{
-        transform:none !important;
+      .intro-actions .btn{
+        width:100%;
       }
     }
   </style>
@@ -844,72 +620,64 @@
 
     <main class="main">
       <div class="container">
-        <section class="auth-layout">
+        <section class="auth-shell">
           <section class="intro-panel">
             <div class="intro-inner">
-              <div class="intro-top">
-                <div class="intro-chip">Tu espacio de estudio</div>
+              <div class="eyebrow">Acceso a tu espacio</div>
 
-                <div class="mini-tags">
-                  <span class="mini-tag">Clases</span>
-                  <span class="mini-tag">IA</span>
-                  <span class="mini-tag">Apuntes</span>
+              <h1 class="intro-title">
+                Volvé a estudiar de una forma más <span>clara</span>.
+              </h1>
+
+              <p class="intro-text">
+                Entrá a tus clases, retomá tus avances y seguí usando Eduvia
+                desde un entorno limpio, ordenado y pensado para acompañarte.
+              </p>
+
+              <div class="feature-list">
+                <div class="feature">
+                  <span class="feature-dot"></span>
+                  <div>
+                    <strong>Tus clases en un solo lugar</strong>
+                    <p>Accedé rápido a lo que ya venías trabajando.</p>
+                  </div>
+                </div>
+
+                <div class="feature">
+                  <span class="feature-dot"></span>
+                  <div>
+                    <strong>Explicación con IA</strong>
+                    <p>Una experiencia pensada para seguir aprendiendo sin vueltas.</p>
+                  </div>
+                </div>
+
+                <div class="feature">
+                  <span class="feature-dot"></span>
+                  <div>
+                    <strong>Continuidad real</strong>
+                    <p>Retomá el estudio sin sentir que empezás de cero otra vez.</p>
+                  </div>
                 </div>
               </div>
 
-              <div class="intro-copy">
-                <div class="copy-inner">
-                  <h1>Entrá y seguí aprendiendo de una forma más <span>clara y ordenada</span>.</h1>
-                  <p>
-                    Eduvia está pensada para acompañarte en el estudio con una experiencia más simple,
-                    más visual y más cómoda. Volvés a tus clases, retomás tus temas y seguís avanzando a tu ritmo.
-                  </p>
-
-                  <div class="feature-row">
-                    <span class="feature">📚 Tus clases</span>
-                    <span class="feature">🧠 IA en vivo</span>
-                    <span class="feature">✏️ Progreso personal</span>
-                  </div>
-                </div>
-              </div>
-
-              <div class="cards-grid">
-                <article class="info-card">
-                  <div class="info-inner-card">
-                    <div class="info-icon">1</div>
-                    <strong>Retomá rápido</strong>
-                    <p>Volvé a lo que estabas estudiando sin perder tiempo buscando dónde seguir.</p>
-                  </div>
-                </article>
-
-                <article class="info-card">
-                  <div class="info-inner-card">
-                    <div class="info-icon">2</div>
-                    <strong>Todo más claro</strong>
-                    <p>Una experiencia visual pensada para que estudiar se sienta ordenado y llevadero.</p>
-                  </div>
-                </article>
-
-                <article class="info-card">
-                  <div class="info-inner-card">
-                    <div class="info-icon">3</div>
-                    <strong>Apoyo constante</strong>
-                    <p>La IA acompaña tu aprendizaje y te ayuda a resolver dudas cuando lo necesités.</p>
-                  </div>
-                </article>
+              <div class="intro-actions">
+                <a href="#login-form" class="btn btn-primary">Entrar ahora</a>
+                <a href="register.html" class="btn btn-soft">Crear cuenta</a>
               </div>
             </div>
           </section>
 
-          <aside class="login-panel">
-            <div class="login-card">
-              <div class="login-head">
-                <div class="login-badge">Iniciar sesión</div>
-                <h2>Volvé a entrar a <span>Eduvia</span></h2>
-                <p>
-                  Accedé a tus clases, tus avances y tu espacio de estudio desde un entorno más simple y agradable.
-                </p>
-              </div>
+          <aside class="form-panel">
+            <div class="form-card">
+              <div class="form-badge">Iniciar sesión</div>
+
+              <h2 class="form-title">
+                Entrá a <span>Eduvia</span>
+              </h2>
+
+              <p class="form-subtitle">
+                Accedé a tu cuenta para seguir con tus clases, tu progreso y tu espacio de estudio.
+              </p>
 
               <form class="form" id="login-form">
                 <div class="field">
@@ -949,12 +717,12 @@
               <button class="alt-btn" type="button">Ingresar con Google</button>
 
               <div class="chips">
-                <div class="chip">Tu progreso</div>
                 <div class="chip">Tus clases</div>
+                <div class="chip">Tu progreso</div>
                 <div class="chip">IA en vivo</div>
               </div>
 
-              <div class="auth-footer">
+              <div class="form-footer">
                 <p>¿Todavía no tenés cuenta?</p>
                 <a href="register.html">Crear cuenta</a>
               </div>
