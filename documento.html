@@ -52,6 +52,10 @@
       text-decoration:none;
     }
 
+    .hidden{
+      display:none !important;
+    }
+
     .access-guard{
       display:none;
       min-height:100vh;
@@ -83,6 +87,230 @@
     .access-card p{
       color:var(--muted);
       line-height:1.7;
+    }
+
+    .doc-loading-screen{
+      position:fixed;
+      inset:0;
+      z-index:120;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
+      background:
+        radial-gradient(circle at top left, rgba(194,231,255,.72), transparent 28%),
+        radial-gradient(circle at bottom right, rgba(232,240,254,.95), transparent 32%),
+        linear-gradient(180deg, #f7f8fb 0%, #eef2f7 100%);
+    }
+
+    .doc-loading-screen.show{
+      display:flex;
+    }
+
+    .doc-loading-card{
+      width:min(100%, 720px);
+      background:rgba(255,255,255,.9);
+      border:1px solid rgba(218,220,224,.95);
+      border-radius:28px;
+      box-shadow:0 30px 70px rgba(15,23,42,.16);
+      padding:28px;
+      backdrop-filter:blur(10px);
+    }
+
+    .doc-loading-hero{
+      position:relative;
+      height:108px;
+      margin-bottom:18px;
+      border-radius:22px;
+      background:linear-gradient(135deg, #eef4ff 0%, #f8fbff 100%);
+      overflow:hidden;
+      border:1px solid #e6edf8;
+    }
+
+    .hero-paper{
+      position:absolute;
+      width:86px;
+      height:110px;
+      border-radius:14px;
+      background:#fff;
+      border:1px solid #dce6f3;
+      box-shadow:0 14px 24px rgba(59,130,246,.08);
+    }
+
+    .hero-paper-1{
+      left:92px;
+      top:14px;
+      transform:rotate(-7deg);
+    }
+
+    .hero-paper-2{
+      left:145px;
+      top:8px;
+      transform:rotate(5deg);
+    }
+
+    .hero-magnifier{
+      position:absolute;
+      right:90px;
+      top:26px;
+      width:42px;
+      height:42px;
+      border:5px solid #1a73e8;
+      border-radius:999px;
+    }
+
+    .hero-magnifier::after{
+      content:"";
+      position:absolute;
+      right:-16px;
+      bottom:-14px;
+      width:24px;
+      height:6px;
+      border-radius:999px;
+      background:#1a73e8;
+      transform:rotate(42deg);
+      transform-origin:left center;
+    }
+
+    .hero-lines{
+      position:absolute;
+      left:285px;
+      right:150px;
+      top:28px;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+
+    .hero-lines span{
+      height:10px;
+      border-radius:999px;
+      background:linear-gradient(90deg, #d6e7ff, #edf4ff);
+      animation: shimmer 1.4s ease-in-out infinite alternate;
+    }
+
+    .hero-lines span:nth-child(2){
+      width:82%;
+      animation-delay:.15s;
+    }
+
+    .hero-lines span:nth-child(3){
+      width:68%;
+      animation-delay:.3s;
+    }
+
+    @keyframes shimmer{
+      from{ opacity:.55; transform:translateX(-2px); }
+      to{ opacity:1; transform:translateX(3px); }
+    }
+
+    .doc-loading-badge{
+      display:inline-flex;
+      align-items:center;
+      padding:8px 14px;
+      border-radius:999px;
+      background:#e8f0fe;
+      color:#0b57d0;
+      font-size:.8rem;
+      font-weight:800;
+      margin-bottom:12px;
+    }
+
+    .doc-loading-card h2{
+      font-family:"Sora",sans-serif;
+      font-size:2rem;
+      line-height:1.05;
+      letter-spacing:-.03em;
+      color:#202124;
+      margin-bottom:10px;
+    }
+
+    .doc-loading-card > p{
+      color:#5f6368;
+      line-height:1.7;
+      font-size:.98rem;
+      margin-bottom:22px;
+    }
+
+    .doc-loading-steps{
+      display:grid;
+      gap:10px;
+      margin-bottom:18px;
+    }
+
+    .doc-step{
+      display:flex;
+      align-items:flex-start;
+      gap:12px;
+      padding:14px 14px;
+      border-radius:18px;
+      border:1px solid #e7ebef;
+      background:#f8fafc;
+      transition:.2s ease;
+    }
+
+    .doc-step strong{
+      display:block;
+      font-size:.95rem;
+      color:#202124;
+      margin-bottom:4px;
+    }
+
+    .doc-step p{
+      margin:0;
+      font-size:.85rem;
+      color:#5f6368;
+      line-height:1.5;
+    }
+
+    .doc-step-dot{
+      width:14px;
+      height:14px;
+      border-radius:999px;
+      background:#cfd8e3;
+      margin-top:4px;
+      flex:none;
+    }
+
+    .doc-step.active{
+      background:linear-gradient(135deg, #e8f0fe 0%, #f5f9ff 100%);
+      border-color:#cfe0ff;
+      box-shadow:0 10px 24px rgba(26,115,232,.08);
+    }
+
+    .doc-step.active .doc-step-dot{
+      background:#1a73e8;
+      box-shadow:0 0 0 6px rgba(26,115,232,.12);
+    }
+
+    .doc-step.done{
+      background:#eef8f0;
+      border-color:#d5ead9;
+    }
+
+    .doc-step.done .doc-step-dot{
+      background:#1e8e3e;
+      box-shadow:0 0 0 6px rgba(30,142,62,.10);
+    }
+
+    .doc-loading-progress{
+      height:10px;
+      border-radius:999px;
+      background:#e6ebf1;
+      overflow:hidden;
+    }
+
+    .doc-loading-progress-bar{
+      width:38%;
+      height:100%;
+      border-radius:inherit;
+      background:linear-gradient(90deg, #1a73e8, #8ab4f8);
+      animation: progressSlide 1.2s ease-in-out infinite alternate;
+    }
+
+    @keyframes progressSlide{
+      from{ transform:translateX(-10%); }
+      to{ transform:translateX(10%); }
     }
 
     .editor-chrome{
@@ -645,10 +873,6 @@
       white-space:nowrap;
     }
 
-    .hidden{
-      display:none !important;
-    }
-
     .share-modal-backdrop{
       position:fixed;
       inset:0;
@@ -887,6 +1111,40 @@
     }
 
     @media (max-width: 720px){
+      .doc-loading-card{
+        padding:20px;
+        border-radius:24px;
+      }
+
+      .doc-loading-card h2{
+        font-size:1.55rem;
+      }
+
+      .doc-loading-hero{
+        height:92px;
+      }
+
+      .hero-paper-1{
+        left:32px;
+      }
+
+      .hero-paper-2{
+        left:75px;
+      }
+
+      .hero-lines{
+        left:190px;
+        right:82px;
+        top:26px;
+      }
+
+      .hero-magnifier{
+        right:34px;
+        top:24px;
+        width:36px;
+        height:36px;
+      }
+
       .topbar{
         padding:10px 12px 6px;
         align-items:flex-start;
@@ -1009,14 +1267,67 @@
     </div>
   </div>
 
-  <div class="access-guard show" id="doc-loading">
-    <div class="access-card">
-      <h2>Cargando documento...</h2>
-      <p>Estamos preparando el contenido y validando el acceso.</p>
+  <div class="doc-loading-screen show" id="doc-loading" aria-live="polite">
+    <div class="doc-loading-card">
+      <div class="doc-loading-hero">
+        <div class="hero-paper hero-paper-1"></div>
+        <div class="hero-paper hero-paper-2"></div>
+        <div class="hero-magnifier"></div>
+        <div class="hero-lines">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </div>
+
+      <div class="doc-loading-badge">Eduvia está preparando tu documento</div>
+
+      <h2 id="doc-loading-title">Preparando contenido</h2>
+      <p id="doc-loading-text">
+        Estamos validando acceso, buscando fuentes y armando el material para estudiar.
+      </p>
+
+      <div class="doc-loading-steps">
+        <div class="doc-step active" data-step="access">
+          <span class="doc-step-dot"></span>
+          <div>
+            <strong>Validando acceso</strong>
+            <p>Comprobando permisos del documento.</p>
+          </div>
+        </div>
+
+        <div class="doc-step" data-step="sources">
+          <span class="doc-step-dot"></span>
+          <div>
+            <strong>Buscando fuentes</strong>
+            <p>Reuniendo información confiable.</p>
+          </div>
+        </div>
+
+        <div class="doc-step" data-step="analysis">
+          <span class="doc-step-dot"></span>
+          <div>
+            <strong>Analizando tema</strong>
+            <p>Ordenando conceptos y puntos clave.</p>
+          </div>
+        </div>
+
+        <div class="doc-step" data-step="writing">
+          <span class="doc-step-dot"></span>
+          <div>
+            <strong>Redactando documento</strong>
+            <p>Preparando el texto final para estudiar.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="doc-loading-progress">
+        <div class="doc-loading-progress-bar"></div>
+      </div>
     </div>
   </div>
 
-  <div id="document-app">
+  <div id="document-app" class="hidden">
     <div class="editor-chrome">
       <header class="topbar">
         <div class="topbar-left">
@@ -1255,10 +1566,10 @@
         </div>
       </div>
 
-      <<div class="share-note">
-  Este documento se comparte de forma individual. Podés invitar personas con permiso
-  de solo lectura o edición.
-</div>
+      <div class="share-note">
+        Este documento se comparte de forma individual. Podés invitar personas con permiso
+        de solo lectura o edición.
+      </div>
 
       <div class="share-status" id="share-status"></div>
 
@@ -1339,325 +1650,409 @@
     </div>
   </div>
 
-<script>
-  (() => {
-    const editableAreas = Array.from(document.querySelectorAll(".doc-editable"));
-    const editor = document.getElementById("doc-content");
-    const titleEditor = document.getElementById("doc-title");
+  <script>
+    window.EduviaDocLoading = (() => {
+      const loading = document.getElementById("doc-loading");
+      const app = document.getElementById("document-app");
+      const title = document.getElementById("doc-loading-title");
+      const text = document.getElementById("doc-loading-text");
+      const steps = Array.from(document.querySelectorAll(".doc-step"));
+      const order = ["access", "sources", "analysis", "writing"];
 
-    const formatBlock = document.getElementById("format-block");
-    const fontFamilySelect = document.getElementById("font-family-select");
-    const fontSizeSelect = document.getElementById("font-size-select");
-    const textColor = document.getElementById("text-color");
-    const highlightColor = document.getElementById("highlight-color");
+      let autoIndex = 0;
+      let autoTimer = null;
 
-    const openMoreBtn = document.getElementById("open-more-btn");
-    const moreDropdown = document.getElementById("more-dropdown");
-    const moreBackdrop = document.getElementById("more-backdrop");
-    const moreStatus = document.getElementById("more-status");
+      function setStepClasses(idx) {
+        steps.forEach((step, i) => {
+          step.classList.remove("active", "done");
+          if (i < idx) step.classList.add("done");
+          else if (i === idx) step.classList.add("active");
+        });
+      }
 
-    const actionChat = document.getElementById("action-chat");
-    const actionPdf = document.getElementById("action-pdf");
-    const actionPrint = document.getElementById("action-print");
-    const actionDuplicate = document.getElementById("action-duplicate");
-    const actionSharePanel = document.getElementById("action-share-panel");
-
-    const openShareBtn = document.getElementById("open-share-btn");
-
-    const linkBtn = document.getElementById("link-btn");
-    const imageBtn = document.getElementById("image-btn");
-    const printBtn = document.getElementById("print-btn");
-    const undoBtn = document.getElementById("undo-btn");
-    const redoBtn = document.getElementById("redo-btn");
-
-    let activeEditable = editor;
-    let savedRange = null;
-
-    function canEditCurrentArea() {
-      return (
-        activeEditable &&
-        activeEditable.getAttribute("contenteditable") === "true" &&
-        !activeEditable.isContentEditable === false
-      );
-    }
-
-    function normalizeUrl(value = "") {
-      try {
-        const url = new URL(String(value).trim(), window.location.origin);
-        if (url.protocol === "http:" || url.protocol === "https:") {
-          return url.href;
+      function setStage(stage, message = "") {
+        const idx = order.indexOf(stage);
+        if (idx !== -1) {
+          autoIndex = idx;
+          setStepClasses(idx);
         }
-        return "";
-      } catch {
-        return "";
-      }
-    }
 
-    function setMoreStatus(message = "") {
-      if (moreStatus) moreStatus.textContent = message;
-    }
+        if (stage === "access") {
+          title.textContent = "Validando documento";
+          text.textContent = message || "Estamos comprobando permisos y preparando el entorno.";
+        }
 
-    window.setMoreStatus = setMoreStatus;
+        if (stage === "sources") {
+          title.textContent = "Buscando fuentes";
+          text.textContent = message || "Estamos reuniendo información confiable para construir el documento.";
+        }
 
-    function positionMoreDropdown() {
-      if (!openMoreBtn || !moreDropdown) return;
+        if (stage === "analysis") {
+          title.textContent = "Analizando contenido";
+          text.textContent = message || "Estamos ordenando ideas, conceptos clave y puntos importantes.";
+        }
 
-      const rect = openMoreBtn.getBoundingClientRect();
-      const dropdownWidth = Math.min(360, window.innerWidth - 24);
-      let left = rect.right - dropdownWidth;
-      const top = rect.bottom + 10;
-
-      if (left < 12) left = 12;
-      if (left + dropdownWidth > window.innerWidth - 12) {
-        left = window.innerWidth - dropdownWidth - 12;
+        if (stage === "writing") {
+          title.textContent = "Redactando documento";
+          text.textContent = message || "Estamos preparando el texto final y organizándolo para estudiar.";
+        }
       }
 
-      moreDropdown.style.top = `${top}px`;
-      moreDropdown.style.left = `${left}px`;
-      moreDropdown.style.right = "auto";
-    }
-
-    function openMoreDropdown() {
-      if (!moreDropdown || !moreBackdrop) return;
-      positionMoreDropdown();
-      moreDropdown.classList.add("show");
-      moreBackdrop.classList.add("show");
-      openMoreBtn?.setAttribute("aria-expanded", "true");
-      setMoreStatus("");
-    }
-
-    function closeMoreDropdown() {
-      moreDropdown?.classList.remove("show");
-      moreBackdrop?.classList.remove("show");
-      openMoreBtn?.setAttribute("aria-expanded", "false");
-      setMoreStatus("");
-    }
-
-    window.closeMoreDropdown = closeMoreDropdown;
-
-    function saveSelection() {
-      const selection = window.getSelection();
-      if (!selection || !selection.rangeCount || !activeEditable) return;
-
-      const range = selection.getRangeAt(0);
-      if (activeEditable.contains(range.commonAncestorContainer)) {
-        savedRange = range.cloneRange();
-      }
-    }
-
-    function restoreSelection() {
-      if (!savedRange) return;
-      const selection = window.getSelection();
-      if (!selection) return;
-      selection.removeAllRanges();
-      selection.addRange(savedRange);
-    }
-
-    function triggerEditorInput() {
-      if (!activeEditable) return;
-      activeEditable.dispatchEvent(new Event("input", { bubbles: true }));
-    }
-
-    function focusEditable() {
-      if (!activeEditable) activeEditable = editor;
-      if (!activeEditable) return;
-      activeEditable.focus({ preventScroll: true });
-      restoreSelection();
-    }
-
-    function exec(command, value = null) {
-      if (!activeEditable) return;
-      focusEditable();
-
-      try {
-        document.execCommand(command, false, value);
-      } catch {
-        return;
+      function startAutoFlow() {
+        stopAutoFlow();
+        autoTimer = setInterval(() => {
+          if (autoIndex < order.length - 1) {
+            autoIndex += 1;
+            setStage(order[autoIndex]);
+          }
+        }, 2600);
       }
 
-      saveSelection();
-      refreshToolbarState();
-      triggerEditorInput();
-    }
+      function stopAutoFlow() {
+        if (autoTimer) {
+          clearInterval(autoTimer);
+          autoTimer = null;
+        }
+      }
 
-    function refreshToolbarState() {
-      const commands = new Set([
-        "bold",
-        "italic",
-        "underline",
-        "strikeThrough",
-        "justifyLeft",
-        "justifyCenter",
-        "justifyRight",
-        "justifyFull",
-        "insertOrderedList",
-        "insertUnorderedList",
-      ]);
+      function finish() {
+        stopAutoFlow();
+        loading?.classList.remove("show");
+        app?.classList.remove("hidden");
+      }
 
-      document.querySelectorAll("[data-command]").forEach((btn) => {
-        const command = btn.dataset.command;
-        if (!commands.has(command)) {
-          btn.classList.remove("is-active");
+      function showError(message = "No se pudo cargar el documento.") {
+        stopAutoFlow();
+        title.textContent = "No se pudo preparar el documento";
+        text.textContent = message;
+        steps.forEach((step) => {
+          step.classList.remove("active", "done");
+        });
+      }
+
+      setStage("access");
+      startAutoFlow();
+
+      return {
+        setStage,
+        finish,
+        showError,
+        startAutoFlow,
+        stopAutoFlow,
+      };
+    })();
+  </script>
+
+  <script>
+    (() => {
+      const editableAreas = Array.from(document.querySelectorAll(".doc-editable"));
+      const editor = document.getElementById("doc-content");
+
+      const formatBlock = document.getElementById("format-block");
+      const fontFamilySelect = document.getElementById("font-family-select");
+      const fontSizeSelect = document.getElementById("font-size-select");
+      const textColor = document.getElementById("text-color");
+      const highlightColor = document.getElementById("highlight-color");
+
+      const openMoreBtn = document.getElementById("open-more-btn");
+      const moreDropdown = document.getElementById("more-dropdown");
+      const moreBackdrop = document.getElementById("more-backdrop");
+      const moreStatus = document.getElementById("more-status");
+
+      const actionChat = document.getElementById("action-chat");
+      const actionPdf = document.getElementById("action-pdf");
+      const actionPrint = document.getElementById("action-print");
+      const actionDuplicate = document.getElementById("action-duplicate");
+      const actionSharePanel = document.getElementById("action-share-panel");
+
+      const openShareBtn = document.getElementById("open-share-btn");
+
+      const linkBtn = document.getElementById("link-btn");
+      const imageBtn = document.getElementById("image-btn");
+      const printBtn = document.getElementById("print-btn");
+      const undoBtn = document.getElementById("undo-btn");
+      const redoBtn = document.getElementById("redo-btn");
+
+      let activeEditable = editor;
+      let savedRange = null;
+
+      function normalizeUrl(value = "") {
+        try {
+          const url = new URL(String(value).trim(), window.location.origin);
+          if (url.protocol === "http:" || url.protocol === "https:") {
+            return url.href;
+          }
+          return "";
+        } catch {
+          return "";
+        }
+      }
+
+      function setMoreStatus(message = "") {
+        if (moreStatus) moreStatus.textContent = message;
+      }
+
+      window.setMoreStatus = setMoreStatus;
+
+      function positionMoreDropdown() {
+        if (!openMoreBtn || !moreDropdown) return;
+
+        const rect = openMoreBtn.getBoundingClientRect();
+        const dropdownWidth = Math.min(360, window.innerWidth - 24);
+        let left = rect.right - dropdownWidth;
+        const top = rect.bottom + 10;
+
+        if (left < 12) left = 12;
+        if (left + dropdownWidth > window.innerWidth - 12) {
+          left = window.innerWidth - dropdownWidth - 12;
+        }
+
+        moreDropdown.style.top = `${top}px`;
+        moreDropdown.style.left = `${left}px`;
+        moreDropdown.style.right = "auto";
+      }
+
+      function openMoreDropdown() {
+        if (!moreDropdown || !moreBackdrop) return;
+        positionMoreDropdown();
+        moreDropdown.classList.add("show");
+        moreBackdrop.classList.add("show");
+        openMoreBtn?.setAttribute("aria-expanded", "true");
+        setMoreStatus("");
+      }
+
+      function closeMoreDropdown() {
+        moreDropdown?.classList.remove("show");
+        moreBackdrop?.classList.remove("show");
+        openMoreBtn?.setAttribute("aria-expanded", "false");
+        setMoreStatus("");
+      }
+
+      window.closeMoreDropdown = closeMoreDropdown;
+
+      function saveSelection() {
+        const selection = window.getSelection();
+        if (!selection || !selection.rangeCount || !activeEditable) return;
+
+        const range = selection.getRangeAt(0);
+        if (activeEditable.contains(range.commonAncestorContainer)) {
+          savedRange = range.cloneRange();
+        }
+      }
+
+      function restoreSelection() {
+        if (!savedRange) return;
+        const selection = window.getSelection();
+        if (!selection) return;
+        selection.removeAllRanges();
+        selection.addRange(savedRange);
+      }
+
+      function triggerEditorInput() {
+        if (!activeEditable) return;
+        activeEditable.dispatchEvent(new Event("input", { bubbles: true }));
+      }
+
+      function focusEditable() {
+        if (!activeEditable) activeEditable = editor;
+        if (!activeEditable) return;
+        activeEditable.focus({ preventScroll: true });
+        restoreSelection();
+      }
+
+      function exec(command, value = null) {
+        if (!activeEditable) return;
+        focusEditable();
+
+        try {
+          document.execCommand(command, false, value);
+        } catch {
           return;
         }
 
-        try {
-          const active = document.queryCommandState(command);
-          btn.classList.toggle("is-active", !!active);
-        } catch {
-          btn.classList.remove("is-active");
+        saveSelection();
+        refreshToolbarState();
+        triggerEditorInput();
+      }
+
+      function refreshToolbarState() {
+        const commands = new Set([
+          "bold",
+          "italic",
+          "underline",
+          "strikeThrough",
+          "justifyLeft",
+          "justifyCenter",
+          "justifyRight",
+          "justifyFull",
+          "insertOrderedList",
+          "insertUnorderedList",
+        ]);
+
+        document.querySelectorAll("[data-command]").forEach((btn) => {
+          const command = btn.dataset.command;
+          if (!commands.has(command)) {
+            btn.classList.remove("is-active");
+            return;
+          }
+
+          try {
+            const active = document.queryCommandState(command);
+            btn.classList.toggle("is-active", !!active);
+          } catch {
+            btn.classList.remove("is-active");
+          }
+        });
+      }
+
+      editableAreas.forEach((area) => {
+        area.addEventListener("focus", () => {
+          activeEditable = area;
+          saveSelection();
+          refreshToolbarState();
+        });
+
+        area.addEventListener("mouseup", () => {
+          saveSelection();
+          refreshToolbarState();
+        });
+
+        area.addEventListener("keyup", () => {
+          saveSelection();
+          refreshToolbarState();
+        });
+
+        area.addEventListener("input", () => {
+          saveSelection();
+        });
+      });
+
+      document.addEventListener("selectionchange", () => {
+        saveSelection();
+        refreshToolbarState();
+      });
+
+      document.querySelectorAll("[data-command]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const command = btn.dataset.command;
+          if (!command) return;
+          exec(command);
+        });
+      });
+
+      formatBlock?.addEventListener("change", () => {
+        const map = {
+          p: "P",
+          h2: "H2",
+          h3: "H3",
+          blockquote: "BLOCKQUOTE",
+        };
+
+        exec("formatBlock", map[formatBlock.value] || "P");
+      });
+
+      fontFamilySelect?.addEventListener("change", () => {
+        exec("fontName", fontFamilySelect.value);
+      });
+
+      fontSizeSelect?.addEventListener("change", () => {
+        exec("fontSize", fontSizeSelect.value);
+      });
+
+      textColor?.addEventListener("input", () => {
+        exec("foreColor", textColor.value);
+      });
+
+      highlightColor?.addEventListener("input", () => {
+        exec("hiliteColor", highlightColor.value);
+      });
+
+      linkBtn?.addEventListener("click", () => {
+        const raw = prompt("Pegá el link que querés insertar:");
+        if (!raw) return;
+
+        const url = normalizeUrl(raw);
+        if (!url) {
+          alert("Ingresá una URL válida que empiece con http:// o https://");
+          return;
+        }
+
+        exec("createLink", url);
+      });
+
+      imageBtn?.addEventListener("click", () => {
+        const raw = prompt("Pegá la URL de la imagen:");
+        if (!raw) return;
+
+        const url = normalizeUrl(raw);
+        if (!url) {
+          alert("Ingresá una URL válida que empiece con http:// o https://");
+          return;
+        }
+
+        exec("insertImage", url);
+      });
+
+      printBtn?.addEventListener("click", () => {
+        window.print();
+      });
+
+      undoBtn?.addEventListener("click", () => {
+        exec("undo");
+      });
+
+      redoBtn?.addEventListener("click", () => {
+        exec("redo");
+      });
+
+      openMoreBtn?.addEventListener("click", () => {
+        const isOpen = moreDropdown?.classList.contains("show");
+        if (isOpen) closeMoreDropdown();
+        else openMoreDropdown();
+      });
+
+      moreBackdrop?.addEventListener("click", closeMoreDropdown);
+
+      window.addEventListener("resize", () => {
+        if (moreDropdown?.classList.contains("show")) {
+          positionMoreDropdown();
         }
       });
-    }
 
-    editableAreas.forEach((area) => {
-      area.addEventListener("focus", () => {
-        activeEditable = area;
-        saveSelection();
-        refreshToolbarState();
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") {
+          closeMoreDropdown();
+        }
       });
 
-      area.addEventListener("mouseup", () => {
-        saveSelection();
-        refreshToolbarState();
+      actionChat?.addEventListener("click", () => {
+        setMoreStatus("El chat se abre desde la lógica principal del documento.");
       });
 
-      area.addEventListener("keyup", () => {
-        saveSelection();
-        refreshToolbarState();
-      });
-
-      area.addEventListener("input", () => {
-        saveSelection();
-      });
-    });
-
-    document.addEventListener("selectionchange", () => {
-      saveSelection();
-      refreshToolbarState();
-    });
-
-    document.querySelectorAll("[data-command]").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        const command = btn.dataset.command;
-        if (!command) return;
-        exec(command);
-      });
-    });
-
-    formatBlock?.addEventListener("change", () => {
-      const map = {
-        p: "P",
-        h2: "H2",
-        h3: "H3",
-        blockquote: "BLOCKQUOTE",
-      };
-
-      exec("formatBlock", map[formatBlock.value] || "P");
-    });
-
-    fontFamilySelect?.addEventListener("change", () => {
-      exec("fontName", fontFamilySelect.value);
-    });
-
-    fontSizeSelect?.addEventListener("change", () => {
-      exec("fontSize", fontSizeSelect.value);
-    });
-
-    textColor?.addEventListener("input", () => {
-      exec("foreColor", textColor.value);
-    });
-
-    highlightColor?.addEventListener("input", () => {
-      exec("hiliteColor", highlightColor.value);
-    });
-
-    linkBtn?.addEventListener("click", () => {
-      const raw = prompt("Pegá el link que querés insertar:");
-      if (!raw) return;
-
-      const url = normalizeUrl(raw);
-      if (!url) {
-        alert("Ingresá una URL válida que empiece con http:// o https://");
-        return;
-      }
-
-      exec("createLink", url);
-    });
-
-    imageBtn?.addEventListener("click", () => {
-      const raw = prompt("Pegá la URL de la imagen:");
-      if (!raw) return;
-
-      const url = normalizeUrl(raw);
-      if (!url) {
-        alert("Ingresá una URL válida que empiece con http:// o https://");
-        return;
-      }
-
-      exec("insertImage", url);
-    });
-
-    printBtn?.addEventListener("click", () => {
-      window.print();
-    });
-
-    undoBtn?.addEventListener("click", () => {
-      exec("undo");
-    });
-
-    redoBtn?.addEventListener("click", () => {
-      exec("redo");
-    });
-
-    openMoreBtn?.addEventListener("click", () => {
-      const isOpen = moreDropdown?.classList.contains("show");
-      if (isOpen) closeMoreDropdown();
-      else openMoreDropdown();
-    });
-
-    moreBackdrop?.addEventListener("click", closeMoreDropdown);
-
-    window.addEventListener("resize", () => {
-      if (moreDropdown?.classList.contains("show")) {
-        positionMoreDropdown();
-      }
-    });
-
-    document.addEventListener("keydown", (event) => {
-      if (event.key === "Escape") {
+      actionPdf?.addEventListener("click", () => {
         closeMoreDropdown();
-      }
-    });
+        setMoreStatus("Se abrió la impresión para guardarlo como PDF.");
+        window.print();
+      });
 
-    actionChat?.addEventListener("click", () => {
-      setMoreStatus("El chat se abre desde la lógica principal del documento.");
-    });
+      actionPrint?.addEventListener("click", () => {
+        closeMoreDropdown();
+        setMoreStatus("Abriendo impresión...");
+        window.print();
+      });
 
-    actionPdf?.addEventListener("click", () => {
-      closeMoreDropdown();
-      setMoreStatus("Se abrió la impresión para guardarlo como PDF.");
-      window.print();
-    });
+      actionDuplicate?.addEventListener("click", () => {
+        setMoreStatus("La duplicación se conecta desde documento.js o Firebase.");
+      });
 
-    actionPrint?.addEventListener("click", () => {
-      closeMoreDropdown();
-      setMoreStatus("Abriendo impresión...");
-      window.print();
-    });
+      actionSharePanel?.addEventListener("click", () => {
+        closeMoreDropdown();
+        openShareBtn?.click();
+      });
 
-    actionDuplicate?.addEventListener("click", () => {
-      setMoreStatus("La duplicación se conecta desde documento.js o Firebase.");
-    });
-
-    actionSharePanel?.addEventListener("click", () => {
-      closeMoreDropdown();
-      openShareBtn?.click();
-    });
-
-    refreshToolbarState();
-  })();
-</script>
+      refreshToolbarState();
+    })();
+  </script>
 
   <script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
   <script type="module" src="documento.js"></script>
