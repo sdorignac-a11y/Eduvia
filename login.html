@@ -14,23 +14,23 @@
 
   <style>
     :root{
-      --bg:#f6f3ee;
+      --bg:#f7f4ee;
       --surface:#ffffff;
-      --surface-soft:#fbfaf7;
+      --surface-soft:#fcfaf6;
       --text:#1f1b24;
       --muted:#6f6878;
-      --line:#e8e2d9;
+      --line:#e8e1d8;
 
       --primary:#6f5ef7;
       --primary-dark:#5d4ae8;
       --primary-soft:#f1eeff;
 
       --shadow-sm:0 8px 22px rgba(28,25,36,.05);
-      --shadow-md:0 18px 40px rgba(28,25,36,.08);
+      --shadow-md:0 18px 50px rgba(28,25,36,.08);
+
       --radius-xl:30px;
       --radius-lg:22px;
       --radius-md:16px;
-
       --container:1180px;
     }
 
@@ -48,7 +48,8 @@
       font-family:"Inter",sans-serif;
       color:var(--text);
       background:
-        radial-gradient(circle at top left, rgba(255,255,255,.85), transparent 26%),
+        radial-gradient(circle at top left, rgba(255,255,255,.9), transparent 24%),
+        radial-gradient(circle at bottom right, rgba(111,94,247,.05), transparent 20%),
         linear-gradient(180deg, #faf8f4 0%, var(--bg) 100%);
       overflow-x:hidden;
     }
@@ -58,11 +59,11 @@
       position:fixed;
       inset:0;
       pointer-events:none;
-      opacity:.5;
+      opacity:.45;
       background-image:
-        linear-gradient(rgba(111,94,247,.035) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(111,94,247,.035) 1px, transparent 1px);
-      background-size:34px 34px;
+        linear-gradient(rgba(111,94,247,.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(111,94,247,.03) 1px, transparent 1px);
+      background-size:36px 36px;
     }
 
     a{
@@ -93,7 +94,7 @@
       justify-content:space-between;
       gap:16px;
       padding:14px 16px;
-      border:1px solid rgba(255,255,255,.9);
+      border:1px solid rgba(255,255,255,.92);
       border-radius:22px;
       background:rgba(255,255,255,.72);
       backdrop-filter:blur(12px);
@@ -115,7 +116,7 @@
       font-family:"Sora",sans-serif;
       font-weight:800;
       color:#fff;
-      background:linear-gradient(135deg, var(--primary), #8f7dff);
+      background:linear-gradient(135deg, var(--primary), #8b7aff);
       box-shadow:0 12px 24px rgba(111,94,247,.22);
       flex:none;
     }
@@ -178,36 +179,34 @@
       flex:1;
       display:flex;
       align-items:center;
-      padding:18px 0 32px;
+      justify-content:center;
+      padding:28px 0 36px;
     }
 
-    .auth-shell{
-      display:grid;
-      grid-template-columns:1.05fr .95fr;
-      gap:22px;
-      align-items:stretch;
-    }
-
-    .intro-panel,
-    .form-panel{
-      border-radius:var(--radius-xl);
-      background:rgba(255,255,255,.78);
-      border:1px solid rgba(255,255,255,.92);
-      box-shadow:var(--shadow-md);
-      backdrop-filter:blur(12px);
-    }
-
-    .intro-panel{
-      padding:34px;
-      display:flex;
-      align-items:center;
-    }
-
-    .intro-inner{
+    .auth-wrap{
+      width:100%;
       max-width:560px;
+      margin:0 auto;
     }
 
-    .eyebrow{
+    .auth-card{
+      background:rgba(255,255,255,.82);
+      backdrop-filter:blur(12px);
+      border:1px solid rgba(255,255,255,.95);
+      border-radius:var(--radius-xl);
+      box-shadow:var(--shadow-md);
+      padding:22px;
+    }
+
+    .auth-inner{
+      background:linear-gradient(180deg, var(--surface) 0%, var(--surface-soft) 100%);
+      border:1px solid var(--line);
+      border-radius:26px;
+      padding:30px 26px 24px;
+      box-shadow:var(--shadow-sm);
+    }
+
+    .badge{
       display:inline-flex;
       align-items:center;
       gap:8px;
@@ -216,140 +215,66 @@
       background:var(--primary-soft);
       color:var(--primary);
       border:1px solid rgba(111,94,247,.08);
-      font-size:.83rem;
-      font-weight:800;
-      margin-bottom:18px;
-    }
-
-    .eyebrow::before{
-      content:"";
-      width:8px;
-      height:8px;
-      border-radius:50%;
-      background:linear-gradient(135deg, var(--primary), #8f7dff);
-      display:block;
-    }
-
-    .intro-title{
-      font-family:"Sora",sans-serif;
-      font-size:clamp(2rem, 4vw, 3.25rem);
-      line-height:1.02;
-      letter-spacing:-.055em;
-      margin-bottom:14px;
-    }
-
-    .intro-title span{
-      color:var(--primary);
-    }
-
-    .intro-text{
-      color:var(--muted);
-      font-size:1rem;
-      line-height:1.85;
-      max-width:520px;
-      margin-bottom:24px;
-    }
-
-    .feature-list{
-      display:grid;
-      gap:12px;
-      margin-bottom:24px;
-    }
-
-    .feature{
-      display:flex;
-      align-items:flex-start;
-      gap:12px;
-      padding:14px 16px;
-      border-radius:18px;
-      background:rgba(255,255,255,.9);
-      border:1px solid var(--line);
-      box-shadow:var(--shadow-sm);
-    }
-
-    .feature-dot{
-      width:11px;
-      height:11px;
-      border-radius:50%;
-      background:linear-gradient(135deg, var(--primary), #8f7dff);
-      margin-top:6px;
-      flex:none;
-    }
-
-    .feature strong{
-      display:block;
-      font-size:.95rem;
-      margin-bottom:4px;
-      letter-spacing:-.02em;
-    }
-
-    .feature p{
-      color:var(--muted);
-      font-size:.9rem;
-      line-height:1.6;
-    }
-
-    .intro-actions{
-      display:flex;
-      gap:12px;
-      flex-wrap:wrap;
-    }
-
-    .form-panel{
-      padding:22px;
-      display:flex;
-      align-items:center;
-    }
-
-    .form-card{
-      width:100%;
-      background:linear-gradient(180deg, #ffffff 0%, var(--surface-soft) 100%);
-      border:1px solid var(--line);
-      border-radius:26px;
-      padding:28px 24px 24px;
-      box-shadow:var(--shadow-sm);
-    }
-
-    .form-badge{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding:8px 12px;
-      border-radius:999px;
-      background:#fff;
-      border:1px solid var(--line);
-      color:var(--primary);
       font-size:.82rem;
       font-weight:800;
       margin-bottom:16px;
     }
 
-    .form-badge::before{
+    .badge::before{
       content:"";
       width:8px;
       height:8px;
       border-radius:50%;
-      background:linear-gradient(135deg, var(--primary), #8f7dff);
+      background:linear-gradient(135deg, var(--primary), #8b7aff);
       display:block;
     }
 
-    .form-title{
+    .title{
       font-family:"Sora",sans-serif;
-      font-size:clamp(1.8rem, 3vw, 2.4rem);
+      font-size:clamp(1.9rem, 4vw, 2.6rem);
       line-height:1.04;
       letter-spacing:-.05em;
       margin-bottom:10px;
     }
 
-    .form-title span{
+    .title span{
       color:var(--primary);
     }
 
-    .form-subtitle{
+    .subtitle{
       color:var(--muted);
       line-height:1.8;
       margin-bottom:22px;
-      max-width:450px;
+    }
+
+    .quick-row{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-bottom:22px;
+    }
+
+    .quick-chip{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:10px 13px;
+      border-radius:999px;
+      background:#fff;
+      border:1px solid var(--line);
+      box-shadow:var(--shadow-sm);
+      font-size:.83rem;
+      font-weight:700;
+      color:#4e5a6e;
+    }
+
+    .quick-chip::before{
+      content:"";
+      width:6px;
+      height:6px;
+      border-radius:50%;
+      background:linear-gradient(135deg, var(--primary), #8b7aff);
+      display:block;
     }
 
     .form{
@@ -477,37 +402,7 @@
       transform:translateY(-2px);
     }
 
-    .chips{
-      margin-top:18px;
-      display:flex;
-      flex-wrap:wrap;
-      gap:10px;
-    }
-
-    .chip{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding:10px 13px;
-      border-radius:999px;
-      background:#fff;
-      border:1px solid var(--line);
-      font-size:.84rem;
-      font-weight:700;
-      color:#4f5b70;
-      box-shadow:var(--shadow-sm);
-    }
-
-    .chip::before{
-      content:"";
-      width:6px;
-      height:6px;
-      border-radius:50%;
-      background:linear-gradient(135deg, var(--primary), #8f7dff);
-      display:block;
-    }
-
-    .form-footer{
+    .footer-row{
       margin-top:18px;
       padding-top:18px;
       border-top:1px solid var(--line);
@@ -518,12 +413,12 @@
       flex-wrap:wrap;
     }
 
-    .form-footer p{
+    .footer-row p{
       color:var(--muted);
       font-size:.92rem;
     }
 
-    .form-footer a{
+    .footer-row a{
       color:var(--primary);
       font-weight:800;
     }
@@ -539,14 +434,8 @@
       justify-content:space-between;
       gap:14px;
       flex-wrap:wrap;
-      border-top:1px solid rgba(232,226,217,.9);
+      border-top:1px solid rgba(232,225,216,.92);
       padding-top:18px;
-    }
-
-    @media (max-width: 1020px){
-      .auth-shell{
-        grid-template-columns:1fr;
-      }
     }
 
     @media (max-width: 640px){
@@ -572,27 +461,18 @@
         display:none;
       }
 
-      .intro-panel,
-      .form-panel{
+      .auth-card{
         border-radius:24px;
-        padding:20px;
+        padding:16px;
       }
 
-      .form-card{
+      .auth-inner{
         border-radius:22px;
-        padding:22px 18px 20px;
+        padding:24px 18px 20px;
       }
 
-      .intro-panel{
-        padding:24px 20px;
-      }
-
-      .intro-actions{
-        flex-direction:column;
-      }
-
-      .intro-actions .btn{
-        width:100%;
+      .quick-row{
+        gap:8px;
       }
     }
   </style>
@@ -620,64 +500,24 @@
 
     <main class="main">
       <div class="container">
-        <section class="auth-shell">
-          <section class="intro-panel">
-            <div class="intro-inner">
-              <div class="eyebrow">Acceso a tu espacio</div>
+        <div class="auth-wrap">
+          <section class="auth-card">
+            <div class="auth-inner">
+              <div class="badge">Iniciar sesión</div>
 
-              <h1 class="intro-title">
-                Volvé a estudiar de una forma más <span>clara</span>.
+              <h1 class="title">
+                Entrá a <span>Eduvia</span>
               </h1>
 
-              <p class="intro-text">
-                Entrá a tus clases, retomá tus avances y seguí usando Eduvia
-                desde un entorno limpio, ordenado y pensado para acompañarte.
+              <p class="subtitle">
+                Accedé a tus clases, tu progreso y tu espacio de estudio desde una experiencia simple, clara y ordenada.
               </p>
 
-              <div class="feature-list">
-                <div class="feature">
-                  <span class="feature-dot"></span>
-                  <div>
-                    <strong>Tus clases en un solo lugar</strong>
-                    <p>Accedé rápido a lo que ya venías trabajando.</p>
-                  </div>
-                </div>
-
-                <div class="feature">
-                  <span class="feature-dot"></span>
-                  <div>
-                    <strong>Explicación con IA</strong>
-                    <p>Una experiencia pensada para seguir aprendiendo sin vueltas.</p>
-                  </div>
-                </div>
-
-                <div class="feature">
-                  <span class="feature-dot"></span>
-                  <div>
-                    <strong>Continuidad real</strong>
-                    <p>Retomá el estudio sin sentir que empezás de cero otra vez.</p>
-                  </div>
-                </div>
+              <div class="quick-row">
+                <span class="quick-chip">Tus clases</span>
+                <span class="quick-chip">Tu progreso</span>
+                <span class="quick-chip">IA en vivo</span>
               </div>
-
-              <div class="intro-actions">
-                <a href="#login-form" class="btn btn-primary">Entrar ahora</a>
-                <a href="register.html" class="btn btn-soft">Crear cuenta</a>
-              </div>
-            </div>
-          </section>
-
-          <aside class="form-panel">
-            <div class="form-card">
-              <div class="form-badge">Iniciar sesión</div>
-
-              <h2 class="form-title">
-                Entrá a <span>Eduvia</span>
-              </h2>
-
-              <p class="form-subtitle">
-                Accedé a tu cuenta para seguir con tus clases, tu progreso y tu espacio de estudio.
-              </p>
 
               <form class="form" id="login-form">
                 <div class="field">
@@ -716,19 +556,13 @@
 
               <button class="alt-btn" type="button">Ingresar con Google</button>
 
-              <div class="chips">
-                <div class="chip">Tus clases</div>
-                <div class="chip">Tu progreso</div>
-                <div class="chip">IA en vivo</div>
-              </div>
-
-              <div class="form-footer">
+              <div class="footer-row">
                 <p>¿Todavía no tenés cuenta?</p>
                 <a href="register.html">Crear cuenta</a>
               </div>
             </div>
-          </aside>
-        </section>
+          </section>
+        </div>
       </div>
     </main>
 
