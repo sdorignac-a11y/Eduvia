@@ -5,46 +5,53 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Eduvia | Crear contenido</title>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap"
+    rel="stylesheet"
+  />
 
   <style>
     :root{
       --bg:#f7f3ec;
-      --bg-2:#f3ede4;
-      --paper:#fffdf8;
-      --paper-2:#fbf7f0;
-      --paper-3:#f4ede3;
+      --bg-2:#f2ebdf;
+      --paper:#fffdf9;
+      --paper-2:#faf5ee;
+      --paper-3:#f5ede2;
 
       --text:#2a2433;
       --muted:#6d6574;
+      --muted-2:#887f90;
 
       --primary:#7c6cf2;
-      --primary-2:#6c5be8;
+      --primary-2:#6957e9;
       --primary-soft:#eee9ff;
-      --primary-line:rgba(124,108,242,.14);
-      --primary-line-soft:rgba(124,108,242,.08);
-      --primary-line-strong:rgba(124,108,242,.20);
+      --primary-soft-2:#f5f1ff;
 
       --accent:#f4d98b;
-      --accent-soft:#fbf1c9;
+      --accent-soft:#fbf2cf;
 
-      --rose-soft:#f4e6ea;
-      --peach-soft:#f6e8dc;
+      --line:rgba(124,108,242,.14);
+      --line-soft:rgba(124,108,242,.08);
+      --line-strong:rgba(124,108,242,.22);
 
-      --success-soft:#edf5ea;
+      --success:#2f8f5b;
+      --success-soft:#eaf6ef;
 
-      --shadow:0 20px 45px rgba(55, 44, 84, .08);
-      --shadow-soft:0 12px 28px rgba(55, 44, 84, .06);
-      --shadow-card:0 18px 42px rgba(52, 43, 77, .07);
+      --danger:#d85c5c;
+      --danger-soft:#fdeeee;
+
+      --shadow:0 20px 50px rgba(49, 38, 73, .08);
+      --shadow-soft:0 10px 26px rgba(49, 38, 73, .06);
+      --shadow-card:0 16px 36px rgba(49, 38, 73, .07);
 
       --radius-xl:30px;
       --radius-lg:24px;
       --radius-md:18px;
       --radius-sm:14px;
 
-      --sidebar:250px;
+      --sidebar:248px;
     }
 
     *{
@@ -61,8 +68,8 @@
       font-family:"Inter",sans-serif;
       color:var(--text);
       background:
-        radial-gradient(circle at top left, rgba(255,255,255,.58), transparent 26%),
-        radial-gradient(circle at bottom right, rgba(124,108,242,.07), transparent 20%),
+        radial-gradient(circle at top left, rgba(255,255,255,.62), transparent 26%),
+        radial-gradient(circle at bottom right, rgba(124,108,242,.06), transparent 22%),
         linear-gradient(180deg, var(--bg) 0%, var(--bg-2) 100%);
       min-height:100vh;
       overflow-x:hidden;
@@ -72,11 +79,11 @@
       content:"";
       position:fixed;
       inset:0;
-      background:
-        linear-gradient(180deg, rgba(255,255,255,.16), transparent 22%),
-        radial-gradient(circle at 82% 12%, rgba(244,217,139,.12), transparent 18%),
-        radial-gradient(circle at 14% 22%, rgba(124,108,242,.05), transparent 20%);
       pointer-events:none;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.12), transparent 24%),
+        radial-gradient(circle at 85% 12%, rgba(244,217,139,.12), transparent 18%),
+        radial-gradient(circle at 14% 20%, rgba(124,108,242,.05), transparent 20%);
       z-index:0;
     }
 
@@ -92,14 +99,14 @@
       position:sticky;
       top:0;
       height:100vh;
-      background:linear-gradient(180deg, rgba(255,253,248,.92), rgba(247,241,232,.94));
-      backdrop-filter:blur(18px);
-      border-right:1px solid var(--primary-line-soft);
       padding:24px 18px;
       display:flex;
       flex-direction:column;
       gap:22px;
-      box-shadow:8px 0 28px rgba(52,43,77,.04);
+      background:linear-gradient(180deg, rgba(255,253,249,.92), rgba(247,241,232,.94));
+      backdrop-filter:blur(18px);
+      border-right:1px solid var(--line-soft);
+      box-shadow:8px 0 28px rgba(49,38,73,.04);
     }
 
     .brand{
@@ -107,7 +114,7 @@
       align-items:center;
       gap:12px;
       padding:6px 6px 18px;
-      border-bottom:1px solid var(--primary-line-soft);
+      border-bottom:1px solid var(--line-soft);
     }
 
     .brand-mark{
@@ -116,12 +123,13 @@
       border-radius:16px;
       display:grid;
       place-items:center;
+      background:linear-gradient(135deg, var(--primary), var(--primary-2));
+      color:#fff;
       font-family:"Sora",sans-serif;
       font-weight:800;
       font-size:1rem;
-      color:#fff;
-      background:linear-gradient(135deg, var(--primary), var(--primary-2));
-      box-shadow:0 12px 22px rgba(124,108,242,.20);
+      letter-spacing:-.03em;
+      box-shadow:0 14px 24px rgba(124,108,242,.22);
       flex:none;
     }
 
@@ -129,8 +137,8 @@
       display:block;
       font-family:"Sora",sans-serif;
       font-size:1rem;
+      line-height:1.08;
       letter-spacing:-.03em;
-      line-height:1.1;
     }
 
     .brand-text span{
@@ -147,16 +155,16 @@
     .menu a,
     .menu button{
       width:100%;
+      text-align:left;
       text-decoration:none;
       border:none;
       background:transparent;
-      text-align:left;
       color:#4d445a;
+      font-family:inherit;
+      font-size:.97rem;
+      font-weight:700;
       padding:13px 14px;
       border-radius:16px;
-      font-weight:700;
-      font-family:inherit;
-      font-size:.98rem;
       cursor:pointer;
       transition:.2s ease;
       position:relative;
@@ -183,7 +191,7 @@
       bottom:10px;
       width:4px;
       border-radius:999px;
-      background:linear-gradient(180deg, var(--primary), #9b8cff);
+      background:linear-gradient(180deg, var(--primary), #a18fff);
     }
 
     .menu button:focus{
@@ -194,7 +202,7 @@
     .sidebar-note{
       margin-top:auto;
       background:linear-gradient(180deg, rgba(255,251,245,.98), rgba(248,242,233,.98));
-      border:1px solid var(--primary-line-soft);
+      border:1px solid var(--line-soft);
       border-radius:22px;
       padding:16px;
       box-shadow:var(--shadow-soft);
@@ -218,136 +226,84 @@
     }
 
     .page{
-      max-width:1320px;
+      max-width:1280px;
       margin:0 auto;
       display:grid;
-      gap:22px;
+      gap:20px;
     }
 
-    .hero-craft{
-      position:relative;
-      overflow:hidden;
-      background:
-        radial-gradient(circle at top left, rgba(255,255,255,.5), transparent 24%),
-        linear-gradient(180deg, #fcf8f1 0%, #f4ede3 100%);
-      border:1px solid var(--primary-line-soft);
-      border-radius:var(--radius-xl);
-      padding:24px 28px 26px;
-      box-shadow:var(--shadow-card);
-    }
-
-    .craft-stage{
-      position:relative;
-      z-index:1;
-    }
-
-    .board-header{
+    .topbar{
       display:flex;
-      align-items:center;
+      align-items:flex-start;
       justify-content:space-between;
-      gap:14px;
+      gap:16px;
       flex-wrap:wrap;
-      margin-bottom:18px;
+      padding:4px 2px;
     }
 
-    .board-frame-label{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      padding:9px 14px;
-      border-radius:999px;
-      background:var(--primary-soft);
-      color:var(--primary-2);
-      font-size:.76rem;
-      font-weight:800;
-      letter-spacing:.14em;
-      text-transform:uppercase;
-      border:1px solid var(--primary-line-soft);
+    .topbar-copy{
+      max-width:760px;
     }
 
-    .board-tabs{
-      display:flex;
-      flex-wrap:wrap;
-      gap:10px;
-    }
-
-    .board-tab{
-      padding:10px 14px;
-      border-radius:999px;
-      font-size:.84rem;
-      font-weight:800;
-      border:1px solid var(--primary-line-soft);
-      background:rgba(255,255,255,.68);
-      color:#625a70;
-      box-shadow:0 6px 14px rgba(63,72,138,.03);
-    }
-
-    .board-tab.active{
-      background:linear-gradient(135deg, rgba(124,108,242,.12), rgba(244,217,139,.18));
-      color:var(--primary-2);
-    }
-
-    .modern-board{
-      position:relative;
-      background:
-        linear-gradient(180deg, rgba(255,252,246,.98) 0%, rgba(247,241,232,.98) 100%);
-      border:1px solid var(--primary-line-soft);
-      border-radius:28px;
-      padding:22px;
-      box-shadow:
-        inset 0 1px 0 rgba(255,255,255,.55),
-        0 18px 34px rgba(52,43,77,.06);
-      overflow:hidden;
-    }
-
-    .modern-board::before{
-      content:"";
-      position:absolute;
-      inset:0;
-      background:
-        linear-gradient(180deg, rgba(124,108,242,.025), transparent 22%),
-        radial-gradient(circle at 85% 18%, rgba(244,217,139,.10), transparent 20%);
-      pointer-events:none;
-    }
-
-    .board-topbar{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:14px;
-      margin-bottom:22px;
-      position:relative;
-      z-index:2;
-    }
-
-    .board-dots{
-      display:flex;
-      gap:8px;
-    }
-
-    .board-dot{
-      width:10px;
-      height:10px;
-      border-radius:50%;
-      background:rgba(124,108,242,.18);
-    }
-
-    .board-status{
+    .eyebrow{
       display:inline-flex;
       align-items:center;
       gap:8px;
+      margin-bottom:10px;
       padding:8px 12px;
       border-radius:999px;
-      border:1px solid var(--primary-line-soft);
+      background:var(--primary-soft);
+      border:1px solid var(--line-soft);
+      color:var(--primary-2);
+      font-size:.77rem;
+      font-weight:800;
+      letter-spacing:.10em;
+      text-transform:uppercase;
+    }
+
+    .topbar h1{
+      font-family:"Sora",sans-serif;
+      font-size:clamp(2rem, 3vw, 2.7rem);
+      line-height:1.03;
+      letter-spacing:-.05em;
+      color:#2f273a;
+      margin-bottom:10px;
+    }
+
+    .topbar p{
+      color:var(--muted);
+      line-height:1.78;
+      font-size:1rem;
+      max-width:780px;
+    }
+
+    .topbar-status{
+      min-width:250px;
+      max-width:320px;
+      background:linear-gradient(180deg, rgba(255,252,247,.98), rgba(247,241,232,.98));
+      border:1px solid var(--line-soft);
+      border-radius:22px;
+      padding:16px 18px;
+      box-shadow:var(--shadow-soft);
+    }
+
+    .topbar-status span{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      margin-bottom:10px;
+      padding:8px 12px;
+      border-radius:999px;
       background:rgba(124,108,242,.07);
       color:var(--primary-2);
-      font-size:.78rem;
+      border:1px solid var(--line-soft);
+      font-size:.76rem;
       font-weight:800;
       letter-spacing:.08em;
       text-transform:uppercase;
     }
 
-    .board-status::before{
+    .topbar-status span::before{
       content:"";
       width:8px;
       height:8px;
@@ -356,246 +312,281 @@
       box-shadow:0 0 0 4px rgba(124,108,242,.10);
     }
 
-    .board-content{
-      position:relative;
-      z-index:2;
-      display:grid;
-      grid-template-columns:1.08fr .92fr;
-      gap:18px;
-      align-items:stretch;
-    }
-
-    .chalk-note{
-      max-width:none;
-    }
-
-    .mini-label{
-      display:inline-block;
-      margin-bottom:14px;
-      padding:8px 12px;
-      border-radius:999px;
-      border:1px solid var(--primary-line-soft);
-      background:var(--primary-soft);
-      color:var(--primary-2);
-      font-size:.76rem;
-      font-weight:800;
-      letter-spacing:.11em;
-      text-transform:uppercase;
-    }
-
-    .chalk-note h1{
-      font-family:"Sora",sans-serif;
-      font-size:clamp(2rem,4vw,3rem);
-      line-height:1.02;
-      letter-spacing:-.05em;
-      color:#2f273a;
-      margin-bottom:14px;
-      max-width:700px;
-    }
-
-    .chalk-note p{
-      color:#6a6174;
-      line-height:1.82;
-      font-size:1rem;
-      max-width:700px;
-      margin-bottom:18px;
-    }
-
-    .board-feature-row{
-      display:flex;
-      flex-wrap:wrap;
-      gap:10px;
-    }
-
-    .board-feature{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      padding:11px 14px;
-      border-radius:14px;
-      border:1px solid var(--primary-line-soft);
-      background:#fffaf3;
-      color:#564e65;
-      font-size:.88rem;
-      font-weight:800;
-      box-shadow:0 8px 18px rgba(63,72,138,.03);
-    }
-
-    .board-side-cards{
-      display:grid;
-      gap:12px;
-      align-self:stretch;
-    }
-
-    .side-card{
-      background:linear-gradient(180deg, rgba(255,251,245,.96), rgba(247,241,232,.96));
-      border:1px solid var(--primary-line-soft);
-      border-radius:18px;
-      padding:16px;
-      box-shadow:0 10px 18px rgba(52,43,77,.05);
-    }
-
-    .side-card span{
+    .topbar-status strong{
       display:block;
-      color:#7b7188;
-      font-size:.78rem;
-      font-weight:800;
+      font-size:1rem;
+      color:#322a40;
       margin-bottom:6px;
-      letter-spacing:.04em;
-      text-transform:uppercase;
-    }
-
-    .side-card strong{
-      display:block;
-      color:#342c42;
-      font-size:1rem;
-      line-height:1.4;
       letter-spacing:-.02em;
-      margin-bottom:6px;
     }
 
-    .side-card p{
-      color:#6b6275;
-      font-size:.9rem;
-      line-height:1.62;
+    .topbar-status p{
+      color:#6c6277;
+      font-size:.91rem;
+      line-height:1.6;
     }
 
-    .board-bottom{
-      position:relative;
-      z-index:2;
-      margin-top:18px;
-      padding-top:16px;
-      border-top:1px solid var(--primary-line-soft);
-    }
-
-    .chalk-shelf{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:14px;
-      flex-wrap:wrap;
-    }
-
-    .chalk-tools{
-      display:flex;
-      gap:8px;
-      align-items:center;
-    }
-
-    .chalk{
-      width:22px;
-      height:6px;
-      border-radius:999px;
-      display:inline-block;
-      opacity:.95;
-    }
-
-    .chalk.white{ background:#f4f2f7; }
-    .chalk.yellow{ background:#f4d98b; }
-    .chalk.violet{ background:#d8d1ff; }
-
-    .board-bottom-line{
-      flex:1;
-      min-width:180px;
-      height:6px;
-      border-radius:999px;
-      background:linear-gradient(90deg, rgba(124,108,242,.15), rgba(124,108,242,.04));
-    }
-
-    .content-grid{
+    .layout-grid{
       display:grid;
-      grid-template-columns:1fr;
-      gap:22px;
+      grid-template-columns:minmax(0, 1.3fr) minmax(290px, .7fr);
+      gap:20px;
       align-items:start;
     }
 
-    .workspace-main{
+    .main-stack{
       display:grid;
-      gap:18px;
+      gap:20px;
     }
 
-    .editor-card,
-    .support-card{
+    .panel{
       position:relative;
-      background:linear-gradient(180deg,#fffcf7 0%, #f6efe5 100%);
-      border:1px solid var(--primary-line-soft);
-      border-radius:30px;
+      background:linear-gradient(180deg, rgba(255,253,249,.98), rgba(247,241,232,.98));
+      border:1px solid var(--line-soft);
+      border-radius:28px;
       box-shadow:var(--shadow-card);
       overflow:hidden;
     }
 
-    .editor-card::before,
-    .support-card::before{
+    .panel::before{
       content:"";
       position:absolute;
       inset:0;
-      background:
-        radial-gradient(circle at top left, rgba(255,255,255,.85), transparent 26%),
-        linear-gradient(180deg, rgba(124,108,242,.02), transparent 28%);
       pointer-events:none;
-      opacity:.92;
+      background:
+        radial-gradient(circle at top left, rgba(255,255,255,.84), transparent 26%),
+        linear-gradient(180deg, rgba(124,108,242,.018), transparent 28%);
     }
 
-    .editor-inner,
-    .support-inner{
+    .panel-inner{
       position:relative;
       z-index:2;
-      padding:26px;
+      padding:24px;
     }
 
-    .section-badge{
+    .panel-head{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:14px;
+      flex-wrap:wrap;
+      margin-bottom:18px;
+    }
+
+    .panel-head h2{
+      font-family:"Sora",sans-serif;
+      font-size:1.28rem;
+      letter-spacing:-.03em;
+      color:#2f273a;
+      margin-bottom:6px;
+    }
+
+    .panel-head p{
+      color:var(--muted);
+      line-height:1.7;
+      max-width:720px;
+      font-size:.96rem;
+    }
+
+    .panel-chip{
       display:inline-flex;
       align-items:center;
-      gap:8px;
-      padding:9px 14px;
+      justify-content:center;
+      padding:9px 13px;
       border-radius:999px;
+      font-size:.78rem;
       font-weight:800;
-      font-size:.84rem;
-      box-shadow:var(--shadow-soft);
-      margin-bottom:14px;
-      border:1px solid rgba(0,0,0,.04);
+      border:1px solid var(--line-soft);
+      white-space:nowrap;
     }
 
-    .section-badge.yellow{
-      background:var(--accent-soft);
-      color:#6b5321;
-    }
-
-    .section-badge.blue{
+    .panel-chip.primary{
       background:var(--primary-soft);
-      color:#5c51c9;
+      color:var(--primary-2);
     }
 
-    .section-badge.violet{
-      background:var(--rose-soft);
-      color:#7b5d86;
+    .panel-chip.accent{
+      background:var(--accent-soft);
+      color:#6c5421;
     }
 
-    .editor-head h2,
-    .support-head h3{
-      font-family:"Sora",sans-serif;
-      font-size:1.42rem;
-      letter-spacing:-.03em;
-      margin-bottom:8px;
-      color:#30273e;
+    .type-grid{
+      display:grid;
+      grid-template-columns:repeat(2, minmax(0, 1fr));
+      gap:12px;
     }
 
-    .editor-head p,
-    .support-head p{
-      color:#62586e;
-      line-height:1.75;
-      max-width:760px;
+    .type-option{
+      position:relative;
     }
 
-    .editor-head{
-      margin-bottom:20px;
+    .type-option input{
+      position:absolute;
+      inset:0;
+      opacity:0;
+      cursor:pointer;
+      z-index:3;
+    }
+
+    .type-card{
+      position:relative;
+      height:100%;
+      min-height:108px;
+      display:flex;
+      align-items:flex-start;
+      gap:14px;
+      padding:16px;
+      border-radius:20px;
+      background:linear-gradient(180deg, #fffaf3 0%, #f7efe4 100%);
+      border:1.5px solid #e5dcfb;
+      box-shadow:0 8px 18px rgba(124,108,242,.035);
+      transition:.2s ease;
+      overflow:hidden;
+    }
+
+    .type-card::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:radial-gradient(circle at top left, rgba(255,255,255,.86), transparent 30%);
+      pointer-events:none;
+    }
+
+    .type-card:hover{
+      transform:translateY(-2px);
+      border-color:#d9ccff;
+      box-shadow:0 14px 24px rgba(124,108,242,.06);
+    }
+
+    .type-option input:checked + .type-card{
+      background:linear-gradient(180deg, #f5efff 0%, #eee6fd 100%);
+      border-color:var(--primary);
+      box-shadow:0 0 0 4px rgba(124,108,242,.08), 0 18px 28px rgba(124,108,242,.10);
+    }
+
+    .type-icon{
+      width:46px;
+      height:46px;
+      border-radius:15px;
+      display:grid;
+      place-items:center;
+      background:#fff;
+      border:1.5px solid rgba(124,108,242,.10);
+      color:var(--primary-2);
+      font-size:.92rem;
+      font-weight:800;
+      box-shadow:0 6px 12px rgba(124,108,242,.05);
+      flex:none;
+      position:relative;
+      z-index:2;
+    }
+
+    .type-content{
+      position:relative;
+      z-index:2;
+      flex:1;
+      min-width:0;
+    }
+
+    .type-row{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:6px;
+    }
+
+    .type-row strong{
+      font-size:1rem;
+      color:#31283f;
+      letter-spacing:-.02em;
+    }
+
+    .type-check{
+      width:22px;
+      height:22px;
+      border-radius:50%;
+      border:2px solid #d2c8ff;
+      background:#fff;
+      box-shadow:0 4px 10px rgba(124,108,242,.05);
+      transition:.2s ease;
+      flex:none;
+    }
+
+    .type-option input:checked + .type-card .type-check{
+      border-color:transparent;
+      background:linear-gradient(135deg, var(--primary), var(--primary-2));
+      box-shadow:0 8px 16px rgba(124,108,242,.18);
+    }
+
+    .type-content p{
+      color:#675d72;
+      line-height:1.55;
+      font-size:.9rem;
+    }
+
+    .type-meta{
+      display:flex;
+      flex-wrap:wrap;
+      gap:7px;
+      margin-top:10px;
+    }
+
+    .type-meta span{
+      padding:7px 10px;
+      border-radius:999px;
+      background:rgba(255,255,255,.82);
+      border:1px solid var(--line-soft);
+      color:#675d72;
+      font-size:.76rem;
+      font-weight:700;
+    }
+
+    .helper-row{
+      margin-top:12px;
+      color:#766c81;
+      font-size:.87rem;
+      line-height:1.6;
+      font-weight:600;
+    }
+
+    .dynamic-wrap{
+      display:grid;
+      gap:16px;
+    }
+
+    .dynamic-header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+      padding:0 2px;
+    }
+
+    .dynamic-header strong{
+      font-size:1rem;
+      color:#352d43;
+      letter-spacing:-.02em;
+    }
+
+    .dynamic-header span{
+      color:#7a7086;
+      font-size:.88rem;
+      font-weight:600;
+    }
+
+    .dynamic-shell{
+      background:linear-gradient(180deg, #fffaf3 0%, #f7efe4 100%);
+      border:1px solid var(--line-soft);
+      border-radius:22px;
+      padding:18px;
+      box-shadow:0 8px 20px rgba(49,38,73,.035);
     }
 
     .form-grid{
       display:grid;
       grid-template-columns:1fr 1fr;
       gap:16px;
-      margin-top:8px;
     }
 
     .field{
@@ -619,7 +610,7 @@
       width:100%;
       border-radius:16px;
       border:1.5px solid #e3dafd;
-      background:#fffaf3;
+      background:#fffaf4;
       padding:14px 16px;
       font-size:1rem;
       font-family:inherit;
@@ -661,154 +652,81 @@
       font-weight:600;
     }
 
-    .content-type-selector{
-      display:grid;
-      grid-template-columns:repeat(3, minmax(0, 1fr));
-      gap:16px;
-      margin-top:6px;
-    }
-
-    .content-type-selector .mode-card{
-      min-height:210px;
-      padding:20px;
-    }
-
-    .mode-selector{
+    .format-switcher{
       display:grid;
       grid-template-columns:1fr 1fr;
-      gap:14px;
-      margin-top:4px;
+      gap:12px;
+      margin-bottom:14px;
     }
 
-    .mode-option{
+    .format-option{
       position:relative;
     }
 
-    .mode-option input{
+    .format-option input{
       position:absolute;
       inset:0;
       opacity:0;
       cursor:pointer;
+      z-index:3;
     }
 
-    .mode-card{
-      height:100%;
-      border-radius:22px;
-      border:1.5px solid #e1d8fb;
-      background:linear-gradient(180deg,#fffaf3 0%, #f7efe4 100%);
-      padding:18px;
-      box-shadow:0 8px 16px rgba(124,108,242,.04);
-      transition:.2s ease;
-      overflow:hidden;
-      position:relative;
-    }
-
-    .mode-card::before{
-      content:"";
-      position:absolute;
-      inset:0;
-      background:radial-gradient(circle at top left, rgba(255,255,255,.88), transparent 28%);
-      pointer-events:none;
-    }
-
-    .mode-card:hover{
-      transform:translateY(-2px);
-      border-color:#d8ccff;
-      box-shadow:0 12px 24px rgba(124,108,242,.07);
-    }
-
-    .mode-option input:checked + .mode-card{
-      border-color:var(--primary);
-      box-shadow:0 0 0 4px rgba(124,108,242,.08), 0 18px 32px rgba(124,108,242,.10);
-      background:linear-gradient(180deg,#f5efff 0%, #f0e8fd 100%);
-    }
-
-    .mode-top{
-      position:relative;
-      z-index:2;
+    .format-card{
+      min-height:96px;
       display:flex;
       align-items:center;
-      justify-content:space-between;
-      gap:12px;
-      margin-bottom:12px;
+      gap:14px;
+      padding:16px;
+      border-radius:18px;
+      border:1.5px solid #e5dcfb;
+      background:linear-gradient(180deg, #fffaf3 0%, #f7efe4 100%);
+      transition:.2s ease;
+      box-shadow:0 8px 16px rgba(124,108,242,.03);
     }
 
-    .mode-icon{
-      width:46px;
-      height:46px;
-      border-radius:16px;
+    .format-card:hover{
+      transform:translateY(-2px);
+      border-color:#d6c9ff;
+    }
+
+    .format-option input:checked + .format-card{
+      border-color:var(--primary);
+      background:linear-gradient(180deg, #f5efff 0%, #eee6fd 100%);
+      box-shadow:0 0 0 4px rgba(124,108,242,.08), 0 14px 24px rgba(124,108,242,.08);
+    }
+
+    .format-icon{
+      width:42px;
+      height:42px;
+      border-radius:14px;
       display:grid;
       place-items:center;
       background:#fff;
-      border:1.5px solid rgba(124,108,242,.10);
-      font-size:.95rem;
+      border:1px solid rgba(124,108,242,.10);
+      color:var(--primary-2);
       font-weight:800;
-      color:#5643d3;
-      box-shadow:0 6px 14px rgba(124,108,242,.05);
-      flex:none;
-      letter-spacing:.02em;
-    }
-
-    .mode-check{
-      width:24px;
-      height:24px;
-      border-radius:50%;
-      border:2px solid #d4c9ff;
-      background:#fff;
-      transition:.2s ease;
-      box-shadow:0 4px 10px rgba(124,108,242,.05);
+      font-size:.88rem;
       flex:none;
     }
 
-    .mode-option input:checked + .mode-card .mode-check{
-      background:linear-gradient(135deg, var(--primary), var(--primary-2));
-      border-color:transparent;
-      box-shadow:0 8px 16px rgba(124,108,242,.18);
+    .format-copy strong{
+      display:block;
+      color:#342c42;
+      font-size:.98rem;
+      margin-bottom:4px;
     }
 
-    .mode-card h4{
-      position:relative;
-      z-index:2;
-      font-family:"Sora",sans-serif;
-      font-size:1rem;
-      letter-spacing:-.03em;
-      margin-bottom:6px;
-      color:#322a40;
-    }
-
-    .mode-card p{
-      position:relative;
-      z-index:2;
-      color:#645a73;
-      line-height:1.6;
-      font-size:.92rem;
-      margin-bottom:14px;
-    }
-
-    .mode-mini{
-      position:relative;
-      z-index:2;
-      display:flex;
-      flex-wrap:wrap;
-      gap:8px;
-    }
-
-    .mode-mini span{
-      padding:8px 10px;
-      border-radius:999px;
-      background:rgba(255,255,255,.84);
-      border:1px solid var(--primary-line-soft);
-      color:#62586e;
-      font-size:.78rem;
-      font-weight:700;
+    .format-copy p{
+      color:#6c6277;
+      font-size:.89rem;
+      line-height:1.5;
     }
 
     .format-preview{
-      margin-top:14px;
-      padding:16px 16px;
+      padding:16px;
       border-radius:18px;
       background:linear-gradient(180deg,#fffaf3 0%, #f6eee3 100%);
-      border:1px solid var(--primary-line-soft);
+      border:1px solid var(--line-soft);
       box-shadow:var(--shadow-soft);
     }
 
@@ -827,9 +745,9 @@
 
     .upload-box{
       position:relative;
-      border:1.5px dashed #dccccf;
+      border:1.5px dashed #d9ccff;
       background:linear-gradient(180deg,#fffaf4 0%, #f6eee4 100%);
-      border-radius:20px;
+      border-radius:22px;
       padding:18px;
       overflow:hidden;
       transition:.2s ease;
@@ -851,17 +769,17 @@
     }
 
     .upload-inner{
+      position:relative;
+      z-index:1;
       display:flex;
       align-items:flex-start;
       gap:14px;
-      position:relative;
-      z-index:1;
     }
 
     .upload-icon{
-      width:46px;
-      height:46px;
-      border-radius:15px;
+      width:48px;
+      height:48px;
+      border-radius:16px;
       display:grid;
       place-items:center;
       background:#fff;
@@ -876,8 +794,8 @@
     .upload-inner strong{
       display:block;
       font-size:.98rem;
-      margin-bottom:4px;
       color:#352d43;
+      margin-bottom:4px;
     }
 
     .upload-inner p{
@@ -893,21 +811,112 @@
     }
 
     .file-item{
+      display:flex;
+      align-items:center;
+      gap:10px;
       padding:12px 14px;
       border-radius:16px;
       background:#fffaf3;
-      border:1px solid var(--primary-line-soft);
+      border:1px solid var(--line-soft);
       color:#4d566b;
       font-size:.93rem;
       font-weight:600;
       box-shadow:var(--shadow-soft);
     }
 
-    .form-actions{
+    .aside-stack{
+      display:grid;
+      gap:20px;
+      position:sticky;
+      top:28px;
+    }
+
+    .mini-card{
+      background:linear-gradient(180deg, rgba(255,252,247,.98), rgba(247,241,232,.98));
+      border:1px solid var(--line-soft);
+      border-radius:24px;
+      padding:18px;
+      box-shadow:var(--shadow-soft);
+    }
+
+    .mini-card h3{
+      font-family:"Sora",sans-serif;
+      font-size:1rem;
+      letter-spacing:-.02em;
+      margin-bottom:8px;
+      color:#31283f;
+    }
+
+    .mini-card p{
+      color:#6d6477;
+      line-height:1.65;
+      font-size:.91rem;
+    }
+
+    .steps{
+      display:grid;
+      gap:12px;
+      margin-top:14px;
+    }
+
+    .step{
+      display:flex;
+      align-items:flex-start;
+      gap:12px;
+      padding:12px;
+      border-radius:16px;
+      background:#fffaf3;
+      border:1px solid var(--line-soft);
+    }
+
+    .step-index{
+      width:28px;
+      height:28px;
+      border-radius:999px;
+      display:grid;
+      place-items:center;
+      background:var(--primary-soft);
+      color:var(--primary-2);
+      font-weight:800;
+      font-size:.82rem;
+      flex:none;
+    }
+
+    .step strong{
+      display:block;
+      color:#352d43;
+      font-size:.92rem;
+      margin-bottom:3px;
+    }
+
+    .step p{
+      color:#70667a;
+      font-size:.86rem;
+      line-height:1.55;
+    }
+
+    .tips-list{
+      display:grid;
+      gap:10px;
+      margin-top:12px;
+    }
+
+    .tip{
+      padding:12px 13px;
+      border-radius:16px;
+      background:#fffaf3;
+      border:1px solid var(--line-soft);
+      color:#6b6276;
+      font-size:.88rem;
+      line-height:1.55;
+      font-weight:600;
+    }
+
+    .actions-bar{
       display:flex;
       gap:12px;
       flex-wrap:wrap;
-      margin-top:20px;
+      margin-top:2px;
     }
 
     .btn{
@@ -922,8 +931,8 @@
       font-weight:800;
       border-radius:999px;
       padding:14px 22px;
-      transition:.2s ease;
       min-height:52px;
+      transition:.2s ease;
     }
 
     .btn:hover{
@@ -939,7 +948,7 @@
     .btn-soft{
       color:var(--primary-2);
       background:#f3edff;
-      border:1px solid var(--primary-line);
+      border:1px solid var(--line);
       box-shadow:0 10px 20px rgba(124,108,242,.05);
     }
 
@@ -947,34 +956,39 @@
       background:#eee7ff;
     }
 
+    .btn-ghost{
+      color:#5f5670;
+      background:#fffaf3;
+      border:1px solid var(--line-soft);
+      box-shadow:0 10px 20px rgba(49,38,73,.035);
+    }
+
+    .btn-ghost:hover{
+      background:#fff7ee;
+    }
+
     .hidden-legacy{
       display:none !important;
     }
 
-    @media (max-width: 1100px){
-      .content-type-selector{
+    @media (max-width: 1180px){
+      .layout-grid{
+        grid-template-columns:1fr;
+      }
+
+      .aside-stack{
+        position:relative;
+        top:0;
         grid-template-columns:repeat(2, minmax(0, 1fr));
       }
     }
 
-    @media (max-width: 640px){
-      .content-type-selector{
-        grid-template-columns:1fr;
-      }
-    }
-
-    @media (max-width: 1080px){
-      .content-grid{
-        grid-template-columns:1fr;
-      }
-    }
-
     @media (max-width: 980px){
-      .board-content{
+      .type-grid{
         grid-template-columns:1fr;
       }
 
-      .board-side-cards{
+      .form-grid{
         grid-template-columns:1fr;
       }
     }
@@ -988,56 +1002,65 @@
         position:relative;
         height:auto;
         border-right:none;
-        border-bottom:1px solid var(--primary-line-soft);
+        border-bottom:1px solid var(--line-soft);
       }
 
       .main{
         padding:18px;
       }
 
-      .hero-craft,
-      .editor-card,
-      .support-card{
-        border-radius:24px;
+      .panel,
+      .mini-card{
+        border-radius:22px;
       }
 
-      .editor-inner,
-      .support-inner{
+      .panel-inner{
         padding:20px;
-      }
-
-      .form-grid{
-        grid-template-columns:1fr;
       }
     }
 
-    @media (max-width: 720px){
-      .form-actions{
+    @media (max-width: 760px){
+      .topbar{
+        gap:14px;
+      }
+
+      .topbar-status{
+        max-width:none;
+        width:100%;
+      }
+
+      .format-switcher{
+        grid-template-columns:1fr;
+      }
+
+      .aside-stack{
+        grid-template-columns:1fr;
+      }
+
+      .actions-bar{
         flex-direction:column;
       }
 
-      .form-actions .btn{
+      .actions-bar .btn{
         width:100%;
       }
     }
 
-    @media (max-width: 640px){
-      .modern-board{
-        border-radius:22px;
-        padding:18px;
+    @media (max-width: 560px){
+      .main{
+        padding:14px;
       }
 
-      .chalk-note h1{
-        font-size:2rem;
+      .topbar h1{
+        font-size:1.9rem;
       }
 
-      .mode-selector,
-      .content-type-selector{
-        grid-template-columns:1fr;
+      .type-card{
+        min-height:auto;
       }
 
-      .board-header{
-        align-items:flex-start;
+      .panel-head{
+        margin-bottom:16px;
       }
     }
   </style>
@@ -1065,302 +1088,333 @@
 
       <div class="sidebar-note">
         <strong>Sugerencia</strong>
-        <p>Cuanto más claro sea el pedido, más precisa va a ser la estructura que genere la IA para tu contenido.</p>
+        <p>
+          Elegí primero qué querés crear. Después completá solo lo esencial:
+          la IA va a trabajar mucho mejor con un pedido corto pero claro.
+        </p>
       </div>
     </aside>
 
     <main class="main">
       <div class="page">
-
-        <section class="hero-craft">
-          <div class="craft-stage">
-            <div class="board-header">
-              <div class="board-frame-label">EDUVIA</div>
-
-              <div class="board-tabs">
-                <span class="board-tab active">Crear contenido</span>
-                <span class="board-tab">Configuración</span>
-                <span class="board-tab">Formato</span>
-                <span class="board-tab">Materiales</span>
-              </div>
-            </div>
-
-            <div class="modern-board">
-              <div class="board-topbar">
-                <div class="board-dots">
-                  <span class="board-dot"></span>
-                  <span class="board-dot"></span>
-                  <span class="board-dot"></span>
-                </div>
-
-                <div class="board-status">Preparación activa</div>
-              </div>
-
-              <div class="board-content">
-                <div class="chalk-note">
-                  <span class="mini-label">Crear con IA</span>
-                  <h1>Generá el contenido que necesites con una estructura más clara y flexible.</h1>
-                  <p>
-                    Prepará clases, resúmenes, análisis, documentos de estudio o investigaciones
-                    sin depender de un formulario rígido. Elegís el tipo de contenido y Eduvia
-                    adapta la experiencia a ese objetivo.
-                  </p>
-
-                  <div class="board-feature-row">
-                    <span class="board-feature">Clase escolar</span>
-                    <span class="board-feature">Resumen</span>
-                    <span class="board-feature">Análisis</span>
-                    <span class="board-feature">Documento</span>
-                    <span class="board-feature">Investigación</span>
-                  </div>
-                </div>
-
-                <div class="board-side-cards">
-                  <div class="side-card">
-                    <span>Flexibilidad</span>
-                    <strong>Un flujo más amplio</strong>
-                    <p>La interfaz se adapta tanto a contenidos escolares como a desarrollos más libres y específicos.</p>
-                  </div>
-
-                  <div class="side-card">
-                    <span>Formato</span>
-                    <strong>Dos formas de estudio</strong>
-                    <p>Podés elegir una vista más visual o una presentación más lineal y ordenada según el uso que le quieras dar.</p>
-                  </div>
-
-                  <div class="side-card">
-                    <span>Material de apoyo</span>
-                    <strong>Más contexto, mejor resultado</strong>
-                    <p>Archivos, apuntes o imágenes ayudan a que la IA construya respuestas más alineadas a tu tema real.</p>
-                  </div>
-                </div>
-              </div>
-
-              <div class="board-bottom">
-                <div class="chalk-shelf">
-                  <div class="chalk-tools">
-                    <span class="chalk white"></span>
-                    <span class="chalk yellow"></span>
-                    <span class="chalk violet"></span>
-                  </div>
-                  <div class="board-bottom-line"></div>
-                </div>
-              </div>
-            </div>
+        <header class="topbar">
+          <div class="topbar-copy">
+            <span class="eyebrow">Crear con Eduvia</span>
+            <h1>Armá contenido de estudio de forma más clara y flexible.</h1>
+            <p>
+              Elegí el tipo de contenido, completá los datos importantes y decidí
+              cómo querés ver el resultado final. La experiencia está pensada para
+              que crear sea rápido y ordenado.
+            </p>
           </div>
-        </section>
 
-        <section class="content-grid">
-          <div class="workspace-main">
-            <div class="editor-card">
-              <div class="editor-inner">
-                <div class="editor-head">
-                  <span class="section-badge yellow">Configuración principal</span>
-                  <h2>Prepará tu contenido</h2>
-                  <p>
-                    Elegí qué querés crear y completá solo los campos que realmente tengan sentido
-                    para ese tipo de contenido.
-                  </p>
-                </div>
+          <div class="topbar-status">
+            <span>Preparación activa</span>
+            <strong>Tu flujo de creación</strong>
+            <p>
+              Primero elegís el contenido, después completás el formulario y al final
+              definís la visualización y el material de apoyo.
+            </p>
+          </div>
+        </header>
 
-                <form id="clase-form">
-                  <div class="form-grid">
-                    <div class="field full">
-                      <label>Tipo de contenido</label>
-
-                      <div class="content-type-selector" id="content-type-selector">
-                        <label class="mode-option">
-                          <input type="radio" name="tipo_contenido" value="clase" checked />
-                          <div class="mode-card">
-                            <div class="mode-top">
-                              <div class="mode-icon">CL</div>
-                              <div class="mode-check"></div>
-                            </div>
-                            <h4>Clase escolar</h4>
-                            <p>Ideal para materias como matemática, historia, biología o inglés.</p>
-                            <div class="mode-mini">
-                              <span>Materia</span>
-                              <span>Nivel</span>
-                              <span>Objetivo</span>
-                            </div>
-                          </div>
-                        </label>
-
-                        <label class="mode-option">
-                          <input type="radio" name="tipo_contenido" value="resumen" />
-                          <div class="mode-card">
-                            <div class="mode-top">
-                              <div class="mode-icon">RS</div>
-                              <div class="mode-check"></div>
-                            </div>
-                            <h4>Resumen / explicación</h4>
-                            <p>Para entender un tema puntual de forma clara, sin formato escolar rígido.</p>
-                            <div class="mode-mini">
-                              <span>Tema libre</span>
-                              <span>Enfoque</span>
-                              <span>Profundidad</span>
-                            </div>
-                          </div>
-                        </label>
-
-                        <label class="mode-option">
-                          <input type="radio" name="tipo_contenido" value="analisis" />
-                          <div class="mode-card">
-                            <div class="mode-top">
-                              <div class="mode-icon">AN</div>
-                              <div class="mode-check"></div>
-                            </div>
-                            <h4>Análisis de tema</h4>
-                            <p>Perfecto para interpretar, comparar o desarrollar una mirada más profunda.</p>
-                            <div class="mode-mini">
-                              <span>Comparación</span>
-                              <span>Crítico</span>
-                              <span>Interpretación</span>
-                            </div>
-                          </div>
-                        </label>
-
-                        <label class="mode-option">
-                          <input type="radio" name="tipo_contenido" value="documento" />
-                          <div class="mode-card">
-                            <div class="mode-top">
-                              <div class="mode-icon">DC</div>
-                              <div class="mode-check"></div>
-                            </div>
-                            <h4>Documento de estudio</h4>
-                            <p>Para crear apuntes, desarrollos largos o material de repaso más ordenado.</p>
-                            <div class="mode-mini">
-                              <span>Apunte</span>
-                              <span>Esquema</span>
-                              <span>Repaso</span>
-                            </div>
-                          </div>
-                        </label>
-
-                        <label class="mode-option">
-                          <input type="radio" name="tipo_contenido" value="investigacion" />
-                          <div class="mode-card">
-                            <div class="mode-top">
-                              <div class="mode-icon">IN</div>
-                              <div class="mode-check"></div>
-                            </div>
-                            <h4>Investigación rápida</h4>
-                            <p>Para buscar ideas clave, organizar hallazgos y explorar un tema puntual.</p>
-                            <div class="mode-mini">
-                              <span>Pregunta</span>
-                              <span>Búsqueda</span>
-                              <span>Hallazgos</span>
-                            </div>
-                          </div>
-                        </label>
-                      </div>
-
-                      <span class="helper">
-                        Elegí el formato que mejor se adapte a lo que querés crear.
-                      </span>
+        <div class="layout-grid">
+          <section class="main-stack">
+            <form id="clase-form">
+              <div class="panel">
+                <div class="panel-inner">
+                  <div class="panel-head">
+                    <div>
+                      <h2>1. Elegí qué querés crear</h2>
+                      <p>
+                        Seleccioná el tipo de contenido que mejor se adapte a tu necesidad.
+                      </p>
                     </div>
+                    <span class="panel-chip primary">Paso principal</span>
+                  </div>
 
-                    <div id="dynamic-fields" class="form-grid field full"></div>
-
-                    <div class="field full">
-                      <label>Formato del contenido</label>
-
-                      <div class="mode-selector">
-                        <label class="mode-option">
-                          <input type="radio" name="formato" value="pizarron" checked />
-                          <div class="mode-card">
-                            <div class="mode-top">
-                              <div class="mode-icon">PZ</div>
-                              <div class="mode-check"></div>
-                            </div>
-
-                            <h4>Modo Pizarrón</h4>
-                            <p>
-                              Ideal para una experiencia más visual, explicativa y guiada.
-                            </p>
-
-                            <div class="mode-mini">
-                              <span>Visual</span>
-                              <span>Más guiado</span>
-                              <span>Estilo aula</span>
-                            </div>
+                  <div class="type-grid" id="content-type-selector">
+                    <label class="type-option">
+                      <input type="radio" name="tipo_contenido" value="clase" checked />
+                      <div class="type-card">
+                        <div class="type-icon">CL</div>
+                        <div class="type-content">
+                          <div class="type-row">
+                            <strong>Clase escolar</strong>
+                            <span class="type-check"></span>
                           </div>
-                        </label>
-
-                        <label class="mode-option">
-                          <input type="radio" name="formato" value="documento" />
-                          <div class="mode-card">
-                            <div class="mode-top">
-                              <div class="mode-icon">DC</div>
-                              <div class="mode-check"></div>
-                            </div>
-
-                            <h4>Modo Documento</h4>
-                            <p>
-                              Pensado para apuntes claros, lectura ordenada y estudio más tranquilo.
-                            </p>
-
-                            <div class="mode-mini">
-                              <span>Apunte</span>
-                              <span>Más ordenado</span>
-                              <span>Ideal para repasar</span>
-                            </div>
-                          </div>
-                        </label>
-                      </div>
-
-                      <div id="format-preview" class="format-preview">
-                        <strong>Vista elegida: Pizarrón</strong>
-                        <p>
-                          El contenido se mostrará en una experiencia más visual, tipo aula interactiva.
-                        </p>
-                      </div>
-
-                      <span class="helper">
-                        Elegí el formato según cómo quieras estudiar o presentar la información.
-                      </span>
-                    </div>
-
-                    <div class="field full">
-                      <label for="archivo">Material de apoyo</label>
-
-                      <div class="upload-box">
-                        <input id="archivo" type="file" multiple accept=".pdf,.doc,.docx,.txt,.png,.jpg,.jpeg" />
-                        <div class="upload-inner">
-                          <div class="upload-icon">AR</div>
-                          <div>
-                            <strong>Subí archivos para usar dentro del contenido</strong>
-                            <p>Apuntes, guías, PDFs, imágenes, textos o cualquier material que sume contexto.</p>
+                          <p>Ideal para materias, temas puntuales y objetivos de aprendizaje.</p>
+                          <div class="type-meta">
+                            <span>Materia</span>
+                            <span>Nivel</span>
+                            <span>Objetivo</span>
                           </div>
                         </div>
                       </div>
+                    </label>
 
-                      <span class="helper">
-                        Mientras más claro sea el material, mejor podrá usarlo la IA.
-                      </span>
+                    <label class="type-option">
+                      <input type="radio" name="tipo_contenido" value="resumen" />
+                      <div class="type-card">
+                        <div class="type-icon">RS</div>
+                        <div class="type-content">
+                          <div class="type-row">
+                            <strong>Resumen / explicación</strong>
+                            <span class="type-check"></span>
+                          </div>
+                          <p>Para entender un tema puntual con una explicación clara y directa.</p>
+                          <div class="type-meta">
+                            <span>Tema libre</span>
+                            <span>Enfoque</span>
+                            <span>Profundidad</span>
+                          </div>
+                        </div>
+                      </div>
+                    </label>
 
-                      <div id="file-list" class="file-list"></div>
+                    <label class="type-option">
+                      <input type="radio" name="tipo_contenido" value="analisis" />
+                      <div class="type-card">
+                        <div class="type-icon">AN</div>
+                        <div class="type-content">
+                          <div class="type-row">
+                            <strong>Análisis de tema</strong>
+                            <span class="type-check"></span>
+                          </div>
+                          <p>Perfecto para interpretar, comparar o desarrollar una mirada más profunda.</p>
+                          <div class="type-meta">
+                            <span>Comparación</span>
+                            <span>Crítico</span>
+                            <span>Interpretación</span>
+                          </div>
+                        </div>
+                      </div>
+                    </label>
+
+                    <label class="type-option">
+                      <input type="radio" name="tipo_contenido" value="documento" />
+                      <div class="type-card">
+                        <div class="type-icon">DC</div>
+                        <div class="type-content">
+                          <div class="type-row">
+                            <strong>Documento de estudio</strong>
+                            <span class="type-check"></span>
+                          </div>
+                          <p>Para apuntes, desarrollos largos o material de repaso más ordenado.</p>
+                          <div class="type-meta">
+                            <span>Apunte</span>
+                            <span>Esquema</span>
+                            <span>Repaso</span>
+                          </div>
+                        </div>
+                      </div>
+                    </label>
+
+                    <label class="type-option">
+                      <input type="radio" name="tipo_contenido" value="investigacion" />
+                      <div class="type-card">
+                        <div class="type-icon">IN</div>
+                        <div class="type-content">
+                          <div class="type-row">
+                            <strong>Investigación rápida</strong>
+                            <span class="type-check"></span>
+                          </div>
+                          <p>Para explorar una pregunta, organizar hallazgos y sacar ideas clave.</p>
+                          <div class="type-meta">
+                            <span>Pregunta</span>
+                            <span>Búsqueda</span>
+                            <span>Hallazgos</span>
+                          </div>
+                        </div>
+                      </div>
+                    </label>
+                  </div>
+
+                  <div class="helper-row">
+                    Elegí el formato que mejor se adapte a lo que querés construir.
+                  </div>
+                </div>
+              </div>
+
+              <div class="panel">
+                <div class="panel-inner">
+                  <div class="panel-head">
+                    <div>
+                      <h2>2. Completá la información necesaria</h2>
+                      <p>
+                        Los campos cambian automáticamente según el tipo de contenido elegido.
+                      </p>
+                    </div>
+                    <span class="panel-chip accent">Campos dinámicos</span>
+                  </div>
+
+                  <div class="dynamic-wrap">
+                    <div class="dynamic-header">
+                      <strong>Detalles del contenido</strong>
+                      <span>Completá solo lo que tenga sentido para este caso</span>
+                    </div>
+
+                    <div class="dynamic-shell">
+                      <div id="dynamic-fields" class="form-grid"></div>
                     </div>
                   </div>
+                </div>
+              </div>
 
-                  <div class="hidden-legacy" aria-hidden="true">
-                    <input type="hidden" id="tipo_contenido_hidden" name="tipo_contenido_hidden" value="clase" />
-                    <input type="hidden" id="materia" name="materia" />
-                    <input type="hidden" id="tema" name="tema" />
-                    <input type="hidden" id="nivel" name="nivel" />
-                    <input type="hidden" id="duracion" name="duracion" />
-                    <textarea id="objetivo" name="objetivo"></textarea>
+              <div class="panel">
+                <div class="panel-inner">
+                  <div class="panel-head">
+                    <div>
+                      <h2>3. Elegí cómo querés ver el resultado</h2>
+                      <p>
+                        Esta elección define la forma de presentación, no el contenido.
+                      </p>
+                    </div>
+                    <span class="panel-chip primary">Visualización</span>
                   </div>
 
-                  <div class="form-actions">
-                    <button type="submit" class="btn btn-primary">Crear contenido</button>
-                    <a href="panel.html" class="btn btn-soft">Volver al panel</a>
+                  <div class="format-switcher">
+                    <label class="format-option">
+                      <input type="radio" name="formato" value="pizarron" checked />
+                      <div class="format-card">
+                        <div class="format-icon">PZ</div>
+                        <div class="format-copy">
+                          <strong>Modo Pizarrón</strong>
+                          <p>Más visual, guiado e interactivo.</p>
+                        </div>
+                      </div>
+                    </label>
+
+                    <label class="format-option">
+                      <input type="radio" name="formato" value="documento" />
+                      <div class="format-card">
+                        <div class="format-icon">DC</div>
+                        <div class="format-copy">
+                          <strong>Modo Documento</strong>
+                          <p>Más lineal, ordenado y cómodo para repasar.</p>
+                        </div>
+                      </div>
+                    </label>
                   </div>
-                </form>
+
+                  <div id="format-preview" class="format-preview">
+                    <strong>Vista elegida: Pizarrón</strong>
+                    <p>
+                      El contenido se mostrará en una experiencia más visual, tipo aula interactiva.
+                    </p>
+                  </div>
+
+                  <div class="helper-row">
+                    Podés cambiar esta preferencia antes de generar el contenido.
+                  </div>
+                </div>
+              </div>
+
+              <div class="panel">
+                <div class="panel-inner">
+                  <div class="panel-head">
+                    <div>
+                      <h2>4. Sumá material de apoyo</h2>
+                      <p>
+                        Podés adjuntar archivos para que la IA tenga más contexto al generar.
+                      </p>
+                    </div>
+                    <span class="panel-chip primary">Opcional</span>
+                  </div>
+
+                  <div class="field full">
+                    <label for="archivo">Material de apoyo</label>
+
+                    <div class="upload-box">
+                      <input id="archivo" type="file" multiple accept=".pdf,.doc,.docx,.txt,.png,.jpg,.jpeg" />
+                      <div class="upload-inner">
+                        <div class="upload-icon">AR</div>
+                        <div>
+                          <strong>Subí archivos para enriquecer el contenido</strong>
+                          <p>
+                            Apuntes, PDFs, guías, imágenes o textos pueden ayudar a que la respuesta
+                            sea mucho más precisa y útil.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <span class="helper">
+                      Mientras más claro y relevante sea el material, mejor podrá usarlo la IA.
+                    </span>
+
+                    <div id="file-list" class="file-list"></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="hidden-legacy" aria-hidden="true">
+                <input type="hidden" id="tipo_contenido_hidden" name="tipo_contenido_hidden" value="clase" />
+                <input type="hidden" id="materia" name="materia" />
+                <input type="hidden" id="tema" name="tema" />
+                <input type="hidden" id="nivel" name="nivel" />
+                <input type="hidden" id="duracion" name="duracion" />
+                <textarea id="objetivo" name="objetivo"></textarea>
+              </div>
+
+              <div class="actions-bar">
+                <button type="submit" class="btn btn-primary">Crear contenido</button>
+                <a href="panel.html" class="btn btn-soft">Volver al panel</a>
+                <button type="button" class="btn btn-ghost" id="clear-form-btn">Limpiar selección</button>
+              </div>
+            </form>
+          </section>
+
+          <aside class="aside-stack">
+            <div class="mini-card">
+              <h3>Cómo funciona</h3>
+              <p>
+                El flujo está organizado para que tomes primero la decisión más importante y después completes solo los datos necesarios.
+              </p>
+
+              <div class="steps">
+                <div class="step">
+                  <div class="step-index">1</div>
+                  <div>
+                    <strong>Elegí el tipo</strong>
+                    <p>Definí qué querés crear antes de completar el resto.</p>
+                  </div>
+                </div>
+
+                <div class="step">
+                  <div class="step-index">2</div>
+                  <div>
+                    <strong>Completá el formulario</strong>
+                    <p>La interfaz se adapta automáticamente al contenido elegido.</p>
+                  </div>
+                </div>
+
+                <div class="step">
+                  <div class="step-index">3</div>
+                  <div>
+                    <strong>Definí la visualización</strong>
+                    <p>Elegí si querés una experiencia más visual o más lineal.</p>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-        </section>
+
+            <div class="mini-card">
+              <h3>Consejos para mejores resultados</h3>
+              <p>
+                Una consigna simple pero específica suele funcionar mejor que un pedido demasiado largo.
+              </p>
+
+              <div class="tips-list">
+                <div class="tip">Sé claro con el tema principal.</div>
+                <div class="tip">Indicá el nivel o público al que va dirigido.</div>
+                <div class="tip">Aclar
+á si querés algo breve, medio o profundo.</div>
+                <div class="tip">Adjuntá material solo si realmente aporta contexto.</div>
+              </div>
+            </div>
+          </aside>
+        </div>
       </div>
     </main>
   </div>
@@ -1389,6 +1443,7 @@
   <script>
     const fileInput = document.getElementById("archivo");
     const fileList = document.getElementById("file-list");
+    const clearFormBtn = document.getElementById("clear-form-btn");
 
     fileInput?.addEventListener("change", () => {
       fileList.innerHTML = "";
@@ -1396,12 +1451,41 @@
       const files = Array.from(fileInput.files || []);
       if (!files.length) return;
 
-      files.forEach(file => {
+      files.forEach((file) => {
         const item = document.createElement("div");
         item.className = "file-item";
         item.textContent = `📄 ${file.name}`;
         fileList.appendChild(item);
       });
+    });
+
+    clearFormBtn?.addEventListener("click", () => {
+      const defaultType = document.querySelector('input[name="tipo_contenido"][value="clase"]');
+      const defaultFormat = document.querySelector('input[name="formato"][value="pizarron"]');
+
+      if (defaultType) defaultType.checked = true;
+      if (defaultFormat) defaultFormat.checked = true;
+
+      const allInputs = document.querySelectorAll("#dynamic-fields input, #dynamic-fields select, #dynamic-fields textarea");
+      allInputs.forEach((el) => {
+        if (el.tagName === "SELECT") {
+          el.selectedIndex = 0;
+        } else {
+          el.value = "";
+        }
+      });
+
+      if (fileInput) {
+        fileInput.value = "";
+      }
+
+      if (fileList) {
+        fileList.innerHTML = "";
+      }
+
+      renderDynamicFields();
+      updateFormatPreview();
+      syncLegacyFields();
     });
   </script>
 
@@ -1432,7 +1516,7 @@
       }
     }
 
-    formatInputs.forEach(input => {
+    formatInputs.forEach((input) => {
       input.addEventListener("change", updateFormatPreview);
     });
 
@@ -1482,7 +1566,7 @@
             <option value="45 min">45 minutos</option>
             <option value="60 min">60 minutos</option>
           </select>
-          <span class="helper">Organiza mejor la estructura de la clase.</span>
+          <span class="helper">Organiza mejor la estructura.</span>
         </div>
 
         <div class="field full">
@@ -1528,7 +1612,7 @@
         <div class="field full">
           <label for="resumen_pedido">Qué querés que explique</label>
           <textarea id="resumen_pedido" placeholder="Ejemplo: Quiero un texto claro con ejemplos, partes principales y por qué fue importante."></textarea>
-          <span class="helper">Podés pedir ejemplos, contexto histórico o una explicación simple.</span>
+          <span class="helper">Podés pedir ejemplos, contexto o una explicación más simple.</span>
         </div>
       `,
 
@@ -1638,13 +1722,6 @@
       return document.getElementById(id)?.value?.trim() || "";
     }
 
-    function renderDynamicFields() {
-      const selected = document.querySelector('input[name="tipo_contenido"]:checked')?.value || "clase";
-      dynamicFields.innerHTML = fieldTemplates[selected] || fieldTemplates.clase;
-      syncLegacyFields();
-      bindDynamicInputs();
-    }
-
     function syncLegacyFields() {
       const selected = document.querySelector('input[name="tipo_contenido"]:checked')?.value || "clase";
 
@@ -1734,6 +1811,13 @@
         input.addEventListener("input", syncLegacyFields);
         input.addEventListener("change", syncLegacyFields);
       });
+    }
+
+    function renderDynamicFields() {
+      const selected = document.querySelector('input[name="tipo_contenido"]:checked')?.value || "clase";
+      dynamicFields.innerHTML = fieldTemplates[selected] || fieldTemplates.clase;
+      bindDynamicInputs();
+      syncLegacyFields();
     }
 
     tipoInputs.forEach((input) => {
