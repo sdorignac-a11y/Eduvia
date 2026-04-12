@@ -76,6 +76,57 @@ function limpiarLista(value, max = 6) {
     .slice(0, max);
 }
 
+function sanitizeUrl(value = "") {
+  try {
+    const url = new URL(String(value), "https://example.com");
+    if (url.protocol === "http:" || url.protocol === "https:") {
+      return url.href;
+    }
+    return "";
+  } catch {
+    return "";
+  }
+}
+
+function limpiarFuentes(value) {
+  if (!Array.isArray(value)) return [];
+
+  const seen = new Set();
+
+  return value
+    .map((item) => {
+      if (!item || typeof item !== "object") return null;
+
+      const titulo = limpiarTexto(item.title || item.titulo || item.name || "Fuente");
+      const url = sanitizeUrl(item.url || item.link || "");
+      const key = `${titulo}|${url}`;
+
+      if (!titulo && !url) return null;
+      if (seen.has(key)) return null;
+
+      seen.add(key);
+
+      return {
+        title: titulo || "Fuente",
+        url,
+      };
+    })
+    .filter(Boolean)
+    .slice(0, 10);
+}
+
+function construirTextoFuentes(fuentes = []) {
+  if (!fuentes.length) return "No hay fuentes disponibles.";
+
+  return fuentes
+    .map((fuente, index) => {
+      const titulo = limpiarTexto(fuente.title || "Fuente");
+      const url = limpiarTexto(fuente.url || "");
+      return `${index + 1}. ${titulo}${url ? ` — ${url}` : ""}`;
+    })
+    .join("\n");
+}
+
 function extraerOutputText(response) {
   if (typeof response?.output_text === "string" && response.output_text.trim()) {
     return response.output_text;
@@ -175,14 +226,20 @@ export default async function handler(req, res) {
       pregunta = "",
       documentoActual = "",
       tituloDocumento = "",
+      objetivoDocumento = "",
       textoSeleccionado = "",
+      investigacion = "",
+      fuentes = [],
       ultimaRespuesta = null,
     } = req.body || {};
 
     const preguntaLimpia = limpiarTexto(pregunta);
     const documentoLimpio = limpiarTexto(documentoActual);
     const tituloLimpio = limpiarTexto(tituloDocumento);
+    const objetivoLimpio = limpiarTexto(objetivoDocumento);
     const seleccionadoLimpio = limpiarTexto(textoSeleccionado);
+    const investigacionLimpia = limpiarTexto(investigacion);
+    const fuentesLimpias = limpiarFuentes(fuentes);
 
     if (!preguntaLimpia) {
       return res.status(400).json({
@@ -221,6 +278,8 @@ Reglas:
 - Si el usuario pide acortar, conservá la idea central.
 - Si el usuario pide mejorar estilo, hacelo más claro y natural.
 - Si hay texto seleccionado, priorizalo por encima del resto del documento.
+- Si hay objetivo del documento, tenelo en cuenta.
+- Si hay investigación previa y fuentes, usalas para sostener mejor la respuesta.
 - No reescribas todo el documento salvo que el usuario lo pida.
 - Cuando propongas cambios, que sean accionables.
 - Devolvé SOLO JSON válido.
@@ -248,11 +307,20 @@ Formato:
 TÍTULO DEL DOCUMENTO:
 ${tituloLimpio || "Sin título"}
 
+OBJETIVO DEL DOCUMENTO:
+${objetivoLimpio || "No especificado."}
+
 TEXTO SELECCIONADO:
 ${seleccionadoLimpio || "No hay texto seleccionado."}
 
 DOCUMENTO COMPLETO:
 ${documentoLimpio || "No disponible."}
+
+INVESTIGACIÓN PREVIA:
+${investigacionLimpia || "No disponible."}
+
+FUENTES:
+${construirTextoFuentes(fuentesLimpias)}
 
 ÚLTIMA RESPUESTA DEL ASISTENTE:
 ${JSON.stringify(ultimaRespuesta || {}, null, 2)}
