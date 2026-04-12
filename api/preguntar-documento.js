@@ -181,15 +181,71 @@ function normalizarCambios(value) {
     .slice(0, 6);
 }
 
-function normalizarRespuesta(parsed = {}) {
+function normalizarModo(modo = "", accion = "", pregunta = "") {
+  const modoLimpio = limpiarTexto(modo).toLowerCase();
+  const accionLimpia = limpiarTexto(accion).toLowerCase();
+  const preguntaLimpia = limpiarTexto(pregunta).toLowerCase();
+
+  const validos = ["respuesta", "mejora", "expansion", "resumen", "reescritura"];
+  if (validos.includes(modoLimpio)) return modoLimpio;
+
+  if (["alargar", "expandir", "profundizar", "ampliar"].includes(accionLimpia)) {
+    return "expansion";
+  }
+
+  if (["acortar", "resumir"].includes(accionLimpia)) {
+    return "resumen";
+  }
+
+  if (["formal", "claro", "mejorar"].includes(accionLimpia)) {
+    return "mejora";
+  }
+
+  if (["reescribir", "reescritura"].includes(accionLimpia)) {
+    return "reescritura";
+  }
+
+  if (
+    preguntaLimpia.includes("alarg") ||
+    preguntaLimpia.includes("ampli") ||
+    preguntaLimpia.includes("profund")
+  ) {
+    return "expansion";
+  }
+
+  if (
+    preguntaLimpia.includes("resum") ||
+    preguntaLimpia.includes("acort")
+  ) {
+    return "resumen";
+  }
+
+  if (
+    preguntaLimpia.includes("reescrib") ||
+    preguntaLimpia.includes("reformular")
+  ) {
+    return "reescritura";
+  }
+
+  if (
+    preguntaLimpia.includes("mejor") ||
+    preguntaLimpia.includes("más claro") ||
+    preguntaLimpia.includes("mas claro") ||
+    preguntaLimpia.includes("más formal") ||
+    preguntaLimpia.includes("mas formal")
+  ) {
+    return "mejora";
+  }
+
+  return "respuesta";
+}
+
+function normalizarRespuesta(parsed = {}, accion = "", pregunta = "") {
   const subtitulo = limpiarTexto(parsed.subtitulo) || "Asistente del documento";
   const respuestaRaw =
     parsed.respuesta && typeof parsed.respuesta === "object" ? parsed.respuesta : {};
 
-  const modosValidos = ["respuesta", "mejora", "expansion", "resumen", "reescritura"];
-  const modo = modosValidos.includes(respuestaRaw.modo)
-    ? respuestaRaw.modo
-    : "respuesta";
+  const modo = normalizarModo(respuestaRaw.modo, accion, pregunta);
 
   const titulo = limpiarTexto(respuestaRaw.titulo) || "Respuesta sobre el documento";
   const resumen =
@@ -213,6 +269,75 @@ function normalizarRespuesta(parsed = {}) {
   };
 }
 
+function construirInstruccionSegunAccion(accion = "") {
+  const a = limpiarTexto(accion).toLowerCase();
+
+  switch (a) {
+    case "explicar":
+      return `
+Acción elegida: EXPLICAR.
+- Explicá mejor el fragmento seleccionado.
+- Priorizá claridad, contexto y facilidad de estudio.
+- Si ayuda, incluí una versión mejor explicada en "textoPropuesto".
+      `.trim();
+
+    case "mejorar":
+      return `
+Acción elegida: MEJORAR.
+- Mejorá la redacción sin cambiar la idea central.
+- Hacelo más natural, fluido y prolijo.
+- Devolvé un "textoPropuesto" mejorado.
+      `.trim();
+
+    case "alargar":
+      return `
+Acción elegida: ALARGAR.
+- Expandí el fragmento con contenido útil.
+- Agregá desarrollo real, no relleno.
+- Devolvé un "textoPropuesto" más completo.
+      `.trim();
+
+    case "acortar":
+      return `
+Acción elegida: ACORTAR.
+- Reducí el fragmento manteniendo la idea principal.
+- Eliminá repeticiones y exceso.
+- Devolvé un "textoPropuesto" más breve y claro.
+      `.trim();
+
+    case "claro":
+      return `
+Acción elegida: MÁS CLARO.
+- Reescribí el fragmento para que sea más simple y fácil de entender.
+- Pensá en alguien que está estudiando.
+- Devolvé un "textoPropuesto" más claro.
+      `.trim();
+
+    case "formal":
+      return `
+Acción elegida: MÁS FORMAL.
+- Reescribí el fragmento con tono más académico y prolijo.
+- Sin volverlo rígido ni artificial.
+- Devolvé un "textoPropuesto" más formal.
+      `.trim();
+
+    case "resumir":
+      return `
+Acción elegida: RESUMIR.
+- Resumí el fragmento conservando lo esencial.
+- Hacelo más directo.
+- Devolvé un "textoPropuesto" resumido.
+      `.trim();
+
+    default:
+      return `
+Acción general.
+- Respondé según el pedido del usuario.
+- Si corresponde, proponé un nuevo texto en "textoPropuesto".
+      `.trim();
+  }
+}
+
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({
@@ -224,6 +349,7 @@ export default async function handler(req, res) {
   try {
     const {
       pregunta = "",
+      accion = "",
       documentoActual = "",
       tituloDocumento = "",
       objetivoDocumento = "",
@@ -234,6 +360,7 @@ export default async function handler(req, res) {
     } = req.body || {};
 
     const preguntaLimpia = limpiarTexto(pregunta);
+    const accionLimpia = limpiarTexto(accion);
     const documentoLimpio = limpiarTexto(documentoActual);
     const tituloLimpio = limpiarTexto(tituloDocumento);
     const objetivoLimpio = limpiarTexto(objetivoDocumento);
@@ -272,7 +399,7 @@ Tu trabajo:
 Reglas:
 - Respondé en español rioplatense neutro.
 - Sé claro, didáctico y útil.
-- No hables como un chat casual.
+- No hables como chat casual.
 - No inventes contenido fuera del documento salvo que el usuario te pida explícitamente ampliarlo.
 - Si el usuario pide alargar, expandí con contenido útil, no con relleno.
 - Si el usuario pide acortar, conservá la idea central.
@@ -282,6 +409,7 @@ Reglas:
 - Si hay investigación previa y fuentes, usalas para sostener mejor la respuesta.
 - No reescribas todo el documento salvo que el usuario lo pida.
 - Cuando propongas cambios, que sean accionables.
+- "textoPropuesto" debe ser realmente usable cuando la acción implique modificar el texto.
 - Devolvé SOLO JSON válido.
 
 Interpretación de pedidos:
@@ -290,6 +418,8 @@ Interpretación de pedidos:
 - Si pide alargar o profundizar => modo "expansion".
 - Si pide resumir o achicar => modo "resumen".
 - Si pide reescribir una parte => modo "reescritura".
+
+${construirInstruccionSegunAccion(accionLimpia)}
 
 Formato:
 - subtitulo: etiqueta breve.
@@ -360,7 +490,7 @@ ${preguntaLimpia}
       });
     }
 
-    const respuesta = normalizarRespuesta(parsed);
+    const respuesta = normalizarRespuesta(parsed, accionLimpia, preguntaLimpia);
 
     return res.status(200).json({
       ok: true,
