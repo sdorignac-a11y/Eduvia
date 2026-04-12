@@ -17,7 +17,8 @@ const toggleSourcesBtn = document.getElementById("toggle-sources-btn");
 const closeSourcesBtn = document.getElementById("sources-close-btn");
 const sourcesList = document.getElementById("sources-list");
 
-const FETCH_TIMEOUT_MS = 30000;
+const GENERAR_CLASE_TIMEOUT_MS = 90000;
+const PREGUNTA_CHAT_TIMEOUT_MS = 60000;
 
 let claseGuardadaActual = null;
 let claseGeneradaActual = null;
@@ -59,6 +60,23 @@ function sanitizeUrl(value = "") {
     return "";
   } catch {
     return "";
+  }
+}
+
+async function leerRespuestaSeguro(response) {
+  const rawText = await response.text();
+
+  if (!rawText) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(rawText);
+  } catch {
+    return {
+      ok: false,
+      error: rawText.slice(0, 300) || "El servidor devolvió una respuesta inválida.",
+    };
   }
 }
 
@@ -119,7 +137,7 @@ function wait(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-async function fetchConTimeout(url, options = {}, timeoutMs = FETCH_TIMEOUT_MS) {
+async function fetchConTimeout(url, options = {}, timeoutMs) {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
@@ -337,6 +355,27 @@ function fallbackSecciones(raw = {}) {
   return secciones;
 }
 
+function partirEnLineas(text = "", maxChars = 22, maxLineas = 4) {
+  const palabras = String(text || "").split(/\s+/).filter(Boolean);
+  const lineas = [];
+  let actual = "";
+
+  for (const palabra of palabras) {
+    const candidato = actual ? `${actual} ${palabra}` : palabra;
+
+    if (candidato.length <= maxChars) {
+      actual = candidato;
+    } else {
+      if (actual) lineas.push(actual);
+      actual = palabra;
+    }
+  }
+
+  if (actual) lineas.push(actual);
+
+  return lineas.slice(0, maxLineas);
+}
+
 function fallbackCardsDerecha(clase = {}) {
   const resumenLineas = dedupeLista([
     ...partirEnLineas(clase.resumen || "", 26, 3),
@@ -351,9 +390,10 @@ function fallbackCardsDerecha(clase = {}) {
   };
 
   const card2 = {
-    titulo: clase.secciones[1]?.titulo || "Claves",
-    lineas: clase.secciones[1]?.bullets?.slice(0, 4)
-      || clase.secciones[0]?.bullets?.slice(0, 4)
+    titulo: clase.secciones?.[1]?.titulo || "Claves",
+    lineas:
+      clase.secciones?.[1]?.bullets?.slice(0, 4)
+      || clase.secciones?.[0]?.bullets?.slice(0, 4)
       || ["Buscá relaciones", "Prestá atención a las reglas", "Volvé al ejemplo"],
     caption: "Puntos útiles para estudiar mejor",
     estilo: "green",
@@ -376,7 +416,7 @@ function fallbackCardsDerecha(clase = {}) {
 function fallbackImagenesContenido(clase = {}) {
   const visuales = [];
 
-  for (let i = 0; i < clase.secciones.length; i += 2) {
+  for (let i = 0; i < (clase.secciones || []).length; i += 2) {
     const seccion = clase.secciones[i];
     if (!seccion) continue;
 
@@ -393,27 +433,6 @@ function fallbackImagenesContenido(clase = {}) {
   }
 
   return visuales.slice(0, 3);
-}
-
-function partirEnLineas(text = "", maxChars = 22, maxLineas = 4) {
-  const palabras = String(text || "").split(/\s+/).filter(Boolean);
-  const lineas = [];
-  let actual = "";
-
-  for (const palabra of palabras) {
-    const candidato = actual ? `${actual} ${palabra}` : palabra;
-
-    if (candidato.length <= maxChars) {
-      actual = candidato;
-    } else {
-      if (actual) lineas.push(actual);
-      actual = palabra;
-    }
-  }
-
-  if (actual) lineas.push(actual);
-
-  return lineas.slice(0, maxLineas);
 }
 
 function normalizarClase(raw = {}) {
@@ -644,7 +663,7 @@ function renderSeccionesConVisuales(secciones = [], imagenesContenido = [], keyw
   return html;
 }
 
-async function escribirTextoConHTML(el, plainText, finalHtml, velocidad = 18) {
+async function escribirTextoConHTML(el, plainText, finalHtml, velocidad = 10) {
   if (!el) return;
 
   const texto = String(plainText || "");
@@ -666,12 +685,12 @@ async function animarTargets(root) {
   for (const target of targets) {
     const plain = target.dataset.plain || target.textContent || "";
     const finalHtml = decodeStoredHtml(target.dataset.finalHtml || "");
-    await escribirTextoConHTML(target, plain, finalHtml, 14);
-    await wait(60);
+    await escribirTextoConHTML(target, plain, finalHtml, 8);
+    await wait(30);
   }
 }
 
-async function mostrarBloque(el, delay = 180) {
+async function mostrarBloque(el, delay = 90) {
   if (!el) return;
   el.classList.add("is-visible");
   await wait(delay);
@@ -690,42 +709,44 @@ async function animarClase() {
 
   if (title) {
     const text = title.textContent;
-    await mostrarBloque(title, 120);
-    await escribirTextoConHTML(title, text, escapeHtml(text), 22);
+    await mostrarBloque(title, 80);
+    await escribirTextoConHTML(title, text, escapeHtml(text), 10);
   }
 
   if (badge) {
     const text = badge.textContent;
-    await mostrarBloque(badge, 100);
-    await escribirTextoConHTML(badge, text, escapeHtml(text), 10);
+    await mostrarBloque(badge, 60);
+    await escribirTextoConHTML(badge, text, escapeHtml(text), 5);
   }
 
   if (summaryBox) {
-    await mostrarBloque(summaryBox, 120);
+    await mostrarBloque(summaryBox, 70);
     await animarTargets(summaryBox);
   }
 
   for (let i = 0; i < rightCards.length; i++) {
-    await mostrarBloque(rightCards[i], 90);
+    await mostrarBloque(rightCards[i], 50);
   }
 
   let inlineIndex = 0;
 
   for (let i = 0; i < sections.length; i++) {
     const section = sections[i];
-    await mostrarBloque(section, 110);
+    await mostrarBloque(section, 60);
     await animarTargets(section);
 
     if (i % 2 === 1 && inlineVisuals[inlineIndex]) {
-      await mostrarBloque(inlineVisuals[inlineIndex], 120);
+      await mostrarBloque(inlineVisuals[inlineIndex], 60);
       inlineIndex += 1;
     }
   }
 
   while (inlineIndex < inlineVisuals.length) {
-    await mostrarBloque(inlineVisuals[inlineIndex], 120);
+    await mostrarBloque(inlineVisuals[inlineIndex], 60);
     inlineIndex += 1;
   }
+
+  board.dataset.animando = "false";
 }
 
 function renderLeccion(clase, meta = {}, options = {}) {
@@ -906,33 +927,32 @@ async function preguntarEnChat(pregunta) {
   let response;
 
   try {
-    response = await fetchConTimeout("/api/preguntar-clase", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
+    response = await fetchConTimeout(
+      "/api/preguntar-clase",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          pregunta,
+          claseGuardada: claseGuardadaActual,
+          claseGenerada: claseGeneradaActual,
+          ultimaRespuesta: ultimaRespuestaChat,
+          fuentes: fuentesClaseActual,
+          investigacion: investigacionClaseActual,
+        }),
       },
-      body: JSON.stringify({
-        pregunta,
-        claseGuardada: claseGuardadaActual,
-        claseGenerada: claseGeneradaActual,
-        ultimaRespuesta: ultimaRespuestaChat,
-        fuentes: fuentesClaseActual,
-        investigacion: investigacionClaseActual,
-      }),
-    });
+      PREGUNTA_CHAT_TIMEOUT_MS
+    );
   } catch (error) {
     if (error.name === "AbortError") {
       throw new Error("La respuesta tardó demasiado. Probá de nuevo.");
     }
-    throw error;
+    throw new Error("No se pudo conectar con el servidor.");
   }
 
-  let data;
-  try {
-    data = await response.json();
-  } catch {
-    throw new Error("El servidor respondió con un formato inválido.");
-  }
+  const data = await leerRespuestaSeguro(response);
 
   if (!response.ok || !data?.ok) {
     throw new Error(data?.error || "Hubo un error al responder la pregunta.");
@@ -1042,19 +1062,23 @@ async function cargarClaseEnPizarron() {
 
     let response;
     try {
-      response = await fetchConTimeout("/api/generar-clase", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      response = await fetchConTimeout(
+        "/api/generar-clase",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            materia,
+            tema,
+            nivel,
+            duracion,
+            objetivo,
+          }),
         },
-        body: JSON.stringify({
-          materia,
-          tema,
-          nivel,
-          duracion,
-          objetivo,
-        }),
-      });
+        GENERAR_CLASE_TIMEOUT_MS
+      );
     } catch (error) {
       if (error.name === "AbortError") {
         renderError("La generación de la clase tardó demasiado. Probá de nuevo.");
@@ -1062,18 +1086,12 @@ async function cargarClaseEnPizarron() {
         return;
       }
 
-      throw error;
-    }
-
-    let data;
-    try {
-      data = await response.json();
-    } catch {
-      renderSourcesPanel([]);
-      renderError("El servidor respondió con un formato inválido.");
-      updateChatStatus("Error del servidor.");
+      renderError("No se pudo conectar con el servidor.");
+      updateChatStatus("Sin conexión con el servidor.");
       return;
     }
+
+    const data = await leerRespuestaSeguro(response);
 
     if (!response.ok || !data?.ok || !data?.clase) {
       fuentesClaseActual = [];
@@ -1101,7 +1119,7 @@ async function cargarClaseEnPizarron() {
   } catch (err) {
     console.error("Error cargando clase:", err);
     renderSourcesPanel([]);
-    renderError("Error al cargar la clase en el pizarrón.");
+    renderError(err?.message || "Error al cargar la clase en el pizarrón.");
     updateChatStatus("Error al cargar.");
   }
 }
