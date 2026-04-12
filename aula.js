@@ -4,7 +4,11 @@ import {
   collection,
   doc,
   setDoc,
-  serverTimestamp
+  serverTimestamp,
+  getDocs,
+  query,
+  where,
+  limit
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const board = document.getElementById("board-content");
@@ -31,7 +35,7 @@ const saveSummaryBtn = document.getElementById("save-summary-btn");
 const GENERAR_CLASE_TIMEOUT_MS = 90000;
 const PREGUNTA_CHAT_TIMEOUT_MS = 60000;
 
-// Si en documento.html usás otro nombre de colección, cambiá esta línea.
+// Si documento.html usa otra colección, cambiá este valor.
 const DOCUMENTOS_COLLECTION = "documentos";
 
 let claseGuardadaActual = null;
@@ -434,16 +438,18 @@ function normalizarClase(raw = {}) {
   const cardsDerecha = normalizarVisuales(raw.cardsDerecha);
   const imagenesContenido = normalizarVisuales(raw.imagenesContenido);
 
+  const seccionesFinales = secciones.length ? secciones : fallbackSecciones(raw);
+
   const clase = {
     titulo: titulo || "Clase generada",
     resumen: resumen || "Resumen no disponible.",
     palabrasClave,
-    secciones: secciones.length ? secciones : fallbackSecciones(raw),
+    secciones: seccionesFinales,
     cardsDerecha: cardsDerecha.length ? cardsDerecha : fallbackCardsDerecha({
       titulo,
       resumen,
       palabrasClave,
-      secciones: secciones.length ? secciones : fallbackSecciones(raw),
+      secciones: seccionesFinales,
     }),
     imagenesContenido,
   };
@@ -1111,6 +1117,33 @@ function obtenerFirmaDocumento() {
   });
 }
 
+async function buscarResumenGuardado(userUid, claseKey) {
+  if (!userUid || !claseKey) return null;
+
+  try {
+    const ref = collection(db, "usuarios", userUid, DOCUMENTOS_COLLECTION);
+    const q = query(
+      ref,
+      where("tipo", "==", "resumen_aula"),
+      where("claseKey", "==", claseKey),
+      limit(1)
+    );
+
+    const snap = await getDocs(q);
+
+    if (snap.empty) return null;
+
+    const docSnap = snap.docs[0];
+    return {
+      id: docSnap.id,
+      ...docSnap.data(),
+    };
+  } catch (error) {
+    console.error("Error buscando resumen guardado:", error);
+    return null;
+  }
+}
+
 async function guardarResumenAula(origen = "auto") {
   if (!ultimaVistaAula?.clase || guardandoResumen) return;
 
@@ -1168,6 +1201,11 @@ async function guardarResumenAula(origen = "auto") {
 
       fuentes: Array.isArray(fuentesClaseActual) ? fuentesClaseActual : [],
       investigacion: investigacionClaseActual || "",
+
+      claseSnapshot: ultimaVistaAula?.clase || null,
+      metaSnapshot: ultimaVistaAula?.meta || {},
+      optionsSnapshot: ultimaVistaAula?.options || {},
+      claseKey: claveResumenActual || "",
 
       updatedAt: serverTimestamp(),
       actualizadoEn: serverTimestamp(),
@@ -1343,6 +1381,39 @@ async function cargarClaseEnPizarron() {
       renderError("Faltan datos clave de la clase: materia, tema o nivel.");
       updateChatStatus("Faltan datos de la clase.");
       return;
+    }
+
+    const user = await esperarUsuarioActual();
+
+    if (user) {
+      const resumenGuardado = await buscarResumenGuardado(user.uid, claveResumenActual);
+
+      if (resumenGuardado?.claseSnapshot) {
+        resumenAulaDocId = resumenGuardado.id;
+        sessionStorage.setItem("eduvia_aula_doc_id", resumenAulaDocId);
+
+        fuentesClaseActual = Array.isArray(resumenGuardado.fuentes) ? resumenGuardado.fuentes : [];
+        investigacionClaseActual = String(resumenGuardado.investigacion || "").trim();
+
+        renderSourcesPanel(fuentesClaseActual);
+
+        claseGeneradaActual = {
+          ...resumenGuardado.claseSnapshot,
+          fuentes: fuentesClaseActual,
+          investigacion: investigacionClaseActual,
+        };
+
+        ultimaRespuestaChat = null;
+
+        renderLeccion(
+          normalizarClase(resumenGuardado.claseSnapshot),
+          resumenGuardado.metaSnapshot || { materia, nivel, tema, objetivo, duracion },
+          resumenGuardado.optionsSnapshot || {}
+        );
+
+        updateChatStatus("Clase recuperada.");
+        return;
+      }
     }
 
     let response;
