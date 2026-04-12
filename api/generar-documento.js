@@ -639,7 +639,7 @@ ${refuerzo ? `- ${refuerzo.replace(/\n/g, "\n- ")}` : ""}
         schema: DOCUMENTO_SCHEMA,
       },
     },
-    max_output_tokens: 3200,
+    max_output_tokens: 2200,
   });
 
   return parseDocumentoDesdeResponse(documentoResponse);
