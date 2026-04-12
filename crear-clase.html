@@ -223,12 +223,12 @@
       padding:28px;
     }
 
-    .page{
-      max-width:1180px;
-      margin:0 auto;
-      display:grid;
-      gap:22px;
-    }
+.page{
+  max-width:1320px;
+  margin:0 auto;
+  display:grid;
+  gap:22px;
+}
 
     .hero-craft{
       position:relative;
@@ -520,18 +520,17 @@
       background:linear-gradient(90deg, rgba(255,255,255,.18), rgba(255,255,255,.04));
     }
 
-    .content-grid{
-      display:grid;
-      grid-template-columns:1.12fr .88fr;
-      gap:22px;
-      align-items:start;
-    }
+.content-grid{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:22px;
+  align-items:start;
+}
 
-    .workspace-main,
-    .support-column{
-      display:grid;
-      gap:18px;
-    }
+.workspace-main{
+  display:grid;
+  gap:18px;
+}
 
     .editor-card,
     .support-card{
@@ -673,12 +672,17 @@
       font-weight:600;
     }
 
-    .content-type-selector{
-      display:grid;
-      grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));
-      gap:14px;
-      margin-top:4px;
-    }
+.content-type-selector{
+  display:grid;
+  grid-template-columns:repeat(3, minmax(0, 1fr));
+  gap:16px;
+  margin-top:6px;
+}
+
+.content-type-selector .mode-card{
+  min-height:210px;
+  padding:20px;
+}
 
     .mode-selector{
       display:grid;
@@ -989,6 +993,18 @@
     .hidden-legacy{
       display:none !important;
     }
+
+    @media (max-width: 1100px){
+  .content-type-selector{
+    grid-template-columns:repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px){
+  .content-type-selector{
+    grid-template-columns:1fr;
+  }
+}
 
     @media (max-width: 1080px){
       .content-grid{
@@ -1389,60 +1405,6 @@
               </div>
             </div>
           </div>
-
-          <aside class="support-column">
-            <div class="support-card">
-              <div class="support-inner">
-                <div class="support-head">
-                  <span class="section-badge blue">💡 Guía rápida</span>
-                  <h3>Cómo elegir bien el tipo</h3>
-                  <p>
-                    No todos los pedidos necesitan la misma estructura. Elegí la opción que mejor encaje.
-                  </p>
-                </div>
-
-                <div class="support-list">
-                  <div class="support-item">
-                    <strong>Clase escolar</strong>
-                    <p>Usala cuando haya materia, nivel y un objetivo de aprendizaje más típico.</p>
-                  </div>
-
-                  <div class="support-item">
-                    <strong>Resumen o explicación</strong>
-                    <p>Ideal para temas libres como arquitectura, historia del arte o conceptos generales.</p>
-                  </div>
-
-                  <div class="support-item">
-                    <strong>Análisis o investigación</strong>
-                    <p>Sirve para desarrollar ideas, comparar temas o buscar información de forma más profunda.</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="support-card">
-              <div class="support-inner">
-                <div class="support-head">
-                  <span class="section-badge violet">📚 Ideas para empezar</span>
-                  <h3>Ejemplos de pedidos</h3>
-                  <p>
-                    Algunos temas que encajan muy bien con este nuevo sistema.
-                  </p>
-                </div>
-
-                <div class="tag-cloud">
-                  <span>Arquitectura de Roma</span>
-                  <span>Revolución Francesa</span>
-                  <span>Fotosíntesis</span>
-                  <span>La casa de Bernarda Alba</span>
-                  <span>Funciones cuadráticas</span>
-                  <span>Sistema solar</span>
-                  <span>Barroco</span>
-                  <span>Marketing digital</span>
-                </div>
-              </div>
-            </div>
-          </aside>
         </section>
       </div>
     </main>
