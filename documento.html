@@ -12,7 +12,6 @@
   <style>
     :root{
       --bg:#f1f3f4;
-      --bg-soft:#f8f9fa;
       --paper:#ffffff;
       --line:#dadce0;
       --line-soft:#eceff1;
@@ -46,18 +45,25 @@
       font:inherit;
     }
 
-    .topbar{
+    #document-app{
+      min-height:100vh;
+    }
+
+    .app-header{
       position:sticky;
       top:0;
       z-index:40;
-      min-height:64px;
       background:#fff;
       border-bottom:1px solid var(--line);
+    }
+
+    .topbar{
+      min-height:62px;
       display:flex;
       align-items:center;
       justify-content:space-between;
       gap:16px;
-      padding:10px 18px;
+      padding:10px 18px 8px;
     }
 
     .topbar-left{
@@ -70,7 +76,7 @@
     .doc-icon{
       width:38px;
       height:38px;
-      border-radius:10px;
+      border-radius:8px;
       display:grid;
       place-items:center;
       background:var(--blue);
@@ -86,8 +92,8 @@
 
     .topbar-text strong{
       display:block;
-      font-size:1rem;
-      font-weight:700;
+      font-size:1.03rem;
+      font-weight:600;
       white-space:nowrap;
       overflow:hidden;
       text-overflow:ellipsis;
@@ -95,7 +101,7 @@
 
     .topbar-text span{
       display:block;
-      font-size:.84rem;
+      font-size:.82rem;
       color:var(--muted);
       margin-top:2px;
     }
@@ -138,11 +144,6 @@
       box-shadow:0 10px 18px rgba(26,115,232,.18);
     }
 
-    .btn-danger{
-      background:#feeceb;
-      color:var(--danger);
-    }
-
     .btn-toolbar{
       background:#f1f3f4;
       color:#3c4043;
@@ -153,14 +154,36 @@
       background:#e8eaed;
     }
 
-    .subbar{
-      position:sticky;
-      top:64px;
-      z-index:35;
-      background:#fff;
-      border-bottom:1px solid var(--line);
-      padding:8px 14px;
+    .menurow{
+      display:flex;
+      align-items:center;
+      gap:2px;
+      padding:0 18px 6px;
       overflow-x:auto;
+    }
+
+    .menu-link{
+      border:none;
+      background:transparent;
+      color:#202124;
+      font-size:.9rem;
+      padding:7px 10px;
+      border-radius:8px;
+      cursor:pointer;
+      white-space:nowrap;
+    }
+
+    .menu-link:hover{
+      background:#f1f3f4;
+    }
+
+    .subbar{
+      display:flex;
+      align-items:center;
+      gap:0;
+      padding:6px 14px 10px;
+      overflow-x:auto;
+      border-top:1px solid #f3f4f6;
     }
 
     .toolbar-track{
@@ -173,36 +196,31 @@
     .toolbar-group{
       display:flex;
       align-items:center;
-      gap:4px;
-      padding:0 10px;
+      gap:2px;
+      padding:0 8px;
       flex:none;
     }
 
     .toolbar-group + .toolbar-group{
-      border-left:1px solid #e0e3e7;
+      border-left:1px solid #e5e7eb;
     }
 
     .toolbar-group.meta-group{
+      padding-right:12px;
       gap:8px;
     }
 
     .chip{
       display:inline-flex;
       align-items:center;
-      padding:8px 12px;
+      padding:7px 12px;
       border-radius:999px;
       background:#f1f3f4;
-      border:none;
       color:#3c4043;
-      font-size:.83rem;
+      font-size:.82rem;
       font-weight:600;
-      box-shadow:none;
       white-space:nowrap;
       flex:none;
-    }
-
-    .mini-divider{
-      display:none;
     }
 
     .tool-btn{
@@ -214,23 +232,16 @@
       color:#202124;
       font-weight:700;
       cursor:pointer;
-      transition:.15s ease;
+      transition:.14s ease;
       padding:0 8px;
       display:inline-flex;
       align-items:center;
       justify-content:center;
-      gap:6px;
-      box-shadow:none;
       flex:none;
     }
 
     .tool-btn:hover{
       background:#f1f3f4;
-      transform:none;
-    }
-
-    .tool-btn:active{
-      transform:none;
     }
 
     .tool-btn.is-active{
@@ -245,20 +256,15 @@
       background:transparent;
       padding:0 10px;
       color:#202124;
-      min-width:150px;
+      min-width:148px;
       outline:none;
       font-weight:500;
-      box-shadow:none;
       flex:none;
     }
 
-    .tool-select:hover{
-      background:#f1f3f4;
-    }
-
+    .tool-select:hover,
     .tool-select:focus{
       background:#f1f3f4;
-      box-shadow:none;
     }
 
     .color-pill{
@@ -269,8 +275,6 @@
       padding:0 10px;
       border-radius:8px;
       background:transparent;
-      border:none;
-      box-shadow:none;
       font-size:.82rem;
       font-weight:600;
       color:#3c4043;
@@ -305,7 +309,7 @@
     }
 
     .workspace{
-      padding:24px 14px 56px;
+      padding:22px 14px 56px;
     }
 
     .paper-wrap{
@@ -321,7 +325,7 @@
       background:var(--paper);
       border:1px solid #e0e0e0;
       box-shadow:var(--shadow);
-      border-radius:8px;
+      border-radius:2px;
       overflow:hidden;
     }
 
@@ -337,7 +341,7 @@
 
     .doc-title{
       font-family:"Sora",sans-serif;
-      font-size:2.15rem;
+      font-size:2.05rem;
       line-height:1.08;
       letter-spacing:-.04em;
       font-weight:700;
@@ -581,12 +585,12 @@
     .sidepanel{
       position:fixed;
       top:0;
-      right:-360px;
-      width:min(340px, 92vw);
+      right:-390px;
+      width:min(360px, 92vw);
       height:100vh;
       background:#fff;
       border-left:1px solid #e0e3e7;
-      box-shadow:-2px 0 12px rgba(60,64,67,.15);
+      box-shadow:-4px 0 16px rgba(60,64,67,.16);
       z-index:90;
       transition:right .18s ease;
       display:flex;
@@ -636,11 +640,30 @@
     }
 
     .sidepanel-body{
-      padding:6px 0;
+      padding:10px 0;
       overflow:auto;
     }
 
-    .panel-action{
+    .panel-section{
+      padding:0 0 8px;
+    }
+
+    .panel-section + .panel-section{
+      border-top:1px solid #edf1f5;
+      margin-top:8px;
+      padding-top:10px;
+    }
+
+    .panel-section-title{
+      padding:0 16px 8px;
+      font-size:.76rem;
+      font-weight:800;
+      letter-spacing:.04em;
+      text-transform:uppercase;
+      color:#6b7280;
+    }
+
+    .panel-item{
       width:100%;
       border:none;
       background:#fff;
@@ -648,50 +671,51 @@
       display:flex;
       align-items:center;
       gap:12px;
-      cursor:pointer;
       text-align:left;
+      cursor:pointer;
       transition:.14s ease;
     }
 
-    .panel-action:hover{
+    .panel-item:hover{
       background:#f8f9fa;
-      transform:none;
     }
 
-    .panel-action-icon{
+    .panel-item-icon{
       width:28px;
       height:28px;
+      border-radius:8px;
       display:grid;
       place-items:center;
+      background:#f1f3f4;
       color:#3c4043;
-      font-size:.95rem;
+      font-size:.92rem;
       font-weight:700;
       flex:none;
     }
 
-    .panel-action-main{
+    .panel-item-main{
       display:flex;
       flex-direction:column;
       min-width:0;
       flex:1;
     }
 
-    .panel-action-title{
+    .panel-item-title{
       font-size:.94rem;
       font-weight:600;
       color:#202124;
       margin-bottom:2px;
     }
 
-    .panel-action-desc{
+    .panel-item-desc{
       color:#5f6368;
       font-size:.82rem;
       line-height:1.45;
     }
 
-    .panel-action-arrow{
+    .panel-item-arrow{
       color:#9aa0a6;
-      font-size:1.15rem;
+      font-size:1.1rem;
       flex:none;
     }
 
@@ -721,7 +745,7 @@
 
     @media (max-width: 720px){
       .topbar{
-        padding:12px 14px;
+        padding:12px 14px 8px;
         align-items:flex-start;
         flex-direction:column;
       }
@@ -731,10 +755,12 @@
         justify-content:flex-start;
       }
 
+      .menurow{
+        padding:0 12px 6px;
+      }
+
       .subbar{
-        position:static;
-        top:auto;
-        padding:8px 10px;
+        padding:6px 10px 10px;
       }
 
       .toolbar-group{
@@ -771,12 +797,14 @@
       }
     }
 
+    .menurow::-webkit-scrollbar,
     .subbar::-webkit-scrollbar,
     .sidepanel-body::-webkit-scrollbar{
       height:8px;
       width:8px;
     }
 
+    .menurow::-webkit-scrollbar-thumb,
     .subbar::-webkit-scrollbar-thumb,
     .sidepanel-body::-webkit-scrollbar-thumb{
       background:#d7dce2;
@@ -803,80 +831,92 @@
   </div>
 
   <div id="document-app">
-    <header class="topbar">
-      <div class="topbar-left">
-        <div class="doc-icon">📄</div>
-        <div class="topbar-text">
-          <strong id="topbar-title">Documento sin título</strong>
-          <span>Eduvia · modo documento</span>
+    <header class="app-header">
+      <div class="topbar">
+        <div class="topbar-left">
+          <div class="doc-icon">📄</div>
+          <div class="topbar-text">
+            <strong id="topbar-title">Documento sin título</strong>
+            <span>Eduvia · modo documento</span>
+          </div>
+        </div>
+
+        <div class="topbar-actions">
+          <a href="crear-clase.html" class="btn btn-soft">Volver</a>
+          <button type="button" class="btn btn-soft" id="open-share-btn">Compartir</button>
+          <button type="button" class="btn btn-toolbar" id="open-sidepanel-btn">Más</button>
+          <button type="button" class="btn btn-primary">Generar ejercicios</button>
         </div>
       </div>
 
-      <div class="topbar-actions">
-        <a href="crear-clase.html" class="btn btn-soft">Volver</a>
-        <button type="button" class="btn btn-soft" id="open-share-btn">Compartir</button>
-        <button type="button" class="btn btn-toolbar" id="open-sidepanel-btn">Más</button>
-        <button type="button" class="btn btn-primary">Generar ejercicios</button>
+      <div class="menurow">
+        <button class="menu-link" type="button">Archivo</button>
+        <button class="menu-link" type="button">Editar</button>
+        <button class="menu-link" type="button">Ver</button>
+        <button class="menu-link" type="button">Insertar</button>
+        <button class="menu-link" type="button">Formato</button>
+        <button class="menu-link" type="button">Herramientas</button>
+        <button class="menu-link" type="button">Ayuda</button>
+      </div>
+
+      <div class="subbar">
+        <div class="toolbar-track">
+          <div class="toolbar-group meta-group">
+            <div class="chip" id="chip-materia">Materia: —</div>
+            <div class="chip" id="chip-nivel">Nivel: —</div>
+            <div class="chip" id="chip-duracion">Duración: —</div>
+            <div class="chip">Formato: Documento</div>
+          </div>
+
+          <div class="toolbar-group">
+            <button type="button" class="tool-btn" data-command="undo" title="Deshacer">↶</button>
+            <button type="button" class="tool-btn" data-command="redo" title="Rehacer">↷</button>
+          </div>
+
+          <div class="toolbar-group">
+            <select class="tool-select" id="format-block">
+              <option value="p">Texto normal</option>
+              <option value="h2">Título grande</option>
+              <option value="h3">Subtítulo</option>
+              <option value="blockquote">Cita</option>
+            </select>
+          </div>
+
+          <div class="toolbar-group">
+            <button type="button" class="tool-btn" data-command="bold" title="Negrita"><strong>B</strong></button>
+            <button type="button" class="tool-btn" data-command="italic" title="Cursiva"><em>I</em></button>
+            <button type="button" class="tool-btn" data-command="underline" title="Subrayado"><u>U</u></button>
+          </div>
+
+          <div class="toolbar-group">
+            <label class="color-pill" title="Color de texto">
+              Texto
+              <span class="color-wrap">
+                <input type="color" id="text-color" value="#202124">
+              </span>
+            </label>
+
+            <label class="color-pill" title="Resaltado">
+              Fondo
+              <span class="color-wrap">
+                <input type="color" id="highlight-color" value="#fff59d">
+              </span>
+            </label>
+          </div>
+
+          <div class="toolbar-group">
+            <button type="button" class="tool-btn" data-command="insertUnorderedList" title="Lista">•</button>
+            <button type="button" class="tool-btn" data-command="insertOrderedList" title="Lista numerada">1.</button>
+          </div>
+
+          <div class="toolbar-group">
+            <button type="button" class="tool-btn" data-command="justifyLeft" title="Alinear izquierda">⬅</button>
+            <button type="button" class="tool-btn" data-command="justifyCenter" title="Centrar">⬌</button>
+            <button type="button" class="tool-btn" data-command="justifyRight" title="Alinear derecha">➡</button>
+          </div>
+        </div>
       </div>
     </header>
-
-    <div class="subbar">
-      <div class="toolbar-track">
-        <div class="toolbar-group meta-group">
-          <div class="chip" id="chip-materia">Materia: —</div>
-          <div class="chip" id="chip-nivel">Nivel: —</div>
-          <div class="chip" id="chip-duracion">Duración: —</div>
-          <div class="chip">Formato: Documento</div>
-        </div>
-
-        <div class="toolbar-group">
-          <select class="tool-select" id="format-block">
-            <option value="p">Texto normal</option>
-            <option value="h2">Título grande</option>
-            <option value="h3">Subtítulo</option>
-            <option value="blockquote">Cita</option>
-          </select>
-        </div>
-
-        <div class="toolbar-group">
-          <button type="button" class="tool-btn" data-command="bold" title="Negrita"><strong>B</strong></button>
-          <button type="button" class="tool-btn" data-command="italic" title="Cursiva"><em>I</em></button>
-          <button type="button" class="tool-btn" data-command="underline" title="Subrayado"><u>U</u></button>
-        </div>
-
-        <div class="toolbar-group">
-          <label class="color-pill" title="Color de texto">
-            Texto
-            <span class="color-wrap">
-              <input type="color" id="text-color" value="#202124">
-            </span>
-          </label>
-
-          <label class="color-pill" title="Resaltado">
-            Fondo
-            <span class="color-wrap">
-              <input type="color" id="highlight-color" value="#fff59d">
-            </span>
-          </label>
-        </div>
-
-        <div class="toolbar-group">
-          <button type="button" class="tool-btn" data-command="insertUnorderedList" title="Lista">•</button>
-          <button type="button" class="tool-btn" data-command="insertOrderedList" title="Lista numerada">1.</button>
-        </div>
-
-        <div class="toolbar-group">
-          <button type="button" class="tool-btn" data-command="justifyLeft" title="Alinear izquierda">⬅</button>
-          <button type="button" class="tool-btn" data-command="justifyCenter" title="Centrar">⬌</button>
-          <button type="button" class="tool-btn" data-command="justifyRight" title="Alinear derecha">➡</button>
-        </div>
-
-        <div class="toolbar-group">
-          <button type="button" class="tool-btn" data-command="undo" title="Deshacer">↶</button>
-          <button type="button" class="tool-btn" data-command="redo" title="Rehacer">↷</button>
-        </div>
-      </div>
-    </div>
 
     <main class="workspace">
       <div class="paper-wrap">
@@ -982,50 +1022,75 @@
     </div>
 
     <div class="sidepanel-body">
-      <button type="button" class="panel-action" id="action-presentation">
-        <span class="panel-action-icon">🎞️</span>
-        <span class="panel-action-main">
-          <span class="panel-action-title">Pasar a presentación</span>
-          <span class="panel-action-desc">Convertir el documento en diapositivas.</span>
-        </span>
-        <span class="panel-action-arrow">›</span>
-      </button>
+      <div class="panel-section">
+        <div class="panel-section-title">IA</div>
 
-      <button type="button" class="panel-action" id="action-pdf">
-        <span class="panel-action-icon">PDF</span>
-        <span class="panel-action-main">
-          <span class="panel-action-title">Descargar PDF</span>
-          <span class="panel-action-desc">Guardar este documento como PDF.</span>
-        </span>
-        <span class="panel-action-arrow">›</span>
-      </button>
+        <button type="button" class="panel-item" id="action-chat">
+          <span class="panel-item-icon">💬</span>
+          <span class="panel-item-main">
+            <span class="panel-item-title">Abrir chat con IA</span>
+            <span class="panel-item-desc">Abrí el mismo chat interactivo para consultar o ajustar el documento.</span>
+          </span>
+          <span class="panel-item-arrow">›</span>
+        </button>
+      </div>
 
-      <button type="button" class="panel-action" id="action-print">
-        <span class="panel-action-icon">🖨️</span>
-        <span class="panel-action-main">
-          <span class="panel-action-title">Imprimir</span>
-          <span class="panel-action-desc">Abrir la impresión del navegador.</span>
-        </span>
-        <span class="panel-action-arrow">›</span>
-      </button>
+      <div class="panel-section">
+        <div class="panel-section-title">Convertir</div>
 
-      <button type="button" class="panel-action" id="action-duplicate">
-        <span class="panel-action-icon">📄</span>
-        <span class="panel-action-main">
-          <span class="panel-action-title">Duplicar documento</span>
-          <span class="panel-action-desc">Crear una copia del contenido.</span>
-        </span>
-        <span class="panel-action-arrow">›</span>
-      </button>
+        <button type="button" class="panel-item" id="action-presentation">
+          <span class="panel-item-icon">🎞️</span>
+          <span class="panel-item-main">
+            <span class="panel-item-title">Pasar a presentación</span>
+            <span class="panel-item-desc">Convertir el documento en diapositivas.</span>
+          </span>
+          <span class="panel-item-arrow">›</span>
+        </button>
 
-      <button type="button" class="panel-action" id="action-share-panel">
-        <span class="panel-action-icon">🔗</span>
-        <span class="panel-action-main">
-          <span class="panel-action-title">Compartir</span>
-          <span class="panel-action-desc">Abrir permisos e invitaciones.</span>
-        </span>
-        <span class="panel-action-arrow">›</span>
-      </button>
+        <button type="button" class="panel-item" id="action-duplicate">
+          <span class="panel-item-icon">📄</span>
+          <span class="panel-item-main">
+            <span class="panel-item-title">Duplicar documento</span>
+            <span class="panel-item-desc">Crear una copia del contenido actual.</span>
+          </span>
+          <span class="panel-item-arrow">›</span>
+        </button>
+      </div>
+
+      <div class="panel-section">
+        <div class="panel-section-title">Exportar</div>
+
+        <button type="button" class="panel-item" id="action-pdf">
+          <span class="panel-item-icon">PDF</span>
+          <span class="panel-item-main">
+            <span class="panel-item-title">Descargar PDF</span>
+            <span class="panel-item-desc">Guardar este documento como PDF.</span>
+          </span>
+          <span class="panel-item-arrow">›</span>
+        </button>
+
+        <button type="button" class="panel-item" id="action-print">
+          <span class="panel-item-icon">🖨️</span>
+          <span class="panel-item-main">
+            <span class="panel-item-title">Imprimir</span>
+            <span class="panel-item-desc">Abrir la impresión del navegador.</span>
+          </span>
+          <span class="panel-item-arrow">›</span>
+        </button>
+      </div>
+
+      <div class="panel-section">
+        <div class="panel-section-title">Documento</div>
+
+        <button type="button" class="panel-item" id="action-share-panel">
+          <span class="panel-item-icon">🔗</span>
+          <span class="panel-item-main">
+            <span class="panel-item-title">Compartir</span>
+            <span class="panel-item-desc">Abrir permisos e invitaciones.</span>
+          </span>
+          <span class="panel-item-arrow">›</span>
+        </button>
+      </div>
     </div>
 
     <div class="sidepanel-footer">
@@ -1047,6 +1112,7 @@
     const closeSidepanelBtn = document.getElementById("close-sidepanel-btn");
     const panelStatus = document.getElementById("panel-status");
 
+    const actionChat = document.getElementById("action-chat");
     const actionPresentation = document.getElementById("action-presentation");
     const actionPdf = document.getElementById("action-pdf");
     const actionPrint = document.getElementById("action-print");
@@ -1078,6 +1144,31 @@
       sidepanelBackdrop?.classList.remove("show");
       document.body.style.overflow = "";
       setPanelStatus("");
+    }
+
+    function tryOpenDocumentChat() {
+      const selectors = [
+        "#chat-toggle-btn",
+        "#open-chat-btn",
+        "#chat-fab",
+        "[data-open-chat]",
+        ".chat-toggle-btn",
+        ".chat-launcher"
+      ];
+
+      for (const selector of selectors) {
+        const el = document.querySelector(selector);
+        if (el) {
+          el.click();
+          return true;
+        }
+      }
+
+      window.dispatchEvent(new CustomEvent("eduvia:open-chat", {
+        detail: { source: "documento" }
+      }));
+
+      return false;
     }
 
     document.querySelectorAll("[data-command]").forEach((btn) => {
@@ -1122,8 +1213,14 @@
       }
     });
 
+    actionChat?.addEventListener("click", () => {
+      closeSidepanel();
+      const opened = tryOpenDocumentChat();
+      setPanelStatus(opened ? "Abriendo chat..." : "Se disparó la apertura del chat.");
+    });
+
     actionPresentation?.addEventListener("click", () => {
-      setPanelStatus("Esta opción ya quedó lista en la interfaz para conectarla después.");
+      setPanelStatus("La opción de presentación ya quedó lista para conectarla después.");
     });
 
     actionPdf?.addEventListener("click", () => {
@@ -1137,7 +1234,7 @@
     });
 
     actionDuplicate?.addEventListener("click", () => {
-      setPanelStatus("La interfaz de duplicar ya está lista para conectarla con Firebase.");
+      setPanelStatus("La opción de duplicar quedó lista para conectarla con Firebase.");
     });
 
     actionSharePanel?.addEventListener("click", () => {
