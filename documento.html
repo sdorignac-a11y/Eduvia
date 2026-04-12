@@ -22,6 +22,10 @@
       --blue-soft:#e8f0fe;
       --danger:#d93025;
       --shadow:0 1px 2px rgba(60,64,67,.16), 0 4px 12px rgba(60,64,67,.10);
+      --shadow-soft:0 8px 24px rgba(60,64,67,.08);
+      --radius-xl:22px;
+      --radius-lg:18px;
+      --radius-md:14px;
     }
 
     *{
@@ -51,7 +55,8 @@
       top:0;
       z-index:40;
       min-height:64px;
-      background:#fff;
+      background:rgba(255,255,255,.94);
+      backdrop-filter:blur(10px);
       border-bottom:1px solid var(--line);
       display:flex;
       align-items:center;
@@ -147,25 +152,34 @@
       position:sticky;
       top:64px;
       z-index:35;
-      background:rgba(255,255,255,.92);
-      backdrop-filter:blur(10px);
+      background:rgba(255,255,255,.88);
+      backdrop-filter:blur(12px);
       border-bottom:1px solid var(--line);
-      padding:10px 18px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:14px;
-      flex-wrap:nowrap;
+      padding:12px 18px;
       overflow-x:auto;
     }
 
-    .subbar-left,
-    .subbar-tools{
+    .toolbar-track{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      min-width:max-content;
+    }
+
+    .toolbar-group{
       display:flex;
       align-items:center;
       gap:10px;
-      flex-wrap:nowrap;
+      padding:8px;
+      border-radius:18px;
+      background:linear-gradient(180deg,#ffffff 0%, #f8fafc 100%);
+      border:1px solid #e6eaef;
+      box-shadow:0 6px 16px rgba(60,64,67,.06);
       flex:none;
+    }
+
+    .toolbar-group.meta-group{
+      padding:8px 10px;
     }
 
     .chip{
@@ -180,6 +194,7 @@
       font-size:.85rem;
       font-weight:700;
       box-shadow:0 1px 2px rgba(60,64,67,.08);
+      flex:none;
     }
 
     .mini-divider{
@@ -187,13 +202,14 @@
       height:28px;
       background:#e6eaef;
       border-radius:999px;
+      flex:none;
     }
 
     .tool-btn{
-      min-width:40px;
-      height:40px;
+      min-width:42px;
+      height:42px;
       border:none;
-      border-radius:12px;
+      border-radius:13px;
       background:linear-gradient(180deg,#ffffff 0%, #f6f8fb 100%);
       color:#202124;
       font-weight:700;
@@ -206,6 +222,7 @@
       gap:6px;
       border:1px solid #e6eaef;
       box-shadow:0 1px 2px rgba(60,64,67,.08);
+      flex:none;
     }
 
     .tool-btn:hover{
@@ -225,16 +242,17 @@
     }
 
     .tool-select{
-      height:40px;
+      height:42px;
       border:1px solid #e6eaef;
-      border-radius:12px;
+      border-radius:13px;
       background:linear-gradient(180deg,#ffffff 0%, #f6f8fb 100%);
       padding:0 14px;
       color:#202124;
-      min-width:170px;
+      min-width:190px;
       outline:none;
       font-weight:600;
       box-shadow:0 1px 2px rgba(60,64,67,.08);
+      flex:none;
     }
 
     .tool-select:focus{
@@ -246,9 +264,9 @@
       display:inline-flex;
       align-items:center;
       gap:8px;
-      height:40px;
+      height:42px;
       padding:0 10px 0 12px;
-      border-radius:12px;
+      border-radius:13px;
       background:linear-gradient(180deg,#ffffff 0%, #f6f8fb 100%);
       border:1px solid #e6eaef;
       box-shadow:0 1px 2px rgba(60,64,67,.08);
@@ -256,6 +274,7 @@
       font-weight:700;
       color:#3c4043;
       cursor:pointer;
+      flex:none;
     }
 
     .color-wrap{
@@ -539,6 +558,163 @@
       line-height:1.7;
     }
 
+    .sidepanel-backdrop{
+      position:fixed;
+      inset:0;
+      background:rgba(15,23,42,.24);
+      opacity:0;
+      pointer-events:none;
+      transition:.22s ease;
+      z-index:85;
+    }
+
+    .sidepanel-backdrop.show{
+      opacity:1;
+      pointer-events:auto;
+    }
+
+    .sidepanel{
+      position:fixed;
+      top:0;
+      right:-420px;
+      width:min(410px, 92vw);
+      height:100vh;
+      background:rgba(255,255,255,.96);
+      backdrop-filter:blur(16px);
+      border-left:1px solid #e5e7eb;
+      box-shadow:-18px 0 40px rgba(15,23,42,.12);
+      z-index:90;
+      transition:right .24s ease;
+      display:flex;
+      flex-direction:column;
+    }
+
+    .sidepanel.show{
+      right:0;
+    }
+
+    .sidepanel-header{
+      padding:22px 20px 16px;
+      border-bottom:1px solid #edf1f5;
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:12px;
+    }
+
+    .sidepanel-header h3{
+      font-size:1.2rem;
+      font-weight:800;
+      margin-bottom:6px;
+    }
+
+    .sidepanel-header p{
+      color:var(--muted);
+      line-height:1.55;
+      font-size:.93rem;
+    }
+
+    .sidepanel-close{
+      width:42px;
+      height:42px;
+      border:none;
+      border-radius:14px;
+      background:#f3f6fb;
+      color:#334155;
+      cursor:pointer;
+      font-size:1rem;
+      font-weight:800;
+      flex:none;
+      border:1px solid #e5e7eb;
+    }
+
+    .sidepanel-body{
+      padding:18px 16px 18px;
+      overflow:auto;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+
+    .panel-action{
+      width:100%;
+      border:none;
+      background:#fff;
+      border:1px solid #e8edf3;
+      border-radius:18px;
+      padding:16px;
+      display:flex;
+      align-items:flex-start;
+      gap:14px;
+      cursor:pointer;
+      text-align:left;
+      transition:.18s ease;
+      box-shadow:0 3px 10px rgba(60,64,67,.05);
+    }
+
+    .panel-action:hover{
+      transform:translateY(-1px);
+      border-color:#d7e3fd;
+      background:#f9fbff;
+    }
+
+    .panel-action-icon{
+      width:48px;
+      height:48px;
+      border-radius:14px;
+      display:grid;
+      place-items:center;
+      background:#eef4ff;
+      color:var(--blue);
+      font-size:1.1rem;
+      font-weight:800;
+      flex:none;
+    }
+
+    .panel-action-text{
+      min-width:0;
+    }
+
+    .panel-action-title{
+      font-size:1rem;
+      font-weight:800;
+      color:#111827;
+      margin-bottom:4px;
+    }
+
+    .panel-action-desc{
+      color:#64748b;
+      font-size:.92rem;
+      line-height:1.55;
+    }
+
+    .panel-badge{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      margin-top:8px;
+      padding:6px 10px;
+      border-radius:999px;
+      background:#eef3fd;
+      color:var(--blue);
+      font-size:.75rem;
+      font-weight:800;
+    }
+
+    .sidepanel-footer{
+      margin-top:auto;
+      padding:16px 18px 22px;
+      border-top:1px solid #edf1f5;
+    }
+
+    .panel-status{
+      min-height:22px;
+      font-size:.9rem;
+      font-weight:600;
+      color:var(--blue);
+      line-height:1.5;
+    }
+
     @media (max-width: 900px){
       .paper-inner{
         padding:42px 28px 50px;
@@ -563,37 +739,20 @@
 
       .subbar{
         position:static;
+        top:auto;
         padding:10px 14px;
-        align-items:center;
-        flex-wrap:nowrap;
-        overflow-x:auto;
       }
 
-      .subbar-left,
-      .subbar-tools{
-        display:flex;
-        align-items:center;
+      .toolbar-track{
         gap:10px;
-        flex-wrap:nowrap;
-        flex:none;
       }
 
-      .subbar-tools{
-        padding-top:4px;
-      }
-
-      .chip{
-        width:auto;
-        justify-content:flex-start;
+      .toolbar-group{
+        padding:7px;
       }
 
       .tool-select{
         min-width:170px;
-      }
-
-      .color-pill{
-        flex:none;
-        justify-content:flex-start;
       }
 
       .workspace{
@@ -622,21 +781,16 @@
       }
     }
 
-    .subbar::-webkit-scrollbar{
+    .subbar::-webkit-scrollbar,
+    .sidepanel-body::-webkit-scrollbar{
       height:8px;
+      width:8px;
     }
 
-    .subbar::-webkit-scrollbar-thumb{
+    .subbar::-webkit-scrollbar-thumb,
+    .sidepanel-body::-webkit-scrollbar-thumb{
       background:#d7dce2;
       border-radius:999px;
-    }
-
-    .chip,
-    .tool-btn,
-    .tool-select,
-    .color-pill,
-    .mini-divider{
-      flex:none;
     }
   </style>
 </head>
@@ -671,63 +825,66 @@
       <div class="topbar-actions">
         <a href="crear-clase.html" class="btn btn-soft">Volver</a>
         <button type="button" class="btn btn-soft" id="open-share-btn">Compartir</button>
+        <button type="button" class="btn btn-soft" id="open-sidepanel-btn">Más acciones</button>
         <button type="button" class="btn btn-primary">Generar ejercicios</button>
       </div>
     </header>
 
     <div class="subbar">
-      <div class="subbar-left">
-        <div class="chip" id="chip-materia">Materia: —</div>
-        <div class="chip" id="chip-nivel">Nivel: —</div>
-        <div class="chip" id="chip-duracion">Duración: —</div>
-        <div class="chip">Formato: Documento</div>
-      </div>
+      <div class="toolbar-track">
+        <div class="toolbar-group meta-group">
+          <div class="chip" id="chip-materia">Materia: —</div>
+          <div class="chip" id="chip-nivel">Nivel: —</div>
+          <div class="chip" id="chip-duracion">Duración: —</div>
+          <div class="chip">Formato: Documento</div>
+        </div>
 
-      <div class="subbar-tools">
-        <select class="tool-select" id="format-block">
-          <option value="p">Texto normal</option>
-          <option value="h2">Título grande</option>
-          <option value="h3">Subtítulo</option>
-          <option value="blockquote">Cita</option>
-        </select>
+        <div class="toolbar-group">
+          <select class="tool-select" id="format-block">
+            <option value="p">Texto normal</option>
+            <option value="h2">Título grande</option>
+            <option value="h3">Subtítulo</option>
+            <option value="blockquote">Cita</option>
+          </select>
+        </div>
 
-        <div class="mini-divider"></div>
+        <div class="toolbar-group">
+          <button type="button" class="tool-btn" data-command="bold" title="Negrita"><strong>B</strong></button>
+          <button type="button" class="tool-btn" data-command="italic" title="Cursiva"><em>I</em></button>
+          <button type="button" class="tool-btn" data-command="underline" title="Subrayado"><u>U</u></button>
+        </div>
 
-        <button type="button" class="tool-btn" data-command="bold" title="Negrita"><strong>B</strong></button>
-        <button type="button" class="tool-btn" data-command="italic" title="Cursiva"><em>I</em></button>
-        <button type="button" class="tool-btn" data-command="underline" title="Subrayado"><u>U</u></button>
+        <div class="toolbar-group">
+          <label class="color-pill" title="Color de texto">
+            Texto
+            <span class="color-wrap">
+              <input type="color" id="text-color" value="#202124">
+            </span>
+          </label>
 
-        <div class="mini-divider"></div>
+          <label class="color-pill" title="Resaltado">
+            Fondo
+            <span class="color-wrap">
+              <input type="color" id="highlight-color" value="#fff59d">
+            </span>
+          </label>
+        </div>
 
-        <label class="color-pill" title="Color de texto">
-          Texto
-          <span class="color-wrap">
-            <input type="color" id="text-color" value="#202124">
-          </span>
-        </label>
+        <div class="toolbar-group">
+          <button type="button" class="tool-btn" data-command="insertUnorderedList" title="Lista">•</button>
+          <button type="button" class="tool-btn" data-command="insertOrderedList" title="Lista numerada">1.</button>
+        </div>
 
-        <label class="color-pill" title="Resaltado">
-          Fondo
-          <span class="color-wrap">
-            <input type="color" id="highlight-color" value="#fff59d">
-          </span>
-        </label>
+        <div class="toolbar-group">
+          <button type="button" class="tool-btn" data-command="justifyLeft" title="Alinear izquierda">⬅</button>
+          <button type="button" class="tool-btn" data-command="justifyCenter" title="Centrar">⬌</button>
+          <button type="button" class="tool-btn" data-command="justifyRight" title="Alinear derecha">➡</button>
+        </div>
 
-        <div class="mini-divider"></div>
-
-        <button type="button" class="tool-btn" data-command="insertUnorderedList" title="Lista">•</button>
-        <button type="button" class="tool-btn" data-command="insertOrderedList" title="Lista numerada">1.</button>
-
-        <div class="mini-divider"></div>
-
-        <button type="button" class="tool-btn" data-command="justifyLeft" title="Alinear izquierda">⬅</button>
-        <button type="button" class="tool-btn" data-command="justifyCenter" title="Centrar">⬌</button>
-        <button type="button" class="tool-btn" data-command="justifyRight" title="Alinear derecha">➡</button>
-
-        <div class="mini-divider"></div>
-
-        <button type="button" class="tool-btn" data-command="undo" title="Deshacer">↶</button>
-        <button type="button" class="tool-btn" data-command="redo" title="Rehacer">↷</button>
+        <div class="toolbar-group">
+          <button type="button" class="tool-btn" data-command="undo" title="Deshacer">↶</button>
+          <button type="button" class="tool-btn" data-command="redo" title="Rehacer">↷</button>
+        </div>
       </div>
     </div>
 
@@ -823,6 +980,78 @@
     </div>
   </div>
 
+  <div class="sidepanel-backdrop" id="sidepanel-backdrop"></div>
+
+  <aside class="sidepanel" id="sidepanel">
+    <div class="sidepanel-header">
+      <div>
+        <h3>Opciones del documento</h3>
+        <p>
+          Desde acá podés exportar, convertir o reutilizar el contenido sin tocar el editor principal.
+        </p>
+      </div>
+      <button type="button" class="sidepanel-close" id="close-sidepanel-btn">✕</button>
+    </div>
+
+    <div class="sidepanel-body">
+      <button type="button" class="panel-action" id="action-presentation">
+        <div class="panel-action-icon">🎞️</div>
+        <div class="panel-action-text">
+          <div class="panel-action-title">Pasar a presentación</div>
+          <div class="panel-action-desc">
+            Convertir todo el documento en una versión pensada para diapositivas.
+          </div>
+          <span class="panel-badge">Preparado para integrar</span>
+        </div>
+      </button>
+
+      <button type="button" class="panel-action" id="action-pdf">
+        <div class="panel-action-icon">PDF</div>
+        <div class="panel-action-text">
+          <div class="panel-action-title">Descargar PDF</div>
+          <div class="panel-action-desc">
+            Abrir la vista de impresión para guardar el documento como PDF.
+          </div>
+        </div>
+      </button>
+
+      <button type="button" class="panel-action" id="action-print">
+        <div class="panel-action-icon">🖨️</div>
+        <div class="panel-action-text">
+          <div class="panel-action-title">Imprimir</div>
+          <div class="panel-action-desc">
+            Imprimir el contenido actual del documento directamente desde el navegador.
+          </div>
+        </div>
+      </button>
+
+      <button type="button" class="panel-action" id="action-duplicate">
+        <div class="panel-action-icon">📄</div>
+        <div class="panel-action-text">
+          <div class="panel-action-title">Duplicar documento</div>
+          <div class="panel-action-desc">
+            Crear una copia del contenido actual para reutilizarla después.
+          </div>
+          <span class="panel-badge">Interfaz lista</span>
+        </div>
+      </button>
+
+      <button type="button" class="panel-action" id="action-share-panel">
+        <div class="panel-action-icon">🔗</div>
+        <div class="panel-action-text">
+          <div class="panel-action-title">Compartir</div>
+          <div class="panel-action-desc">
+            Abrir la ventana de invitación y permisos del documento.
+          </div>
+        </div>
+      </button>
+    </div>
+
+    <div class="sidepanel-footer">
+      <div class="panel-status" id="panel-status"></div>
+    </div>
+  </aside>
+
   <script>
     const editor = document.getElementById("doc-content");
     const titleEditor = document.getElementById("doc-title");
@@ -831,6 +1060,19 @@
     const textColor = document.getElementById("text-color");
     const highlightColor = document.getElementById("highlight-color");
 
+    const sidepanel = document.getElementById("sidepanel");
+    const sidepanelBackdrop = document.getElementById("sidepanel-backdrop");
+    const openSidepanelBtn = document.getElementById("open-sidepanel-btn");
+    const closeSidepanelBtn = document.getElementById("close-sidepanel-btn");
+    const panelStatus = document.getElementById("panel-status");
+
+    const actionPresentation = document.getElementById("action-presentation");
+    const actionPdf = document.getElementById("action-pdf");
+    const actionPrint = document.getElementById("action-print");
+    const actionDuplicate = document.getElementById("action-duplicate");
+    const actionSharePanel = document.getElementById("action-share-panel");
+    const openShareBtn = document.getElementById("open-share-btn");
+
     function focusEditor() {
       editor?.focus({ preventScroll: true });
     }
@@ -838,6 +1080,23 @@
     function exec(command, value = null) {
       focusEditor();
       document.execCommand(command, false, value);
+    }
+
+    function setPanelStatus(message = "") {
+      if (panelStatus) panelStatus.textContent = message;
+    }
+
+    function openSidepanel() {
+      sidepanel?.classList.add("show");
+      sidepanelBackdrop?.classList.add("show");
+      document.body.style.overflow = "hidden";
+    }
+
+    function closeSidepanel() {
+      sidepanel?.classList.remove("show");
+      sidepanelBackdrop?.classList.remove("show");
+      document.body.style.overflow = "";
+      setPanelStatus("");
     }
 
     document.querySelectorAll("[data-command]").forEach((btn) => {
@@ -870,6 +1129,39 @@
       if (topbarTitleEl) {
         topbarTitleEl.textContent = value || "Documento sin título";
       }
+    });
+
+    openSidepanelBtn?.addEventListener("click", openSidepanel);
+    closeSidepanelBtn?.addEventListener("click", closeSidepanel);
+    sidepanelBackdrop?.addEventListener("click", closeSidepanel);
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        closeSidepanel();
+      }
+    });
+
+    actionPresentation?.addEventListener("click", () => {
+      setPanelStatus("La opción para pasar a presentación ya quedó lista en la interfaz. Después la conectamos con el backend.");
+    });
+
+    actionPdf?.addEventListener("click", () => {
+      setPanelStatus("Se abrió la impresión del navegador para que puedas guardarlo como PDF.");
+      window.print();
+    });
+
+    actionPrint?.addEventListener("click", () => {
+      setPanelStatus("Abriendo impresión...");
+      window.print();
+    });
+
+    actionDuplicate?.addEventListener("click", () => {
+      setPanelStatus("La duplicación quedó preparada visualmente. Después se puede conectar para crear una copia real en Firebase.");
+    });
+
+    actionSharePanel?.addEventListener("click", () => {
+      closeSidepanel();
+      openShareBtn?.click();
     });
   </script>
 
