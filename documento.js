@@ -52,6 +52,14 @@ const SUPPORT_PANEL_ID = "document-support-panel";
 const SAVE_DEBOUNCE_MS = 900;
 const GENERATE_TIMEOUT_MS = 90000;
 
+const DOC_CHAT_STYLE_ID = "document-chat-style";
+const DOC_CHAT_LAUNCHER_ID = "document-chat-launcher";
+const DOC_CHAT_PANEL_ID = "document-chat-panel";
+const DOC_CHAT_MESSAGES_ID = "document-chat-messages";
+const DOC_CHAT_FORM_ID = "document-chat-form";
+const DOC_CHAT_INPUT_ID = "document-chat-input";
+const DOC_CHAT_STATUS_ID = "document-chat-status";
+
 let currentUser = null;
 let currentClaseId = claseIdFromUrl || null;
 let currentOwnerUid = ownerUidFromUrl || null;
@@ -64,6 +72,11 @@ let shareUiInitialized = false;
 let autosaveListenersAttached = false;
 let generationPromise = null;
 let lastSavedSignature = "";
+
+let documentChatInitialized = false;
+let documentChatBusy = false;
+let documentChatLastResponse = null;
+let documentChatLastSelection = "";
 
 if (documentApp) {
   documentApp.style.display = "";
@@ -598,8 +611,17 @@ function hideLoading() {
   }
 }
 
+function setDocumentChatVisibility(visible) {
+  const launcher = document.getElementById(DOC_CHAT_LAUNCHER_ID);
+  const panel = document.getElementById(DOC_CHAT_PANEL_ID);
+
+  if (launcher) launcher.style.display = visible ? "" : "none";
+  if (panel && !visible) panel.classList.remove("show");
+}
+
 function showDenied() {
   hideLoading();
+  setDocumentChatVisibility(false);
   if (documentApp) documentApp.style.display = "none";
   if (accessGuard) accessGuard.classList.add("show");
 }
@@ -608,11 +630,13 @@ function showDocument() {
   hideLoading();
   if (accessGuard) accessGuard.classList.remove("show");
   if (documentApp) documentApp.style.display = "";
+  setDocumentChatVisibility(true);
 }
 
 function renderError(message) {
   clearSupportPanel();
   hideLoading();
+  setDocumentChatVisibility(false);
 
   if (docContent) {
     docContent.innerHTML = `
@@ -1336,6 +1360,722 @@ function setupShareUi() {
   });
 }
 
+function getPlainDocumentText() {
+  const titulo = limpiarTexto(docTitle?.textContent || "");
+  const objetivo = stripObjectivePrefix(limpiarTexto(docObjective?.textContent || ""));
+  const contenido = limpiarTexto(docContent?.innerText || docContent?.textContent || "");
+
+  return [titulo, objetivo, contenido].filter(Boolean).join("\n\n");
+}
+
+function selectionBelongsToDocument(selection) {
+  if (!selection || !selection.rangeCount) return false;
+
+  const range = selection.getRangeAt(0);
+  const node =
+    range.commonAncestorContainer?.nodeType === Node.ELEMENT_NODE
+      ? range.commonAncestorContainer
+      : range.commonAncestorContainer?.parentElement;
+
+  if (!node) return false;
+
+  return Boolean(
+    docTitle?.contains(node) ||
+      docObjective?.contains(node) ||
+      docContent?.contains(node)
+  );
+}
+
+function getSelectedDocumentText() {
+  const selection = window.getSelection();
+  if (!selection || !selection.rangeCount) return "";
+
+  const text = limpiarTexto(selection.toString());
+  if (!text) return "";
+  if (!selectionBelongsToDocument(selection)) return "";
+
+  return text;
+}
+
+function trackDocumentSelection() {
+  const text = getSelectedDocumentText();
+  if (text) {
+    documentChatLastSelection = text.slice(0, 4000);
+  }
+}
+
+function plainTextToHtmlBlocks(text = "") {
+  const clean = limpiarTexto(text);
+  if (!clean) return "";
+
+  return clean
+    .split(/\n{2,}/)
+    .map((block) => block.trim())
+    .filter(Boolean)
+    .map((block) => `<p>${escapeHtml(block).replace(/\n/g, "<br>")}</p>`)
+    .join("");
+}
+
+function appendProposedTextToDocument(text = "") {
+  if (!canEdit() || !docContent) return;
+
+  const html = plainTextToHtmlBlocks(text);
+  if (!html) return;
+
+  docContent.insertAdjacentHTML("beforeend", html);
+  docContent.focus();
+  scheduleSave();
+}
+
+async function copyTextToClipboard(text = "") {
+  const clean = limpiarTexto(text);
+  if (!clean) return false;
+
+  try {
+    await navigator.clipboard.writeText(clean);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function setDocumentChatStatus(message = "") {
+  const status = document.getElementById(DOC_CHAT_STATUS_ID);
+  if (status) {
+    status.textContent = message;
+  }
+}
+
+function openDocumentChat() {
+  const panel = document.getElementById(DOC_CHAT_PANEL_ID);
+  const input = document.getElementById(DOC_CHAT_INPUT_ID);
+
+  if (!panel) return;
+  panel.classList.add("show");
+
+  setTimeout(() => {
+    input?.focus();
+  }, 50);
+}
+
+function closeDocumentChat() {
+  const panel = document.getElementById(DOC_CHAT_PANEL_ID);
+  if (!panel) return;
+  panel.classList.remove("show");
+}
+
+function addDocumentChatHtml(role = "assistant", html = "") {
+  const messages = document.getElementById(DOC_CHAT_MESSAGES_ID);
+  if (!messages) return;
+
+  const item = document.createElement("div");
+  item.className = `doc-ai-msg ${role}`;
+  item.innerHTML = html;
+
+  messages.appendChild(item);
+  messages.scrollTop = messages.scrollHeight;
+}
+
+function addDocumentChatNode(role = "assistant", node) {
+  const messages = document.getElementById(DOC_CHAT_MESSAGES_ID);
+  if (!messages || !node) return;
+
+  const item = document.createElement("div");
+  item.className = `doc-ai-msg ${role}`;
+  item.appendChild(node);
+
+  messages.appendChild(item);
+  messages.scrollTop = messages.scrollHeight;
+}
+
+function normalizeDocumentAssistantPayload(raw = {}) {
+  const payload = raw?.respuesta && raw?.subtitulo ? raw : raw?.respuesta || raw;
+  const body =
+    payload?.respuesta && typeof payload.respuesta === "object"
+      ? payload.respuesta
+      : payload;
+
+  return {
+    subtitulo: limpiarTexto(payload?.subtitulo || "Asistente del documento"),
+    titulo: limpiarTexto(body?.titulo || "Respuesta sobre el documento"),
+    modo: limpiarTexto(body?.modo || "respuesta"),
+    resumen: limpiarTexto(body?.resumen || ""),
+    cambios: Array.isArray(body?.cambios) ? body.cambios : [],
+    textoPropuesto: limpiarTexto(body?.textoPropuesto || ""),
+    preguntasSeguimiento: Array.isArray(body?.preguntasSeguimiento)
+      ? body.preguntasSeguimiento
+      : [],
+  };
+}
+
+function renderDocumentAssistantResponse(raw = {}) {
+  const data = normalizeDocumentAssistantPayload(raw);
+  documentChatLastResponse = data;
+
+  const wrapper = document.createElement("div");
+  wrapper.className = "doc-ai-card";
+
+  const cambiosHtml = data.cambios.length
+    ? `
+      <div class="doc-ai-section">
+        <div class="doc-ai-section-title">Cambios sugeridos</div>
+        <div class="doc-ai-list">
+          ${data.cambios
+            .map((item) => {
+              const tipo = escapeHtml(item?.tipo || "mejora");
+              const titulo = escapeHtml(item?.titulo || "Mejora");
+              const detalle = escapeHtml(item?.detalle || "");
+              const ejemplo = escapeHtml(item?.ejemplo || "");
+
+              return `
+                <article class="doc-ai-change">
+                  <div class="doc-ai-change-top">
+                    <span class="doc-ai-badge">${tipo}</span>
+                    <strong>${titulo}</strong>
+                  </div>
+                  ${detalle ? `<p>${detalle}</p>` : ""}
+                  ${ejemplo ? `<div class="doc-ai-example">${ejemplo}</div>` : ""}
+                </article>
+              `;
+            })
+            .join("")}
+        </div>
+      </div>
+    `
+    : "";
+
+  const textoPropuestoHtml = data.textoPropuesto
+    ? `
+      <div class="doc-ai-section">
+        <div class="doc-ai-section-title">Texto propuesto</div>
+        <pre class="doc-ai-proposed">${escapeHtml(data.textoPropuesto)}</pre>
+        <div class="doc-ai-actions">
+          <button type="button" class="doc-ai-action-btn" data-action="copy-proposed">
+            Copiar texto
+          </button>
+          ${
+            canEdit()
+              ? `
+                <button type="button" class="doc-ai-action-btn primary" data-action="append-proposed">
+                  Agregar al documento
+                </button>
+              `
+              : ""
+          }
+        </div>
+      </div>
+    `
+    : "";
+
+  const followUpHtml = data.preguntasSeguimiento.length
+    ? `
+      <div class="doc-ai-section">
+        <div class="doc-ai-section-title">Siguientes ideas</div>
+        <ul class="doc-ai-followup">
+          ${data.preguntasSeguimiento
+            .map((item) => `<li>${escapeHtml(item)}</li>`)
+            .join("")}
+        </ul>
+      </div>
+    `
+    : "";
+
+  wrapper.innerHTML = `
+    <div class="doc-ai-subtitle">${escapeHtml(data.subtitulo)}</div>
+    <h4>${escapeHtml(data.titulo)}</h4>
+    ${
+      data.resumen
+        ? `<p class="doc-ai-summary">${escapeHtml(data.resumen)}</p>`
+        : ""
+    }
+    ${cambiosHtml}
+    ${textoPropuestoHtml}
+    ${followUpHtml}
+  `;
+
+  wrapper
+    .querySelector('[data-action="copy-proposed"]')
+    ?.addEventListener("click", async () => {
+      const ok = await copyTextToClipboard(data.textoPropuesto);
+      setDocumentChatStatus(ok ? "Texto copiado." : "No se pudo copiar el texto.");
+    });
+
+  wrapper
+    .querySelector('[data-action="append-proposed"]')
+    ?.addEventListener("click", () => {
+      appendProposedTextToDocument(data.textoPropuesto);
+      setDocumentChatStatus("Texto agregado al documento.");
+    });
+
+  addDocumentChatNode("assistant", wrapper);
+}
+
+async function handleDocumentChatSubmit(e) {
+  e.preventDefault();
+
+  if (documentChatBusy) return;
+
+  const input = document.getElementById(DOC_CHAT_INPUT_ID);
+  const pregunta = limpiarTexto(input?.value || "");
+
+  if (!pregunta) return;
+
+  const tituloDocumento = limpiarTexto(docTitle?.textContent || "");
+  const objetivoDocumento = stripObjectivePrefix(
+    limpiarTexto(docObjective?.textContent || "")
+  );
+  const documentoActual = getPlainDocumentText();
+  const textoSeleccionado = getSelectedDocumentText() || documentChatLastSelection;
+  const investigacion = getInvestigacionDocumento(currentClaseData || {});
+  const fuentes = getFuentesDocumento(currentClaseData || {});
+
+  addDocumentChatHtml(
+    "user",
+    `
+      <div class="doc-ai-user-bubble">
+        <p>${escapeHtml(pregunta)}</p>
+        ${
+          textoSeleccionado
+            ? `<div class="doc-ai-selection-note">Tomando en cuenta el texto seleccionado.</div>`
+            : ""
+        }
+      </div>
+    `
+  );
+
+  if (input) input.value = "";
+  documentChatBusy = true;
+  setDocumentChatStatus("Pensando...");
+
+  try {
+    const response = await fetch("/api/preguntar-documento", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        pregunta,
+        tituloDocumento,
+        objetivoDocumento,
+        documentoActual,
+        textoSeleccionado,
+        investigacion,
+        fuentes,
+        ultimaRespuesta: documentChatLastResponse,
+      }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok || !data?.ok) {
+      throw new Error(data?.error || "No se pudo analizar el documento.");
+    }
+
+    renderDocumentAssistantResponse(data.respuesta);
+  } catch (error) {
+    console.error("Error en chat de documento:", error);
+
+    addDocumentChatHtml(
+      "assistant",
+      `
+        <div class="doc-ai-card">
+          <div class="doc-ai-subtitle">Asistente del documento</div>
+          <h4>No se pudo responder</h4>
+          <p class="doc-ai-summary">
+            ${escapeHtml(error?.message || "Hubo un problema al consultar la IA.")}
+          </p>
+        </div>
+      `
+    );
+  } finally {
+    documentChatBusy = false;
+    setDocumentChatStatus("");
+  }
+}
+
+function injectDocumentChatStyles() {
+  if (document.getElementById(DOC_CHAT_STYLE_ID)) return;
+
+  const style = document.createElement("style");
+  style.id = DOC_CHAT_STYLE_ID;
+  style.textContent = `
+    #${DOC_CHAT_LAUNCHER_ID}{
+      position:fixed;
+      right:22px;
+      bottom:22px;
+      width:58px;
+      height:58px;
+      border:none;
+      border-radius:999px;
+      background:linear-gradient(135deg,#355d95 0%, #4d7bc0 100%);
+      color:#fff;
+      font-size:24px;
+      cursor:pointer;
+      box-shadow:0 18px 40px rgba(40,72,120,.28);
+      z-index:1200;
+    }
+
+    #${DOC_CHAT_PANEL_ID}{
+      position:fixed;
+      right:22px;
+      bottom:92px;
+      width:min(420px, calc(100vw - 28px));
+      height:min(620px, calc(100vh - 130px));
+      background:#fff;
+      border:1px solid rgba(53,93,149,.14);
+      border-radius:24px;
+      box-shadow:0 24px 70px rgba(24,39,75,.18);
+      display:none;
+      flex-direction:column;
+      overflow:hidden;
+      z-index:1200;
+    }
+
+    #${DOC_CHAT_PANEL_ID}.show{
+      display:flex;
+    }
+
+    .doc-ai-header{
+      padding:16px 16px 12px;
+      border-bottom:1px solid rgba(53,93,149,.10);
+      background:linear-gradient(180deg,#f8fbff 0%, #f4f8ff 100%);
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:12px;
+    }
+
+    .doc-ai-header h3{
+      margin:0;
+      font-size:1rem;
+      color:#27486d;
+      font-weight:800;
+    }
+
+    .doc-ai-header p{
+      margin:6px 0 0;
+      color:#5f7186;
+      font-size:.9rem;
+      line-height:1.45;
+    }
+
+    .doc-ai-close{
+      border:none;
+      background:#e9f1ff;
+      color:#355d95;
+      width:34px;
+      height:34px;
+      border-radius:999px;
+      cursor:pointer;
+      font-size:18px;
+      flex-shrink:0;
+    }
+
+    #${DOC_CHAT_MESSAGES_ID}{
+      flex:1;
+      overflow:auto;
+      padding:14px;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+      background:#fbfcfe;
+    }
+
+    .doc-ai-msg.user{
+      display:flex;
+      justify-content:flex-end;
+    }
+
+    .doc-ai-msg.assistant{
+      display:flex;
+      justify-content:flex-start;
+    }
+
+    .doc-ai-user-bubble{
+      max-width:86%;
+      background:linear-gradient(135deg,#355d95 0%, #4d7bc0 100%);
+      color:#fff;
+      padding:12px 14px;
+      border-radius:18px 18px 6px 18px;
+      box-shadow:0 10px 24px rgba(53,93,149,.18);
+    }
+
+    .doc-ai-user-bubble p{
+      margin:0;
+      line-height:1.5;
+      white-space:pre-wrap;
+    }
+
+    .doc-ai-selection-note{
+      margin-top:8px;
+      font-size:.76rem;
+      opacity:.9;
+    }
+
+    .doc-ai-card{
+      width:min(100%, 330px);
+      background:#fff;
+      border:1px solid rgba(53,93,149,.10);
+      border-radius:18px;
+      padding:14px;
+      box-shadow:0 10px 26px rgba(24,39,75,.06);
+    }
+
+    .doc-ai-subtitle{
+      display:inline-flex;
+      padding:5px 10px;
+      border-radius:999px;
+      background:#edf4ff;
+      color:#355d95;
+      font-size:.74rem;
+      font-weight:800;
+      margin-bottom:10px;
+    }
+
+    .doc-ai-card h4{
+      margin:0 0 8px;
+      font-size:1rem;
+      color:#223b59;
+      font-weight:800;
+      line-height:1.35;
+    }
+
+    .doc-ai-summary{
+      margin:0;
+      color:#44576c;
+      line-height:1.65;
+      white-space:pre-wrap;
+    }
+
+    .doc-ai-section{
+      margin-top:14px;
+    }
+
+    .doc-ai-section-title{
+      margin-bottom:8px;
+      color:#2d4f76;
+      font-size:.82rem;
+      font-weight:800;
+      letter-spacing:.02em;
+      text-transform:uppercase;
+    }
+
+    .doc-ai-list{
+      display:grid;
+      gap:8px;
+    }
+
+    .doc-ai-change{
+      padding:11px 12px;
+      border-radius:14px;
+      background:#f7faff;
+      border:1px solid rgba(53,93,149,.08);
+    }
+
+    .doc-ai-change-top{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      margin-bottom:6px;
+      flex-wrap:wrap;
+    }
+
+    .doc-ai-change p{
+      margin:0;
+      color:#4c6177;
+      line-height:1.55;
+    }
+
+    .doc-ai-badge{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:4px 8px;
+      border-radius:999px;
+      background:#e8f1ff;
+      color:#355d95;
+      font-size:.7rem;
+      font-weight:800;
+      text-transform:capitalize;
+    }
+
+    .doc-ai-example{
+      margin-top:8px;
+      padding:10px;
+      border-radius:12px;
+      background:#fff;
+      color:#40576f;
+      line-height:1.55;
+      border:1px dashed rgba(53,93,149,.16);
+      white-space:pre-wrap;
+    }
+
+    .doc-ai-proposed{
+      margin:0;
+      padding:12px;
+      border-radius:14px;
+      background:#f7f9fc;
+      border:1px solid rgba(53,93,149,.10);
+      color:#33485f;
+      font-size:.9rem;
+      line-height:1.6;
+      white-space:pre-wrap;
+      overflow:auto;
+      font-family:Inter, sans-serif;
+    }
+
+    .doc-ai-actions{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      margin-top:10px;
+    }
+
+    .doc-ai-action-btn{
+      border:none;
+      border-radius:12px;
+      padding:10px 12px;
+      background:#eef4ff;
+      color:#355d95;
+      font-weight:700;
+      cursor:pointer;
+    }
+
+    .doc-ai-action-btn.primary{
+      background:linear-gradient(135deg,#355d95 0%, #4d7bc0 100%);
+      color:#fff;
+    }
+
+    .doc-ai-followup{
+      margin:0;
+      padding-left:18px;
+      color:#4b6075;
+      line-height:1.6;
+    }
+
+    #${DOC_CHAT_STATUS_ID}{
+      min-height:22px;
+      padding:0 14px 8px;
+      color:#5f7186;
+      font-size:.82rem;
+    }
+
+    .doc-ai-form{
+      padding:12px;
+      border-top:1px solid rgba(53,93,149,.10);
+      background:#fff;
+      display:flex;
+      gap:8px;
+      align-items:flex-end;
+    }
+
+    .doc-ai-form textarea{
+      flex:1;
+      resize:none;
+      min-height:48px;
+      max-height:130px;
+      border-radius:14px;
+      border:1px solid rgba(53,93,149,.14);
+      padding:12px 14px;
+      font:inherit;
+      color:#243d59;
+      background:#fbfcff;
+      outline:none;
+    }
+
+    .doc-ai-form button{
+      border:none;
+      border-radius:14px;
+      padding:12px 14px;
+      background:linear-gradient(135deg,#355d95 0%, #4d7bc0 100%);
+      color:#fff;
+      font-weight:800;
+      cursor:pointer;
+      flex-shrink:0;
+    }
+
+    @media (max-width: 768px){
+      #${DOC_CHAT_LAUNCHER_ID}{
+        right:16px;
+        bottom:16px;
+      }
+
+      #${DOC_CHAT_PANEL_ID}{
+        right:14px;
+        left:14px;
+        width:auto;
+        bottom:84px;
+        height:min(70vh, 620px);
+      }
+    }
+  `;
+  document.head.appendChild(style);
+}
+
+function ensureDocumentChatUi() {
+  if (documentChatInitialized) return;
+  documentChatInitialized = true;
+
+  injectDocumentChatStyles();
+
+  const launcher = document.createElement("button");
+  launcher.id = DOC_CHAT_LAUNCHER_ID;
+  launcher.type = "button";
+  launcher.setAttribute("aria-label", "Abrir asistente del documento");
+  launcher.textContent = "✦";
+
+  const panel = document.createElement("aside");
+  panel.id = DOC_CHAT_PANEL_ID;
+  panel.innerHTML = `
+    <div class="doc-ai-header">
+      <div>
+        <h3>Asistente del documento</h3>
+        <p>Preguntá, pedí mejoras, más contenido o una reescritura.</p>
+      </div>
+      <button type="button" class="doc-ai-close" aria-label="Cerrar">×</button>
+    </div>
+
+    <div id="${DOC_CHAT_MESSAGES_ID}"></div>
+    <div id="${DOC_CHAT_STATUS_ID}"></div>
+
+    <form id="${DOC_CHAT_FORM_ID}" class="doc-ai-form">
+      <textarea
+        id="${DOC_CHAT_INPUT_ID}"
+        rows="1"
+        placeholder="Ej: esta introducción quedó corta, alargala un poco"
+      ></textarea>
+      <button type="submit">Enviar</button>
+    </form>
+  `;
+
+  document.body.appendChild(launcher);
+  document.body.appendChild(panel);
+
+  launcher.addEventListener("click", openDocumentChat);
+  panel.querySelector(".doc-ai-close")?.addEventListener("click", closeDocumentChat);
+  panel.querySelector(`#${DOC_CHAT_FORM_ID}`)?.addEventListener("submit", handleDocumentChatSubmit);
+
+  document.addEventListener("selectionchange", trackDocumentSelection);
+
+  addDocumentChatHtml(
+    "assistant",
+    `
+      <div class="doc-ai-card">
+        <div class="doc-ai-subtitle">Listo para ayudarte</div>
+        <h4>Podés usar este chat para mejorar el documento</h4>
+        <p class="doc-ai-summary">
+          Ejemplos:
+          "explicame mejor este párrafo",
+          "decime qué parte cambiarías",
+          "esta sección quedó corta, alargala",
+          "reescribilo más formal",
+          "resumime esta parte".
+        </p>
+      </div>
+    `
+  );
+}
+
 async function resolveClaseFromFirestoreOrLocal(user) {
   const fallbackOwner = ownerUidFromUrl || user.uid;
   const localClase = readClaseFromLocalStorage(fallbackOwner, claseIdFromUrl);
@@ -1464,6 +2204,7 @@ async function loadClase(user) {
     showDocument();
     setupShareUi();
     attachAutosaveListeners();
+    ensureDocumentChatUi();
 
     const claseFinal = await generarDocumentoSiFalta(claseBase);
 
