@@ -8,48 +8,28 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
     rel="stylesheet"
   />
 
   <style>
     :root{
-      --bg:#f8f3e8;
-      --paper:#fffdf8;
-      --paper-2:#fff7ea;
-      --paper-3:#fffaf2;
-      --text:#2a2532;
-      --muted:#6f6577;
+      --bg:#f6f8ff;
+      --surface:#ffffff;
+      --text:#12141c;
+      --muted:#687487;
+      --line:#e4eafb;
 
-      --violet:#7d6bf2;
-      --violet-2:#6c59eb;
-      --violet-soft:#efeaff;
+      --primary:#6a5cff;
+      --secondary:#42c7ff;
+      --pink:#ff8fd8;
 
-      --yellow:#ffe796;
-      --yellow-soft:#fff5cf;
+      --shadow-sm:0 10px 26px rgba(21,29,52,.06);
+      --shadow-md:0 18px 48px rgba(21,29,52,.10);
+      --shadow-lg:0 28px 80px rgba(21,29,52,.14);
 
-      --mint:#d9f0a1;
-      --mint-soft:#eff8d1;
-
-      --sky:#d9f1ff;
-      --sky-soft:#ecf8ff;
-
-      --orange:#ffb46d;
-      --orange-soft:#fff0df;
-
-      --board:#28564a;
-      --board-2:#21483e;
-      --board-3:#19382f;
-
-      --line:rgba(124,108,242,.12);
-      --line-soft:rgba(124,108,242,.08);
-      --red-line:rgba(255,90,110,.18);
-
-      --shadow:0 18px 40px rgba(63,72,138,.08);
-      --shadow-soft:0 10px 24px rgba(63,72,138,.06);
-      --shadow-strong:0 26px 60px rgba(63,72,138,.12);
-
-      --container:1220px;
+      --transition:.3s cubic-bezier(.22,.61,.36,1);
+      --container:1180px;
     }
 
     *{
@@ -63,40 +43,17 @@
     }
 
     body{
-      font-family:"Inter",sans-serif;
+      font-family:"Inter", sans-serif;
       color:var(--text);
       background:
-        radial-gradient(circle at top left, rgba(255,255,255,.78), transparent 28%),
-        radial-gradient(circle at bottom right, rgba(255,231,150,.22), transparent 24%),
-        var(--bg);
+        radial-gradient(circle at 10% 10%, rgba(106,92,255,.18), transparent 24%),
+        radial-gradient(circle at 88% 14%, rgba(66,199,255,.18), transparent 22%),
+        radial-gradient(circle at 50% 55%, rgba(255,143,216,.08), transparent 22%),
+        linear-gradient(rgba(106,92,255,.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(106,92,255,.035) 1px, transparent 1px),
+        linear-gradient(180deg, #fbfcff 0%, #f4f7ff 100%);
+      background-size:auto, auto, auto, 34px 34px, 34px 34px, auto;
       overflow-x:hidden;
-    }
-
-    body::before{
-      content:"";
-      position:fixed;
-      inset:0;
-      background-image:
-        linear-gradient(rgba(124,108,242,.04) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(124,108,242,.04) 1px, transparent 1px);
-      background-size:28px 28px;
-      pointer-events:none;
-      z-index:0;
-      opacity:.65;
-    }
-
-    body::after{
-      content:"";
-      position:fixed;
-      inset:0;
-      background:
-        radial-gradient(circle at 10% 18%, rgba(255,255,255,.45) 0 2px, transparent 2px),
-        radial-gradient(circle at 82% 24%, rgba(255,255,255,.38) 0 2px, transparent 2px),
-        radial-gradient(circle at 28% 84%, rgba(255,255,255,.3) 0 2px, transparent 2px);
-      background-size:180px 180px, 220px 220px, 250px 250px;
-      pointer-events:none;
-      opacity:.4;
-      z-index:0;
     }
 
     a{
@@ -105,11 +62,18 @@
     }
 
     .page{
-      position:relative;
-      z-index:1;
       min-height:100vh;
       display:flex;
       flex-direction:column;
+    }
+
+    .topbar{
+      position:sticky;
+      top:0;
+      z-index:20;
+      backdrop-filter:blur(16px);
+      background:rgba(246,248,255,.74);
+      border-bottom:1px solid rgba(228,234,251,.78);
     }
 
     .container{
@@ -117,62 +81,48 @@
       margin:0 auto;
     }
 
-    .topbar{
-      padding:18px 0 8px;
-    }
-
     .nav{
+      min-height:78px;
       display:flex;
       align-items:center;
       justify-content:space-between;
       gap:18px;
-      background:rgba(255,252,245,.82);
-      backdrop-filter:blur(14px);
-      border:1px solid rgba(255,255,255,.8);
-      box-shadow:var(--shadow-soft);
-      border-radius:24px;
-      padding:14px 16px;
     }
 
     .brand{
       display:flex;
       align-items:center;
       gap:12px;
+      font-weight:800;
+      letter-spacing:-.04em;
+      font-size:1rem;
     }
 
     .brand-mark{
-      width:44px;
-      height:44px;
-      border-radius:14px;
+      width:42px;
+      height:42px;
+      border-radius:15px;
       display:grid;
       place-items:center;
-      font-family:"Sora",sans-serif;
-      font-weight:800;
       color:#fff;
-      background:linear-gradient(135deg, var(--violet), var(--orange));
-      box-shadow:0 12px 24px rgba(124,108,242,.2);
-      flex:none;
+      font-weight:800;
+      background:linear-gradient(135deg, var(--primary), var(--secondary));
+      box-shadow:0 14px 32px rgba(106,92,255,.24);
+      position:relative;
+      overflow:hidden;
     }
 
-    .brand-text strong{
-      display:block;
-      font-family:"Sora",sans-serif;
-      font-size:1rem;
-      letter-spacing:-.03em;
-    }
-
-    .brand-text span{
-      display:block;
-      color:var(--muted);
-      font-size:.83rem;
-      margin-top:2px;
+    .brand-mark::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:linear-gradient(135deg, rgba(255,255,255,.22), transparent 60%);
     }
 
     .nav-actions{
       display:flex;
       align-items:center;
       gap:10px;
-      flex-wrap:wrap;
     }
 
     .btn{
@@ -180,14 +130,13 @@
       align-items:center;
       justify-content:center;
       gap:10px;
+      padding:12px 18px;
       border:none;
-      text-decoration:none;
-      cursor:pointer;
-      font-family:inherit;
-      font-weight:800;
       border-radius:999px;
-      padding:13px 18px;
-      transition:.2s ease;
+      cursor:pointer;
+      font-size:.94rem;
+      font-weight:700;
+      transition:var(--transition);
       white-space:nowrap;
     }
 
@@ -197,429 +146,141 @@
 
     .btn-primary{
       color:#fff;
-      background:linear-gradient(135deg, var(--violet), var(--orange));
-      box-shadow:0 14px 28px rgba(124,108,242,.16);
+      background:linear-gradient(135deg, var(--primary), var(--secondary));
+      box-shadow:0 14px 30px rgba(106,92,255,.22);
     }
 
-    .btn-soft{
-      color:var(--violet);
-      background:#efeaff;
-      border:1px solid rgba(124,108,242,.08);
+    .btn-secondary{
+      color:var(--text);
+      background:rgba(255,255,255,.9);
+      border:1px solid var(--line);
+      box-shadow:var(--shadow-sm);
     }
 
     .main{
       flex:1;
       display:flex;
       align-items:center;
-      padding:18px 0 28px;
+      padding:34px 0 42px;
     }
 
-    .auth-layout{
+    .auth-shell{
+      position:relative;
+      width:100%;
       display:grid;
-      grid-template-columns:1.08fr .92fr;
+      grid-template-columns:1fr 1fr;
       gap:22px;
       align-items:stretch;
     }
 
-    .hero-panel,
-    .login-panel{
-      position:relative;
-      overflow:hidden;
-      border-radius:34px;
-      box-shadow:var(--shadow);
-    }
-
-    .hero-panel{
-      background:linear-gradient(180deg, var(--paper) 0%, var(--paper-2) 100%);
-      border:2px solid rgba(124,108,242,.08);
-      padding:24px 26px 26px;
-    }
-
-    .hero-panel::before{
-      content:"";
+    .glow{
       position:absolute;
-      inset:0;
-      background:
-        radial-gradient(circle at 12% 18%, rgba(255,255,255,.78), transparent 20%),
-        radial-gradient(circle at 88% 82%, rgba(255,231,150,.14), transparent 18%);
+      border-radius:50%;
+      filter:blur(60px);
+      opacity:.55;
       pointer-events:none;
+      z-index:0;
+      animation:pulseGlow 6s ease-in-out infinite;
     }
 
-    .hero-stage{
+    .glow.g1{
+      width:240px;
+      height:240px;
+      top:-30px;
+      left:-30px;
+      background:rgba(106,92,255,.18);
+    }
+
+    .glow.g2{
+      width:230px;
+      height:230px;
+      bottom:-30px;
+      right:-10px;
+      background:rgba(66,199,255,.18);
+      animation-delay:1.2s;
+    }
+
+    .auth-panel,
+    .info-panel{
       position:relative;
       z-index:1;
-      height:100%;
-      display:flex;
-      flex-direction:column;
-    }
-
-    .hero-top{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:14px;
-      flex-wrap:wrap;
-      margin-bottom:14px;
-    }
-
-    .hero-label{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      padding:9px 14px;
-      border-radius:999px;
-      background:#f6f0ff;
-      color:#6b5ee8;
-      font-size:.78rem;
-      font-weight:800;
-      letter-spacing:.12em;
-      text-transform:uppercase;
-      border:1px solid rgba(124,108,242,.12);
-      box-shadow:0 8px 18px rgba(124,108,242,.06);
-    }
-
-    .hero-tabs{
-      display:flex;
-      flex-wrap:wrap;
-      gap:10px;
-    }
-
-    .hero-tab{
-      padding:10px 14px;
-      border-radius:999px;
-      font-size:.84rem;
-      font-weight:800;
-      border:1px solid var(--line);
-      background:rgba(255,255,255,.72);
-      color:#5f5670;
-      box-shadow:0 8px 16px rgba(63,72,138,.04);
-    }
-
-    .hero-tab.active{
-      background:linear-gradient(135deg, rgba(124,108,242,.16), rgba(255,179,107,.14));
-      color:#5e4fe0;
-    }
-
-    .board{
-      position:relative;
-      flex:1;
-      background:
-        radial-gradient(circle at 18% 18%, rgba(255,255,255,.05), transparent 20%),
-        radial-gradient(circle at 72% 30%, rgba(255,255,255,.04), transparent 22%),
-        linear-gradient(180deg, var(--board) 0%, var(--board-2) 54%, var(--board-3) 100%);
-      border:12px solid #c99661;
-      border-bottom-width:16px;
-      border-radius:30px;
-      padding:20px 22px 22px;
-      box-shadow:
-        inset 0 0 0 2px rgba(255,255,255,.04),
-        inset 0 20px 40px rgba(255,255,255,.03),
-        0 22px 30px rgba(35,34,58,.12);
+      border:1px solid rgba(228,234,251,.95);
+      background:linear-gradient(180deg, rgba(255,255,255,.84), rgba(255,255,255,.74));
+      box-shadow:var(--shadow-lg);
+      backdrop-filter:blur(16px);
+      border-radius:34px;
       overflow:hidden;
     }
 
-    .board::before{
+    .auth-panel{
+      padding:30px;
+    }
+
+    .auth-panel::before,
+    .info-panel::before{
       content:"";
       position:absolute;
       inset:0;
-      background:
-        linear-gradient(transparent 43px, rgba(255,255,255,.018) 44px),
-        radial-gradient(circle at top left, rgba(255,255,255,.04), transparent 30%);
-      background-size:100% 44px, auto;
-      opacity:.45;
       pointer-events:none;
+      background:
+        radial-gradient(circle at top right, rgba(106,92,255,.08), transparent 28%),
+        radial-gradient(circle at left bottom, rgba(66,199,255,.07), transparent 24%);
     }
 
-    .board-topbar{
+    .auth-inner,
+    .info-inner{
       position:relative;
-      z-index:2;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:14px;
-      margin-bottom:20px;
+      z-index:1;
     }
 
-    .board-dots{
-      display:flex;
-      gap:8px;
+    .auth-inner{
+      max-width:470px;
     }
 
-    .board-dot{
-      width:10px;
-      height:10px;
-      border-radius:50%;
-      background:rgba(255,255,255,.22);
-    }
-
-    .board-status{
+    .eyebrow{
       display:inline-flex;
       align-items:center;
       gap:8px;
-      padding:8px 12px;
+      padding:8px 13px;
       border-radius:999px;
-      border:1px solid rgba(255,255,255,.12);
-      background:rgba(255,255,255,.06);
-      color:#e8f8f0;
-      font-size:.78rem;
-      font-weight:800;
-      letter-spacing:.08em;
-      text-transform:uppercase;
+      background:rgba(255,255,255,.88);
+      border:1px solid rgba(228,234,251,.95);
+      color:var(--primary);
+      font-size:.84rem;
+      font-weight:700;
+      margin-bottom:16px;
+      box-shadow:var(--shadow-sm);
     }
 
-    .board-status::before{
+    .eyebrow::before{
       content:"";
       width:8px;
       height:8px;
       border-radius:50%;
-      background:#9cf1c4;
-      box-shadow:0 0 0 4px rgba(156,241,196,.14);
-    }
-
-    .board-content{
-      position:relative;
-      z-index:2;
-      display:grid;
-      grid-template-columns:1.08fr .92fr;
-      gap:16px;
-      align-items:stretch;
-    }
-
-    .board-copy .mini-label{
-      display:inline-block;
-      margin-bottom:14px;
-      padding:8px 12px;
-      border-radius:999px;
-      border:1px solid rgba(255,255,255,.14);
-      background:rgba(255,255,255,.06);
-      color:#e0f3ea;
-      font-size:.78rem;
-      font-weight:800;
-      letter-spacing:.11em;
-      text-transform:uppercase;
-    }
-
-    .board-copy h1{
-      font-family:"Sora",sans-serif;
-      font-size:clamp(2rem,4vw,3rem);
-      line-height:1.03;
-      letter-spacing:-.05em;
-      color:#f7fff9;
-      margin-bottom:14px;
-      max-width:620px;
-    }
-
-    .board-copy p{
-      color:rgba(235,248,241,.88);
-      line-height:1.85;
-      font-size:1rem;
-      max-width:590px;
-      margin-bottom:18px;
-    }
-
-    .feature-row{
-      display:flex;
-      flex-wrap:wrap;
-      gap:10px;
-      margin-bottom:18px;
-    }
-
-    .feature{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      padding:11px 14px;
-      border-radius:15px;
-      border:1px solid rgba(255,255,255,.12);
-      background:rgba(255,255,255,.075);
-      color:#eefcf4;
-      font-size:.9rem;
-      font-weight:800;
-      box-shadow:0 8px 18px rgba(0,0,0,.05);
-    }
-
-    .hero-actions{
-      display:flex;
-      gap:12px;
-      flex-wrap:wrap;
-    }
-
-    .hero-actions .btn-soft{
-      background:rgba(255,255,255,.12);
-      color:#fff;
-      border:1px solid rgba(255,255,255,.12);
-    }
-
-    .hero-side{
-      display:grid;
-      gap:12px;
-      align-self:stretch;
-    }
-
-    .hero-card{
-      background:rgba(255,255,255,.075);
-      border:1px solid rgba(255,255,255,.1);
-      border-radius:18px;
-      padding:16px;
-      backdrop-filter:blur(4px);
-      box-shadow:0 10px 18px rgba(0,0,0,.06);
-    }
-
-    .hero-card span{
+      background:linear-gradient(135deg, var(--primary), var(--secondary));
       display:block;
-      color:rgba(226,239,233,.72);
-      font-size:.78rem;
-      font-weight:700;
-      margin-bottom:6px;
-      letter-spacing:.03em;
     }
 
-    .hero-card strong{
-      display:block;
-      color:#f4fff8;
-      font-size:1rem;
-      line-height:1.4;
-      letter-spacing:-.02em;
-      margin-bottom:6px;
-    }
-
-    .hero-card p{
-      color:rgba(235,248,241,.76);
-      font-size:.9rem;
-      line-height:1.6;
-    }
-
-    .board-bottom{
-      position:relative;
-      z-index:2;
-      margin-top:22px;
-    }
-
-    .chalk-shelf{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:14px;
-      flex-wrap:wrap;
-    }
-
-    .chalk-tools{
-      display:flex;
-      gap:8px;
-      align-items:center;
-    }
-
-    .chalk{
-      width:26px;
-      height:8px;
-      border-radius:999px;
-      display:inline-block;
-      box-shadow:0 2px 6px rgba(0,0,0,.15);
-    }
-
-    .chalk.white{ background:#f9fbff; }
-    .chalk.yellow{ background:#ffe796; }
-    .chalk.blue{ background:#c9e7ff; }
-
-    .board-line{
-      flex:1;
-      min-width:180px;
-      height:6px;
-      border-radius:999px;
-      background:linear-gradient(90deg, rgba(255,255,255,.18), rgba(255,255,255,.04));
-    }
-
-    .login-panel{
-      background:linear-gradient(180deg, var(--paper) 0%, var(--paper-3) 100%);
-      border:2px solid rgba(124,108,242,.08);
-      padding:22px;
-      box-shadow:var(--shadow-strong);
-      display:flex;
-      align-items:center;
-    }
-
-    .login-panel::before{
-      content:"";
-      position:absolute;
-      inset:0;
-      background:
-        radial-gradient(circle at top right, rgba(124,108,242,.08), transparent 26%),
-        radial-gradient(circle at left bottom, rgba(255,179,107,.08), transparent 22%);
-      pointer-events:none;
-    }
-
-    .login-card{
-      position:relative;
-      z-index:1;
-      width:100%;
-      background:linear-gradient(180deg, #fffdf8 0%, #fff8ee 100%);
-      border:1px solid rgba(124,108,242,.08);
-      border-radius:28px;
-      padding:26px 24px 24px;
-      box-shadow:var(--shadow-soft);
-      overflow:hidden;
-    }
-
-    .login-card::before{
-      content:"";
-      position:absolute;
-      inset:0;
-      background-image:linear-gradient(transparent 35px, rgba(124,108,242,.04) 36px);
-      background-size:100% 36px;
-      pointer-events:none;
-      opacity:.95;
-    }
-
-    .login-card::after{
-      content:"";
-      position:absolute;
-      left:22px;
-      top:0;
-      bottom:0;
-      width:2px;
-      background:var(--red-line);
-      pointer-events:none;
-    }
-
-    .login-inner{
-      position:relative;
-      z-index:1;
-      padding-left:16px;
-    }
-
-    .login-chip{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding:9px 13px;
-      border-radius:999px;
-      background:var(--violet-soft);
-      border:1px solid rgba(124,108,242,.12);
-      color:#6b5ee8;
-      font-size:.84rem;
+    h1{
+      font-size:clamp(1.9rem, 4vw, 2.8rem);
+      line-height:1.04;
+      letter-spacing:-.055em;
       font-weight:800;
-      margin-bottom:16px;
-      box-shadow:var(--shadow-soft);
+      margin-bottom:12px;
     }
 
-    .login-title{
-      font-family:"Sora",sans-serif;
-      font-size:clamp(1.8rem,3vw,2.45rem);
-      line-height:1.05;
-      letter-spacing:-.05em;
-      margin-bottom:10px;
-      max-width:460px;
+    h1 span{
+      background:linear-gradient(135deg, var(--primary), var(--secondary), var(--pink));
+      -webkit-background-clip:text;
+      background-clip:text;
+      color:transparent;
     }
 
-    .login-title span{
-      color:var(--violet);
-    }
-
-    .login-subtitle{
+    .subtitle{
       color:var(--muted);
-      line-height:1.8;
-      margin-bottom:20px;
-      max-width:460px;
+      font-size:1rem;
+      margin-bottom:22px;
+      max-width:420px;
     }
 
     .form{
@@ -635,23 +296,22 @@
 
     .field label{
       font-size:.9rem;
-      font-weight:800;
-      color:#2d2737;
+      font-weight:700;
+      color:#283142;
     }
 
     .input{
       width:100%;
-      height:56px;
+      height:54px;
       border-radius:18px;
-      border:1px solid rgba(124,108,242,.14);
-      background:rgba(255,255,255,.86);
+      border:1px solid #dfe6f7;
+      background:rgba(255,255,255,.92);
       padding:0 16px;
       font-size:.95rem;
       color:var(--text);
       outline:none;
-      transition:.2s ease;
+      transition:var(--transition);
       box-shadow:0 8px 18px rgba(18,24,40,.03);
-      font-family:inherit;
     }
 
     .input:focus{
@@ -661,7 +321,7 @@
     }
 
     .input::placeholder{
-      color:#9a92a5;
+      color:#96a0b3;
     }
 
     .form-row{
@@ -679,17 +339,16 @@
       gap:9px;
       color:var(--muted);
       font-size:.88rem;
-      font-weight:600;
     }
 
     .remember input{
-      accent-color:var(--violet);
+      accent-color:var(--primary);
     }
 
     .forgot{
-      color:var(--violet);
+      color:var(--primary);
       font-size:.88rem;
-      font-weight:800;
+      font-weight:700;
     }
 
     .submit-btn{
@@ -700,16 +359,15 @@
       color:#fff;
       font-size:.97rem;
       font-weight:800;
-      background:linear-gradient(135deg, var(--violet), var(--orange));
-      box-shadow:0 16px 34px rgba(124,108,242,.24);
+      background:linear-gradient(135deg, var(--primary), var(--secondary));
+      box-shadow:0 16px 34px rgba(106,92,255,.24);
       cursor:pointer;
-      transition:.2s ease;
-      font-family:inherit;
+      transition:var(--transition);
     }
 
     .submit-btn:hover{
       transform:translateY(-2px);
-      box-shadow:0 20px 38px rgba(124,108,242,.28);
+      box-shadow:0 20px 38px rgba(106,92,255,.28);
     }
 
     .divider{
@@ -717,9 +375,9 @@
       display:flex;
       align-items:center;
       gap:12px;
-      color:#8c8397;
+      color:#97a1b5;
       font-size:.86rem;
-      font-weight:700;
+      font-weight:600;
     }
 
     .divider::before,
@@ -727,27 +385,47 @@
       content:"";
       flex:1;
       height:1px;
-      background:rgba(124,108,242,.12);
+      background:#e6ecf8;
     }
 
     .alt-btn{
       width:100%;
       height:54px;
       border-radius:18px;
-      border:1px solid rgba(124,108,242,.12);
-      background:rgba(255,255,255,.86);
+      border:1px solid #dfe6f7;
+      background:rgba(255,255,255,.92);
       font-size:.94rem;
-      font-weight:800;
-      color:#2c2533;
+      font-weight:700;
+      color:#253044;
       cursor:pointer;
-      box-shadow:var(--shadow-soft);
-      transition:.2s ease;
-      font-family:inherit;
+      box-shadow:var(--shadow-sm);
+      transition:var(--transition);
     }
 
     .alt-btn:hover{
       transform:translateY(-2px);
       background:#fff;
+    }
+
+    .auth-footer{
+      margin-top:18px;
+      padding-top:18px;
+      border-top:1px solid #e7edf9;
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      align-items:center;
+      flex-wrap:wrap;
+    }
+
+    .auth-footer p{
+      color:var(--muted);
+      font-size:.92rem;
+    }
+
+    .auth-footer a{
+      color:var(--primary);
+      font-weight:800;
     }
 
     .chips{
@@ -764,11 +442,11 @@
       padding:10px 13px;
       border-radius:999px;
       background:rgba(255,255,255,.86);
-      border:1px solid rgba(124,108,242,.12);
+      border:1px solid #e1e8f8;
       font-size:.84rem;
       font-weight:700;
       color:#4f5b70;
-      box-shadow:var(--shadow-soft);
+      box-shadow:var(--shadow-sm);
     }
 
     .chip::before{
@@ -776,33 +454,84 @@
       width:6px;
       height:6px;
       border-radius:50%;
-      background:linear-gradient(135deg, var(--violet), var(--orange));
+      background:linear-gradient(135deg, var(--primary), var(--secondary));
       display:block;
     }
 
-    .auth-footer{
-      margin-top:18px;
-      padding-top:18px;
-      border-top:1px solid rgba(124,108,242,.10);
+    .info-panel{
+      padding:28px;
       display:flex;
-      justify-content:space-between;
-      gap:12px;
       align-items:center;
-      flex-wrap:wrap;
     }
 
-    .auth-footer p{
-      color:var(--muted);
-      font-size:.92rem;
+    .info-badge{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 13px;
+      border-radius:999px;
+      background:rgba(255,255,255,.88);
+      border:1px solid #e2e9fa;
+      color:var(--primary);
+      font-size:.84rem;
+      font-weight:700;
+      margin-bottom:16px;
+      box-shadow:var(--shadow-sm);
     }
 
-    .auth-footer a{
-      color:var(--violet);
+    .info-badge::before{
+      content:"";
+      width:8px;
+      height:8px;
+      border-radius:50%;
+      background:linear-gradient(135deg, var(--primary), var(--secondary));
+      display:block;
+    }
+
+    .info-panel h2{
+      font-size:clamp(1.5rem, 3vw, 2.2rem);
+      line-height:1.05;
+      letter-spacing:-.045em;
       font-weight:800;
+      margin-bottom:10px;
+      max-width:430px;
+    }
+
+    .info-panel p{
+      color:var(--muted);
+      font-size:.98rem;
+      max-width:460px;
+      margin-bottom:20px;
+    }
+
+    .stats{
+      display:grid;
+      gap:12px;
+    }
+
+    .stat{
+      padding:18px;
+      border-radius:22px;
+      background:rgba(255,255,255,.88);
+      border:1px solid #e3e9f9;
+      box-shadow:var(--shadow-sm);
+    }
+
+    .stat strong{
+      display:block;
+      font-size:.96rem;
+      margin-bottom:4px;
+      letter-spacing:-.02em;
+    }
+
+    .stat span{
+      color:var(--muted);
+      font-size:.88rem;
+      line-height:1.45;
     }
 
     .footer-note{
-      padding:0 0 24px;
+      padding:0 0 26px;
       color:var(--muted);
       font-size:.9rem;
     }
@@ -812,40 +541,24 @@
       justify-content:space-between;
       gap:14px;
       flex-wrap:wrap;
-      border-top:1px solid rgba(124,108,242,.10);
+      border-top:1px solid rgba(228,234,251,.9);
       padding-top:18px;
     }
 
-    @media (max-width: 1080px){
-      .auth-layout{
-        grid-template-columns:1fr;
+    @keyframes pulseGlow{
+      0%,100%{
+        opacity:.52;
+        transform:scale(1);
       }
-
-      .board-content{
-        grid-template-columns:1fr;
+      50%{
+        opacity:.72;
+        transform:scale(1.08);
       }
     }
 
-    @media (max-width: 820px){
-      .main{
-        padding:12px 0 24px;
-      }
-
-      .hero-panel,
-      .login-panel{
-        border-radius:24px;
-      }
-
-      .hero-panel,
-      .login-panel{
-        padding:20px;
-      }
-
-      .board{
-        border-width:9px;
-        border-bottom-width:12px;
-        border-radius:22px;
-        padding:18px;
+    @media (max-width: 980px){
+      .auth-shell{
+        grid-template-columns:1fr;
       }
     }
 
@@ -854,46 +567,27 @@
         width:min(var(--container), calc(100% - 20px));
       }
 
-      .nav{
-        padding:12px;
-        border-radius:18px;
+      .main{
+        padding:20px 0 30px;
       }
 
-      .nav-actions{
-        width:100%;
+      .auth-panel,
+      .info-panel{
+        border-radius:26px;
+        padding:20px;
+      }
+
+      .nav{
+        min-height:72px;
       }
 
       .nav-actions .btn{
-        flex:1;
-        min-width:0;
+        padding:10px 14px;
+        font-size:.88rem;
       }
 
-      .brand-text span{
-        display:none;
-      }
-
-      .hero-top{
-        align-items:flex-start;
-      }
-
-      .hero-actions{
-        flex-direction:column;
-      }
-
-      .hero-actions .btn{
-        width:100%;
-      }
-
-      .login-card{
-        padding:22px 18px 20px;
-      }
-
-      .login-inner{
-        padding-left:12px;
-      }
-
-      .login-title{
-        font-size:1.95rem;
+      .brand span{
+        font-size:.94rem;
       }
     }
   </style>
@@ -905,14 +599,11 @@
         <nav class="nav">
           <a href="#" class="brand">
             <div class="brand-mark">E</div>
-            <div class="brand-text">
-              <strong>Eduvia</strong>
-              <span>Tu aula con IA</span>
-            </div>
+            <span>Eduvia</span>
           </a>
 
           <div class="nav-actions">
-            <a href="#" class="btn btn-soft">Volver</a>
+            <a href="#" class="btn btn-secondary">Volver</a>
             <a href="register.html" class="btn btn-primary">Crear cuenta</a>
           </div>
         </nav>
@@ -921,146 +612,85 @@
 
     <main class="main">
       <div class="container">
-        <section class="auth-layout">
-          <section class="hero-panel">
-            <div class="hero-stage">
-              <div class="hero-top">
-                <div class="hero-label">EDUVIA</div>
+        <section class="auth-shell">
+          <div class="glow g1"></div>
+          <div class="glow g2"></div>
 
-                <div class="hero-tabs">
-                  <span class="hero-tab active">Iniciar sesión</span>
-                  <span class="hero-tab">Clases</span>
-                  <span class="hero-tab">IA</span>
-                  <span class="hero-tab">Apuntes</span>
+          <div class="auth-panel">
+            <div class="auth-inner">
+              <div class="eyebrow">Iniciar sesión</div>
+
+              <h1>
+                Volvé a entrar a <span>Eduvia</span>
+              </h1>
+
+              <p class="subtitle">
+                Accedé a tus clases, tus avances y tu espacio de estudio con IA.
+              </p>
+
+              <form class="form" id="login-form">
+                <div class="field">
+                  <label for="email">Correo electrónico</label>
+                  <input id="email" class="input" type="email" placeholder="nombre@email.com" />
                 </div>
+
+                <div class="field">
+                  <label for="password">Contraseña</label>
+                  <input id="password" class="input" type="password" placeholder="Tu contraseña" />
+                </div>
+
+                <div class="form-row">
+                  <label class="remember">
+                    <input type="checkbox" />
+                    <span>Recordarme</span>
+                  </label>
+
+                  <a href="#" class="forgot">Olvidé mi contraseña</a>
+                </div>
+
+                <button type="submit" class="submit-btn">Iniciar sesión</button>
+              </form>
+
+              <div class="divider">o continuá con</div>
+
+              <button class="alt-btn" type="button">Google</button>
+
+              <div class="chips">
+                <div class="chip">Tu progreso</div>
+                <div class="chip">Tus clases</div>
+                <div class="chip">IA en vivo</div>
               </div>
 
-              <div class="board">
-                <div class="board-topbar">
-                  <div class="board-dots">
-                    <span class="board-dot"></span>
-                    <span class="board-dot"></span>
-                    <span class="board-dot"></span>
-                  </div>
-
-                  <div class="board-status">Estudio activo</div>
-                </div>
-
-                <div class="board-content">
-                  <div class="board-copy">
-                    <span class="mini-label">Tu espacio de aprendizaje</span>
-                    <h1>Entrá y retomá una forma de estudiar más clara y acompañada.</h1>
-                    <p>
-                      Eduvia está pensada para que puedas volver a tus temas, generar nuevas clases,
-                      seguir tus avances y usar la IA como apoyo en el momento en que la necesitás.
-                    </p>
-
-                    <div class="feature-row">
-                      <span class="feature">📚 Tus clases</span>
-                      <span class="feature">🧠 IA en vivo</span>
-                      <span class="feature">✏️ Explicación guiada</span>
-                    </div>
-
-                    <div class="hero-actions">
-                      <a href="#login-form" class="btn btn-primary">Entrar ahora</a>
-                      <a href="register.html" class="btn btn-soft">Crear cuenta</a>
-                    </div>
-                  </div>
-
-                  <div class="hero-side">
-                    <div class="hero-card">
-                      <span>Continuidad</span>
-                      <strong>Seguís desde donde dejaste</strong>
-                      <p>Volvés a tus clases y retomás el estudio sin perder el hilo.</p>
-                    </div>
-
-                    <div class="hero-card">
-                      <span>Apoyo</span>
-                      <strong>Explicaciones más claras</strong>
-                      <p>La IA puede simplificar, repetir o cambiar la forma de explicar.</p>
-                    </div>
-
-                    <div class="hero-card">
-                      <span>Orden</span>
-                      <strong>Todo dentro del mismo lugar</strong>
-                      <p>Una experiencia pensada para que estudiar se sienta más simple.</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="board-bottom">
-                  <div class="chalk-shelf">
-                    <div class="chalk-tools">
-                      <span class="chalk white"></span>
-                      <span class="chalk yellow"></span>
-                      <span class="chalk blue"></span>
-                    </div>
-                    <div class="board-line"></div>
-                  </div>
-                </div>
+              <div class="auth-footer">
+                <p>¿Todavía no tenés cuenta?</p>
+                <a href="register.html">Crear cuenta</a>
               </div>
             </div>
-          </section>
+          </div>
 
-          <aside class="login-panel">
-            <div class="login-card">
-              <div class="login-inner">
-                <div class="login-chip">Iniciar sesión</div>
+          <aside class="info-panel">
+            <div class="info-inner">
+              <div class="info-badge">Seguís desde donde dejaste</div>
+              <h2>Entrá y retomá una experiencia de estudio más clara y rápida.</h2>
+              <p>
+                Eduvia está pensada para que puedas volver a tus temas, generar nuevas clases
+                y resolver dudas en el momento en que aparecen.
+              </p>
 
-                <h2 class="login-title">
-                  Volvé a entrar a <span>Eduvia</span>
-                </h2>
-
-                <p class="login-subtitle">
-                  Accedé a tus clases, tus avances y tu espacio de estudio con una estética más clara y ordenada.
-                </p>
-
-                <form class="form" id="login-form">
-                  <div class="field">
-                    <label for="email">Correo electrónico</label>
-                    <input
-                      id="email"
-                      class="input"
-                      type="email"
-                      placeholder="nombre@email.com"
-                    />
-                  </div>
-
-                  <div class="field">
-                    <label for="password">Contraseña</label>
-                    <input
-                      id="password"
-                      class="input"
-                      type="password"
-                      placeholder="Tu contraseña"
-                    />
-                  </div>
-
-                  <div class="form-row">
-                    <label class="remember">
-                      <input type="checkbox" />
-                      <span>Recordarme</span>
-                    </label>
-
-                    <a href="#" class="forgot">Olvidé mi contraseña</a>
-                  </div>
-
-                  <button type="submit" class="submit-btn">Iniciar sesión</button>
-                </form>
-
-                <div class="divider">o continuá con</div>
-
-                <button class="alt-btn" type="button">Ingresar con Google</button>
-
-                <div class="chips">
-                  <div class="chip">Tu progreso</div>
-                  <div class="chip">Tus clases</div>
-                  <div class="chip">IA en vivo</div>
+              <div class="stats">
+                <div class="stat">
+                  <strong>Clases instantáneas</strong>
+                  <span>Ingresás y podés crear una nueva clase sin depender de horarios ni coordinación.</span>
                 </div>
 
-                <div class="auth-footer">
-                  <p>¿Todavía no tenés cuenta?</p>
-                  <a href="register.html">Crear cuenta</a>
+                <div class="stat">
+                  <strong>Explicación adaptada</strong>
+                  <span>La IA responde según tu duda y puede repetir o simplificar cuando lo necesites.</span>
+                </div>
+
+                <div class="stat">
+                  <strong>Todo en un mismo lugar</strong>
+                  <span>Tu cuenta reúne acceso, continuidad y una experiencia visual pensada para aprender.</span>
                 </div>
               </div>
             </div>
@@ -1076,7 +706,6 @@
       </div>
     </footer>
   </div>
-
   <script type="module" src="login.js"></script>
 </body>
 </html>
