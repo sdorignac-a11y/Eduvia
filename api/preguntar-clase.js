@@ -4,6 +4,102 @@ const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
+const RESPUESTA_SCHEMA = {
+  type: "object",
+  additionalProperties: false,
+  properties: {
+    subtitulo: { type: "string" },
+    clase: {
+      type: "object",
+      additionalProperties: false,
+      properties: {
+        titulo: { type: "string" },
+        resumen: { type: "string" },
+        palabrasClave: {
+          type: "array",
+          items: { type: "string" },
+          minItems: 3,
+          maxItems: 8,
+        },
+        secciones: {
+          type: "array",
+          minItems: 2,
+          maxItems: 6,
+          items: {
+            type: "object",
+            additionalProperties: false,
+            properties: {
+              titulo: { type: "string" },
+              texto: { type: "string" },
+              bullets: {
+                type: "array",
+                items: { type: "string" },
+                maxItems: 5,
+              },
+            },
+            required: ["titulo", "texto", "bullets"],
+          },
+        },
+        cardsDerecha: {
+          type: "array",
+          items: {
+            type: "object",
+            additionalProperties: false,
+            properties: {
+              titulo: { type: "string" },
+              lineas: {
+                type: "array",
+                items: { type: "string" },
+                minItems: 2,
+                maxItems: 4,
+              },
+              caption: { type: "string" },
+              estilo: {
+                type: "string",
+                enum: ["blue", "green", "yellow", "red"],
+              },
+            },
+            required: ["titulo", "lineas", "caption", "estilo"],
+          },
+          maxItems: 3,
+        },
+        imagenesContenido: {
+          type: "array",
+          items: {
+            type: "object",
+            additionalProperties: false,
+            properties: {
+              titulo: { type: "string" },
+              lineas: {
+                type: "array",
+                items: { type: "string" },
+                minItems: 2,
+                maxItems: 4,
+              },
+              caption: { type: "string" },
+              estilo: {
+                type: "string",
+                enum: ["blue", "green", "yellow", "red"],
+              },
+            },
+            required: ["titulo", "lineas", "caption", "estilo"],
+          },
+          maxItems: 3,
+        },
+      },
+      required: [
+        "titulo",
+        "resumen",
+        "palabrasClave",
+        "secciones",
+        "cardsDerecha",
+        "imagenesContenido",
+      ],
+    },
+  },
+  required: ["subtitulo", "clase"],
+};
+
 function limpiarTexto(value = "") {
   return String(value || "").trim();
 }
@@ -14,38 +110,6 @@ function limpiarLista(value, max = 8) {
     .map((item) => limpiarTexto(item))
     .filter(Boolean)
     .slice(0, max);
-}
-
-function limpiarFormulas(value) {
-  if (!Array.isArray(value)) return [];
-  return value
-    .map((item) => {
-      if (!item) return null;
-
-      if (typeof item === "string") {
-        const formula = limpiarTexto(item);
-        if (!formula) return null;
-        return {
-          nombre: "",
-          formula,
-          explicacion: "",
-        };
-      }
-
-      const nombre = limpiarTexto(item.nombre);
-      const formula = limpiarTexto(item.formula);
-      const explicacion = limpiarTexto(item.explicacion);
-
-      if (!nombre && !formula && !explicacion) return null;
-
-      return {
-        nombre,
-        formula,
-        explicacion,
-      };
-    })
-    .filter(Boolean)
-    .slice(0, 5);
 }
 
 function limpiarFuentes(value) {
@@ -89,29 +153,54 @@ function extraerOutputText(response) {
   return parts.join("\n").trim();
 }
 
-function normalizarRespuesta(parsed = {}) {
-  return {
-    titulo: limpiarTexto(parsed.titulo) || "Respuesta de la IA",
-    subtitulo: limpiarTexto(parsed.subtitulo) || "Duda respondida",
-    introduccion:
-      limpiarTexto(parsed.introduccion) ||
-      limpiarTexto(parsed.explicacion) ||
-      "Te explico esta duda de forma más clara.",
-    ideaPrincipal:
-      limpiarTexto(parsed.ideaPrincipal) ||
-      limpiarTexto(parsed.resumen) ||
-      limpiarTexto(parsed.introduccion) ||
-      "Esta es la idea más importante de la respuesta.",
-    puntos: limpiarLista(parsed.puntos, 8),
-    formulas: limpiarFormulas(parsed.formulas),
-    pasos: limpiarLista(parsed.pasos, 8),
-    tips: limpiarLista(parsed.tips, 8),
-    errores: limpiarLista(parsed.errores, 8),
-    ejemplo: limpiarTexto(parsed.ejemplo),
-    actividad:
-      limpiarTexto(parsed.actividad) ||
-      "Podés hacer otra pregunta desde el chat para seguir profundizando.",
-  };
+function limpiarSecciones(value) {
+  if (!Array.isArray(value)) return [];
+
+  return value
+    .map((item) => {
+      if (!item || typeof item !== "object") return null;
+
+      const titulo = limpiarTexto(item.titulo);
+      const texto = limpiarTexto(item.texto);
+      const bullets = limpiarLista(item.bullets, 5);
+
+      if (!titulo && !texto && !bullets.length) return null;
+
+      return {
+        titulo: titulo || "Idea importante",
+        texto,
+        bullets,
+      };
+    })
+    .filter(Boolean)
+    .slice(0, 6);
+}
+
+function limpiarVisuales(value, max = 3) {
+  if (!Array.isArray(value)) return [];
+
+  return value
+    .map((item) => {
+      if (!item || typeof item !== "object") return null;
+
+      const titulo = limpiarTexto(item.titulo);
+      const lineas = limpiarLista(item.lineas, 4);
+      const caption = limpiarTexto(item.caption);
+      const estilo = ["blue", "green", "yellow", "red"].includes(item.estilo)
+        ? item.estilo
+        : "blue";
+
+      if (!titulo && !lineas.length && !caption) return null;
+
+      return {
+        titulo: titulo || "Apoyo visual",
+        lineas: lineas.length ? lineas : ["Idea importante", "Repaso rápido"],
+        caption: caption || "Apoyo visual",
+        estilo,
+      };
+    })
+    .filter(Boolean)
+    .slice(0, max);
 }
 
 function construirTextoFuentes(fuentes = []) {
@@ -124,6 +213,67 @@ function construirTextoFuentes(fuentes = []) {
       return `${index + 1}. ${titulo}${url ? ` — ${url}` : ""}`;
     })
     .join("\n");
+}
+
+function fallbackSeccionesDesdeTexto(resumen = "") {
+  const texto = limpiarTexto(resumen);
+
+  if (!texto) {
+    return [
+      {
+        titulo: "Explicación",
+        texto: "No se pudo reconstruir bien la respuesta.",
+        bullets: [],
+      },
+      {
+        titulo: "Seguimos",
+        texto: "Podés reformular la pregunta para profundizar mejor.",
+        bullets: [],
+      },
+    ];
+  }
+
+  return [
+    {
+      titulo: "Explicación",
+      texto,
+      bullets: [],
+    },
+    {
+      titulo: "Seguimos",
+      texto: "Podés hacer otra pregunta para profundizar esta idea.",
+      bullets: [],
+    },
+  ];
+}
+
+function normalizarRespuesta(parsed = {}) {
+  const subtitulo = limpiarTexto(parsed.subtitulo) || "Duda respondida";
+  const claseRaw = parsed.clase && typeof parsed.clase === "object" ? parsed.clase : {};
+
+  const titulo = limpiarTexto(claseRaw.titulo) || "Respuesta de la IA";
+  const resumen =
+    limpiarTexto(claseRaw.resumen) ||
+    "Te explico esta duda de forma más clara.";
+
+  const palabrasClave = limpiarLista(claseRaw.palabrasClave, 8);
+  const secciones = limpiarSecciones(claseRaw.secciones);
+  const cardsDerecha = limpiarVisuales(claseRaw.cardsDerecha, 3);
+  const imagenesContenido = limpiarVisuales(claseRaw.imagenesContenido, 3);
+
+  return {
+    subtitulo,
+    clase: {
+      titulo,
+      resumen,
+      palabrasClave: palabrasClave.length
+        ? palabrasClave
+        : ["idea principal", "contexto", "repaso"],
+      secciones: secciones.length ? secciones : fallbackSeccionesDesdeTexto(resumen),
+      cardsDerecha,
+      imagenesContenido,
+    },
+  };
 }
 
 export default async function handler(req, res) {
@@ -165,7 +315,7 @@ export default async function handler(req, res) {
     };
 
     const response = await client.responses.create({
-      model: process.env.OPENAI_MODEL || "gpt-5.4",
+      model: process.env.OPENAI_MODEL || "gpt-5.4-mini",
       input: [
         {
           role: "developer",
@@ -175,7 +325,7 @@ Respondés dudas del alumno dentro de una clase ya iniciada.
 
 Objetivo:
 - Resolver la pregunta de forma clara, visual y útil.
-- Mantener relación con la clase actual.
+- Mantener relación con la clase actual cuando sea relevante.
 - Escribir como si la respuesta fuera a mostrarse en un pizarrón.
 - Apoyarte en la investigación previa y en las fuentes ya usadas para la clase.
 
@@ -183,13 +333,35 @@ Reglas:
 - Respondé en español rioplatense neutro.
 - Sé didáctico, concreto y ordenado.
 - No hables como chat informal.
-- Si es matemática, incluí fórmulas y pasos cuando sirva.
-- Si es inglés, incluí ejemplos claros y cortos.
-- Si la pregunta es simple, no inventes contenido de más.
+- No uses una estructura fija.
+- Adaptá la respuesta al tipo de pregunta.
+- Solo incluí fórmulas si la pregunta realmente las necesita.
+- Solo incluí pasos si la pregunta realmente los necesita.
+- Si la pregunta es histórica, cultural, social o teórica, priorizá explicación, contexto, comparación, causas, relaciones y ejemplos.
+- Si la pregunta es matemática o procedural, priorizá reglas, fórmulas, procedimiento y errores comunes.
+- Si la pregunta es simple, no agregues secciones innecesarias.
 - Priorizá la investigación previa antes que inventar.
-- Si falta información exacta, explicalo con prudencia y mantenete dentro del tema actual.
+- Si falta información exacta, explicalo con prudencia.
 - No contradigas el contenido base de la clase.
 - Devolvé SOLO JSON válido.
+
+Formato esperado:
+- "subtitulo": una etiqueta breve para mostrar arriba.
+- "clase": objeto con contenido flexible y útil para estudiar.
+
+Dentro de "clase":
+- "titulo": claro y específico.
+- "resumen": explicación principal.
+- "palabrasClave": entre 3 y 8.
+- "secciones": entre 2 y 6, elegidas según el tema.
+- "cardsDerecha": opcionalmente 0 a 3 apoyos visuales si suman valor real.
+- "imagenesContenido": opcionalmente 0 a 3 apoyos visuales si suman valor real.
+
+Muy importante:
+- No armes secciones vacías.
+- No inventes una sección de fórmulas si no corresponde.
+- No inventes una sección de pasos si no corresponde.
+- Las secciones deben surgir del contenido real de la pregunta.
           `.trim(),
         },
         {
@@ -215,80 +387,16 @@ ${construirTextoFuentes(fuentesLimpias)}
 PREGUNTA DEL ALUMNO:
 ${preguntaLimpia}
 
-Generá una respuesta con esta estructura:
-- titulo
-- subtitulo
-- introduccion
-- ideaPrincipal
-- puntos
-- formulas
-- pasos
-- tips
-- errores
-- ejemplo
-- actividad
+Respondé adaptando la estructura a esta pregunta concreta.
           `.trim(),
         },
       ],
       text: {
         format: {
           type: "json_schema",
-          name: "respuesta_clase_eduvia",
+          name: "respuesta_clase_eduvia_flexible",
           strict: true,
-          schema: {
-            type: "object",
-            additionalProperties: false,
-            properties: {
-              titulo: { type: "string" },
-              subtitulo: { type: "string" },
-              introduccion: { type: "string" },
-              ideaPrincipal: { type: "string" },
-              puntos: {
-                type: "array",
-                items: { type: "string" },
-              },
-              formulas: {
-                type: "array",
-                items: {
-                  type: "object",
-                  additionalProperties: false,
-                  properties: {
-                    nombre: { type: "string" },
-                    formula: { type: "string" },
-                    explicacion: { type: "string" },
-                  },
-                  required: ["nombre", "formula", "explicacion"],
-                },
-              },
-              pasos: {
-                type: "array",
-                items: { type: "string" },
-              },
-              tips: {
-                type: "array",
-                items: { type: "string" },
-              },
-              errores: {
-                type: "array",
-                items: { type: "string" },
-              },
-              ejemplo: { type: "string" },
-              actividad: { type: "string" },
-            },
-            required: [
-              "titulo",
-              "subtitulo",
-              "introduccion",
-              "ideaPrincipal",
-              "puntos",
-              "formulas",
-              "pasos",
-              "tips",
-              "errores",
-              "ejemplo",
-              "actividad",
-            ],
-          },
+          schema: RESPUESTA_SCHEMA,
         },
       },
     });
