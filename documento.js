@@ -43,6 +43,11 @@ const closeShareBtn = document.getElementById("close-share-btn");
 const copyLinkBtn = document.getElementById("copy-link-btn");
 const sendShareBtn = document.getElementById("send-share-btn");
 
+const exportPptBtn =
+  document.getElementById("btn-exportar-ppt") ||
+  document.getElementById("export-ppt-btn") ||
+  document.querySelector('[data-action="export-ppt"]');
+
 const params = new URLSearchParams(window.location.search);
 const claseIdFromUrl = params.get("id") || params.get("doc");
 const ownerUidFromUrl = params.get("owner");
@@ -74,6 +79,8 @@ let selectionActionBusy = false;
 let documentAssistantLastResponse = null;
 let currentSelectedText = "";
 let currentSelectedRange = null;
+
+let pptExportInitialized = false;
 
 if (documentApp) {
   documentApp.style.display = "";
@@ -884,12 +891,20 @@ function applyRoleUi(role) {
   setEditableState(docContent, editable);
 
   toolbarControls.forEach((control) => {
+    if (!control) return;
+
+    const isExportControl = control === exportPptBtn;
+    if (isExportControl) {
+      control.disabled = false;
+      return;
+    }
+
     control.disabled = !editable;
   });
 
   if (toolbarWrap) {
-    toolbarWrap.style.opacity = editable ? "1" : "0.55";
-    toolbarWrap.style.pointerEvents = editable ? "auto" : "none";
+    toolbarWrap.style.opacity = editable ? "1" : "0.72";
+    toolbarWrap.style.pointerEvents = "auto";
   }
 
   if (openShareBtn) {
@@ -1370,6 +1385,437 @@ function getPlainDocumentText() {
   const contenido = limpiarTexto(docContent?.innerText || docContent?.textContent || "");
 
   return [titulo, objetivo, contenido].filter(Boolean).join("\n\n");
+}
+
+function normalizePresentationText(value = "") {
+  return String(value || "")
+    .replace(/\u00A0/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function chunkArray(items = [], size = 5) {
+  const chunks = [];
+  for (let i = 0; i < items.length; i += size) {
+    chunks.push(items.slice(i, i + size));
+  }
+  return chunks;
+}
+
+function splitPresentationText(text = "", maxChars = 180) {
+  const clean = normalizePresentationText(text);
+  if (!clean) return [];
+
+  const sentences = clean
+    .split(/(?<=[.!?])\s+/)
+    .map((item) => item.trim())
+    .filter(Boolean);
+
+  if (!sentences.length) {
+    return [clean.slice(0, maxChars)];
+  }
+
+  const blocks = [];
+  let current = "";
+
+  function pushCurrent() {
+    const value = normalizePresentationText(current);
+    if (value) blocks.push(value);
+    current = "";
+  }
+
+  for (const sentence of sentences) {
+    if (sentence.length <= maxChars) {
+      const next = current ? `${current} ${sentence}` : sentence;
+      if (next.length <= maxChars) {
+        current = next;
+      } else {
+        pushCurrent();
+        current = sentence;
+      }
+      continue;
+    }
+
+    const words = sentence.split(/\s+/).filter(Boolean);
+    let partial = "";
+
+    for (const word of words) {
+      const next = partial ? `${partial} ${word}` : word;
+      if (next.length <= maxChars) {
+        partial = next;
+      } else {
+        if (partial) blocks.push(partial);
+        partial = word;
+      }
+    }
+
+    if (partial) {
+      if (!current) current = partial;
+      else {
+        const next = `${current} ${partial}`;
+        if (next.length <= maxChars) current = next;
+        else {
+          pushCurrent();
+          current = partial;
+        }
+      }
+    }
+  }
+
+  pushCurrent();
+
+  return blocks.filter(Boolean);
+}
+
+function getPresentationMeta() {
+  const clase = currentClaseData || {};
+
+  return {
+    titulo:
+      normalizePresentationText(docTitle?.textContent || "") ||
+      normalizePresentationText(getDocumentoTitle(clase)) ||
+      "Presentación",
+    objetivo:
+      stripObjectivePrefix(
+        normalizePresentationText(docObjective?.textContent || "")
+      ) ||
+      normalizePresentationText(getDocumentoObjective(clase)),
+    materia: normalizePresentationText(clase.materia || ""),
+    nivel: normalizePresentationText(clase.nivel || ""),
+    duracion: normalizePresentationText(clase.duracion || ""),
+  };
+}
+
+function extractPresentationSectionsFromDom() {
+  if (!docContent) return [];
+
+  const sections = [];
+  let currentSection = {
+    title: "Contenido",
+    bullets: [],
+  };
+
+  function pushSection() {
+    const title = normalizePresentationText(currentSection.title);
+    const bullets = currentSection.bullets
+      .map((item) => normalizePresentationText(item))
+      .filter(Boolean);
+
+    if (!title && !bullets.length) return;
+
+    if (bullets.length) {
+      sections.push({
+        title: title || "Contenido",
+        bullets,
+      });
+    }
+  }
+
+  const children = Array.from(docContent.children || []);
+
+  if (!children.length) {
+    const fallbackText = normalizePresentationText(docContent.innerText || "");
+    if (!fallbackText) return [];
+    return [
+      {
+        title: "Contenido",
+        bullets: splitPresentationText(fallbackText, 170),
+      },
+    ];
+  }
+
+  for (const child of children) {
+    const tag = (child.tagName || "").toLowerCase();
+
+    if (tag === "h1" || tag === "h2") {
+      pushSection();
+      currentSection = {
+        title: normalizePresentationText(child.textContent || "Sección"),
+        bullets: [],
+      };
+      continue;
+    }
+
+    if (tag === "h3") {
+      const subtitle = normalizePresentationText(child.textContent || "");
+      if (subtitle) {
+        currentSection.bullets.push(subtitle);
+      }
+      continue;
+    }
+
+    if (tag === "p" || tag === "blockquote") {
+      const text = normalizePresentationText(child.innerText || child.textContent || "");
+      if (text) {
+        currentSection.bullets.push(...splitPresentationText(text, 170));
+      }
+      continue;
+    }
+
+    if (tag === "ul" || tag === "ol") {
+      const items = Array.from(child.querySelectorAll(":scope > li"))
+        .map((li) => normalizePresentationText(li.innerText || li.textContent || ""))
+        .filter(Boolean);
+
+      for (const item of items) {
+        currentSection.bullets.push(...splitPresentationText(item, 150));
+      }
+      continue;
+    }
+
+    const fallback = normalizePresentationText(child.innerText || child.textContent || "");
+    if (fallback) {
+      currentSection.bullets.push(...splitPresentationText(fallback, 170));
+    }
+  }
+
+  pushSection();
+
+  if (!sections.length) {
+    const fallbackText = normalizePresentationText(docContent.innerText || "");
+    if (!fallbackText) return [];
+    return [
+      {
+        title: "Contenido",
+        bullets: splitPresentationText(fallbackText, 170),
+      },
+    ];
+  }
+
+  return sections;
+}
+
+function addPresentationCoverSlide(pptx, meta) {
+  const slide = pptx.addSlide();
+  slide.background = { color: "F8F4EC" };
+
+  slide.addText(meta.titulo || "Presentación", {
+    x: 0.65,
+    y: 0.8,
+    w: 11.8,
+    h: 1.0,
+    fontFace: "Inter",
+    fontSize: 24,
+    bold: true,
+    color: "2B2434",
+    margin: 0,
+    valign: "mid",
+  });
+
+  if (meta.objetivo) {
+    slide.addText(meta.objetivo, {
+      x: 0.65,
+      y: 1.95,
+      w: 11.3,
+      h: 0.8,
+      fontFace: "Inter",
+      fontSize: 12,
+      color: "6F6577",
+      margin: 0,
+      breakLine: false,
+    });
+  }
+
+  const chips = [
+    meta.materia ? `Materia: ${meta.materia}` : "",
+    meta.nivel ? `Nivel: ${meta.nivel}` : "",
+    meta.duracion ? `Duración: ${meta.duracion}` : "",
+  ].filter(Boolean);
+
+  let chipX = 0.65;
+  for (const chip of chips) {
+    slide.addText(chip, {
+      x: chipX,
+      y: 3.0,
+      w: 2.35,
+      h: 0.38,
+      fontFace: "Inter",
+      fontSize: 9,
+      bold: true,
+      color: "5A4FCF",
+      align: "center",
+      valign: "mid",
+      margin: 0.06,
+      fill: { color: "EFEAFF" },
+      line: { color: "EFEAFF" },
+      radius: 0.1,
+    });
+    chipX += 2.5;
+  }
+
+  slide.addText("Eduvia", {
+    x: 0.68,
+    y: 6.65,
+    w: 1.1,
+    h: 0.2,
+    fontFace: "Inter",
+    fontSize: 9,
+    bold: true,
+    color: "8E7FE8",
+    margin: 0,
+  });
+}
+
+function addPresentationContentSlide(pptx, title, bullets = [], slideNumber = 1) {
+  const slide = pptx.addSlide();
+  slide.background = { color: "FFFDF8" };
+
+  slide.addText(title || "Contenido", {
+    x: 0.65,
+    y: 0.45,
+    w: 11.6,
+    h: 0.5,
+    fontFace: "Inter",
+    fontSize: 20,
+    bold: true,
+    color: "2B2434",
+    margin: 0,
+  });
+
+  const bulletText = bullets
+    .map((item) => `• ${normalizePresentationText(item)}`)
+    .join("\n");
+
+  slide.addText(bulletText || "• Contenido", {
+    x: 0.85,
+    y: 1.25,
+    w: 11.25,
+    h: 5.25,
+    fontFace: "Inter",
+    fontSize: 15,
+    color: "3C3547",
+    breakLine: false,
+    margin: 0,
+    valign: "top",
+    paraSpaceAfterPt: 14,
+  });
+
+  slide.addText(String(slideNumber), {
+    x: 12.2,
+    y: 6.85,
+    w: 0.35,
+    h: 0.18,
+    fontFace: "Inter",
+    fontSize: 8,
+    color: "9A90A8",
+    align: "right",
+    margin: 0,
+  });
+}
+
+function addPresentationSourcesSlide(pptx, fuentes = [], slideNumber = 1) {
+  if (!Array.isArray(fuentes) || !fuentes.length) return;
+
+  const bullets = fuentes
+    .slice(0, 8)
+    .map((fuente, index) => {
+      const title = normalizePresentationText(fuente.title || `Fuente ${index + 1}`);
+      const url = normalizePresentationText(
+        (fuente.url || "").replace(/^https?:\/\//, "")
+      );
+      return url ? `${title} — ${url}` : title;
+    });
+
+  addPresentationContentSlide(pptx, "Fuentes consultadas", bullets, slideNumber);
+}
+
+function getPresentationFileName(title = "presentacion-eduvia") {
+  const safe = String(title || "presentacion-eduvia")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, "")
+    .trim()
+    .replace(/\s+/g, "-")
+    .slice(0, 60);
+
+  return `${safe || "presentacion-eduvia"}.pptx`;
+}
+
+async function exportDocumentToPresentation() {
+  const PptxGenJS = window.PptxGenJS;
+
+  if (!PptxGenJS) {
+    alert("Falta cargar la librería de presentaciones en documento.html.");
+    return;
+  }
+
+  if (!docContent || !normalizePresentationText(docContent.innerText || "")) {
+    alert("No hay contenido suficiente en el documento para convertir.");
+    return;
+  }
+
+  const originalLabel = exportPptBtn?.textContent || "Pasar a presentación";
+
+  try {
+    if (exportPptBtn) {
+      exportPptBtn.disabled = true;
+      exportPptBtn.textContent = "Generando presentación...";
+    }
+
+    const meta = getPresentationMeta();
+    const sections = extractPresentationSectionsFromDom();
+    const fuentes = getFuentesDocumento(currentClaseData || {});
+
+    const pptx = new PptxGenJS();
+    pptx.layout = "LAYOUT_WIDE";
+    pptx.author = "Eduvia";
+    pptx.company = "Eduvia";
+    pptx.subject = meta.titulo || "Documento convertido a presentación";
+    pptx.title = meta.titulo || "Presentación";
+    pptx.lang = "es-AR";
+
+    addPresentationCoverSlide(pptx, meta);
+
+    let slideNumber = 2;
+
+    for (const section of sections) {
+      const title = normalizePresentationText(section.title || "Contenido");
+      const bullets = Array.isArray(section.bullets) ? section.bullets : [];
+      const groupedBullets = chunkArray(bullets, 5);
+
+      for (let i = 0; i < groupedBullets.length; i++) {
+        const pageTitle =
+          i === 0 ? title : `${title} (cont.)`;
+
+        addPresentationContentSlide(
+          pptx,
+          pageTitle,
+          groupedBullets[i],
+          slideNumber
+        );
+
+        slideNumber += 1;
+      }
+    }
+
+    if (fuentes.length) {
+      addPresentationSourcesSlide(pptx, fuentes, slideNumber);
+    }
+
+    await pptx.writeFile({
+      fileName: getPresentationFileName(meta.titulo),
+    });
+  } catch (error) {
+    console.error("Error exportando a presentación:", error);
+    alert("No se pudo generar la presentación.");
+  } finally {
+    if (exportPptBtn) {
+      exportPptBtn.disabled = false;
+      exportPptBtn.textContent = originalLabel;
+    }
+  }
+}
+
+function setupPresentationExport() {
+  if (pptExportInitialized) return;
+  if (!exportPptBtn) return;
+
+  pptExportInitialized = true;
+
+  exportPptBtn.addEventListener("click", () => {
+    void exportDocumentToPresentation();
+  });
 }
 
 function nodeBelongsToDocument(node) {
@@ -2245,9 +2691,10 @@ async function loadClase(user) {
     }
 
     showDocument();
-    setupShareUi();
-    attachAutosaveListeners();
-    ensureSelectionAssistantUi();
+setupShareUi();
+attachAutosaveListeners();
+ensureSelectionAssistantUi();
+setupPresentationExport();
 
     const claseFinal = await generarDocumentoSiFalta(claseBase);
 
