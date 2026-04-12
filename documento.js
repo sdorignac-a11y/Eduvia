@@ -46,6 +46,7 @@ const sendShareBtn = document.getElementById("send-share-btn");
 const exportPptBtn =
   document.getElementById("btn-exportar-ppt") ||
   document.getElementById("export-ppt-btn") ||
+  document.getElementById("action-presentation") ||
   document.querySelector('[data-action="export-ppt"]');
 
 const params = new URLSearchParams(window.location.search);
@@ -892,19 +893,12 @@ function applyRoleUi(role) {
 
   toolbarControls.forEach((control) => {
     if (!control) return;
-
-    const isExportControl = control === exportPptBtn;
-    if (isExportControl) {
-      control.disabled = false;
-      return;
-    }
-
     control.disabled = !editable;
   });
 
   if (toolbarWrap) {
     toolbarWrap.style.opacity = editable ? "1" : "0.72";
-    toolbarWrap.style.pointerEvents = "auto";
+    toolbarWrap.style.pointerEvents = editable ? "auto" : "none";
   }
 
   if (openShareBtn) {
@@ -1402,7 +1396,7 @@ function chunkArray(items = [], size = 5) {
   return chunks;
 }
 
-function splitPresentationText(text = "", maxChars = 180) {
+function splitPresentationText(text = "", maxChars = 120) {
   const clean = normalizePresentationText(text);
   if (!clean) return [];
 
@@ -1519,7 +1513,7 @@ function extractPresentationSectionsFromDom() {
     return [
       {
         title: "Contenido",
-        bullets: splitPresentationText(fallbackText, 170),
+        bullets: splitPresentationText(fallbackText, 120),
       },
     ];
   }
@@ -1547,7 +1541,7 @@ function extractPresentationSectionsFromDom() {
     if (tag === "p" || tag === "blockquote") {
       const text = normalizePresentationText(child.innerText || child.textContent || "");
       if (text) {
-        currentSection.bullets.push(...splitPresentationText(text, 170));
+        currentSection.bullets.push(...splitPresentationText(text, 120));
       }
       continue;
     }
@@ -1558,14 +1552,14 @@ function extractPresentationSectionsFromDom() {
         .filter(Boolean);
 
       for (const item of items) {
-        currentSection.bullets.push(...splitPresentationText(item, 150));
+        currentSection.bullets.push(...splitPresentationText(item, 100));
       }
       continue;
     }
 
     const fallback = normalizePresentationText(child.innerText || child.textContent || "");
     if (fallback) {
-      currentSection.bullets.push(...splitPresentationText(fallback, 170));
+      currentSection.bullets.push(...splitPresentationText(fallback, 120));
     }
   }
 
@@ -1577,7 +1571,7 @@ function extractPresentationSectionsFromDom() {
     return [
       {
         title: "Contenido",
-        bullets: splitPresentationText(fallbackText, 170),
+        bullets: splitPresentationText(fallbackText, 120),
       },
     ];
   }
@@ -1745,12 +1739,33 @@ async function exportDocumentToPresentation() {
     return;
   }
 
-  const originalLabel = exportPptBtn?.textContent || "Pasar a presentación";
+  const titleNode = exportPptBtn?.querySelector?.(".more-item-title");
+  const originalLabel =
+    titleNode?.textContent ||
+    exportPptBtn?.textContent ||
+    "Pasar a presentación";
+
+  const MAX_CONTENT_SLIDES = 8;
+  const MAX_BULLETS_PER_SLIDE = 4;
+  const MAX_BULLET_LENGTH = 120;
 
   try {
+    if (typeof window.closeMoreDropdown === "function") {
+      window.closeMoreDropdown();
+    }
+
+    if (typeof window.setMoreStatus === "function") {
+      window.setMoreStatus("Generando presentación...");
+    }
+
     if (exportPptBtn) {
       exportPptBtn.disabled = true;
-      exportPptBtn.textContent = "Generando presentación...";
+
+      if (titleNode) {
+        titleNode.textContent = "Generando presentación...";
+      } else {
+        exportPptBtn.textContent = "Generando presentación...";
+      }
     }
 
     const meta = getPresentationMeta();
@@ -1768,15 +1783,32 @@ async function exportDocumentToPresentation() {
     addPresentationCoverSlide(pptx, meta);
 
     let slideNumber = 2;
+    let createdSlides = 0;
 
     for (const section of sections) {
+      if (createdSlides >= MAX_CONTENT_SLIDES) break;
+
       const title = normalizePresentationText(section.title || "Contenido");
-      const bullets = Array.isArray(section.bullets) ? section.bullets : [];
-      const groupedBullets = chunkArray(bullets, 5);
+
+      const bullets = Array.isArray(section.bullets)
+        ? section.bullets
+            .map((item) => normalizePresentationText(item))
+            .filter(Boolean)
+            .map((item) =>
+              item.length > MAX_BULLET_LENGTH
+                ? `${item.slice(0, MAX_BULLET_LENGTH).trim()}...`
+                : item
+            )
+        : [];
+
+      if (!bullets.length) continue;
+
+      const groupedBullets = chunkArray(bullets, MAX_BULLETS_PER_SLIDE);
 
       for (let i = 0; i < groupedBullets.length; i++) {
-        const pageTitle =
-          i === 0 ? title : `${title} (cont.)`;
+        if (createdSlides >= MAX_CONTENT_SLIDES) break;
+
+        const pageTitle = i === 0 ? title : `${title} (cont.)`;
 
         addPresentationContentSlide(
           pptx,
@@ -1786,23 +1818,37 @@ async function exportDocumentToPresentation() {
         );
 
         slideNumber += 1;
+        createdSlides += 1;
       }
     }
 
-    if (fuentes.length) {
+    if (fuentes.length && createdSlides < MAX_CONTENT_SLIDES + 1) {
       addPresentationSourcesSlide(pptx, fuentes, slideNumber);
     }
 
     await pptx.writeFile({
       fileName: getPresentationFileName(meta.titulo),
     });
+
+    if (typeof window.setMoreStatus === "function") {
+      window.setMoreStatus("Presentación generada.");
+    }
   } catch (error) {
     console.error("Error exportando a presentación:", error);
     alert("No se pudo generar la presentación.");
+
+    if (typeof window.setMoreStatus === "function") {
+      window.setMoreStatus("No se pudo generar la presentación.");
+    }
   } finally {
     if (exportPptBtn) {
       exportPptBtn.disabled = false;
-      exportPptBtn.textContent = originalLabel;
+
+      if (titleNode) {
+        titleNode.textContent = originalLabel;
+      } else {
+        exportPptBtn.textContent = originalLabel;
+      }
     }
   }
 }
@@ -2691,10 +2737,10 @@ async function loadClase(user) {
     }
 
     showDocument();
-setupShareUi();
-attachAutosaveListeners();
-ensureSelectionAssistantUi();
-setupPresentationExport();
+    setupShareUi();
+    attachAutosaveListeners();
+    ensureSelectionAssistantUi();
+    setupPresentationExport();
 
     const claseFinal = await generarDocumentoSiFalta(claseBase);
 
