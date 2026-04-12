@@ -14,21 +14,33 @@
       --bg:#f8f3e8;
       --paper:#fffdf8;
       --paper-2:#fff8ee;
+      --paper-3:#fffaf3;
       --text:#2b2434;
       --muted:#6f6577;
 
       --violet:#7c6cf2;
+      --violet-2:#6b59ea;
       --violet-soft:#efeaff;
+
       --yellow:#ffe89c;
+      --yellow-soft:#fff5cf;
+
       --sky:#d8f0ff;
+      --sky-soft:#eef8ff;
+
       --mint:#def4ba;
+      --mint-soft:#f2f9e4;
+
       --orange:#ffb36b;
+      --orange-soft:#fff0df;
 
       --board:#285246;
       --board-2:#1f4339;
+      --board-3:#19352d;
 
       --line:rgba(124,108,242,.12);
-      --red-line:rgba(255,90,110,.18);
+      --line-soft:rgba(124,108,242,.08);
+      --line-strong:rgba(124,108,242,.18);
 
       --shadow:0 18px 40px rgba(63,72,138,.08);
       --shadow-soft:0 10px 24px rgba(63,72,138,.06);
@@ -218,13 +230,14 @@
       gap:22px;
     }
 
+    /* HERO */
     .hero-craft{
       position:relative;
       overflow:hidden;
       background:linear-gradient(180deg, var(--paper) 0%, var(--paper-2) 100%);
       border:2px solid rgba(124,108,242,.08);
       border-radius:34px;
-      padding:18px 28px 22px;
+      padding:24px 28px 26px;
       box-shadow:var(--shadow);
     }
 
@@ -241,142 +254,141 @@
     .craft-stage{
       position:relative;
       z-index:1;
-      padding-top:6px;
     }
 
-    .string{
-      position:absolute;
-      top:0;
-      width:3px;
-      height:24px;
-      background:linear-gradient(180deg, #d6c39f, #b38d63);
-      border-radius:999px;
-      z-index:1;
-    }
-
-    .string.left{ left:13%; }
-    .string.right{ right:13%; }
-
-    .board-wrap{
-      position:relative;
-      padding-top:34px;
-    }
-
-    .title-cutouts{
-      position:absolute;
-      top:0;
-      left:50%;
-      transform:translateX(-50%);
+    .board-header{
       display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
       flex-wrap:wrap;
-      justify-content:center;
-      gap:8px;
-      width:min(840px, calc(100% - 60px));
-      z-index:3;
+      margin-bottom:14px;
     }
 
-    .title-cutouts span{
+    .board-frame-label{
       display:inline-flex;
       align-items:center;
       justify-content:center;
-      min-width:46px;
-      height:54px;
-      padding:0 14px;
-      border-radius:14px;
-      font-family:"Sora",sans-serif;
+      padding:9px 14px;
+      border-radius:999px;
+      background:#f6f0ff;
+      color:#6b5ee8;
+      font-size:.78rem;
       font-weight:800;
-      font-size:1rem;
-      letter-spacing:-.03em;
-      box-shadow:0 8px 18px rgba(0,0,0,.06);
-      border:2px solid rgba(0,0,0,.04);
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      border:1px solid rgba(124,108,242,.12);
+      box-shadow:0 8px 18px rgba(124,108,242,.06);
     }
 
-    .title-cutouts span:nth-child(1),
-    .title-cutouts span:nth-child(4),
-    .title-cutouts span:nth-child(8),
-    .title-cutouts span:nth-child(12){
-      background:#fff1a8;
-      transform:rotate(-2deg);
+    .board-tabs{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
     }
 
-    .title-cutouts span:nth-child(2),
-    .title-cutouts span:nth-child(6),
-    .title-cutouts span:nth-child(10),
-    .title-cutouts span:nth-child(14){
-      background:#d9f0ff;
-      transform:rotate(2deg);
+    .board-tab{
+      padding:10px 14px;
+      border-radius:999px;
+      font-size:.85rem;
+      font-weight:800;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.72);
+      color:#5f5670;
+      box-shadow:0 8px 16px rgba(63,72,138,.04);
     }
 
-    .title-cutouts span:nth-child(3),
-    .title-cutouts span:nth-child(7),
-    .title-cutouts span:nth-child(11),
-    .title-cutouts span:nth-child(15){
-      background:#eadfff;
-      transform:rotate(-1deg);
+    .board-tab.active{
+      background:linear-gradient(135deg, rgba(124,108,242,.16), rgba(255,179,107,.14));
+      color:#5e4fe0;
     }
 
-    .title-cutouts span:nth-child(5),
-    .title-cutouts span:nth-child(9),
-    .title-cutouts span:nth-child(13),
-    .title-cutouts span:nth-child(16){
-      background:#dff4b9;
-      transform:rotate(1.5deg);
-    }
-
-    .title-cutouts::before,
-    .title-cutouts::after{
-      content:"";
-      position:absolute;
-      top:-10px;
-      width:68px;
-      height:18px;
-      border-radius:6px;
-      background:rgba(255,255,255,.45);
-      box-shadow:0 2px 6px rgba(0,0,0,.05);
-    }
-
-    .title-cutouts::before{
-      left:5%;
-      transform:rotate(-9deg);
-    }
-
-    .title-cutouts::after{
-      right:5%;
-      transform:rotate(8deg);
-    }
-
-    .board{
+    .modern-board{
       position:relative;
       background:
         radial-gradient(circle at 18% 18%, rgba(255,255,255,.05), transparent 20%),
         radial-gradient(circle at 72% 30%, rgba(255,255,255,.04), transparent 22%),
-        linear-gradient(180deg, var(--board) 0%, var(--board-2) 100%);
+        linear-gradient(180deg, var(--board) 0%, var(--board-2) 54%, var(--board-3) 100%);
       border:12px solid #c99560;
       border-bottom-width:16px;
-      border-radius:26px;
-      padding:84px 34px 28px;
+      border-radius:30px;
+      padding:20px 22px 22px;
       box-shadow:
-        inset 0 0 0 2px rgba(255,255,255,.05),
-        inset 0 22px 48px rgba(255,255,255,.03),
+        inset 0 0 0 2px rgba(255,255,255,.04),
+        inset 0 20px 40px rgba(255,255,255,.03),
         0 22px 30px rgba(35,34,58,.12);
-      min-height:350px;
       overflow:hidden;
     }
 
-    .board::before{
+    .modern-board::before{
       content:"";
       position:absolute;
       inset:0;
-      background:linear-gradient(transparent 43px, rgba(255,255,255,.022) 44px);
-      background-size:100% 44px;
-      opacity:.5;
+      background:
+        linear-gradient(transparent 43px, rgba(255,255,255,.018) 44px),
+        radial-gradient(circle at top left, rgba(255,255,255,.04), transparent 30%);
+      background-size:100% 44px, auto;
+      opacity:.45;
       pointer-events:none;
     }
 
-    .chalk-note{
+    .board-topbar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+      margin-bottom:20px;
       position:relative;
       z-index:2;
-      max-width:700px;
+    }
+
+    .board-dots{
+      display:flex;
+      gap:8px;
+    }
+
+    .board-dot{
+      width:10px;
+      height:10px;
+      border-radius:50%;
+      background:rgba(255,255,255,.22);
+    }
+
+    .board-status{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 12px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.06);
+      color:#e8f8f0;
+      font-size:.78rem;
+      font-weight:800;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+    }
+
+    .board-status::before{
+      content:"";
+      width:8px;
+      height:8px;
+      border-radius:50%;
+      background:#9cf1c4;
+      box-shadow:0 0 0 4px rgba(156,241,196,.14);
+    }
+
+    .board-content{
+      position:relative;
+      z-index:2;
+      display:grid;
+      grid-template-columns:1.08fr .92fr;
+      gap:18px;
+      align-items:stretch;
+    }
+
+    .chalk-note{
+      max-width:none;
     }
 
     .mini-label{
@@ -399,6 +411,7 @@
       letter-spacing:-.05em;
       color:#f7fff9;
       margin-bottom:14px;
+      max-width:640px;
     }
 
     .chalk-note p{
@@ -406,93 +419,109 @@
       line-height:1.82;
       font-size:1rem;
       max-width:640px;
+      margin-bottom:18px;
     }
 
-    .chalk-line{
-      width:100%;
-      height:1px;
-      margin:24px 0 18px;
-      background:linear-gradient(90deg, rgba(255,255,255,.24), rgba(255,255,255,.04));
-    }
-
-    .chalk-tags{
+    .board-feature-row{
       display:flex;
       flex-wrap:wrap;
-      gap:12px;
-      position:relative;
-      z-index:2;
+      gap:10px;
     }
 
-    .chalk-tags span{
+    .board-feature{
       display:inline-flex;
       align-items:center;
       justify-content:center;
-      padding:12px 16px;
-      border-radius:16px;
+      padding:11px 14px;
+      border-radius:15px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.075);
+      color:#eefcf4;
+      font-size:.9rem;
       font-weight:800;
-      font-size:.92rem;
-      box-shadow:0 8px 16px rgba(0,0,0,.05);
-      border:2px solid rgba(0,0,0,.04);
+      box-shadow:0 8px 18px rgba(0,0,0,.05);
     }
 
-    .chalk-tags span:nth-child(1){
-      background:#fff1a8;
-      color:#55411c;
-      transform:rotate(-2deg);
+    .board-side-cards{
+      display:grid;
+      gap:12px;
+      align-self:stretch;
     }
 
-    .chalk-tags span:nth-child(2){
-      background:#d9f0ff;
-      color:#214d63;
-      transform:rotate(1.5deg);
+    .side-card{
+      background:rgba(255,255,255,.075);
+      border:1px solid rgba(255,255,255,.1);
+      border-radius:18px;
+      padding:16px;
+      backdrop-filter:blur(4px);
+      box-shadow:0 10px 18px rgba(0,0,0,.06);
     }
 
-    .chalk-tags span:nth-child(3){
-      background:#e9ddff;
-      color:#4f3c78;
-      transform:rotate(-1deg);
+    .side-card span{
+      display:block;
+      color:rgba(226,239,233,.72);
+      font-size:.78rem;
+      font-weight:700;
+      margin-bottom:6px;
+      letter-spacing:.03em;
     }
 
-    .chalk-tags span:nth-child(4){
-      background:#dff4b9;
-      color:#40572c;
-      transform:rotate(1deg);
+    .side-card strong{
+      display:block;
+      color:#f4fff8;
+      font-size:1rem;
+      line-height:1.4;
+      letter-spacing:-.02em;
+      margin-bottom:6px;
     }
 
-    .doodle-star,
-    .doodle-arrow,
-    .doodle-circle{
-      position:absolute;
+    .side-card p{
+      color:rgba(235,248,241,.76);
+      font-size:.9rem;
+      line-height:1.6;
+    }
+
+    .board-bottom{
+      position:relative;
       z-index:2;
-      opacity:.75;
-      pointer-events:none;
+      margin-top:22px;
     }
 
-    .doodle-star{
-      top:114px;
-      right:42px;
-      color:rgba(255,255,255,.88);
-      font-size:1.5rem;
-      transform:rotate(14deg);
+    .chalk-shelf{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+      flex-wrap:wrap;
     }
 
-    .doodle-arrow{
-      bottom:82px;
-      right:54px;
-      color:rgba(255,255,255,.68);
-      font-size:1.35rem;
-      transform:rotate(8deg);
+    .chalk-tools{
+      display:flex;
+      gap:8px;
+      align-items:center;
     }
 
-    .doodle-circle{
-      top:164px;
-      right:82px;
-      width:54px;
-      height:54px;
-      border:2px dashed rgba(255,255,255,.3);
-      border-radius:50%;
+    .chalk{
+      width:26px;
+      height:8px;
+      border-radius:999px;
+      display:inline-block;
+      box-shadow:0 2px 6px rgba(0,0,0,.15);
     }
 
+    .chalk.white{ background:#f9fbff; }
+    .chalk.yellow{ background:#ffe796; }
+    .chalk.blue{ background:#c9e7ff; }
+
+    .board-bottom-line{
+      flex:1;
+      min-width:180px;
+      height:6px;
+      border-radius:999px;
+      background:linear-gradient(90deg, rgba(255,255,255,.18), rgba(255,255,255,.04));
+    }
+
+    /* CONTENT */
     .content-grid{
       display:grid;
       grid-template-columns:1.12fr .88fr;
@@ -500,43 +529,24 @@
       align-items:start;
     }
 
-    .workspace-card{
+    .workspace-main,
+    .support-column{
+      display:grid;
+      gap:18px;
+    }
+
+    .editor-card,
+    .support-card{
       position:relative;
-      min-height:100%;
-      padding:18px 0 0 0;
-    }
-
-    .workspace-layer{
-      position:absolute;
-      inset:0;
-      border-radius:30px;
-      box-shadow:var(--shadow);
-    }
-
-    .workspace-layer.layer-1{
-      background:#f7e6ff;
-      transform:rotate(-1.8deg);
-      opacity:.9;
-    }
-
-    .workspace-layer.layer-2{
-      background:#dff3ff;
-      transform:rotate(.9deg);
-      opacity:.9;
-    }
-
-    .workspace-main{
-      position:relative;
-      z-index:2;
       background:linear-gradient(180deg,#fffdf8 0%, #fff7eb 100%);
       border:2px solid rgba(124,108,242,.08);
       border-radius:30px;
-      padding:26px 24px 24px;
       box-shadow:var(--shadow);
       overflow:hidden;
     }
 
-    .workspace-main::before{
+    .editor-card::before,
+    .support-card::before{
       content:"";
       position:absolute;
       inset:0;
@@ -545,66 +555,61 @@
         linear-gradient(transparent 34px, rgba(124,108,242,.035) 35px);
       background-size:auto, 100% 35px;
       pointer-events:none;
+      opacity:.92;
     }
 
-    .binder-rings{
-      position:absolute;
-      top:14px;
-      left:22px;
-      display:flex;
-      gap:10px;
-      z-index:3;
-    }
-
-    .binder-rings span{
-      width:18px;
-      height:18px;
-      border:3px solid rgba(124,108,242,.34);
-      border-radius:50%;
-      background:#fff;
-      box-shadow:0 2px 6px rgba(0,0,0,.05);
-    }
-
-    .workspace-head{
+    .editor-inner,
+    .support-inner{
       position:relative;
       z-index:2;
-      padding:18px 6px 8px 18px;
-      margin-bottom:12px;
+      padding:24px;
     }
 
-    .workspace-badge{
+    .section-badge{
       display:inline-flex;
       align-items:center;
       gap:8px;
       padding:9px 14px;
       border-radius:999px;
-      background:#fff1a8;
-      border:1px solid rgba(0,0,0,.05);
-      box-shadow:var(--shadow-soft);
       font-weight:800;
-      font-size:.9rem;
-      color:#5a4620;
+      font-size:.86rem;
+      box-shadow:var(--shadow-soft);
       margin-bottom:14px;
-      transform:rotate(-2deg);
+      border:1px solid rgba(0,0,0,.05);
     }
 
-    .workspace-head h2{
+    .section-badge.yellow{
+      background:var(--yellow-soft);
+      color:#5a4620;
+    }
+
+    .section-badge.blue{
+      background:var(--sky-soft);
+      color:#37597c;
+    }
+
+    .section-badge.violet{
+      background:var(--violet-soft);
+      color:#5c51c9;
+    }
+
+    .editor-head h2,
+    .support-head h3{
       font-family:"Sora",sans-serif;
-      font-size:1.45rem;
+      font-size:1.42rem;
       letter-spacing:-.03em;
       margin-bottom:8px;
     }
 
-    .workspace-head p{
+    .editor-head p,
+    .support-head p{
       color:#62586e;
       line-height:1.75;
-      max-width:700px;
+      max-width:720px;
     }
 
-    .workspace-main form{
-      position:relative;
-      z-index:2;
-      padding-left:18px;
+    .editor-head{
+      margin-bottom:18px;
     }
 
     .form-grid{
@@ -644,6 +649,7 @@
       font-weight:600;
       resize:none;
       box-shadow:0 8px 16px rgba(124,108,242,.04);
+      transition:.2s ease;
     }
 
     .field input,
@@ -667,81 +673,6 @@
       color:#756b80;
       line-height:1.55;
       font-weight:600;
-    }
-
-    .upload-box{
-      position:relative;
-      border:2px dashed #d8cbff;
-      background:linear-gradient(180deg,#fffdf8 0%, #fff8ef 100%);
-      border-radius:20px;
-      padding:18px;
-      overflow:hidden;
-      transition:.2s ease;
-      box-shadow:0 8px 16px rgba(124,108,242,.04);
-    }
-
-    .upload-box:hover{
-      border-color:var(--violet);
-      transform:translateY(-1px);
-    }
-
-    .upload-box input[type="file"]{
-      position:absolute;
-      inset:0;
-      opacity:0;
-      cursor:pointer;
-      z-index:2;
-    }
-
-    .upload-inner{
-      display:flex;
-      align-items:flex-start;
-      gap:14px;
-      position:relative;
-      z-index:1;
-    }
-
-    .upload-icon{
-      width:46px;
-      height:46px;
-      border-radius:15px;
-      display:grid;
-      place-items:center;
-      background:#fff;
-      border:2px solid rgba(124,108,242,.14);
-      font-size:1.1rem;
-      box-shadow:0 6px 14px rgba(124,108,242,.08);
-      flex:none;
-    }
-
-    .upload-inner strong{
-      display:block;
-      font-size:.98rem;
-      margin-bottom:4px;
-      color:#352d43;
-    }
-
-    .upload-inner p{
-      color:var(--muted);
-      line-height:1.6;
-      font-size:.92rem;
-    }
-
-    .file-list{
-      display:grid;
-      gap:10px;
-      margin-top:14px;
-    }
-
-    .file-item{
-      padding:12px 14px;
-      border-radius:16px;
-      background:#fff;
-      border:1px solid rgba(124,108,242,.12);
-      color:#4d566b;
-      font-size:.93rem;
-      font-weight:600;
-      box-shadow:var(--shadow-soft);
     }
 
     .mode-selector{
@@ -778,8 +709,7 @@
       content:"";
       position:absolute;
       inset:0;
-      background:
-        radial-gradient(circle at top left, rgba(255,255,255,.86), transparent 28%);
+      background:radial-gradient(circle at top left, rgba(255,255,255,.86), transparent 28%);
       pointer-events:none;
     }
 
@@ -894,6 +824,81 @@
       font-size:.9rem;
     }
 
+    .upload-box{
+      position:relative;
+      border:2px dashed #d8cbff;
+      background:linear-gradient(180deg,#fffdf8 0%, #fff8ef 100%);
+      border-radius:20px;
+      padding:18px;
+      overflow:hidden;
+      transition:.2s ease;
+      box-shadow:0 8px 16px rgba(124,108,242,.04);
+    }
+
+    .upload-box:hover{
+      border-color:var(--violet);
+      transform:translateY(-1px);
+    }
+
+    .upload-box input[type="file"]{
+      position:absolute;
+      inset:0;
+      opacity:0;
+      cursor:pointer;
+      z-index:2;
+    }
+
+    .upload-inner{
+      display:flex;
+      align-items:flex-start;
+      gap:14px;
+      position:relative;
+      z-index:1;
+    }
+
+    .upload-icon{
+      width:46px;
+      height:46px;
+      border-radius:15px;
+      display:grid;
+      place-items:center;
+      background:#fff;
+      border:2px solid rgba(124,108,242,.14);
+      font-size:1.1rem;
+      box-shadow:0 6px 14px rgba(124,108,242,.08);
+      flex:none;
+    }
+
+    .upload-inner strong{
+      display:block;
+      font-size:.98rem;
+      margin-bottom:4px;
+      color:#352d43;
+    }
+
+    .upload-inner p{
+      color:var(--muted);
+      line-height:1.6;
+      font-size:.92rem;
+    }
+
+    .file-list{
+      display:grid;
+      gap:10px;
+      margin-top:14px;
+    }
+
+    .file-item{
+      padding:12px 14px;
+      border-radius:16px;
+      background:#fff;
+      border:1px solid rgba(124,108,242,.12);
+      color:#4d566b;
+      font-size:.93rem;
+      font-weight:600;
+      box-shadow:var(--shadow-soft);
+    }
+
     .form-actions{
       display:flex;
       gap:12px;
@@ -931,131 +936,42 @@
       background:#efeaff;
     }
 
-    .idea-board{
-      position:relative;
-      background:linear-gradient(180deg,#fffdf8 0%, #fff7ee 100%);
-      border:2px solid rgba(124,108,242,.08);
-      border-radius:30px;
-      padding:24px;
-      box-shadow:var(--shadow);
-      overflow:hidden;
-      transform:rotate(.8deg);
-    }
-
-    .idea-board::before{
-      content:"";
-      position:absolute;
-      inset:0;
-      background:
-        radial-gradient(circle at top left, rgba(255,255,255,.82), transparent 26%);
-      pointer-events:none;
-    }
-
-    .idea-pin{
-      position:absolute;
-      top:14px;
-      width:16px;
-      height:16px;
-      border-radius:50%;
-      box-shadow:0 2px 6px rgba(0,0,0,.15);
-      z-index:3;
-    }
-
-    .idea-pin.pin-yellow{
-      left:22px;
-      background:#ffd84c;
-    }
-
-    .idea-pin.pin-blue{
-      right:22px;
-      background:#8ccfff;
-    }
-
-    .idea-head{
-      position:relative;
-      z-index:2;
-      margin-bottom:18px;
-      padding-top:8px;
-    }
-
-    .idea-label{
-      display:inline-flex;
-      align-items:center;
-      padding:8px 12px;
-      border-radius:999px;
-      background:#efeaff;
-      color:#5e52cc;
-      font-size:.86rem;
-      font-weight:800;
-      margin-bottom:12px;
-    }
-
-    .idea-head h3{
-      font-family:"Sora",sans-serif;
-      font-size:1.28rem;
-      letter-spacing:-.03em;
-      margin-bottom:8px;
-    }
-
-    .idea-head p{
-      color:#6a6075;
-      line-height:1.7;
-      font-size:.94rem;
-    }
-
-    .idea-notes{
+    .support-list{
       display:grid;
-      gap:14px;
-      position:relative;
-      z-index:2;
+      gap:12px;
+      margin-top:16px;
     }
 
-    .idea-note{
-      padding:16px;
-      border-radius:22px;
+    .support-item{
+      padding:15px 16px;
+      border-radius:18px;
+      background:rgba(255,255,255,.84);
+      border:1px solid rgba(124,108,242,.12);
       box-shadow:var(--shadow-soft);
-      border:1px solid rgba(0,0,0,.05);
     }
 
-    .idea-note strong{
+    .support-item strong{
       display:block;
       margin-bottom:6px;
-      font-size:.96rem;
-      color:#322a40;
+      font-size:.95rem;
+      color:#352d43;
     }
 
-    .idea-note p{
-      color:#5f576c;
-      line-height:1.62;
-      font-size:.92rem;
+    .support-item p{
+      color:#675e73;
+      line-height:1.6;
+      font-size:.91rem;
     }
 
-    .idea-note.yellow{
-      background:#fff1a8;
-      transform:rotate(-1.3deg);
-    }
-
-    .idea-note.blue{
-      background:#d9f0ff;
-      transform:rotate(.9deg);
-    }
-
-    .idea-note.lilac{
-      background:#eadfff;
-      transform:rotate(-.8deg);
-    }
-
-    .idea-tags{
+    .tag-cloud{
       display:flex;
       flex-wrap:wrap;
       gap:10px;
-      margin-top:18px;
-      position:relative;
-      z-index:2;
+      margin-top:16px;
     }
 
-    .idea-tags span{
-      padding:9px 12px;
+    .tag-cloud span{
+      padding:10px 12px;
       border-radius:999px;
       background:#fff;
       border:1px solid rgba(124,108,242,.12);
@@ -1069,39 +985,15 @@
       .content-grid{
         grid-template-columns:1fr;
       }
-
-      .idea-board{
-        transform:none;
-      }
     }
 
-    @media (max-width: 900px){
-      .title-cutouts{
-        position:relative;
-        top:auto;
-        left:auto;
-        transform:none;
-        width:100%;
-        margin-bottom:10px;
+    @media (max-width: 980px){
+      .board-content{
+        grid-template-columns:1fr;
       }
 
-      .board-wrap{
-        padding-top:0;
-      }
-
-      .board{
-        padding:24px 24px 24px;
-        min-height:auto;
-      }
-
-      .string{
-        display:none;
-      }
-
-      .doodle-star,
-      .doodle-arrow,
-      .doodle-circle{
-        display:none;
+      .board-side-cards{
+        grid-template-columns:1fr;
       }
     }
 
@@ -1122,55 +1014,49 @@
       }
 
       .hero-craft,
-      .workspace-main,
-      .idea-board{
-        padding:20px;
+      .editor-card,
+      .support-card{
         border-radius:24px;
+      }
+
+      .editor-inner,
+      .support-inner{
+        padding:20px;
       }
 
       .form-grid{
         grid-template-columns:1fr;
       }
+    }
 
-      .workspace-main form{
-        padding-left:10px;
+    @media (max-width: 720px){
+      .form-actions{
+        flex-direction:column;
       }
 
-      .workspace-head{
-        padding-left:10px;
+      .form-actions .btn{
+        width:100%;
       }
     }
 
     @media (max-width: 640px){
-      .title-cutouts span{
-        min-width:40px;
-        height:48px;
-        font-size:.92rem;
-        padding:0 10px;
-      }
-
-      .board{
+      .modern-board{
         border-width:9px;
         border-bottom-width:12px;
-        border-radius:20px;
+        border-radius:22px;
+        padding:18px;
       }
 
       .chalk-note h1{
         font-size:2rem;
       }
 
-      .chalk-tags{
-        gap:10px;
-      }
-
-      .chalk-tags span,
-      .idea-tags span{
-        width:100%;
-        justify-content:center;
-      }
-
       .mode-selector{
         grid-template-columns:1fr;
+      }
+
+      .board-header{
+        align-items:flex-start;
       }
     }
   </style>
@@ -1207,240 +1093,276 @@
 
         <section class="hero-craft">
           <div class="craft-stage">
-            <span class="string left"></span>
-            <span class="string right"></span>
+            <div class="board-header">
+              <div class="board-frame-label">EDUVIA</div>
 
-            <div class="board-wrap">
-              <div class="title-cutouts" aria-label="Crear una clase">
-                <span>C</span>
-                <span>r</span>
-                <span>e</span>
-                <span>a</span>
-                <span>r</span>
-                <span>u</span>
-                <span>n</span>
-                <span>a</span>
-                <span>c</span>
-                <span>l</span>
-                <span>a</span>
-                <span>s</span>
-                <span>e</span>
+              <div class="board-tabs">
+                <span class="board-tab active">Crear clase</span>
+                <span class="board-tab">Configuración</span>
+                <span class="board-tab">Formato</span>
+                <span class="board-tab">Materiales</span>
+              </div>
+            </div>
+
+            <div class="modern-board">
+              <div class="board-topbar">
+                <div class="board-dots">
+                  <span class="board-dot"></span>
+                  <span class="board-dot"></span>
+                  <span class="board-dot"></span>
+                </div>
+
+                <div class="board-status">Preparación activa</div>
               </div>
 
-              <div class="board">
+              <div class="board-content">
                 <div class="chalk-note">
-                  <span class="mini-label">EDUVIA</span>
+                  <span class="mini-label">Crear una clase</span>
                   <h1>Prepará una clase clara desde el principio.</h1>
                   <p>
-                    Elegí la materia, el tema y el nivel para que la explicación arranque
-                    mucho más enfocada. También podés sumar material para que la IA tenga
-                    mejor contexto desde antes de entrar al aula.
+                    Definí la materia, el tema, el nivel y el objetivo para que la explicación
+                    empiece mucho más enfocada. También podés sumar material para que la IA tenga
+                    mejor contexto antes de arrancar.
                   </p>
 
-                  <div class="chalk-line"></div>
-
-                  <div class="chalk-tags">
-                    <span>📘 Materia</span>
-                    <span>📝 Tema puntual</span>
-                    <span>🎓 Nivel del alumno</span>
-                    <span>📎 Material de estudio</span>
+                  <div class="board-feature-row">
+                    <span class="board-feature">📘 Materia</span>
+                    <span class="board-feature">📝 Tema puntual</span>
+                    <span class="board-feature">🎓 Nivel</span>
+                    <span class="board-feature">📎 Material</span>
                   </div>
                 </div>
 
-                <div class="doodle-star">✦</div>
-                <div class="doodle-arrow">↘</div>
-                <div class="doodle-circle"></div>
+                <div class="board-side-cards">
+                  <div class="side-card">
+                    <span>Enfoque</span>
+                    <strong>Clase más precisa</strong>
+                    <p>Cuanto mejor esté configurada, más clara y útil va a ser la explicación.</p>
+                  </div>
+
+                  <div class="side-card">
+                    <span>Formato</span>
+                    <strong>Pizarrón o documento</strong>
+                    <p>Podés elegir una experiencia más visual o una más tipo apunte.</p>
+                  </div>
+
+                  <div class="side-card">
+                    <span>Material extra</span>
+                    <strong>Más contexto para la IA</strong>
+                    <p>Subir archivos ayuda a que la clase use mejor ejemplos y contenido real.</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="board-bottom">
+                <div class="chalk-shelf">
+                  <div class="chalk-tools">
+                    <span class="chalk white"></span>
+                    <span class="chalk yellow"></span>
+                    <span class="chalk blue"></span>
+                  </div>
+                  <div class="board-bottom-line"></div>
+                </div>
               </div>
             </div>
           </div>
         </section>
 
         <section class="content-grid">
-          <div class="workspace-card">
-            <div class="workspace-layer layer-1"></div>
-            <div class="workspace-layer layer-2"></div>
+          <div class="workspace-main">
+            <div class="editor-card">
+              <div class="editor-inner">
+                <div class="editor-head">
+                  <span class="section-badge yellow">✏️ Configuración principal</span>
+                  <h2>Prepará la clase</h2>
+                  <p>
+                    Completá esta base para que la IA tenga claro qué explicar,
+                    cómo explicarlo y con qué material acompañar la clase.
+                  </p>
+                </div>
 
-            <div class="workspace-main">
-              <div class="binder-rings">
-                <span></span><span></span><span></span>
-              </div>
-
-              <div class="workspace-head">
-                <div class="workspace-badge">✂️ Armá tu clase</div>
-                <h2>Prepará la clase</h2>
-                <p>
-                  Completá esta base para que la IA tenga claro qué explicar, cómo explicarlo
-                  y con qué material acompañar la clase.
-                </p>
-              </div>
-
-              <form id="clase-form">
-                <div class="form-grid">
-                  <div class="field">
-                    <label for="materia">Materia</label>
-                    <input id="materia" placeholder="Ejemplo: Matemática" />
-                    <span class="helper">Elegí la materia principal.</span>
-                  </div>
-
-                  <div class="field">
-                    <label for="tema">Tema</label>
-                    <input id="tema" placeholder="Ejemplo: Fracciones" />
-                    <span class="helper">Podés poner un tema puntual o una unidad.</span>
-                  </div>
-
-                  <div class="field">
-                    <label for="nivel">Nivel</label>
-                    <select id="nivel">
-                      <option value="Primaria">Primaria</option>
-                      <option value="Secundaria">Secundaria</option>
-                      <option value="Universidad">Universidad</option>
-                    </select>
-                    <span class="helper">Ayuda a adaptar la dificultad.</span>
-                  </div>
-
-                  <div class="field">
-                    <label for="duracion">Duración estimada</label>
-                    <select id="duracion">
-                      <option value="20 min">20 minutos</option>
-                      <option value="30 min">30 minutos</option>
-                      <option value="45 min">45 minutos</option>
-                      <option value="60 min">60 minutos</option>
-                    </select>
-                    <span class="helper">Sirve para ordenar mejor la sesión.</span>
-                  </div>
-
-                  <div class="field full">
-                    <label>Formato de la clase</label>
-
-                    <div class="mode-selector">
-                      <label class="mode-option">
-                        <input type="radio" name="formato" value="pizarron" checked />
-                        <div class="mode-card">
-                          <div class="mode-top">
-                            <div class="mode-icon">🧑‍🏫</div>
-                            <div class="mode-check"></div>
-                          </div>
-
-                          <h4>Modo Pizarrón</h4>
-                          <p>
-                            Ideal para chicos o clases más visuales, dinámicas e interactivas.
-                          </p>
-
-                          <div class="mode-mini">
-                            <span>Visual</span>
-                            <span>Más guiado</span>
-                            <span>Estilo aula</span>
-                          </div>
-                        </div>
-                      </label>
-
-                      <label class="mode-option">
-                        <input type="radio" name="formato" value="documento" />
-                        <div class="mode-card">
-                          <div class="mode-top">
-                            <div class="mode-icon">📄</div>
-                            <div class="mode-check"></div>
-                          </div>
-
-                          <h4>Modo Documento</h4>
-                          <p>
-                            Pensado para estudiantes más grandes, apuntes claros y estudio más serio.
-                          </p>
-
-                          <div class="mode-mini">
-                            <span>Apunte</span>
-                            <span>Más ordenado</span>
-                            <span>Ideal para repasar</span>
-                          </div>
-                        </div>
-                      </label>
+                <form id="clase-form">
+                  <div class="form-grid">
+                    <div class="field">
+                      <label for="materia">Materia</label>
+                      <input id="materia" placeholder="Ejemplo: Matemática" />
+                      <span class="helper">Elegí la materia principal.</span>
                     </div>
 
-                    <div id="format-preview" class="format-preview">
-                      <strong>Vista elegida: Pizarrón</strong>
-                      <p>
-                        La clase se mostrará en una experiencia más visual, tipo aula interactiva.
-                      </p>
+                    <div class="field">
+                      <label for="tema">Tema</label>
+                      <input id="tema" placeholder="Ejemplo: Fracciones" />
+                      <span class="helper">Podés poner un tema puntual o una unidad.</span>
                     </div>
 
-                    <span class="helper">
-                      Elegí el formato según la edad del alumno y la forma en la que querés estudiar.
-                    </span>
-                  </div>
+                    <div class="field">
+                      <label for="nivel">Nivel</label>
+                      <select id="nivel">
+                        <option value="Primaria">Primaria</option>
+                        <option value="Secundaria">Secundaria</option>
+                        <option value="Universidad">Universidad</option>
+                      </select>
+                      <span class="helper">Ayuda a adaptar la dificultad.</span>
+                    </div>
 
-                  <div class="field full">
-                    <label for="objetivo">Objetivo de la clase</label>
-                    <textarea id="objetivo" placeholder="Ejemplo: Que el alumno entienda cómo sumar y restar fracciones con distinto denominador."></textarea>
-                    <span class="helper">Mientras más concreto sea, mejor puede explicar la IA.</span>
-                  </div>
+                    <div class="field">
+                      <label for="duracion">Duración estimada</label>
+                      <select id="duracion">
+                        <option value="20 min">20 minutos</option>
+                        <option value="30 min">30 minutos</option>
+                        <option value="45 min">45 minutos</option>
+                        <option value="60 min">60 minutos</option>
+                      </select>
+                      <span class="helper">Sirve para ordenar mejor la sesión.</span>
+                    </div>
 
-                  <div class="field full">
-                    <label for="archivo">Material de estudio</label>
+                    <div class="field full">
+                      <label>Formato de la clase</label>
 
-                    <div class="upload-box">
-                      <input id="archivo" type="file" multiple accept=".pdf,.doc,.docx,.txt,.png,.jpg,.jpeg" />
-                      <div class="upload-inner">
-                        <div class="upload-icon">📎</div>
-                        <div>
-                          <strong>Subí archivos para usar dentro de la clase</strong>
-                          <p>Apuntes, guías, PDFs, imágenes de ejercicios o resúmenes.</p>
+                      <div class="mode-selector">
+                        <label class="mode-option">
+                          <input type="radio" name="formato" value="pizarron" checked />
+                          <div class="mode-card">
+                            <div class="mode-top">
+                              <div class="mode-icon">🧑‍🏫</div>
+                              <div class="mode-check"></div>
+                            </div>
+
+                            <h4>Modo Pizarrón</h4>
+                            <p>
+                              Ideal para clases más visuales, dinámicas e interactivas.
+                            </p>
+
+                            <div class="mode-mini">
+                              <span>Visual</span>
+                              <span>Más guiado</span>
+                              <span>Estilo aula</span>
+                            </div>
+                          </div>
+                        </label>
+
+                        <label class="mode-option">
+                          <input type="radio" name="formato" value="documento" />
+                          <div class="mode-card">
+                            <div class="mode-top">
+                              <div class="mode-icon">📄</div>
+                              <div class="mode-check"></div>
+                            </div>
+
+                            <h4>Modo Documento</h4>
+                            <p>
+                              Pensado para estudiantes más grandes, apuntes claros y estudio más serio.
+                            </p>
+
+                            <div class="mode-mini">
+                              <span>Apunte</span>
+                              <span>Más ordenado</span>
+                              <span>Ideal para repasar</span>
+                            </div>
+                          </div>
+                        </label>
+                      </div>
+
+                      <div id="format-preview" class="format-preview">
+                        <strong>Vista elegida: Pizarrón</strong>
+                        <p>
+                          La clase se mostrará en una experiencia más visual, tipo aula interactiva.
+                        </p>
+                      </div>
+
+                      <span class="helper">
+                        Elegí el formato según la edad del alumno y la forma en la que querés estudiar.
+                      </span>
+                    </div>
+
+                    <div class="field full">
+                      <label for="objetivo">Objetivo de la clase</label>
+                      <textarea id="objetivo" placeholder="Ejemplo: Que el alumno entienda cómo sumar y restar fracciones con distinto denominador."></textarea>
+                      <span class="helper">Mientras más concreto sea, mejor puede explicar la IA.</span>
+                    </div>
+
+                    <div class="field full">
+                      <label for="archivo">Material de estudio</label>
+
+                      <div class="upload-box">
+                        <input id="archivo" type="file" multiple accept=".pdf,.doc,.docx,.txt,.png,.jpg,.jpeg" />
+                        <div class="upload-inner">
+                          <div class="upload-icon">📎</div>
+                          <div>
+                            <strong>Subí archivos para usar dentro de la clase</strong>
+                            <p>Apuntes, guías, PDFs, imágenes de ejercicios o resúmenes.</p>
+                          </div>
                         </div>
                       </div>
+
+                      <span class="helper">
+                        Mientras más claro sea el material, mejor podrá usarlo la IA.
+                      </span>
+
+                      <div id="file-list" class="file-list"></div>
                     </div>
-
-                    <span class="helper">
-                      Mientras más claro sea el material, mejor podrá usarlo la IA.
-                    </span>
-
-                    <div id="file-list" class="file-list"></div>
                   </div>
-                </div>
 
-                <div class="form-actions">
-                  <button type="submit" class="btn btn-primary">Crear clase</button>
-                  <a href="panel.html" class="btn btn-soft">Volver al panel</a>
-                </div>
-              </form>
+                  <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Crear clase</button>
+                    <a href="panel.html" class="btn btn-soft">Volver al panel</a>
+                  </div>
+                </form>
+              </div>
             </div>
           </div>
 
-          <aside class="idea-board">
-            <div class="idea-pin pin-yellow"></div>
-            <div class="idea-pin pin-blue"></div>
+          <aside class="support-column">
+            <div class="support-card">
+              <div class="support-inner">
+                <div class="support-head">
+                  <span class="section-badge blue">💡 Guía rápida</span>
+                  <h3>Qué conviene definir bien</h3>
+                  <p>
+                    Esta parte te ayuda a preparar una clase más clara antes de crearla.
+                  </p>
+                </div>
 
-            <div class="idea-head">
-              <span class="idea-label">💡 Ideas clave</span>
-              <h3>Qué conviene definir</h3>
-              <p>
-                Esta parte está pensada como pistas útiles pegadas en tu mesa de estudio
-                antes de crear la clase.
-              </p>
+                <div class="support-list">
+                  <div class="support-item">
+                    <strong>Elegí un tema concreto</strong>
+                    <p>No pongas solo “Matemática”. Mejor “Fracciones equivalentes” o “Regla de tres”.</p>
+                  </div>
+
+                  <div class="support-item">
+                    <strong>Marcá bien el nivel</strong>
+                    <p>Eso cambia la forma de explicar, el vocabulario y el tipo de ejemplo.</p>
+                  </div>
+
+                  <div class="support-item">
+                    <strong>Definí el objetivo</strong>
+                    <p>Entender desde cero, repasar, preparar una prueba o resolver una duda puntual.</p>
+                  </div>
+                </div>
+              </div>
             </div>
 
-            <div class="idea-notes">
-              <article class="idea-note yellow">
-                <strong>Elegí un tema concreto</strong>
-                <p>No pongas solo “Matemática”. Mejor “Fracciones equivalentes” o “Regla de tres”.</p>
-              </article>
+            <div class="support-card">
+              <div class="support-inner">
+                <div class="support-head">
+                  <span class="section-badge violet">📚 Materias frecuentes</span>
+                  <h3>Ideas para empezar</h3>
+                  <p>
+                    Algunas materias comunes para crear una clase rápida dentro de Eduvia.
+                  </p>
+                </div>
 
-              <article class="idea-note blue">
-                <strong>Marcá bien el nivel</strong>
-                <p>Eso cambia la forma de explicar, el vocabulario y el tipo de ejemplo.</p>
-              </article>
-
-              <article class="idea-note lilac">
-                <strong>Definí el objetivo</strong>
-                <p>Entender desde cero, repasar, preparar una prueba o resolver una duda puntual.</p>
-              </article>
-            </div>
-
-            <div class="idea-tags">
-              <span>Matemática</span>
-              <span>Lengua</span>
-              <span>Historia</span>
-              <span>Biología</span>
-              <span>Química</span>
-              <span>Inglés</span>
+                <div class="tag-cloud">
+                  <span>Matemática</span>
+                  <span>Lengua</span>
+                  <span>Historia</span>
+                  <span>Biología</span>
+                  <span>Química</span>
+                  <span>Inglés</span>
+                  <span>Física</span>
+                  <span>Geografía</span>
+                </div>
+              </div>
             </div>
           </aside>
         </section>
@@ -1450,6 +1372,24 @@
 
   <script type="module" src="owner-access-guard.js"></script>
   <script type="module" src="crear-clase.js"></script>
+  <script type="module" src="panel-auth.js?v=1"></script>
+
+  <script type="module">
+    import { auth } from "./firebase.js?v=7";
+    import { signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+    const logoutBtn = document.getElementById("logout");
+
+    logoutBtn?.addEventListener("click", async () => {
+      try {
+        await signOut(auth);
+        window.location.href = "login.html";
+      } catch (error) {
+        console.error("Error al cerrar sesión:", error);
+        alert("No se pudo cerrar sesión. Intentá de nuevo.");
+      }
+    });
+  </script>
 
   <script>
     const fileInput = document.getElementById("archivo");
@@ -1503,7 +1443,5 @@
 
     updateFormatPreview();
   </script>
-
-  <script type="module" src="panel-auth.js?v=1"></script>
 </body>
 </html>
