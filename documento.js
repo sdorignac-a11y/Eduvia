@@ -10,16 +10,12 @@ import {
   arrayRemove,
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-/* =========================
-   CONFIG
-========================= */
-
 const CONFIG = {
   sharedDocKey: "eduvia_shared_doc_access",
   referenceViewKey: "eduvia_reference_view",
   supportPanelId: "document-support-panel",
   saveDebounceMs: 900,
-  generateTimeoutMs: 90000,
+  generateTimeoutMs: 180000,
   selectionStyleId: "doc-selection-style",
   selectionToolbarId: "doc-selection-toolbar",
   selectionResultId: "doc-selection-result",
@@ -27,10 +23,6 @@ const CONFIG = {
 };
 
 const params = new URLSearchParams(window.location.search);
-
-/* =========================
-   HELPERS
-========================= */
 
 const $ = (id) => document.getElementById(id);
 const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
