@@ -1505,33 +1505,48 @@ async function generarDocumentoSiFalta(clase = {}) {
     console.log("FUENTES ENVIADAS:", payload.fuentes);
     console.log("TEXTO BASE:", payload.contenidoBase);
 
-    const { response, data } = await fetchJsonWithTimeout("/api/generar-documento", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(payload),
-    });
+const { response, data } = await fetchJsonWithTimeout("/api/generar-documento", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify(payload),
+});
 
-    setLoadingStage("analysis", "Ordenando la investigación y preparando la mejor versión del contenido.");
+console.log("RESPUESTA /api/generar-documento:", {
+  status: response?.status,
+  okHttp: response?.ok,
+  okBody: data?.ok,
+  error: data?.error,
+  detail: data?.detail,
+  hasDocumento: Boolean(data?.documento),
+});
 
-    if (!response.ok || !data?.ok || !data?.documento) {
-      throw new Error(data?.error || "No se pudo generar el documento.");
-    }
+setLoadingStage(
+  "analysis",
+  "Ordenando la investigación y preparando la mejor versión del contenido."
+);
 
-    const normalizedDoc = normalizeGeneratedDocumentResult(data.documento, clase);
+if (!response.ok || !data?.ok || !data?.documento) {
+  console.error("Respuesta completa del backend:", data);
+  throw new Error(data?.detail || data?.error || "No se pudo generar el documento.");
+}
 
-    const documentoGeneradoValido =
-      hasRealHtml(normalizedDoc.contenidoHtml) ||
-      hasRealText(normalizedDoc.documentoTexto) ||
-      hasRealStructuredDoc(normalizedDoc.documento);
+const normalizedDoc = normalizeGeneratedDocumentResult(data.documento, clase);
 
-    if (!documentoGeneradoValido) {
-      console.error("Respuesta cruda del backend:", data);
-      throw new Error("La IA respondió, pero no devolvió contenido utilizable.");
-    }
+const documentoGeneradoValido =
+  hasRealHtml(normalizedDoc.contenidoHtml) ||
+  hasRealText(normalizedDoc.documentoTexto) ||
+  hasRealStructuredDoc(normalizedDoc.documento);
 
-    setLoadingStage("writing", "Pegando el contenido final y terminando el documento.");
+if (!documentoGeneradoValido) {
+  console.error("Respuesta cruda del backend:", data);
+  throw new Error(
+    data?.detail || "La IA respondió, pero no devolvió contenido utilizable."
+  );
+}
+
+setLoadingStage("writing", "Pegando el contenido final y terminando el documento.");
 
     const merged = {
       ...clase,
