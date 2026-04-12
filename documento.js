@@ -3,277 +3,105 @@ import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/f
 import {
   doc,
   getDoc,
-  updateDoc,
   setDoc,
+  updateDoc,
   serverTimestamp,
   arrayUnion,
-  arrayRemove
+  arrayRemove,
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-const topbarTitle = document.getElementById("topbar-title");
-const docTitle = document.getElementById("doc-title");
+/* =========================
+   CONFIG
+========================= */
 
-const chipMateria = document.getElementById("chip-materia");
-const chipNivel = document.getElementById("chip-nivel");
-const chipDuracion = document.getElementById("chip-duracion");
-
-const metaMateria = document.getElementById("meta-materia");
-const metaNivel = document.getElementById("meta-nivel");
-const metaDuracion = document.getElementById("meta-duracion");
-
-const docObjective = document.getElementById("doc-objective");
-const docContent = document.getElementById("doc-content");
-
-const documentApp = document.getElementById("document-app");
-const accessGuard = document.getElementById("access-guard");
-const docLoading = document.getElementById("doc-loading");
-
-const toolbarWrap = document.querySelector(".subbar");
-const toolbarControls = document.querySelectorAll(
-  '.subbar button, .subbar select, .subbar input'
-);
-
-const shareModal = document.getElementById("share-modal");
-const shareEmailInput = document.getElementById("share-email");
-const shareRoleSelect = document.getElementById("share-role");
-const shareStatus = document.getElementById("share-status");
-const docLinkInput = document.getElementById("doc-link");
-const openShareBtn = document.getElementById("open-share-btn");
-const closeShareBtn = document.getElementById("close-share-btn");
-const copyLinkBtn = document.getElementById("copy-link-btn");
-const sendShareBtn = document.getElementById("send-share-btn");
-
-const exportPptBtn =
-  document.getElementById("btn-exportar-ppt") ||
-  document.getElementById("export-ppt-btn") ||
-  document.getElementById("action-presentation") ||
-  document.querySelector('[data-action="export-ppt"]');
+const CONFIG = {
+  sharedDocKey: "eduvia_shared_doc_access",
+  referenceViewKey: "eduvia_reference_view",
+  supportPanelId: "document-support-panel",
+  saveDebounceMs: 900,
+  generateTimeoutMs: 90000,
+  selectionStyleId: "doc-selection-style",
+  selectionToolbarId: "doc-selection-toolbar",
+  selectionResultId: "doc-selection-result",
+  maxSources: 20,
+};
 
 const params = new URLSearchParams(window.location.search);
-const claseIdFromUrl = params.get("id") || params.get("doc");
-const ownerUidFromUrl = params.get("owner");
 
-const SHARED_DOC_KEY = "eduvia_shared_doc_access";
-const SUPPORT_PANEL_ID = "document-support-panel";
-const SAVE_DEBOUNCE_MS = 900;
-const GENERATE_TIMEOUT_MS = 90000;
+/* =========================
+   HELPERS
+========================= */
 
-const DOC_SELECTION_STYLE_ID = "doc-selection-style";
-const DOC_SELECTION_TOOLBAR_ID = "doc-selection-toolbar";
-const DOC_SELECTION_RESULT_ID = "doc-selection-result";
+const $ = (id) => document.getElementById(id);
+const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
 
-let currentUser = null;
-let currentClaseId = claseIdFromUrl || null;
-let currentOwnerUid = ownerUidFromUrl || null;
-let currentClaseRef = null;
-let currentClaseData = null;
-let currentRole = "viewer";
-let saveTimer = null;
-let saveInFlight = false;
-let shareUiInitialized = false;
-let autosaveListenersAttached = false;
-let generationPromise = null;
-let lastSavedSignature = "";
+const txt = (value = "") => String(value ?? "").trim();
 
-let selectionAssistantInitialized = false;
-let selectionActionBusy = false;
-let documentAssistantLastResponse = null;
-let currentSelectedText = "";
-let currentSelectedRange = null;
-
-let pptExportInitialized = false;
-
-if (documentApp) {
-  documentApp.style.display = "";
-}
-if (accessGuard) {
-  accessGuard.classList.remove("show");
-}
-if (docLoading) {
-  docLoading.classList.add("show");
-}
-
-function escapeHtml(value = "") {
-  return String(value)
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
-}
-
-function limpiarTexto(value = "") {
-  return String(value || "").trim();
-}
-
-function normalizeEmail(email = "") {
-  return limpiarTexto(email).toLowerCase();
-}
-
-function emailToKey(email = "") {
-  return normalizeEmail(email).replace(/[^a-z0-9]/gi, "_");
-}
-
-function normalizeRole(role = "") {
-  return role === "editor" ? "editor" : "viewer";
-}
-
-function canEdit() {
-  return currentRole === "owner" || currentRole === "editor";
-}
-
-function stripObjectivePrefix(value = "") {
-  return String(value || "")
-    .replace(/^objetivo:\s*/i, "")
-    .trim();
-}
-
-function sanitizeUrl(value = "") {
-  try {
-    const url = new URL(String(value), window.location.origin);
-    if (url.protocol === "http:" || url.protocol === "https:") {
-      return url.href;
-    }
-    return "";
-  } catch {
-    return "";
-  }
-}
-
-function safeJsonParse(value, fallback = null) {
+const safeJsonParse = (value, fallback = null) => {
   try {
     return JSON.parse(value);
   } catch {
     return fallback;
   }
-}
+};
 
-function localStorageKey(ownerUid, claseId) {
-  return `claseActual:${ownerUid || "unknown"}:${claseId || "unknown"}`;
-}
+const escapeHtml = (value = "") =>
+  String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
 
-function readClaseFromLocalStorage(ownerUid, claseId) {
+const normalizeEmail = (email = "") => txt(email).toLowerCase();
+const normalizeRole = (role = "") => (role === "editor" ? "editor" : "viewer");
+const emailToKey = (email = "") => normalizeEmail(email).replace(/[^a-z0-9]/gi, "_");
+
+const toArray = (value) => (Array.isArray(value) ? value : []);
+
+const localDocKey = (ownerUid, claseId) =>
+  `claseActual:${ownerUid || "unknown"}:${claseId || "unknown"}`;
+
+const getDomainLabel = (url = "") => {
   try {
-    const specificKey = localStorageKey(ownerUid, claseId);
-    const specific = localStorage.getItem(specificKey);
-    if (specific) {
-      const parsed = safeJsonParse(specific, null);
-      if (parsed && typeof parsed === "object") return parsed;
-    }
-
-    const legacy = localStorage.getItem("claseActual");
-    if (legacy) {
-      const parsed = safeJsonParse(legacy, null);
-      if (parsed && typeof parsed === "object") return parsed;
-    }
-
-    return null;
+    return new URL(url).hostname.replace(/^www\./, "");
   } catch {
-    return null;
+    return "";
   }
-}
+};
 
-function writeClaseToLocalStorage(clase, ownerUid, claseId) {
+const extractYear = (value = "") => {
+  const match = String(value).match(/\b(19|20)\d{2}\b/);
+  return match ? match[0] : "";
+};
+
+const sanitizeUrl = (value = "") => {
   try {
-    if (!clase || !ownerUid || !claseId) return;
-    localStorage.setItem(localStorageKey(ownerUid, claseId), JSON.stringify(clase));
-    localStorage.setItem("claseActual", JSON.stringify(clase));
+    const url = new URL(String(value), window.location.origin);
+    if (url.protocol === "http:" || url.protocol === "https:") return url.href;
+    return "";
   } catch {
-    // no-op
+    return "";
   }
-}
+};
 
-function setSharedDocSession(role, user, ownerUid, claseId) {
-  if (!user || !ownerUid || !claseId) return;
+const stripObjectivePrefix = (value = "") =>
+  String(value || "").replace(/^objetivo:\s*/i, "").trim();
 
-  if (role === "owner") {
-    sessionStorage.removeItem(SHARED_DOC_KEY);
-    return;
-  }
+const plainTextToBlocks = (text = "") => {
+  const clean = txt(text);
+  if (!clean) return "";
 
-  try {
-    sessionStorage.setItem(
-      SHARED_DOC_KEY,
-      JSON.stringify({
-        userUid: user.uid,
-        userEmail: normalizeEmail(user.email || ""),
-        ownerUid,
-        claseId,
-        role
-      })
-    );
-  } catch {
-    // no-op
-  }
-}
-
-function clearSharedDocSession() {
-  try {
-    sessionStorage.removeItem(SHARED_DOC_KEY);
-  } catch {
-    // no-op
-  }
-}
-
-function getDocumentoTitle(clase = {}) {
-  return (
-    clase.tituloDocumento ||
-    clase.tema ||
-    clase.titulo ||
-    "Documento sin título"
-  );
-}
-
-function getDocumentoObjective(clase = {}) {
-  return clase.objetivoDocumento || clase.objetivo || "";
-}
-
-function getInvestigacionDocumento(clase = {}) {
-  return limpiarTexto(
-    clase.investigacion ||
-      clase.research ||
-      clase.baseInvestigada ||
-      clase.resumenInvestigacion ||
-      ""
-  );
-}
-
-function getFuentesDocumento(clase = {}) {
-  const raw =
-    clase.fuentes ||
-    clase.sources ||
-    clase.webSources ||
-    clase.fuentesUsadas ||
-    [];
-
-  if (!Array.isArray(raw)) return [];
-
-  const seen = new Set();
-
-  return raw
-    .map((item) => {
-      if (!item || typeof item !== "object") return null;
-
-      const title = limpiarTexto(item.title || item.titulo || item.name || "Fuente");
-      const url = sanitizeUrl(item.url || item.link || "");
-      const key = `${title}|${url}`;
-
-      if (!title && !url) return null;
-      if (seen.has(key)) return null;
-
-      seen.add(key);
-
-      return {
-        title: title || "Fuente",
-        url
-      };
-    })
+  return clean
+    .split(/\n{2,}/)
+    .map((block) => block.trim())
     .filter(Boolean)
-    .slice(0, 10);
-}
+    .map((block) => `<p>${escapeHtml(block).replace(/\n/g, "<br>")}</p>`)
+    .join("");
+};
 
-function splitResearchParagraphs(text = "") {
-  const clean = limpiarTexto(text);
+const splitResearchParagraphs = (text = "") => {
+  const clean = txt(text);
   if (!clean) return [];
 
   const blocks = clean
@@ -297,36 +125,26 @@ function splitResearchParagraphs(text = "") {
       return acc;
     }, [])
     .filter(Boolean);
-}
+};
 
-function hasRealHtml(value = "") {
-  return typeof value === "string" && value.trim().length > 30;
-}
+const hasRealText = (value = "") => typeof value === "string" && value.trim().length > 30;
+const hasRealHtml = (value = "") => typeof value === "string" && value.trim().length > 30;
 
-function hasRealText(value = "") {
-  return typeof value === "string" && value.trim().length > 30;
-}
-
-function hasRealStructuredDoc(obj) {
+const hasRealStructuredDoc = (obj) => {
   if (!obj || typeof obj !== "object" || Array.isArray(obj)) return false;
 
-  const puntosClave = Array.isArray(obj.puntosClave)
-    ? obj.puntosClave.filter((item) => limpiarTexto(item))
-    : [];
-
-  const preguntas = Array.isArray(obj.preguntas)
-    ? obj.preguntas.filter((item) => limpiarTexto(item))
-    : [];
+  const puntosClave = toArray(obj.puntosClave).filter((item) => txt(item));
+  const preguntas = toArray(obj.preguntas).filter((item) => txt(item));
 
   return Boolean(
-    limpiarTexto(obj.resumen) ||
-      limpiarTexto(obj.explicacion) ||
-      limpiarTexto(obj.ejemplo) ||
-      limpiarTexto(obj.cierre) ||
+    txt(obj.resumen) ||
+      txt(obj.explicacion) ||
+      txt(obj.ejemplo) ||
+      txt(obj.cierre) ||
       puntosClave.length ||
       preguntas.length
   );
-}
+};
 
 function sanitizeCssStyle(styleText = "") {
   if (!styleText || typeof styleText !== "string") return "";
@@ -337,19 +155,24 @@ function sanitizeCssStyle(styleText = "") {
     "text-align",
     "font-weight",
     "font-style",
-    "text-decoration"
+    "text-decoration",
   ]);
 
+  const validTextAlign = new Set(["left", "center", "right", "justify"]);
+  const validFontWeight = new Set(["normal", "bold", "500", "600", "700", "800"]);
+  const validFontStyle = new Set(["normal", "italic"]);
+  const validTextDecoration = new Set(["none", "underline", "line-through"]);
+  const genericColorRegex =
+    /^(#[0-9a-f]{3,8}|rgba?\([\d\s.,%]+\)|hsla?\([\d\s.,%]+\)|[a-z\s-]+)$/i;
+
   const safeDeclarations = [];
-  const declarations = styleText.split(";");
 
-  for (const declaration of declarations) {
+  for (const declaration of styleText.split(";")) {
     const [rawProp, ...rest] = declaration.split(":");
-    const prop = limpiarTexto(rawProp).toLowerCase();
-    const value = limpiarTexto(rest.join(":"));
+    const prop = txt(rawProp).toLowerCase();
+    const value = txt(rest.join(":"));
 
-    if (!prop || !value) continue;
-    if (!allowedProps.has(prop)) continue;
+    if (!prop || !value || !allowedProps.has(prop)) continue;
 
     const lowerValue = value.toLowerCase();
     if (
@@ -361,30 +184,15 @@ function sanitizeCssStyle(styleText = "") {
       continue;
     }
 
-    const validTextAlign = ["left", "center", "right", "justify"];
-    const validFontWeight = ["normal", "bold", "500", "600", "700", "800"];
-    const validFontStyle = ["normal", "italic"];
-    const validTextDecoration = ["none", "underline", "line-through"];
-    const genericColorRegex =
-      /^(#[0-9a-f]{3,8}|rgba?\([\d\s.,%]+\)|hsla?\([\d\s.,%]+\)|[a-z\s-]+)$/i;
-
     let isValid = false;
 
-    if (prop === "text-align") {
-      isValid = validTextAlign.includes(lowerValue);
-    } else if (prop === "font-weight") {
-      isValid = validFontWeight.includes(lowerValue);
-    } else if (prop === "font-style") {
-      isValid = validFontStyle.includes(lowerValue);
-    } else if (prop === "text-decoration") {
-      isValid = validTextDecoration.includes(lowerValue);
-    } else if (prop === "color" || prop === "background-color") {
-      isValid = genericColorRegex.test(value);
-    }
+    if (prop === "text-align") isValid = validTextAlign.has(lowerValue);
+    if (prop === "font-weight") isValid = validFontWeight.has(lowerValue);
+    if (prop === "font-style") isValid = validFontStyle.has(lowerValue);
+    if (prop === "text-decoration") isValid = validTextDecoration.has(lowerValue);
+    if (prop === "color" || prop === "background-color") isValid = genericColorRegex.test(value);
 
-    if (!isValid) continue;
-
-    safeDeclarations.push(`${prop}: ${value}`);
+    if (isValid) safeDeclarations.push(`${prop}: ${value}`);
   }
 
   return safeDeclarations.join("; ");
@@ -409,7 +217,7 @@ function sanitizeHtml(inputHtml = "") {
     "BR",
     "DIV",
     "SPAN",
-    "FONT"
+    "FONT",
   ]);
 
   const parser = new DOMParser();
@@ -436,9 +244,7 @@ function sanitizeHtml(inputHtml = "") {
 
     if (!allowedTags.has(tag)) {
       const fragment = cleanDoc.createDocumentFragment();
-      for (const child of Array.from(node.childNodes)) {
-        fragment.appendChild(cleanNode(child));
-      }
+      for (const child of Array.from(node.childNodes)) fragment.appendChild(cleanNode(child));
       return fragment;
     }
 
@@ -456,41 +262,377 @@ function sanitizeHtml(inputHtml = "") {
 
     const rawStyle = node.getAttribute("style") || "";
     const safeStyle = sanitizeCssStyle(rawStyle);
-    if (safeStyle) {
-      cleanEl.setAttribute("style", safeStyle);
-    }
 
     if (tag === "FONT") {
       const colorAttr = node.getAttribute("color") || "";
       const colorStyle = sanitizeCssStyle(`color:${colorAttr}`);
-      const mergedStyle = [safeStyle, colorStyle].filter(Boolean).join("; ");
-      if (mergedStyle) {
-        cleanEl.setAttribute("style", mergedStyle);
-      }
+      const merged = [safeStyle, colorStyle].filter(Boolean).join("; ");
+      if (merged) cleanEl.setAttribute("style", merged);
+    } else if (safeStyle) {
+      cleanEl.setAttribute("style", safeStyle);
     }
 
-    for (const child of Array.from(node.childNodes)) {
-      cleanEl.appendChild(cleanNode(child));
-    }
+    for (const child of Array.from(node.childNodes)) cleanEl.appendChild(cleanNode(child));
 
     return cleanEl;
   }
 
-  for (const child of Array.from(sourceRoot.childNodes)) {
-    cleanRoot.appendChild(cleanNode(child));
-  }
-
+  for (const child of Array.from(sourceRoot.childNodes)) cleanRoot.appendChild(cleanNode(child));
   return cleanRoot.innerHTML.trim();
 }
 
-function ensureSupportPanel() {
-  if (!docContent || !docContent.parentNode) return null;
+/* =========================
+   ELEMENTS
+========================= */
 
-  let panel = document.getElementById(SUPPORT_PANEL_ID);
+const els = {
+  topbarTitle: $("topbar-title"),
+  topbarLastSave: $("topbar-last-save"),
+  docTitle: $("doc-title"),
+  docObjective: $("doc-objective"),
+  docContent: $("doc-content"),
+
+  chipMateria: $("chip-materia"),
+  chipNivel: $("chip-nivel"),
+  chipDuracion: $("chip-duracion"),
+
+  metaMateria: $("meta-materia"),
+  metaNivel: $("meta-nivel"),
+  metaDuracion: $("meta-duracion"),
+
+  documentApp: $("document-app"),
+  accessGuard: $("access-guard"),
+  docLoading: $("doc-loading"),
+
+  toolbarWrap: document.querySelector(".subbar"),
+  toolbarControls: $$('.subbar button, .subbar select, .subbar input'),
+
+  shareModal: $("share-modal"),
+  shareEmailInput: $("share-email"),
+  shareRoleSelect: $("share-role"),
+  shareStatus: $("share-status"),
+  docLinkInput: $("doc-link"),
+
+  openShareBtn: $("open-share-btn"),
+  closeShareBtn: $("close-share-btn"),
+  copyLinkBtn: $("copy-link-btn"),
+  sendShareBtn: $("send-share-btn"),
+
+  moreStatus: $("more-status"),
+
+  exportPptBtn:
+    $("btn-exportar-ppt") ||
+    $("export-ppt-btn") ||
+    $("action-presentation") ||
+    document.querySelector('[data-action="export-ppt"]'),
+
+  referencesSection: $("references-section"),
+  referencesTitle: $("references-title"),
+  referencesSub: $("references-sub"),
+  referencesList: $("references-list"),
+  simpleViewBtn: $("simple-view-btn"),
+  apaViewBtn: $("apa-view-btn"),
+  toggleReferenceViewBtn: $("toggle-reference-view-btn"),
+};
+
+/* =========================
+   STATE
+========================= */
+
+const state = {
+  currentUser: null,
+  currentClaseId: params.get("id") || params.get("doc") || null,
+  currentOwnerUid: params.get("owner") || null,
+  currentClaseRef: null,
+  currentClaseData: null,
+  currentRole: "viewer",
+
+  saveTimer: null,
+  saveInFlight: false,
+  queuedSave: false,
+  lastSavedSignature: "",
+
+  generationPromise: null,
+
+  shareBound: false,
+  autosaveBound: false,
+  referencesBound: false,
+  pptBound: false,
+
+  selectionAssistantInitialized: false,
+  selectionActionBusy: false,
+  currentSelectedText: "",
+  currentSelectedRange: null,
+  assistantLastResponse: null,
+
+  referenceMode:
+    localStorage.getItem(CONFIG.referenceViewKey) === "apa" ? "apa" : "simple",
+};
+
+/* =========================
+   DOM BASICS
+========================= */
+
+function setLastSaveLabel(text = "") {
+  if (els.topbarLastSave) els.topbarLastSave.textContent = text;
+}
+
+function setMoreStatus(message = "") {
+  if (els.moreStatus) els.moreStatus.textContent = message;
+  if (typeof window.setMoreStatus === "function") window.setMoreStatus(message);
+}
+
+function canEdit() {
+  return state.currentRole === "owner" || state.currentRole === "editor";
+}
+
+function hideLoading() {
+  els.docLoading?.classList.remove("show");
+}
+
+function showDenied() {
+  hideLoading();
+  if (els.documentApp) els.documentApp.style.display = "none";
+  els.accessGuard?.classList.add("show");
+  setSelectionAssistantVisibility(false);
+}
+
+function showDocument() {
+  hideLoading();
+  els.accessGuard?.classList.remove("show");
+  if (els.documentApp) els.documentApp.style.display = "";
+  setSelectionAssistantVisibility(true);
+}
+
+function renderError(message) {
+  hideLoading();
+  showDocument();
+  clearSupportPanel();
+
+  if (els.docContent) {
+    els.docContent.innerHTML = `
+      <div class="doc-placeholder">
+        <p><strong>No se pudo cargar el documento.</strong></p>
+        <p>${escapeHtml(message)}</p>
+      </div>
+    `;
+  }
+
+  applyRoleUi("viewer");
+}
+
+function updateTopbarTitleFromEditor() {
+  if (!els.topbarTitle || !els.docTitle) return;
+  els.topbarTitle.textContent = txt(els.docTitle.textContent) || "Documento sin título";
+}
+
+function replaceNodeToClearListeners(node) {
+  if (!node || !node.parentNode) return node;
+  const clone = node.cloneNode(true);
+  node.parentNode.replaceChild(clone, node);
+  return clone;
+}
+
+/* =========================
+   STORAGE
+========================= */
+
+function readClaseFromLocalStorage(ownerUid, claseId) {
+  try {
+    const specific = localStorage.getItem(localDocKey(ownerUid, claseId));
+    if (specific) {
+      const parsed = safeJsonParse(specific, null);
+      if (parsed && typeof parsed === "object") return parsed;
+    }
+
+    const legacy = localStorage.getItem("claseActual");
+    if (legacy) {
+      const parsed = safeJsonParse(legacy, null);
+      if (parsed && typeof parsed === "object") return parsed;
+    }
+  } catch {
+    // no-op
+  }
+
+  return null;
+}
+
+function writeClaseToLocalStorage(clase, ownerUid, claseId) {
+  try {
+    if (!clase || !ownerUid || !claseId) return;
+    const value = JSON.stringify(clase);
+    localStorage.setItem(localDocKey(ownerUid, claseId), value);
+    localStorage.setItem("claseActual", value);
+  } catch {
+    // no-op
+  }
+}
+
+function clearSharedDocSession() {
+  try {
+    sessionStorage.removeItem(CONFIG.sharedDocKey);
+  } catch {
+    // no-op
+  }
+}
+
+function setSharedDocSession(role, user, ownerUid, claseId) {
+  if (!user || !ownerUid || !claseId) return;
+
+  if (role === "owner") {
+    clearSharedDocSession();
+    return;
+  }
+
+  try {
+    sessionStorage.setItem(
+      CONFIG.sharedDocKey,
+      JSON.stringify({
+        userUid: user.uid,
+        userEmail: normalizeEmail(user.email || ""),
+        ownerUid,
+        claseId,
+        role,
+      })
+    );
+  } catch {
+    // no-op
+  }
+}
+
+/* =========================
+   DOCUMENT DATA
+========================= */
+
+function getDocumentoTitle(clase = {}) {
+  return clase.tituloDocumento || clase.tema || clase.titulo || "Documento sin título";
+}
+
+function getDocumentoObjective(clase = {}) {
+  return clase.objetivoDocumento || clase.objetivo || "";
+}
+
+function getInvestigacionDocumento(clase = {}) {
+  return txt(
+    clase.investigacion ||
+      clase.research ||
+      clase.baseInvestigada ||
+      clase.resumenInvestigacion ||
+      ""
+  );
+}
+
+function normalizeSourceItem(item, index = 0) {
+  if (!item || typeof item !== "object") return null;
+
+  const url = sanitizeUrl(item.url || item.link || item.href || "");
+  const title = txt(item.title || item.titulo || item.name || item.nombre || `Fuente ${index + 1}`);
+  const year = txt(item.year || item.año || item.anio || extractYear(item.date || item.fecha || ""));
+  const site = txt(item.site || item.sitio || item.publisher || item.publicacion || getDomainLabel(url));
+  const author = txt(item.author || item.autor || item.authors?.[0] || item.autores?.[0] || site || "Autor desconocido");
+
+  if (!title && !url) return null;
+
+  return {
+    id: item.id || index + 1,
+    author,
+    year: year || "s.f.",
+    title: title || `Fuente ${index + 1}`,
+    site,
+    url,
+  };
+}
+
+function getFuentesDocumento(clase = {}) {
+  const raw =
+    clase.fuentes ||
+    clase.sources ||
+    clase.webSources ||
+    clase.fuentesUsadas ||
+    clase.referencias ||
+    [];
+
+  const seen = new Set();
+
+  return toArray(raw)
+    .map((item, index) => normalizeSourceItem(item, index))
+    .filter(Boolean)
+    .filter((item) => {
+      const key = `${item.title}|${item.url}`;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    })
+    .slice(0, CONFIG.maxSources);
+}
+
+/* =========================
+   META + UI ROLE
+========================= */
+
+function setBasicMeta(clase = {}) {
+  const titulo = getDocumentoTitle(clase);
+  const materia = clase.materia || "Sin materia";
+  const nivel = clase.nivel || "No definido";
+  const duracion = clase.duracion || "No definida";
+  const objetivo = getDocumentoObjective(clase);
+
+  if (els.topbarTitle) els.topbarTitle.textContent = titulo;
+  if (els.docTitle) els.docTitle.textContent = titulo;
+
+  if (els.chipMateria) els.chipMateria.textContent = `Materia: ${materia}`;
+  if (els.chipNivel) els.chipNivel.textContent = `Nivel: ${nivel}`;
+  if (els.chipDuracion) els.chipDuracion.textContent = `Duración: ${duracion}`;
+
+  if (els.metaMateria) els.metaMateria.textContent = `Materia: ${materia}`;
+  if (els.metaNivel) els.metaNivel.textContent = `Nivel: ${nivel}`;
+  if (els.metaDuracion) els.metaDuracion.textContent = `Duración: ${duracion}`;
+
+  if (els.docObjective) {
+    els.docObjective.textContent = objetivo
+      ? `Objetivo: ${objetivo}`
+      : "Objetivo: todavía no se definió un objetivo para esta clase.";
+  }
+}
+
+function setEditableState(element, editable) {
+  if (!element) return;
+  element.setAttribute("contenteditable", editable ? "true" : "false");
+}
+
+function applyRoleUi(role = "viewer") {
+  const editable = role === "owner" || role === "editor";
+
+  setEditableState(els.docTitle, editable);
+  setEditableState(els.docObjective, editable);
+  setEditableState(els.docContent, editable);
+
+  els.toolbarControls.forEach((control) => {
+    control.disabled = !editable;
+  });
+
+  if (els.toolbarWrap) {
+    els.toolbarWrap.style.opacity = editable ? "1" : "0.72";
+    els.toolbarWrap.style.pointerEvents = editable ? "auto" : "none";
+  }
+
+  if (els.openShareBtn) {
+    els.openShareBtn.style.display = role === "owner" ? "" : "none";
+  }
+}
+
+/* =========================
+   SUPPORT PANEL
+========================= */
+
+function ensureSupportPanel() {
+  if (!els.docContent || !els.docContent.parentNode) return null;
+
+  let panel = $(CONFIG.supportPanelId);
   if (panel) return panel;
 
   panel = document.createElement("section");
-  panel.id = SUPPORT_PANEL_ID;
+  panel.id = CONFIG.supportPanelId;
   panel.setAttribute("contenteditable", "false");
   panel.style.marginTop = "26px";
   panel.style.padding = "18px";
@@ -500,12 +642,12 @@ function ensureSupportPanel() {
   panel.style.boxShadow = "0 10px 28px rgba(0,0,0,.05)";
   panel.style.display = "none";
 
-  docContent.parentNode.insertBefore(panel, docContent.nextSibling);
+  els.docContent.parentNode.insertBefore(panel, els.docContent.nextSibling);
   return panel;
 }
 
 function clearSupportPanel() {
-  const panel = document.getElementById(SUPPORT_PANEL_ID);
+  const panel = $(CONFIG.supportPanelId);
   if (!panel) return;
   panel.innerHTML = "";
   panel.style.display = "none";
@@ -516,17 +658,19 @@ function renderSupportPanel(clase = {}) {
   if (!panel) return;
 
   const investigacion = getInvestigacionDocumento(clase);
-  const fuentes = getFuentesDocumento(clase);
   const paragraphs = splitResearchParagraphs(investigacion);
+  const sources = getFuentesDocumento(clase);
 
-  if (!paragraphs.length && !fuentes.length) {
+  const hasReferencesSection = Boolean(els.referencesSection);
+
+  if (!paragraphs.length && (!sources.length || hasReferencesSection)) {
     clearSupportPanel();
     return;
   }
 
   const researchHtml = paragraphs.length
     ? `
-      <div style="margin-bottom:${fuentes.length ? "20px" : "0"};">
+      <div style="margin-bottom:${!hasReferencesSection && sources.length ? "20px" : "0"};">
         <div style="display:inline-flex;align-items:center;gap:8px;padding:7px 12px;border-radius:999px;background:#eaf3ff;color:#2d4f76;font-size:.82rem;font-weight:800;margin-bottom:12px;">
           Base investigada por Eduvia
         </div>
@@ -546,130 +690,189 @@ function renderSupportPanel(clase = {}) {
     `
     : "";
 
-  const fuentesHtml = fuentes.length
-    ? `
-      <div>
-        <h3 style="margin:0 0 10px;color:#2d4f76;font-size:1.08rem;font-weight:800;">Fuentes consultadas</h3>
-        <div style="display:grid;gap:10px;">
-          ${fuentes
-            .map((fuente, index) => {
-              const title = escapeHtml(fuente.title || `Fuente ${index + 1}`);
-              const safeUrl = sanitizeUrl(fuente.url || "");
-              const visibleUrl = safeUrl
-                ? escapeHtml(safeUrl.replace(/^https?:\/\//, ""))
-                : "URL no disponible";
+  const sourcesHtml =
+    !hasReferencesSection && sources.length
+      ? `
+        <div>
+          <h3 style="margin:0 0 10px;color:#2d4f76;font-size:1.08rem;font-weight:800;">Fuentes consultadas</h3>
+          <div style="display:grid;gap:10px;">
+            ${sources
+              .map((source, index) => {
+                const safeUrl = sanitizeUrl(source.url || "");
+                const visibleUrl = safeUrl
+                  ? escapeHtml(safeUrl.replace(/^https?:\/\//, ""))
+                  : "URL no disponible";
 
-              return `
-                <article style="padding:12px 14px;border-radius:16px;background:#ffffff;border:1px solid rgba(53,93,149,.10);">
-                  <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:8px;">
-                    <strong style="color:#2d4f76;font-size:.95rem;line-height:1.4;">${title}</strong>
-                    <span style="flex-shrink:0;padding:4px 9px;border-radius:999px;background:#eef5ff;color:#355d95;font-size:.74rem;font-weight:800;">
-                      Fuente ${index + 1}
-                    </span>
-                  </div>
-                  ${
-                    safeUrl
-                      ? `<a href="${safeUrl}" target="_blank" rel="noopener noreferrer" style="color:#5e6c78;font-size:.86rem;line-height:1.45;text-decoration:none;word-break:break-word;">${visibleUrl}</a>`
-                      : `<span style="color:#5e6c78;font-size:.86rem;line-height:1.45;">${visibleUrl}</span>`
-                  }
-                </article>
-              `;
-            })
-            .join("")}
+                return `
+                  <article style="padding:12px 14px;border-radius:16px;background:#ffffff;border:1px solid rgba(53,93,149,.10);">
+                    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:8px;">
+                      <strong style="color:#2d4f76;font-size:.95rem;line-height:1.4;">${escapeHtml(source.title)}</strong>
+                      <span style="flex-shrink:0;padding:4px 9px;border-radius:999px;background:#eef5ff;color:#355d95;font-size:.74rem;font-weight:800;">
+                        Fuente ${index + 1}
+                      </span>
+                    </div>
+                    ${
+                      safeUrl
+                        ? `<a href="${safeUrl}" target="_blank" rel="noopener noreferrer" style="color:#5e6c78;font-size:.86rem;line-height:1.45;text-decoration:none;word-break:break-word;">${visibleUrl}</a>`
+                        : `<span style="color:#5e6c78;font-size:.86rem;line-height:1.45;">${visibleUrl}</span>`
+                    }
+                  </article>
+                `;
+              })
+              .join("")}
+          </div>
         </div>
-      </div>
-    `
-    : "";
+      `
+      : "";
 
-  panel.innerHTML = researchHtml + fuentesHtml;
+  const html = `${researchHtml}${sourcesHtml}`.trim();
+
+  if (!html) {
+    clearSupportPanel();
+    return;
+  }
+
+  panel.innerHTML = html;
   panel.style.display = "";
 }
 
-function setBasicMeta(clase = {}) {
-  const titulo = getDocumentoTitle(clase);
-  const materia = clase.materia || "Sin materia";
-  const nivel = clase.nivel || "No definido";
-  const duracion = clase.duracion || "No definida";
-  const objetivo = getDocumentoObjective(clase);
+/* =========================
+   REFERENCES / APA
+========================= */
 
-  if (topbarTitle) topbarTitle.textContent = titulo;
-  if (docTitle) docTitle.textContent = titulo;
+function bindReferencesUi() {
+  if (state.referencesBound) return;
+  state.referencesBound = true;
 
-  if (chipMateria) chipMateria.textContent = `Materia: ${materia}`;
-  if (chipNivel) chipNivel.textContent = `Nivel: ${nivel}`;
-  if (chipDuracion) chipDuracion.textContent = `Duración: ${duracion}`;
+  els.simpleViewBtn?.addEventListener("click", () => setReferenceMode("simple"));
+  els.apaViewBtn?.addEventListener("click", () => setReferenceMode("apa"));
+  els.toggleReferenceViewBtn?.addEventListener("click", () => {
+    setReferenceMode(state.referenceMode === "apa" ? "simple" : "apa");
+  });
+}
 
-  if (metaMateria) metaMateria.textContent = `Materia: ${materia}`;
-  if (metaNivel) metaNivel.textContent = `Nivel: ${nivel}`;
-  if (metaDuracion) metaDuracion.textContent = `Duración: ${duracion}`;
+function getSourceById(id, sources = []) {
+  return sources.find((source) => String(source.id) === String(id));
+}
 
-  if (docObjective) {
-    docObjective.textContent = objetivo
-      ? `Objetivo: ${objetivo}`
-      : "Objetivo: todavía no se definió un objetivo para esta clase.";
+function formatSimpleReference(source) {
+  const url = sanitizeUrl(source.url || "");
+  return `
+    <strong>${escapeHtml(source.title)}</strong><br>
+    <span>${escapeHtml(source.author)} · ${escapeHtml(source.year)}${source.site ? ` · ${escapeHtml(source.site)}` : ""}</span>
+    ${url ? `<br><a class="reference-link" href="${url}" target="_blank" rel="noopener noreferrer">${escapeHtml(url)}</a>` : ""}
+  `;
+}
+
+function formatApaReference(source) {
+  const url = sanitizeUrl(source.url || "");
+  return `
+    <span>${escapeHtml(source.author)}. (${escapeHtml(source.year || "s.f.")}). <em>${escapeHtml(source.title)}</em>${source.site ? `. ${escapeHtml(source.site)}` : ""}.</span>
+    ${url ? `<a class="reference-link" href="${url}" target="_blank" rel="noopener noreferrer">${escapeHtml(url)}</a>` : ""}
+  `;
+}
+
+function formatInlineCitation(source) {
+  const shortAuthor = txt(source.author || "Autor").split(",")[0].trim();
+  return `(${escapeHtml(shortAuthor)}, ${escapeHtml(source.year || "s.f.")})`;
+}
+
+function renderInlineCitations() {
+  if (!els.docContent) return;
+
+  const sources = getFuentesDocumento(state.currentClaseData || {});
+  const slots = $$(".citation-slot", els.docContent);
+
+  slots.forEach((slot) => {
+    const ids = txt(slot.dataset.sources || "")
+      .split(",")
+      .map((id) => id.trim())
+      .filter(Boolean);
+
+    const selectedSources = ids.map((id) => getSourceById(id, sources)).filter(Boolean);
+
+    if (!selectedSources.length) {
+      slot.innerHTML = "";
+      return;
+    }
+
+    if (state.referenceMode === "apa") {
+      slot.innerHTML = `<span class="apa-inline-citation">${selectedSources
+        .map(formatInlineCitation)
+        .join("; ")}</span>`;
+    } else {
+      slot.innerHTML = ids
+        .map((id) => `<span class="citation-chip">${escapeHtml(id)}</span>`)
+        .join("");
+    }
+  });
+}
+
+function renderReferencesSection() {
+  if (!els.referencesSection || !els.referencesList) return;
+
+  const sources = getFuentesDocumento(state.currentClaseData || {});
+
+  if (els.referencesTitle) {
+    els.referencesTitle.textContent =
+      state.referenceMode === "apa" ? "Referencias (APA)" : "Fuentes utilizadas";
   }
-}
 
-function hideLoading() {
-  if (docLoading) {
-    docLoading.classList.remove("show");
-  }
-}
-
-function setSelectionAssistantVisibility(visible) {
-  const toolbar = document.getElementById(DOC_SELECTION_TOOLBAR_ID);
-  const panel = document.getElementById(DOC_SELECTION_RESULT_ID);
-
-  if (toolbar) {
-    toolbar.style.display = visible ? "" : "none";
-    if (!visible) toolbar.classList.remove("show");
+  if (els.referencesSub) {
+    els.referencesSub.textContent =
+      state.referenceMode === "apa"
+        ? "Listado académico en estilo APA para entregar o estudiar."
+        : "Vista simple para leer rápido y revisar de dónde salió la información.";
   }
 
-  if (panel) {
-    panel.style.display = visible ? "" : "none";
-    if (!visible) panel.classList.remove("show");
+  els.simpleViewBtn?.classList.toggle("is-active", state.referenceMode === "simple");
+  els.apaViewBtn?.classList.toggle("is-active", state.referenceMode === "apa");
+
+  if (els.toggleReferenceViewBtn) {
+    els.toggleReferenceViewBtn.textContent =
+      state.referenceMode === "apa" ? "Simple" : "APA";
   }
-}
 
-function showDenied() {
-  hideLoading();
-  setSelectionAssistantVisibility(false);
-  if (documentApp) documentApp.style.display = "none";
-  if (accessGuard) accessGuard.classList.add("show");
-}
-
-function showDocument() {
-  hideLoading();
-  if (accessGuard) accessGuard.classList.remove("show");
-  if (documentApp) documentApp.style.display = "";
-  setSelectionAssistantVisibility(true);
-}
-
-function renderError(message) {
-  clearSupportPanel();
-  hideLoading();
-  setSelectionAssistantVisibility(false);
-
-  if (docContent) {
-    docContent.innerHTML = `
-      <div class="doc-placeholder">
-        <p><strong>No se pudo cargar el documento.</strong></p>
-        <p>${escapeHtml(message)}</p>
+  if (!sources.length) {
+    els.referencesList.innerHTML = `
+      <div class="reference-item">
+        Todavía no hay fuentes cargadas para este documento.
       </div>
     `;
+    return;
   }
 
-  if (documentApp) {
-    documentApp.style.display = "";
-  }
+  els.referencesList.innerHTML = sources
+    .map(
+      (source) => `
+        <div class="reference-item ${state.referenceMode === "apa" ? "apa" : ""}">
+          ${
+            state.referenceMode === "apa"
+              ? formatApaReference(source)
+              : formatSimpleReference(source)
+          }
+        </div>
+      `
+    )
+    .join("");
 }
+
+function setReferenceMode(mode) {
+  state.referenceMode = mode === "apa" ? "apa" : "simple";
+  localStorage.setItem(CONFIG.referenceViewKey, state.referenceMode);
+  renderInlineCitations();
+  renderReferencesSection();
+}
+
+/* =========================
+   DOCUMENT RENDER
+========================= */
 
 function renderGeneratingDocument(clase = {}) {
   setBasicMeta(clase);
 
-  if (!docContent) return;
-
-  docContent.innerHTML = `
+  if (!els.docContent) return;
+  els.docContent.innerHTML = `
     <div class="doc-placeholder">
       <p><strong>Generando documento...</strong></p>
       <p>Estamos investigando y armando el contenido completo de esta clase.</p>
@@ -679,7 +882,7 @@ function renderGeneratingDocument(clase = {}) {
 }
 
 function renderGeneratedStructure(clase = {}) {
-  if (!docContent) return;
+  if (!els.docContent) return;
 
   const materia = escapeHtml(clase.materia || "la materia");
   const tema = escapeHtml(getDocumentoTitle(clase));
@@ -689,10 +892,9 @@ function renderGeneratedStructure(clase = {}) {
     getDocumentoObjective(clase) || "comprender mejor el contenido trabajado"
   );
 
-  const investigacion = getInvestigacionDocumento(clase);
-  const researchParagraphs = splitResearchParagraphs(investigacion);
+  const researchParagraphs = splitResearchParagraphs(getInvestigacionDocumento(clase));
 
-  docContent.innerHTML = `
+  els.docContent.innerHTML = `
     <h2>Resumen</h2>
     <p>
       Este documento organiza la clase de <strong>${materia}</strong> sobre
@@ -708,9 +910,7 @@ function renderGeneratedStructure(clase = {}) {
     </p>
 
     <h2>Desarrollo del tema</h2>
-    <p>
-      En esta sección debería aparecer la explicación principal del tema.
-    </p>
+    <p>En esta sección debería aparecer la explicación principal del tema.</p>
 
     ${
       researchParagraphs.length
@@ -732,105 +932,65 @@ function renderGeneratedStructure(clase = {}) {
     </ul>
 
     <h2>Cierre</h2>
-    <p>
-      Este documento quedó como base visual, pero no se recibió contenido HTML completo.
-    </p>
+    <p>Este documento quedó como base visual, pero no se recibió contenido completo.</p>
   `;
 }
 
 function renderRichHtmlDocumento(clase = {}) {
-  if (!docContent) return false;
-
-  const rawHtml =
-    clase.contenidoHtml ||
-    clase.documentoHtml ||
-    clase.htmlDocumento ||
-    "";
-
-  if (!rawHtml || typeof rawHtml !== "string" || !rawHtml.trim()) {
-    return false;
-  }
+  const rawHtml = clase.contenidoHtml || clase.documentoHtml || clase.htmlDocumento || "";
+  if (!hasRealHtml(rawHtml) || !els.docContent) return false;
 
   const safeHtml = sanitizeHtml(rawHtml);
   if (!safeHtml) return false;
 
-  docContent.innerHTML = safeHtml;
+  els.docContent.innerHTML = safeHtml;
   return true;
 }
 
 function renderStructuredDocumento(clase = {}) {
-  if (!docContent) return false;
+  if (!els.docContent) return false;
 
-  const contenido = clase.documento || clase.contenidoDocumento || clase.contenido || null;
+  const content = clase.documento || clase.contenidoDocumento || clase.contenido;
+  if (!hasRealStructuredDoc(content)) return false;
 
-  if (!hasRealStructuredDoc(contenido)) {
-    return false;
-  }
-
-  const resumen = escapeHtml(contenido.resumen || "");
-  const explicacion = escapeHtml(contenido.explicacion || "");
-  const ejemplo = escapeHtml(contenido.ejemplo || "");
-  const cierre = escapeHtml(contenido.cierre || "");
-
-  const puntosClave = Array.isArray(contenido.puntosClave) ? contenido.puntosClave : [];
-  const preguntas = Array.isArray(contenido.preguntas) ? contenido.preguntas : [];
+  const resumen = escapeHtml(content.resumen || "");
+  const explicacion = escapeHtml(content.explicacion || "");
+  const ejemplo = escapeHtml(content.ejemplo || "");
+  const cierre = escapeHtml(content.cierre || "");
+  const puntosClave = toArray(content.puntosClave);
+  const preguntas = toArray(content.preguntas);
 
   let html = "";
 
-  if (resumen) {
-    html += `
-      <h2>Resumen</h2>
-      <p>${resumen}</p>
-    `;
-  }
-
-  if (explicacion) {
-    html += `
-      <h2>Desarrollo del tema</h2>
-      <p>${explicacion}</p>
-    `;
-  }
+  if (resumen) html += `<h2>Resumen</h2><p>${resumen}</p>`;
+  if (explicacion) html += `<h2>Desarrollo del tema</h2><p>${explicacion}</p>`;
 
   if (puntosClave.length) {
-    html += "<h2>Puntos clave</h2><ul>";
-    html += puntosClave.map((item) => `<li>${escapeHtml(item)}</li>`).join("");
-    html += "</ul>";
+    html += `<h2>Puntos clave</h2><ul>${puntosClave
+      .map((item) => `<li>${escapeHtml(item)}</li>`)
+      .join("")}</ul>`;
   }
 
-  if (ejemplo) {
-    html += `
-      <h2>Ejemplo o aplicación</h2>
-      <p>${ejemplo}</p>
-    `;
-  }
+  if (ejemplo) html += `<h2>Ejemplo o aplicación</h2><p>${ejemplo}</p>`;
 
   if (preguntas.length) {
-    html += "<h2>Preguntas para practicar</h2><ol>";
-    html += preguntas.map((item) => `<li>${escapeHtml(item)}</li>`).join("");
-    html += "</ol>";
+    html += `<h2>Preguntas para practicar</h2><ol>${preguntas
+      .map((item) => `<li>${escapeHtml(item)}</li>`)
+      .join("")}</ol>`;
   }
 
-  if (cierre) {
-    html += `
-      <h2>Cierre</h2>
-      <p>${cierre}</p>
-    `;
-  }
-
+  if (cierre) html += `<h2>Cierre</h2><p>${cierre}</p>`;
   if (!html.trim()) return false;
 
-  docContent.innerHTML = html;
+  els.docContent.innerHTML = html;
   return true;
 }
 
 function renderPlainTextDocumento(clase = {}) {
-  if (!docContent) return false;
+  if (!els.docContent) return false;
 
   const rawText =
-    clase.documentoTexto ||
-    clase.textoDocumento ||
-    clase.contenidoTexto ||
-    "";
+    clase.documentoTexto || clase.textoDocumento || clase.contenidoTexto || "";
 
   if (!hasRealText(rawText)) return false;
 
@@ -841,138 +1001,349 @@ function renderPlainTextDocumento(clase = {}) {
 
   if (!blocks.length) return false;
 
-  docContent.innerHTML = blocks
-    .map((block, index) => {
-      if (index === 0) {
-        return `<p><strong>${escapeHtml(block)}</strong></p>`;
-      }
-      return `<p>${escapeHtml(block)}</p>`;
-    })
+  els.docContent.innerHTML = blocks
+    .map((block, index) =>
+      index === 0
+        ? `<p><strong>${escapeHtml(block)}</strong></p>`
+        : `<p>${escapeHtml(block)}</p>`
+    )
     .join("");
 
   return true;
 }
 
+function syncSavedSignatureFromDom() {
+  state.lastSavedSignature = getPayloadSignature(getCurrentDocumentPayload());
+}
+
 function renderClase(clase = {}) {
   setBasicMeta(clase);
 
-  if (renderRichHtmlDocumento(clase)) {
-    renderSupportPanel(clase);
-    syncSavedSignatureFromDom();
-    return;
+  if (!renderRichHtmlDocumento(clase) && !renderStructuredDocumento(clase) && !renderPlainTextDocumento(clase)) {
+    renderGeneratedStructure(clase);
   }
 
-  if (renderStructuredDocumento(clase)) {
-    renderSupportPanel(clase);
-    syncSavedSignatureFromDom();
-    return;
-  }
-
-  if (renderPlainTextDocumento(clase)) {
-    renderSupportPanel(clase);
-    syncSavedSignatureFromDom();
-    return;
-  }
-
-  renderGeneratedStructure(clase);
   renderSupportPanel(clase);
+  bindReferencesUi();
+  renderInlineCitations();
+  renderReferencesSection();
   syncSavedSignatureFromDom();
 }
 
-function setEditableState(element, editable) {
-  if (!element) return;
-  element.setAttribute("contenteditable", editable ? "true" : "false");
+/* =========================
+   SAVE
+========================= */
+
+function getCurrentDocumentPayload() {
+  const titulo = txt(els.docTitle?.textContent || "") || "Documento sin título";
+  const objetivo = stripObjectivePrefix(txt(els.docObjective?.textContent || ""));
+  const contenidoHtml = sanitizeHtml(els.docContent?.innerHTML || "");
+
+  return {
+    tituloDocumento: titulo,
+    objetivoDocumento: objetivo,
+    contenidoHtml,
+    ultimoEditorUid: state.currentUser?.uid || "",
+    ultimoEditorEmail: normalizeEmail(state.currentUser?.email || ""),
+    updatedAt: serverTimestamp(),
+  };
 }
 
-function applyRoleUi(role) {
-  const editable = role === "owner" || role === "editor";
+function getPayloadSignature(payload = {}) {
+  return JSON.stringify({
+    tituloDocumento: payload.tituloDocumento || "",
+    objetivoDocumento: payload.objetivoDocumento || "",
+    contenidoHtml: payload.contenidoHtml || "",
+  });
+}
 
-  setEditableState(docTitle, editable);
-  setEditableState(docObjective, editable);
-  setEditableState(docContent, editable);
+function scheduleSave() {
+  if (!state.currentClaseRef || !canEdit()) return;
 
-  toolbarControls.forEach((control) => {
-    if (!control) return;
-    control.disabled = !editable;
+  clearTimeout(state.saveTimer);
+  setLastSaveLabel("Guardando...");
+
+  state.saveTimer = setTimeout(() => {
+    void saveDocumentEdits();
+  }, CONFIG.saveDebounceMs);
+}
+
+async function writeDocumentPayload(payload) {
+  try {
+    await updateDoc(state.currentClaseRef, payload);
+  } catch {
+    await setDoc(state.currentClaseRef, payload, { merge: true });
+  }
+}
+
+async function saveDocumentEdits(force = false) {
+  if (!state.currentClaseRef || !canEdit()) return;
+
+  const payload = getCurrentDocumentPayload();
+  const signature = getPayloadSignature(payload);
+
+  if (!force && signature === state.lastSavedSignature) {
+    setLastSaveLabel("Guardado automático");
+    return;
+  }
+
+  if (state.saveInFlight) {
+    state.queuedSave = true;
+    return;
+  }
+
+  state.saveInFlight = true;
+
+  try {
+    await writeDocumentPayload(payload);
+
+    state.currentClaseData = {
+      ...(state.currentClaseData || {}),
+      tituloDocumento: payload.tituloDocumento,
+      objetivoDocumento: payload.objetivoDocumento,
+      contenidoHtml: payload.contenidoHtml,
+      ultimoEditorUid: payload.ultimoEditorUid,
+      ultimoEditorEmail: payload.ultimoEditorEmail,
+      updatedAt: new Date().toISOString(),
+    };
+
+    state.lastSavedSignature = signature;
+    writeClaseToLocalStorage(state.currentClaseData, state.currentOwnerUid, state.currentClaseId);
+    setLastSaveLabel("Guardado automático");
+  } catch (error) {
+    console.error("Error guardando documento:", error);
+    setLastSaveLabel("No se pudo guardar");
+  } finally {
+    state.saveInFlight = false;
+
+    if (state.queuedSave) {
+      state.queuedSave = false;
+      void saveDocumentEdits(true);
+    }
+  }
+}
+
+function handlePlainTextPaste(event) {
+  if (!canEdit()) return;
+  event.preventDefault();
+  const text = event.clipboardData?.getData("text/plain") || "";
+  document.execCommand("insertText", false, text);
+}
+
+function bindAutosave() {
+  if (state.autosaveBound) return;
+  state.autosaveBound = true;
+
+  const onInput = () => {
+    updateTopbarTitleFromEditor();
+    scheduleSave();
+  };
+
+  [els.docTitle, els.docObjective, els.docContent].forEach((node) => {
+    node?.addEventListener("input", onInput);
+    node?.addEventListener("paste", handlePlainTextPaste);
   });
 
-  if (toolbarWrap) {
-    toolbarWrap.style.opacity = editable ? "1" : "0.72";
-    toolbarWrap.style.pointerEvents = editable ? "auto" : "none";
-  }
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) {
+      clearTimeout(state.saveTimer);
+      void saveDocumentEdits(true);
+    }
+  });
 
-  if (openShareBtn) {
-    openShareBtn.style.display = role === "owner" ? "" : "none";
-  }
+  window.addEventListener("pagehide", () => {
+    clearTimeout(state.saveTimer);
+    void saveDocumentEdits(true);
+  });
 }
+
+/* =========================
+   SHARE
+========================= */
+
+function getShareUrl() {
+  if (!state.currentClaseId || !state.currentOwnerUid) return window.location.href;
+  const url = new URL(window.location.href);
+  url.searchParams.set("id", state.currentClaseId);
+  url.searchParams.set("owner", state.currentOwnerUid);
+  return url.toString();
+}
+
+function rebindShareElements() {
+  els.openShareBtn = replaceNodeToClearListeners(els.openShareBtn);
+  els.closeShareBtn = replaceNodeToClearListeners(els.closeShareBtn);
+  els.copyLinkBtn = replaceNodeToClearListeners(els.copyLinkBtn);
+  els.sendShareBtn = replaceNodeToClearListeners(els.sendShareBtn);
+}
+
+function bindShareUi() {
+  if (state.shareBound || !els.shareModal) return;
+  state.shareBound = true;
+
+  rebindShareElements();
+
+  const openModal = () => {
+    if (els.docLinkInput) els.docLinkInput.value = getShareUrl();
+    if (els.shareStatus) els.shareStatus.textContent = "";
+    els.shareModal?.classList.add("show");
+  };
+
+  const closeModal = () => {
+    els.shareModal?.classList.remove("show");
+  };
+
+  els.openShareBtn?.addEventListener("click", openModal);
+  els.closeShareBtn?.addEventListener("click", closeModal);
+
+  els.shareModal?.addEventListener("click", (event) => {
+    if (event.target === els.shareModal) closeModal();
+  });
+
+  els.copyLinkBtn?.addEventListener("click", async () => {
+    try {
+      const url = getShareUrl();
+      await navigator.clipboard.writeText(url);
+      if (els.docLinkInput) els.docLinkInput.value = url;
+      if (els.shareStatus) els.shareStatus.textContent = "Link copiado.";
+    } catch {
+      if (els.shareStatus) els.shareStatus.textContent = "No se pudo copiar el link.";
+    }
+  });
+
+  els.sendShareBtn?.addEventListener("click", async () => {
+    if (state.currentRole !== "owner") {
+      if (els.shareStatus) els.shareStatus.textContent = "Solo el dueño puede compartir.";
+      return;
+    }
+
+    const email = normalizeEmail(els.shareEmailInput?.value || "");
+    const role = normalizeRole(els.shareRoleSelect?.value || "viewer");
+
+    if (!email || !email.includes("@")) {
+      if (els.shareStatus) els.shareStatus.textContent = "Escribí un email válido.";
+      return;
+    }
+
+    if (!state.currentClaseRef || !state.currentClaseId || !state.currentOwnerUid) {
+      if (els.shareStatus) els.shareStatus.textContent = "No se pudo identificar el documento.";
+      return;
+    }
+
+    if (email === normalizeEmail(state.currentUser?.email || "")) {
+      if (els.shareStatus) els.shareStatus.textContent = "Ese email ya es el dueño.";
+      return;
+    }
+
+    try {
+      const sharedUserKey = `sharedUsers.${emailToKey(email)}`;
+
+      const updates = {
+        sharedWithEmails: arrayUnion(email),
+        [sharedUserKey]: {
+          email,
+          role,
+          invitedBy: normalizeEmail(state.currentUser?.email || ""),
+          invitedAt: new Date().toISOString(),
+        },
+        updatedAt: serverTimestamp(),
+      };
+
+      if (role === "editor") {
+        updates.sharedEditorEmails = arrayUnion(email);
+        updates.sharedViewerEmails = arrayRemove(email);
+      } else {
+        updates.sharedViewerEmails = arrayUnion(email);
+        updates.sharedEditorEmails = arrayRemove(email);
+      }
+
+      await updateDoc(state.currentClaseRef, updates);
+
+      state.currentClaseData = {
+        ...(state.currentClaseData || {}),
+        sharedWithEmails: Array.from(
+          new Set([...(state.currentClaseData?.sharedWithEmails || []), email])
+        ),
+      };
+
+      writeClaseToLocalStorage(state.currentClaseData, state.currentOwnerUid, state.currentClaseId);
+
+      const shareUrl = getShareUrl();
+      const subject = encodeURIComponent("Te compartieron un documento de Eduvia");
+      const body = encodeURIComponent(
+        `Hola.\n\nTe compartieron este documento de Eduvia:\n${shareUrl}\n\nPermiso: ${
+          role === "editor" ? "Puede editar" : "Solo ver"
+        }\n\nEse enlace te da acceso únicamente a este documento.`
+      );
+
+      window.open(
+        `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(
+          email
+        )}&su=${subject}&body=${body}`,
+        "_blank"
+      );
+
+      if (els.shareStatus) {
+        els.shareStatus.textContent = "Permiso guardado y Gmail abierto con la invitación.";
+      }
+
+      if (els.shareEmailInput) els.shareEmailInput.value = "";
+      if (els.shareRoleSelect) els.shareRoleSelect.value = "viewer";
+    } catch (error) {
+      console.error("Error compartiendo documento:", error);
+      if (els.shareStatus) els.shareStatus.textContent = "No se pudo compartir el documento.";
+    }
+  });
+}
+
+/* =========================
+   ROLE RESOLUTION
+========================= */
 
 function resolveUserRole(clase, user, ownerUid) {
   if (!user) return null;
   if (user.uid === ownerUid) return "owner";
 
-  const email = normalizeEmail(user.email);
+  const email = normalizeEmail(user.email || "");
   if (!email) return null;
 
-  const viewerEmails = Array.isArray(clase.sharedViewerEmails)
-    ? clase.sharedViewerEmails.map(normalizeEmail)
-    : [];
-
-  const editorEmails = Array.isArray(clase.sharedEditorEmails)
-    ? clase.sharedEditorEmails.map(normalizeEmail)
-    : [];
-
-  const allEmails = Array.isArray(clase.sharedWithEmails)
-    ? clase.sharedWithEmails.map(normalizeEmail)
-    : [];
+  const viewerEmails = toArray(clase.sharedViewerEmails).map(normalizeEmail);
+  const editorEmails = toArray(clase.sharedEditorEmails).map(normalizeEmail);
+  const allEmails = toArray(clase.sharedWithEmails).map(normalizeEmail);
 
   if (editorEmails.includes(email)) return "editor";
   if (viewerEmails.includes(email)) return "viewer";
   if (allEmails.includes(email)) return "viewer";
 
-  const sharedUsers = clase.sharedUsers && typeof clase.sharedUsers === "object"
-    ? clase.sharedUsers
-    : {};
+  const sharedUsers =
+    clase.sharedUsers && typeof clase.sharedUsers === "object" ? clase.sharedUsers : {};
+  const sharedUser = sharedUsers[emailToKey(email)] || null;
 
-  const key = emailToKey(email);
-  const sharedUser = sharedUsers[key] || null;
+  if (sharedUser?.role) return normalizeRole(sharedUser.role);
 
-  if (sharedUser?.role) {
-    return normalizeRole(sharedUser.role);
-  }
-
-  const legacyShared = Array.isArray(clase.sharedWith) ? clase.sharedWith : [];
-  const legacyEntry = legacyShared.find(
-    (item) => normalizeEmail(item?.email) === email
-  );
-
-  if (legacyEntry) {
-    return normalizeRole(legacyEntry.role);
-  }
+  const legacy = toArray(clase.sharedWith);
+  const legacyEntry = legacy.find((item) => normalizeEmail(item?.email) === email);
+  if (legacyEntry) return normalizeRole(legacyEntry.role);
 
   return null;
 }
 
-async function fetchJsonWithTimeout(url, options = {}, timeoutMs = GENERATE_TIMEOUT_MS) {
+/* =========================
+   API
+========================= */
+
+async function fetchJsonWithTimeout(url, options = {}, timeoutMs = CONFIG.generateTimeoutMs) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
 
   try {
-    const response = await fetch(url, {
-      ...options,
-      signal: controller.signal
-    });
+    const response = await fetch(url, { ...options, signal: controller.signal });
+    const data = await response.json().catch(() => null);
 
-    let data = null;
-    try {
-      data = await response.json();
-    } catch {
-      throw new Error("El servidor devolvió un JSON inválido.");
-    }
-
+    if (!data) throw new Error("El servidor devolvió un JSON inválido.");
     return { response, data };
   } catch (error) {
     if (error.name === "AbortError") {
-      throw new Error("La generación tardó demasiado y fue cancelada.");
+      throw new Error("La operación tardó demasiado y fue cancelada.");
     }
     throw error;
   } finally {
@@ -981,12 +1352,10 @@ async function fetchJsonWithTimeout(url, options = {}, timeoutMs = GENERATE_TIME
 }
 
 async function generarDocumentoSiFalta(clase = {}) {
-  if (generationPromise) {
-    return generationPromise;
-  }
+  if (state.generationPromise) return state.generationPromise;
 
-  generationPromise = (async () => {
-    const yaExiste =
+  state.generationPromise = (async () => {
+    const alreadyExists =
       hasRealHtml(clase.contenidoHtml) ||
       hasRealHtml(clase.documentoHtml) ||
       hasRealHtml(clase.htmlDocumento) ||
@@ -997,9 +1366,7 @@ async function generarDocumentoSiFalta(clase = {}) {
       hasRealStructuredDoc(clase.contenidoDocumento) ||
       hasRealStructuredDoc(clase.contenido);
 
-    if (yaExiste) {
-      return clase;
-    }
+    if (alreadyExists) return clase;
 
     if (!clase?.materia || !clase?.tema || !clase?.nivel) {
       throw new Error("Faltan materia, tema o nivel para generar el documento.");
@@ -1014,20 +1381,16 @@ async function generarDocumentoSiFalta(clase = {}) {
       duracion: clase.duracion || "",
       objetivo: clase.objetivo || "",
       investigacion: clase.investigacion || "",
-      fuentes: Array.isArray(clase.fuentes) ? clase.fuentes : [],
+      fuentes: toArray(clase.fuentes),
     };
 
-    const { response, data } = await fetchJsonWithTimeout(
-      "/api/generar-documento",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
+    const { response, data } = await fetchJsonWithTimeout("/api/generar-documento", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
       },
-      GENERATE_TIMEOUT_MS
-    );
+      body: JSON.stringify(payload),
+    });
 
     if (!response.ok || !data?.ok || !data?.documento) {
       throw new Error(data?.error || "No se pudo generar el documento.");
@@ -1053,18 +1416,14 @@ async function generarDocumentoSiFalta(clase = {}) {
       contenidoHtml: safeHtml,
       resumenDocumento: data.documento.resumenCorto || "",
       investigacion: data.investigacion || clase.investigacion || "",
-      fuentes: Array.isArray(data.fuentes)
-        ? data.fuentes
-        : Array.isArray(clase.fuentes)
-          ? clase.fuentes
-          : [],
-      updatedAt: new Date().toISOString()
+      fuentes: toArray(data.fuentes).length ? data.fuentes : toArray(clase.fuentes),
+      updatedAt: new Date().toISOString(),
     };
 
-    if (currentClaseRef && canEdit()) {
+    if (state.currentClaseRef && canEdit()) {
       try {
         await setDoc(
-          currentClaseRef,
+          state.currentClaseRef,
           {
             tituloDocumento: merged.tituloDocumento,
             objetivoDocumento: merged.objetivoDocumento,
@@ -1072,7 +1431,7 @@ async function generarDocumentoSiFalta(clase = {}) {
             resumenDocumento: merged.resumenDocumento,
             investigacion: merged.investigacion,
             fuentes: merged.fuentes,
-            updatedAt: serverTimestamp()
+            updatedAt: serverTimestamp(),
           },
           { merge: true }
         );
@@ -1081,305 +1440,126 @@ async function generarDocumentoSiFalta(clase = {}) {
       }
     }
 
-    currentClaseData = merged;
-    writeClaseToLocalStorage(merged, currentOwnerUid, currentClaseId);
-
+    state.currentClaseData = merged;
+    writeClaseToLocalStorage(merged, state.currentOwnerUid, state.currentClaseId);
     return merged;
   })();
 
   try {
-    return await generationPromise;
+    return await state.generationPromise;
   } finally {
-    generationPromise = null;
+    state.generationPromise = null;
   }
 }
 
-function updateTopbarTitleFromEditor() {
-  if (!topbarTitle || !docTitle) return;
-  const value = limpiarTexto(docTitle.textContent);
-  topbarTitle.textContent = value || "Documento sin título";
-}
+/* =========================
+   LOAD DOC
+========================= */
 
-function getCurrentDocumentPayload() {
-  const titulo = limpiarTexto(docTitle?.textContent || "") || "Documento sin título";
-  const objetivoRaw = limpiarTexto(docObjective?.textContent || "");
-  const objetivo = stripObjectivePrefix(objetivoRaw);
-  const contenidoHtmlRaw = docContent?.innerHTML || "";
-  const contenidoHtml = sanitizeHtml(contenidoHtmlRaw);
+async function resolveClaseFromFirestoreOrLocal(user) {
+  const fallbackOwner = state.currentOwnerUid || user.uid;
+  const localClase = readClaseFromLocalStorage(fallbackOwner, state.currentClaseId);
 
-  return {
-    tituloDocumento: titulo,
-    objetivoDocumento: objetivo,
-    contenidoHtml,
-    ultimoEditorUid: currentUser?.uid || "",
-    ultimoEditorEmail: normalizeEmail(currentUser?.email || ""),
-    updatedAt: serverTimestamp()
-  };
-}
+  if (!state.currentClaseId && localClase?.id) state.currentClaseId = localClase.id;
+  if (!state.currentOwnerUid) state.currentOwnerUid = localClase?.ownerUid || user.uid;
 
-function getPayloadSignature(payloadLike = {}) {
-  return JSON.stringify({
-    tituloDocumento: payloadLike.tituloDocumento || "",
-    objetivoDocumento: payloadLike.objetivoDocumento || "",
-    contenidoHtml: payloadLike.contenidoHtml || ""
-  });
-}
+  if (!state.currentClaseId) {
+    if (localClase) {
+      state.currentClaseData = localClase;
+      state.currentRole = state.currentOwnerUid === user.uid ? "owner" : "viewer";
+      state.currentClaseRef = doc(db, "usuarios", state.currentOwnerUid, "clases", localClase.id);
 
-function syncSavedSignatureFromDom() {
-  const payload = getCurrentDocumentPayload();
-  lastSavedSignature = getPayloadSignature(payload);
-}
+      if (state.currentRole === "owner") clearSharedDocSession();
+      else setSharedDocSession(state.currentRole, user, state.currentOwnerUid, localClase.id);
 
-function scheduleSave() {
-  if (!currentClaseRef || !canEdit()) return;
+      return { clase: localClase, origin: "local" };
+    }
 
-  clearTimeout(saveTimer);
-  saveTimer = setTimeout(() => {
-    saveDocumentEdits();
-  }, SAVE_DEBOUNCE_MS);
-}
-
-async function saveDocumentEdits(force = false) {
-  if (!currentClaseRef || !canEdit()) return;
-  if (saveInFlight && !force) return;
-
-  const payload = getCurrentDocumentPayload();
-  const signature = getPayloadSignature(payload);
-
-  if (!force && signature === lastSavedSignature) {
-    return;
+    throw new Error("No se encontró el identificador de la clase.");
   }
 
-  saveInFlight = true;
+  const claseRef = doc(db, "usuarios", state.currentOwnerUid, "clases", state.currentClaseId);
 
   try {
-    await updateDoc(currentClaseRef, payload);
+    const snap = await getDoc(claseRef);
 
-    currentClaseData = {
-      ...(currentClaseData || {}),
-      tituloDocumento: payload.tituloDocumento,
-      objetivoDocumento: payload.objetivoDocumento,
-      contenidoHtml: payload.contenidoHtml,
-      ultimoEditorUid: payload.ultimoEditorUid,
-      ultimoEditorEmail: payload.ultimoEditorEmail,
-      updatedAt: new Date().toISOString()
+    if (!snap.exists()) {
+      if (!localClase) throw new Error("La clase no existe o no se pudo encontrar en Firestore.");
+
+      state.currentClaseRef = claseRef;
+      state.currentClaseData = localClase;
+      state.currentRole = state.currentOwnerUid === user.uid ? "owner" : "viewer";
+
+      if (state.currentRole === "owner") clearSharedDocSession();
+      else setSharedDocSession(state.currentRole, user, state.currentOwnerUid, state.currentClaseId);
+
+      return { clase: localClase, origin: "local" };
+    }
+
+    const claseData = {
+      id: snap.id,
+      ownerUid: state.currentOwnerUid,
+      ...snap.data(),
     };
 
-    lastSavedSignature = signature;
-    writeClaseToLocalStorage(currentClaseData, currentOwnerUid, currentClaseId);
+    const role = resolveUserRole(claseData, user, state.currentOwnerUid);
+    if (!role) return { denied: true };
+
+    state.currentClaseRef = claseRef;
+    state.currentClaseData = claseData;
+    state.currentRole = role;
+    setSharedDocSession(role, user, state.currentOwnerUid, state.currentClaseId);
+
+    return { clase: claseData, origin: "firestore" };
   } catch (error) {
-    console.error("Error guardando documento:", error);
+    if (!localClase) throw error;
 
-    try {
-      await setDoc(currentClaseRef, payload, { merge: true });
+    state.currentClaseRef = claseRef;
+    state.currentClaseData = localClase;
+    state.currentRole = state.currentOwnerUid === user.uid ? "owner" : "viewer";
 
-      currentClaseData = {
-        ...(currentClaseData || {}),
-        tituloDocumento: payload.tituloDocumento,
-        objetivoDocumento: payload.objetivoDocumento,
-        contenidoHtml: payload.contenidoHtml,
-        ultimoEditorUid: payload.ultimoEditorUid,
-        ultimoEditorEmail: payload.ultimoEditorEmail,
-        updatedAt: new Date().toISOString()
-      };
+    if (state.currentRole === "owner") clearSharedDocSession();
+    else setSharedDocSession(state.currentRole, user, state.currentOwnerUid, state.currentClaseId);
 
-      lastSavedSignature = signature;
-      writeClaseToLocalStorage(currentClaseData, currentOwnerUid, currentClaseId);
-    } catch (secondError) {
-      console.error("Error secundario guardando documento:", secondError);
-    }
-  } finally {
-    saveInFlight = false;
+    return { clase: localClase, origin: "local" };
   }
 }
 
-function handlePlainTextPaste(e) {
-  if (!canEdit()) return;
+async function loadClase(user) {
+  try {
+    const result = await resolveClaseFromFirestoreOrLocal(user);
 
-  e.preventDefault();
-  const text = e.clipboardData?.getData("text/plain") || "";
-  document.execCommand("insertText", false, text);
-}
-
-function attachAutosaveListeners() {
-  if (autosaveListenersAttached) return;
-  autosaveListenersAttached = true;
-
-  const onInput = () => {
-    updateTopbarTitleFromEditor();
-    scheduleSave();
-  };
-
-  docTitle?.addEventListener("input", onInput);
-  docObjective?.addEventListener("input", onInput);
-  docContent?.addEventListener("input", onInput);
-
-  docTitle?.addEventListener("paste", handlePlainTextPaste);
-  docObjective?.addEventListener("paste", handlePlainTextPaste);
-  docContent?.addEventListener("paste", handlePlainTextPaste);
-
-  document.addEventListener("visibilitychange", () => {
-    if (document.hidden) {
-      clearTimeout(saveTimer);
-      void saveDocumentEdits(true);
+    if (result?.denied) {
+      showDenied();
+      return;
     }
-  });
 
-  window.addEventListener("pagehide", () => {
-    clearTimeout(saveTimer);
-    void saveDocumentEdits(true);
-  });
-}
+    const claseBase = result?.clase;
+    if (!claseBase) throw new Error("No se encontró información de la clase.");
 
-function getShareUrl() {
-  if (!currentClaseId || !currentOwnerUid) return window.location.href;
+    showDocument();
+    bindAutosave();
+    bindShareUi();
+    ensureSelectionAssistantUi();
+    setupPresentationExport();
 
-  const url = new URL(window.location.href);
-  url.searchParams.set("id", currentClaseId);
-  url.searchParams.set("owner", currentOwnerUid);
-  return url.toString();
-}
+    const claseFinal = await generarDocumentoSiFalta(claseBase);
 
-function setupShareUi() {
-  if (!shareModal || shareUiInitialized) return;
-  shareUiInitialized = true;
+    state.currentClaseData = claseFinal;
+    writeClaseToLocalStorage(claseFinal, state.currentOwnerUid, state.currentClaseId);
 
-  if (docLinkInput) {
-    docLinkInput.value = getShareUrl();
+    renderClase(claseFinal);
+    applyRoleUi(state.currentRole);
+    setLastSaveLabel("Guardado automático");
+  } catch (error) {
+    console.error("Error al cargar la clase:", error);
+    renderError(error?.message || "Hubo un problema al cargar la clase.");
   }
-
-  openShareBtn?.addEventListener("click", () => {
-    if (docLinkInput) docLinkInput.value = getShareUrl();
-    if (shareStatus) shareStatus.textContent = "";
-    shareModal.classList.add("show");
-  });
-
-  closeShareBtn?.addEventListener("click", () => {
-    shareModal.classList.remove("show");
-  });
-
-  shareModal.addEventListener("click", (e) => {
-    if (e.target === shareModal) {
-      shareModal.classList.remove("show");
-    }
-  });
-
-  copyLinkBtn?.addEventListener("click", async () => {
-    try {
-      const url = getShareUrl();
-      await navigator.clipboard.writeText(url);
-      if (docLinkInput) docLinkInput.value = url;
-      if (shareStatus) shareStatus.textContent = "Link copiado.";
-    } catch {
-      if (shareStatus) shareStatus.textContent = "No se pudo copiar el link.";
-    }
-  });
-
-  sendShareBtn?.addEventListener("click", async () => {
-    if (currentRole !== "owner") {
-      if (shareStatus) {
-        shareStatus.textContent = "Solo el dueño del documento puede compartirlo.";
-      }
-      return;
-    }
-
-    const email = normalizeEmail(shareEmailInput?.value || "");
-    const role = normalizeRole(shareRoleSelect?.value || "viewer");
-
-    if (!email || !email.includes("@")) {
-      if (shareStatus) shareStatus.textContent = "Escribí un email válido.";
-      return;
-    }
-
-    if (!currentClaseRef || !currentClaseId || !currentOwnerUid) {
-      if (shareStatus) {
-        shareStatus.textContent = "Todavía no se pudo identificar este documento.";
-      }
-      return;
-    }
-
-    if (email === normalizeEmail(currentUser?.email || "")) {
-      if (shareStatus) {
-        shareStatus.textContent = "Ese email ya es el dueño del documento.";
-      }
-      return;
-    }
-
-    try {
-      const sharedUserKey = `sharedUsers.${emailToKey(email)}`;
-
-      const updates = {
-        sharedWithEmails: arrayUnion(email),
-        [sharedUserKey]: {
-          email,
-          role,
-          invitedBy: normalizeEmail(currentUser?.email || ""),
-          invitedAt: new Date().toISOString()
-        },
-        updatedAt: serverTimestamp()
-      };
-
-      if (role === "editor") {
-        updates.sharedEditorEmails = arrayUnion(email);
-        updates.sharedViewerEmails = arrayRemove(email);
-      } else {
-        updates.sharedViewerEmails = arrayUnion(email);
-        updates.sharedEditorEmails = arrayRemove(email);
-      }
-
-      await updateDoc(currentClaseRef, updates);
-
-      currentClaseData = {
-        ...(currentClaseData || {}),
-        sharedWithEmails: Array.isArray(currentClaseData?.sharedWithEmails)
-          ? Array.from(new Set([...currentClaseData.sharedWithEmails, email]))
-          : [email]
-      };
-
-      writeClaseToLocalStorage(currentClaseData, currentOwnerUid, currentClaseId);
-
-      const shareUrl = getShareUrl();
-      if (docLinkInput) docLinkInput.value = shareUrl;
-
-      const subject = encodeURIComponent("Te compartieron un documento de Eduvia");
-      const body = encodeURIComponent(
-        `Hola.\n\n` +
-          `Te compartieron este documento de Eduvia:\n` +
-          `${shareUrl}\n\n` +
-          `Permiso: ${role === "editor" ? "Puede editar" : "Solo ver"}\n\n` +
-          `Ese enlace te da acceso únicamente a este documento.`
-      );
-
-      const gmailUrl =
-        `https://mail.google.com/mail/?view=cm&fs=1` +
-        `&to=${encodeURIComponent(email)}` +
-        `&su=${subject}` +
-        `&body=${body}`;
-
-      window.open(gmailUrl, "_blank");
-
-      if (shareStatus) {
-        shareStatus.textContent = "Permiso guardado y Gmail abierto con la invitación.";
-      }
-
-      if (shareEmailInput) shareEmailInput.value = "";
-      if (shareRoleSelect) shareRoleSelect.value = "viewer";
-    } catch (error) {
-      console.error("Error compartiendo documento:", error);
-      if (shareStatus) {
-        shareStatus.textContent = "No se pudo compartir el documento.";
-      }
-    }
-  });
 }
 
-function getPlainDocumentText() {
-  const titulo = limpiarTexto(docTitle?.textContent || "");
-  const objetivo = stripObjectivePrefix(limpiarTexto(docObjective?.textContent || ""));
-  const contenido = limpiarTexto(docContent?.innerText || docContent?.textContent || "");
-
-  return [titulo, objetivo, contenido].filter(Boolean).join("\n\n");
-}
+/* =========================
+   PRESENTATION EXPORT
+========================= */
 
 function normalizePresentationText(value = "") {
   return String(value || "")
@@ -1390,9 +1570,7 @@ function normalizePresentationText(value = "") {
 
 function chunkArray(items = [], size = 5) {
   const chunks = [];
-  for (let i = 0; i < items.length; i += size) {
-    chunks.push(items.slice(i, i + size));
-  }
+  for (let i = 0; i < items.length; i += size) chunks.push(items.slice(i, i + size));
   return chunks;
 }
 
@@ -1405,25 +1583,22 @@ function splitPresentationText(text = "", maxChars = 120) {
     .map((item) => item.trim())
     .filter(Boolean);
 
-  if (!sentences.length) {
-    return [clean.slice(0, maxChars)];
-  }
+  if (!sentences.length) return [clean.slice(0, maxChars)];
 
   const blocks = [];
   let current = "";
 
-  function pushCurrent() {
+  const pushCurrent = () => {
     const value = normalizePresentationText(current);
     if (value) blocks.push(value);
     current = "";
-  }
+  };
 
   for (const sentence of sentences) {
     if (sentence.length <= maxChars) {
       const next = current ? `${current} ${sentence}` : sentence;
-      if (next.length <= maxChars) {
-        current = next;
-      } else {
+      if (next.length <= maxChars) current = next;
+      else {
         pushCurrent();
         current = sentence;
       }
@@ -1435,44 +1610,36 @@ function splitPresentationText(text = "", maxChars = 120) {
 
     for (const word of words) {
       const next = partial ? `${partial} ${word}` : word;
-      if (next.length <= maxChars) {
-        partial = next;
-      } else {
+      if (next.length <= maxChars) partial = next;
+      else {
         if (partial) blocks.push(partial);
         partial = word;
       }
     }
 
     if (partial) {
-      if (!current) current = partial;
+      const next = current ? `${current} ${partial}` : partial;
+      if (next.length <= maxChars) current = next;
       else {
-        const next = `${current} ${partial}`;
-        if (next.length <= maxChars) current = next;
-        else {
-          pushCurrent();
-          current = partial;
-        }
+        pushCurrent();
+        current = partial;
       }
     }
   }
 
   pushCurrent();
-
   return blocks.filter(Boolean);
 }
 
 function getPresentationMeta() {
-  const clase = currentClaseData || {};
-
+  const clase = state.currentClaseData || {};
   return {
     titulo:
-      normalizePresentationText(docTitle?.textContent || "") ||
+      normalizePresentationText(els.docTitle?.textContent || "") ||
       normalizePresentationText(getDocumentoTitle(clase)) ||
       "Presentación",
     objetivo:
-      stripObjectivePrefix(
-        normalizePresentationText(docObjective?.textContent || "")
-      ) ||
+      stripObjectivePrefix(normalizePresentationText(els.docObjective?.textContent || "")) ||
       normalizePresentationText(getDocumentoObjective(clase)),
     materia: normalizePresentationText(clase.materia || ""),
     nivel: normalizePresentationText(clase.nivel || ""),
@@ -1481,41 +1648,26 @@ function getPresentationMeta() {
 }
 
 function extractPresentationSectionsFromDom() {
-  if (!docContent) return [];
+  if (!els.docContent) return [];
 
   const sections = [];
-  let currentSection = {
-    title: "Contenido",
-    bullets: [],
-  };
+  let currentSection = { title: "Contenido", bullets: [] };
+  const children = Array.from(els.docContent.children || []);
 
-  function pushSection() {
+  const pushSection = () => {
     const title = normalizePresentationText(currentSection.title);
     const bullets = currentSection.bullets
       .map((item) => normalizePresentationText(item))
       .filter(Boolean);
 
-    if (!title && !bullets.length) return;
-
-    if (bullets.length) {
-      sections.push({
-        title: title || "Contenido",
-        bullets,
-      });
-    }
-  }
-
-  const children = Array.from(docContent.children || []);
+    if (title || bullets.length) sections.push({ title: title || "Contenido", bullets });
+  };
 
   if (!children.length) {
-    const fallbackText = normalizePresentationText(docContent.innerText || "");
-    if (!fallbackText) return [];
-    return [
-      {
-        title: "Contenido",
-        bullets: splitPresentationText(fallbackText, 120),
-      },
-    ];
+    const fallbackText = normalizePresentationText(els.docContent.innerText || "");
+    return fallbackText
+      ? [{ title: "Contenido", bullets: splitPresentationText(fallbackText, 120) }]
+      : [];
   }
 
   for (const child of children) {
@@ -1532,17 +1684,13 @@ function extractPresentationSectionsFromDom() {
 
     if (tag === "h3") {
       const subtitle = normalizePresentationText(child.textContent || "");
-      if (subtitle) {
-        currentSection.bullets.push(subtitle);
-      }
+      if (subtitle) currentSection.bullets.push(subtitle);
       continue;
     }
 
     if (tag === "p" || tag === "blockquote") {
       const text = normalizePresentationText(child.innerText || child.textContent || "");
-      if (text) {
-        currentSection.bullets.push(...splitPresentationText(text, 120));
-      }
+      if (text) currentSection.bullets.push(...splitPresentationText(text, 120));
       continue;
     }
 
@@ -1551,32 +1699,16 @@ function extractPresentationSectionsFromDom() {
         .map((li) => normalizePresentationText(li.innerText || li.textContent || ""))
         .filter(Boolean);
 
-      for (const item of items) {
-        currentSection.bullets.push(...splitPresentationText(item, 100));
-      }
+      for (const item of items) currentSection.bullets.push(...splitPresentationText(item, 100));
       continue;
     }
 
     const fallback = normalizePresentationText(child.innerText || child.textContent || "");
-    if (fallback) {
-      currentSection.bullets.push(...splitPresentationText(fallback, 120));
-    }
+    if (fallback) currentSection.bullets.push(...splitPresentationText(fallback, 120));
   }
 
   pushSection();
-
-  if (!sections.length) {
-    const fallbackText = normalizePresentationText(docContent.innerText || "");
-    if (!fallbackText) return [];
-    return [
-      {
-        title: "Contenido",
-        bullets: splitPresentationText(fallbackText, 120),
-      },
-    ];
-  }
-
-  return sections;
+  return sections.filter((section) => section.bullets.length);
 }
 
 function addPresentationCoverSlide(pptx, meta) {
@@ -1606,7 +1738,6 @@ function addPresentationCoverSlide(pptx, meta) {
       fontSize: 12,
       color: "6F6577",
       margin: 0,
-      breakLine: false,
     });
   }
 
@@ -1617,6 +1748,7 @@ function addPresentationCoverSlide(pptx, meta) {
   ].filter(Boolean);
 
   let chipX = 0.65;
+
   for (const chip of chips) {
     slide.addText(chip, {
       x: chipX,
@@ -1666,23 +1798,22 @@ function addPresentationContentSlide(pptx, title, bullets = [], slideNumber = 1)
     margin: 0,
   });
 
-  const bulletText = bullets
-    .map((item) => `• ${normalizePresentationText(item)}`)
-    .join("\n");
-
-  slide.addText(bulletText || "• Contenido", {
-    x: 0.85,
-    y: 1.25,
-    w: 11.25,
-    h: 5.25,
-    fontFace: "Inter",
-    fontSize: 15,
-    color: "3C3547",
-    breakLine: false,
-    margin: 0,
-    valign: "top",
-    paraSpaceAfterPt: 14,
-  });
+  slide.addText(
+    bullets.map((item) => `• ${normalizePresentationText(item)}`).join("\n") || "• Contenido",
+    {
+      x: 0.85,
+      y: 1.25,
+      w: 11.25,
+      h: 5.25,
+      fontFace: "Inter",
+      fontSize: 15,
+      color: "3C3547",
+      breakLine: false,
+      margin: 0,
+      valign: "top",
+      paraSpaceAfterPt: 14,
+    }
+  );
 
   slide.addText(String(slideNumber), {
     x: 12.2,
@@ -1697,18 +1828,14 @@ function addPresentationContentSlide(pptx, title, bullets = [], slideNumber = 1)
   });
 }
 
-function addPresentationSourcesSlide(pptx, fuentes = [], slideNumber = 1) {
-  if (!Array.isArray(fuentes) || !fuentes.length) return;
+function addPresentationSourcesSlide(pptx, sources = [], slideNumber = 1) {
+  if (!sources.length) return;
 
-  const bullets = fuentes
-    .slice(0, 8)
-    .map((fuente, index) => {
-      const title = normalizePresentationText(fuente.title || `Fuente ${index + 1}`);
-      const url = normalizePresentationText(
-        (fuente.url || "").replace(/^https?:\/\//, "")
-      );
-      return url ? `${title} — ${url}` : title;
-    });
+  const bullets = sources.slice(0, 8).map((source, index) => {
+    const title = normalizePresentationText(source.title || `Fuente ${index + 1}`);
+    const url = normalizePresentationText((source.url || "").replace(/^https?:\/\//, ""));
+    return url ? `${title} — ${url}` : title;
+  });
 
   addPresentationContentSlide(pptx, "Fuentes consultadas", bullets, slideNumber);
 }
@@ -1734,43 +1861,27 @@ async function exportDocumentToPresentation() {
     return;
   }
 
-  if (!docContent || !normalizePresentationText(docContent.innerText || "")) {
+  if (!els.docContent || !normalizePresentationText(els.docContent.innerText || "")) {
     alert("No hay contenido suficiente en el documento para convertir.");
     return;
   }
 
-  const titleNode = exportPptBtn?.querySelector?.(".more-item-title");
-  const originalLabel =
-    titleNode?.textContent ||
-    exportPptBtn?.textContent ||
-    "Pasar a presentación";
-
-  const MAX_CONTENT_SLIDES = 8;
-  const MAX_BULLETS_PER_SLIDE = 4;
-  const MAX_BULLET_LENGTH = 120;
+  const targetLabel = els.exportPptBtn?.querySelector?.(".more-item-title");
+  const originalText = targetLabel?.textContent || els.exportPptBtn?.textContent || "Pasar a presentación";
 
   try {
-    if (typeof window.closeMoreDropdown === "function") {
-      window.closeMoreDropdown();
-    }
+    window.closeMoreDropdown?.();
+    setMoreStatus("Generando presentación...");
 
-    if (typeof window.setMoreStatus === "function") {
-      window.setMoreStatus("Generando presentación...");
-    }
-
-    if (exportPptBtn) {
-      exportPptBtn.disabled = true;
-
-      if (titleNode) {
-        titleNode.textContent = "Generando presentación...";
-      } else {
-        exportPptBtn.textContent = "Generando presentación...";
-      }
+    if (els.exportPptBtn) {
+      els.exportPptBtn.disabled = true;
+      if (targetLabel) targetLabel.textContent = "Generando presentación...";
+      else els.exportPptBtn.textContent = "Generando presentación...";
     }
 
     const meta = getPresentationMeta();
     const sections = extractPresentationSectionsFromDom();
-    const fuentes = getFuentesDocumento(currentClaseData || {});
+    const sources = getFuentesDocumento(state.currentClaseData || {});
 
     const pptx = new PptxGenJS();
     pptx.layout = "LAYOUT_WIDE";
@@ -1782,38 +1893,32 @@ async function exportDocumentToPresentation() {
 
     addPresentationCoverSlide(pptx, meta);
 
+    const MAX_CONTENT_SLIDES = 8;
+    const MAX_BULLETS_PER_SLIDE = 4;
+    const MAX_BULLET_LENGTH = 120;
+
     let slideNumber = 2;
     let createdSlides = 0;
 
     for (const section of sections) {
       if (createdSlides >= MAX_CONTENT_SLIDES) break;
 
-      const title = normalizePresentationText(section.title || "Contenido");
+      const bullets = toArray(section.bullets)
+        .map((item) => normalizePresentationText(item))
+        .filter(Boolean)
+        .map((item) =>
+          item.length > MAX_BULLET_LENGTH ? `${item.slice(0, MAX_BULLET_LENGTH).trim()}...` : item
+        );
 
-      const bullets = Array.isArray(section.bullets)
-        ? section.bullets
-            .map((item) => normalizePresentationText(item))
-            .filter(Boolean)
-            .map((item) =>
-              item.length > MAX_BULLET_LENGTH
-                ? `${item.slice(0, MAX_BULLET_LENGTH).trim()}...`
-                : item
-            )
-        : [];
+      const grouped = chunkArray(bullets, MAX_BULLETS_PER_SLIDE);
 
-      if (!bullets.length) continue;
-
-      const groupedBullets = chunkArray(bullets, MAX_BULLETS_PER_SLIDE);
-
-      for (let i = 0; i < groupedBullets.length; i++) {
+      for (let i = 0; i < grouped.length; i++) {
         if (createdSlides >= MAX_CONTENT_SLIDES) break;
-
-        const pageTitle = i === 0 ? title : `${title} (cont.)`;
 
         addPresentationContentSlide(
           pptx,
-          pageTitle,
-          groupedBullets[i],
+          i === 0 ? section.title : `${section.title} (cont.)`,
+          grouped[i],
           slideNumber
         );
 
@@ -1822,489 +1927,62 @@ async function exportDocumentToPresentation() {
       }
     }
 
-    if (fuentes.length && createdSlides < MAX_CONTENT_SLIDES + 1) {
-      addPresentationSourcesSlide(pptx, fuentes, slideNumber);
+    if (sources.length && createdSlides < MAX_CONTENT_SLIDES + 1) {
+      addPresentationSourcesSlide(pptx, sources, slideNumber);
     }
 
-    await pptx.writeFile({
-      fileName: getPresentationFileName(meta.titulo),
-    });
-
-    if (typeof window.setMoreStatus === "function") {
-      window.setMoreStatus("Presentación generada.");
-    }
+    await pptx.writeFile({ fileName: getPresentationFileName(meta.titulo) });
+    setMoreStatus("Presentación generada.");
   } catch (error) {
     console.error("Error exportando a presentación:", error);
     alert("No se pudo generar la presentación.");
-
-    if (typeof window.setMoreStatus === "function") {
-      window.setMoreStatus("No se pudo generar la presentación.");
-    }
+    setMoreStatus("No se pudo generar la presentación.");
   } finally {
-    if (exportPptBtn) {
-      exportPptBtn.disabled = false;
-
-      if (titleNode) {
-        titleNode.textContent = originalLabel;
-      } else {
-        exportPptBtn.textContent = originalLabel;
-      }
+    if (els.exportPptBtn) {
+      els.exportPptBtn.disabled = false;
+      if (targetLabel) targetLabel.textContent = originalText;
+      else els.exportPptBtn.textContent = originalText;
     }
   }
 }
 
 function setupPresentationExport() {
-  if (pptExportInitialized) return;
-  if (!exportPptBtn) return;
+  if (state.pptBound || !els.exportPptBtn) return;
+  state.pptBound = true;
 
-  pptExportInitialized = true;
+  els.exportPptBtn = replaceNodeToClearListeners(els.exportPptBtn);
 
-  exportPptBtn.addEventListener("click", () => {
+  els.exportPptBtn.addEventListener("click", () => {
     void exportDocumentToPresentation();
   });
 }
 
-function nodeBelongsToDocument(node) {
-  const element =
-    node?.nodeType === Node.ELEMENT_NODE ? node : node?.parentElement;
+/* =========================
+   SELECTION ASSISTANT
+========================= */
 
-  if (!element) return false;
+function setSelectionAssistantVisibility(visible) {
+  const toolbar = $(CONFIG.selectionToolbarId);
+  const panel = $(CONFIG.selectionResultId);
 
-  return Boolean(
-    docTitle?.contains(element) ||
-      docObjective?.contains(element) ||
-      docContent?.contains(element)
-  );
-}
-
-function rangeBelongsToDocument(range) {
-  if (!range) return false;
-  return (
-    nodeBelongsToDocument(range.startContainer) &&
-    nodeBelongsToDocument(range.endContainer)
-  );
-}
-
-function getClosestEditableRoot(node) {
-  const element =
-    node?.nodeType === Node.ELEMENT_NODE ? node : node?.parentElement;
-
-  if (!element) return null;
-  if (docTitle?.contains(element)) return docTitle;
-  if (docObjective?.contains(element)) return docObjective;
-  if (docContent?.contains(element)) return docContent;
-
-  return null;
-}
-
-function getClosestBlockElement(node) {
-  const element =
-    node?.nodeType === Node.ELEMENT_NODE ? node : node?.parentElement;
-
-  if (!element) return null;
-
-  return element.closest("p, li, h1, h2, h3, blockquote, div");
-}
-
-function hideSelectionToolbar() {
-  const toolbar = document.getElementById(DOC_SELECTION_TOOLBAR_ID);
   if (toolbar) {
-    toolbar.classList.remove("show");
+    toolbar.style.display = visible ? "" : "none";
+    if (!visible) toolbar.classList.remove("show");
   }
-}
 
-function showSelectionToolbarAt(rect) {
-  const toolbar = document.getElementById(DOC_SELECTION_TOOLBAR_ID);
-  if (!toolbar || !rect) return;
-
-  toolbar.classList.add("show");
-
-  const margin = 16;
-  const maxWidth = Math.min(620, window.innerWidth - 32);
-  const toolbarWidth = Math.min(toolbar.offsetWidth || maxWidth, maxWidth);
-  const top = window.scrollY + rect.top - toolbar.offsetHeight - 12;
-  const rawLeft = window.scrollX + rect.left + rect.width / 2 - toolbarWidth / 2;
-  const left = Math.max(
-    window.scrollX + margin,
-    Math.min(rawLeft, window.scrollX + window.innerWidth - toolbarWidth - margin)
-  );
-
-  toolbar.style.top = `${Math.max(window.scrollY + 12, top)}px`;
-  toolbar.style.left = `${left}px`;
-}
-
-function hideSelectionResult() {
-  const panel = document.getElementById(DOC_SELECTION_RESULT_ID);
   if (panel) {
-    panel.classList.remove("show");
-  }
-}
-
-function trackSelectedTextForAssistant() {
-  if (selectionActionBusy) return;
-
-  const selection = window.getSelection();
-  if (!selection || !selection.rangeCount) {
-    currentSelectedText = "";
-    currentSelectedRange = null;
-    hideSelectionToolbar();
-    return;
-  }
-
-  const text = limpiarTexto(selection.toString());
-  const range = selection.getRangeAt(0);
-
-  if (!text || !rangeBelongsToDocument(range)) {
-    currentSelectedText = "";
-    currentSelectedRange = null;
-    hideSelectionToolbar();
-    return;
-  }
-
-  const rect = range.getBoundingClientRect();
-  if (!rect || (!rect.width && !rect.height)) {
-    hideSelectionToolbar();
-    return;
-  }
-
-  currentSelectedText = text.slice(0, 5000);
-  currentSelectedRange = range.cloneRange();
-  showSelectionToolbarAt(rect);
-}
-
-function getDocumentAssistantQuestion(action, selectedText = "") {
-  const base = limpiarTexto(selectedText);
-
-  switch (action) {
-    case "explicar":
-      return `Explicá mejor el texto seleccionado de forma clara, didáctica y fácil de entender. Si conviene, proponé una versión mejor explicada del fragmento. Texto: ${base}`;
-    case "mejorar":
-      return `Mejorá la redacción del texto seleccionado sin cambiar la idea principal. Texto: ${base}`;
-    case "alargar":
-      return `Alargá el texto seleccionado agregando contenido útil, contexto o desarrollo, sin meter relleno. Texto: ${base}`;
-    case "acortar":
-      return `Acortá el texto seleccionado conservando la idea principal y lo más importante. Texto: ${base}`;
-    case "claro":
-      return `Reescribí el texto seleccionado para que quede más claro, más simple y más fácil de estudiar. Texto: ${base}`;
-    case "formal":
-      return `Reescribí el texto seleccionado con un tono más formal, prolijo y académico. Texto: ${base}`;
-    case "resumir":
-      return `Resumí el texto seleccionado en una versión más breve y directa. Texto: ${base}`;
-    default:
-      return `Ayudame con este texto seleccionado del documento: ${base}`;
-  }
-}
-
-function plainTextToHtmlBlocks(text = "") {
-  const clean = limpiarTexto(text);
-  if (!clean) return "";
-
-  return clean
-    .split(/\n{2,}/)
-    .map((block) => block.trim())
-    .filter(Boolean)
-    .map((block) => `<p>${escapeHtml(block).replace(/\n/g, "<br>")}</p>`)
-    .join("");
-}
-
-function restoreStoredSelection() {
-  if (!currentSelectedRange) return false;
-
-  const selection = window.getSelection();
-  if (!selection) return false;
-
-  selection.removeAllRanges();
-  selection.addRange(currentSelectedRange);
-
-  const root = getClosestEditableRoot(currentSelectedRange.startContainer);
-  root?.focus?.();
-
-  return true;
-}
-
-function replaceSelectedTextWithResult(text = "") {
-  if (!canEdit()) return;
-  const clean = limpiarTexto(text);
-  if (!clean) return;
-  if (!restoreStoredSelection()) return;
-
-  document.execCommand("insertText", false, clean);
-  scheduleSave();
-  hideSelectionToolbar();
-}
-
-function insertResultBelowSelection(text = "") {
-  if (!canEdit()) return;
-  const clean = limpiarTexto(text);
-  if (!clean) return;
-
-  const html = plainTextToHtmlBlocks(clean);
-  if (!html) return;
-
-  const startNode = currentSelectedRange?.startContainer || null;
-  const root = getClosestEditableRoot(startNode);
-
-  if (root === docContent) {
-    const block = getClosestBlockElement(startNode);
-    if (block && docContent.contains(block)) {
-      block.insertAdjacentHTML("afterend", html);
-    } else {
-      docContent.insertAdjacentHTML("beforeend", html);
-    }
-  } else if (root === docObjective) {
-    docObjective.insertAdjacentHTML("afterend", html);
-  } else {
-    docContent?.insertAdjacentHTML("afterbegin", html);
-  }
-
-  scheduleSave();
-}
-
-async function copyAssistantText(text = "") {
-  const value = limpiarTexto(text);
-  if (!value) return false;
-
-  try {
-    await navigator.clipboard.writeText(value);
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-function normalizeAssistantResponse(raw = {}) {
-  const respuesta =
-    raw?.respuesta && typeof raw.respuesta === "object" ? raw.respuesta : raw;
-
-  return {
-    subtitulo: limpiarTexto(raw?.subtitulo || "Asistente del documento"),
-    titulo: limpiarTexto(respuesta?.titulo || "Sugerencia"),
-    modo: limpiarTexto(respuesta?.modo || "respuesta"),
-    resumen: limpiarTexto(respuesta?.resumen || ""),
-    cambios: Array.isArray(respuesta?.cambios) ? respuesta.cambios : [],
-    textoPropuesto: limpiarTexto(respuesta?.textoPropuesto || ""),
-    preguntasSeguimiento: Array.isArray(respuesta?.preguntasSeguimiento)
-      ? respuesta.preguntasSeguimiento
-      : [],
-  };
-}
-
-function renderSelectionResult(raw = {}, actionLabel = "Acción") {
-  const panel = document.getElementById(DOC_SELECTION_RESULT_ID);
-  if (!panel) return;
-
-  const data = normalizeAssistantResponse(raw);
-  documentAssistantLastResponse = data;
-
-  const suggestedText = data.textoPropuesto || "";
-  const copyValue = suggestedText || data.resumen || "";
-
-  panel.innerHTML = `
-    <div class="doc-selection-result-header">
-      <div>
-        <div class="doc-selection-result-chip">${escapeHtml(actionLabel)}</div>
-        <h3>${escapeHtml(data.titulo)}</h3>
-      </div>
-      <button type="button" class="doc-selection-result-close" data-close-selection-panel>×</button>
-    </div>
-
-    ${
-      data.resumen
-        ? `<p class="doc-selection-result-summary">${escapeHtml(data.resumen)}</p>`
-        : ""
-    }
-
-    ${
-      data.cambios.length
-        ? `
-          <div class="doc-selection-result-section">
-            <div class="doc-selection-result-label">Cambios sugeridos</div>
-            <div class="doc-selection-result-list">
-              ${data.cambios
-                .map((item) => {
-                  const tipo = escapeHtml(item?.tipo || "mejora");
-                  const titulo = escapeHtml(item?.titulo || "Cambio");
-                  const detalle = escapeHtml(item?.detalle || "");
-                  const ejemplo = escapeHtml(item?.ejemplo || "");
-
-                  return `
-                    <article class="doc-selection-change">
-                      <div class="doc-selection-change-top">
-                        <span class="doc-selection-mini-chip">${tipo}</span>
-                        <strong>${titulo}</strong>
-                      </div>
-                      ${detalle ? `<p>${detalle}</p>` : ""}
-                      ${ejemplo ? `<div class="doc-selection-example">${ejemplo}</div>` : ""}
-                    </article>
-                  `;
-                })
-                .join("")}
-            </div>
-          </div>
-        `
-        : ""
-    }
-
-    ${
-      suggestedText
-        ? `
-          <div class="doc-selection-result-section">
-            <div class="doc-selection-result-label">Texto propuesto</div>
-            <pre class="doc-selection-proposed">${escapeHtml(suggestedText)}</pre>
-          </div>
-        `
-        : ""
-    }
-
-    ${
-      data.preguntasSeguimiento.length
-        ? `
-          <div class="doc-selection-result-section">
-            <div class="doc-selection-result-label">Siguientes ideas</div>
-            <ul class="doc-selection-followup">
-              ${data.preguntasSeguimiento
-                .map((item) => `<li>${escapeHtml(item)}</li>`)
-                .join("")}
-            </ul>
-          </div>
-        `
-        : ""
-    }
-
-    <div class="doc-selection-result-actions">
-      <button type="button" class="doc-selection-action-btn" data-copy-selection-result>
-        Copiar
-      </button>
-      ${
-        suggestedText && canEdit()
-          ? `
-            <button type="button" class="doc-selection-action-btn" data-insert-selection-result>
-              Insertar debajo
-            </button>
-            <button type="button" class="doc-selection-action-btn primary" data-replace-selection-result>
-              Reemplazar selección
-            </button>
-          `
-          : ""
-      }
-    </div>
-  `;
-
-  panel
-    .querySelector("[data-close-selection-panel]")
-    ?.addEventListener("click", () => {
-      hideSelectionResult();
-    });
-
-  panel
-    .querySelector("[data-copy-selection-result]")
-    ?.addEventListener("click", async () => {
-      await copyAssistantText(copyValue);
-    });
-
-  panel
-    .querySelector("[data-insert-selection-result]")
-    ?.addEventListener("click", () => {
-      insertResultBelowSelection(suggestedText);
-    });
-
-  panel
-    .querySelector("[data-replace-selection-result]")
-    ?.addEventListener("click", () => {
-      replaceSelectedTextWithResult(suggestedText);
-    });
-
-  panel.classList.add("show");
-}
-
-async function runSelectionAction(action = "mejorar", label = "Mejorar") {
-  if (selectionActionBusy) return;
-  if (!currentSelectedText) return;
-
-  selectionActionBusy = true;
-  hideSelectionToolbar();
-
-  const panel = document.getElementById(DOC_SELECTION_RESULT_ID);
-  if (panel) {
-    panel.innerHTML = `
-      <div class="doc-selection-result-header">
-        <div>
-          <div class="doc-selection-result-chip">${escapeHtml(label)}</div>
-          <h3>Generando propuesta...</h3>
-        </div>
-      </div>
-      <p class="doc-selection-result-summary">
-        Estamos analizando el fragmento seleccionado.
-      </p>
-    `;
-    panel.classList.add("show");
-  }
-
-  try {
-    const response = await fetch("/api/preguntar-documento", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        pregunta: getDocumentAssistantQuestion(action, currentSelectedText),
-        accion: action,
-        tituloDocumento: limpiarTexto(docTitle?.textContent || ""),
-        objetivoDocumento: stripObjectivePrefix(
-          limpiarTexto(docObjective?.textContent || "")
-        ),
-        documentoActual: getPlainDocumentText(),
-        textoSeleccionado: currentSelectedText,
-        investigacion: getInvestigacionDocumento(currentClaseData || {}),
-        fuentes: getFuentesDocumento(currentClaseData || {}),
-        ultimaRespuesta: documentAssistantLastResponse,
-      }),
-    });
-
-    const data = await response.json();
-
-    if (!response.ok || !data?.ok) {
-      throw new Error(data?.error || "No se pudo procesar la selección.");
-    }
-
-    renderSelectionResult(data.respuesta, label);
-  } catch (error) {
-    console.error("Error procesando selección:", error);
-
-    if (panel) {
-      panel.innerHTML = `
-        <div class="doc-selection-result-header">
-          <div>
-            <div class="doc-selection-result-chip">${escapeHtml(label)}</div>
-            <h3>No se pudo generar la sugerencia</h3>
-          </div>
-          <button type="button" class="doc-selection-result-close" data-close-selection-panel>×</button>
-        </div>
-        <p class="doc-selection-result-summary">
-          ${escapeHtml(error?.message || "Hubo un problema al consultar la IA.")}
-        </p>
-      `;
-
-      panel
-        .querySelector("[data-close-selection-panel]")
-        ?.addEventListener("click", () => {
-          hideSelectionResult();
-        });
-
-      panel.classList.add("show");
-    }
-  } finally {
-    selectionActionBusy = false;
+    panel.style.display = visible ? "" : "none";
+    if (!visible) panel.classList.remove("show");
   }
 }
 
 function injectSelectionAssistantStyles() {
-  if (document.getElementById(DOC_SELECTION_STYLE_ID)) return;
+  if ($(CONFIG.selectionStyleId)) return;
 
   const style = document.createElement("style");
-  style.id = DOC_SELECTION_STYLE_ID;
+  style.id = CONFIG.selectionStyleId;
   style.textContent = `
-    #${DOC_SELECTION_TOOLBAR_ID}{
+    #${CONFIG.selectionToolbarId}{
       position:absolute;
       z-index:1300;
       display:none;
@@ -2320,9 +1998,7 @@ function injectSelectionAssistantStyles() {
       backdrop-filter:blur(8px);
     }
 
-    #${DOC_SELECTION_TOOLBAR_ID}.show{
-      display:flex;
-    }
+    #${CONFIG.selectionToolbarId}.show{ display:flex; }
 
     .doc-selection-tool-btn{
       border:none;
@@ -2341,7 +2017,7 @@ function injectSelectionAssistantStyles() {
       transform:translateY(-1px);
     }
 
-    #${DOC_SELECTION_RESULT_ID}{
+    #${CONFIG.selectionResultId}{
       position:fixed;
       right:22px;
       top:96px;
@@ -2357,9 +2033,7 @@ function injectSelectionAssistantStyles() {
       box-shadow:0 28px 72px rgba(24,39,75,.18);
     }
 
-    #${DOC_SELECTION_RESULT_ID}.show{
-      display:block;
-    }
+    #${CONFIG.selectionResultId}.show{ display:block; }
 
     .doc-selection-result-header{
       display:flex;
@@ -2408,9 +2082,7 @@ function injectSelectionAssistantStyles() {
       white-space:pre-wrap;
     }
 
-    .doc-selection-result-section{
-      margin-top:14px;
-    }
+    .doc-selection-result-section{ margin-top:14px; }
 
     .doc-selection-result-label{
       margin-bottom:8px;
@@ -2515,7 +2187,7 @@ function injectSelectionAssistantStyles() {
     }
 
     @media (max-width: 768px){
-      #${DOC_SELECTION_RESULT_ID}{
+      #${CONFIG.selectionResultId}{
         right:14px;
         left:14px;
         top:auto;
@@ -2524,7 +2196,7 @@ function injectSelectionAssistantStyles() {
         max-height:58vh;
       }
 
-      #${DOC_SELECTION_TOOLBAR_ID}{
+      #${CONFIG.selectionToolbarId}{
         max-width:calc(100vw - 24px);
       }
 
@@ -2538,14 +2210,385 @@ function injectSelectionAssistantStyles() {
   document.head.appendChild(style);
 }
 
+function nodeBelongsToDocument(node) {
+  const element = node?.nodeType === Node.ELEMENT_NODE ? node : node?.parentElement;
+  if (!element) return false;
+
+  return Boolean(
+    els.docTitle?.contains(element) ||
+      els.docObjective?.contains(element) ||
+      els.docContent?.contains(element)
+  );
+}
+
+function rangeBelongsToDocument(range) {
+  return (
+    range &&
+    nodeBelongsToDocument(range.startContainer) &&
+    nodeBelongsToDocument(range.endContainer)
+  );
+}
+
+function getClosestEditableRoot(node) {
+  const element = node?.nodeType === Node.ELEMENT_NODE ? node : node?.parentElement;
+  if (!element) return null;
+  if (els.docTitle?.contains(element)) return els.docTitle;
+  if (els.docObjective?.contains(element)) return els.docObjective;
+  if (els.docContent?.contains(element)) return els.docContent;
+  return null;
+}
+
+function getClosestBlockElement(node) {
+  const element = node?.nodeType === Node.ELEMENT_NODE ? node : node?.parentElement;
+  return element?.closest?.("p, li, h1, h2, h3, blockquote, div") || null;
+}
+
+function hideSelectionToolbar() {
+  $(CONFIG.selectionToolbarId)?.classList.remove("show");
+}
+
+function hideSelectionResult() {
+  $(CONFIG.selectionResultId)?.classList.remove("show");
+}
+
+function showSelectionToolbarAt(rect) {
+  const toolbar = $(CONFIG.selectionToolbarId);
+  if (!toolbar || !rect) return;
+
+  toolbar.classList.add("show");
+
+  const margin = 16;
+  const maxWidth = Math.min(620, window.innerWidth - 32);
+  const toolbarWidth = Math.min(toolbar.offsetWidth || maxWidth, maxWidth);
+  const top = window.scrollY + rect.top - toolbar.offsetHeight - 12;
+  const rawLeft = window.scrollX + rect.left + rect.width / 2 - toolbarWidth / 2;
+  const left = Math.max(
+    window.scrollX + margin,
+    Math.min(rawLeft, window.scrollX + window.innerWidth - toolbarWidth - margin)
+  );
+
+  toolbar.style.top = `${Math.max(window.scrollY + 12, top)}px`;
+  toolbar.style.left = `${left}px`;
+}
+
+function trackSelectedTextForAssistant() {
+  if (state.selectionActionBusy) return;
+
+  const selection = window.getSelection();
+  if (!selection || !selection.rangeCount) {
+    state.currentSelectedText = "";
+    state.currentSelectedRange = null;
+    hideSelectionToolbar();
+    return;
+  }
+
+  const text = txt(selection.toString());
+  const range = selection.getRangeAt(0);
+
+  if (!text || !rangeBelongsToDocument(range)) {
+    state.currentSelectedText = "";
+    state.currentSelectedRange = null;
+    hideSelectionToolbar();
+    return;
+  }
+
+  const rect = range.getBoundingClientRect();
+  if (!rect || (!rect.width && !rect.height)) {
+    hideSelectionToolbar();
+    return;
+  }
+
+  state.currentSelectedText = text.slice(0, 5000);
+  state.currentSelectedRange = range.cloneRange();
+  showSelectionToolbarAt(rect);
+}
+
+function getPlainDocumentText() {
+  const titulo = txt(els.docTitle?.textContent || "");
+  const objetivo = stripObjectivePrefix(txt(els.docObjective?.textContent || ""));
+  const contenido = txt(els.docContent?.innerText || els.docContent?.textContent || "");
+  return [titulo, objetivo, contenido].filter(Boolean).join("\n\n");
+}
+
+function getDocumentAssistantQuestion(action, selectedText = "") {
+  const base = txt(selectedText);
+
+  switch (action) {
+    case "explicar":
+      return `Explicá mejor el texto seleccionado de forma clara, didáctica y fácil de entender. Si conviene, proponé una versión mejor explicada del fragmento. Texto: ${base}`;
+    case "mejorar":
+      return `Mejorá la redacción del texto seleccionado sin cambiar la idea principal. Texto: ${base}`;
+    case "alargar":
+      return `Alargá el texto seleccionado agregando contenido útil, contexto o desarrollo, sin meter relleno. Texto: ${base}`;
+    case "acortar":
+      return `Acortá el texto seleccionado conservando la idea principal y lo más importante. Texto: ${base}`;
+    case "claro":
+      return `Reescribí el texto seleccionado para que quede más claro, más simple y más fácil de estudiar. Texto: ${base}`;
+    case "formal":
+      return `Reescribí el texto seleccionado con un tono más formal, prolijo y académico. Texto: ${base}`;
+    case "resumir":
+      return `Resumí el texto seleccionado en una versión más breve y directa. Texto: ${base}`;
+    default:
+      return `Ayudame con este texto seleccionado del documento: ${base}`;
+  }
+}
+
+function restoreStoredSelection() {
+  if (!state.currentSelectedRange) return false;
+
+  const selection = window.getSelection();
+  if (!selection) return false;
+
+  selection.removeAllRanges();
+  selection.addRange(state.currentSelectedRange);
+
+  const root = getClosestEditableRoot(state.currentSelectedRange.startContainer);
+  root?.focus?.();
+
+  return true;
+}
+
+function replaceSelectedTextWithResult(text = "") {
+  if (!canEdit()) return;
+  const clean = txt(text);
+  if (!clean || !restoreStoredSelection()) return;
+
+  document.execCommand("insertText", false, clean);
+  scheduleSave();
+  hideSelectionToolbar();
+}
+
+function insertResultBelowSelection(text = "") {
+  if (!canEdit()) return;
+  const clean = txt(text);
+  if (!clean) return;
+
+  const html = plainTextToBlocks(clean);
+  if (!html) return;
+
+  const startNode = state.currentSelectedRange?.startContainer || null;
+  const root = getClosestEditableRoot(startNode);
+
+  if (root === els.docContent) {
+    const block = getClosestBlockElement(startNode);
+    if (block && els.docContent.contains(block)) block.insertAdjacentHTML("afterend", html);
+    else els.docContent.insertAdjacentHTML("beforeend", html);
+  } else if (root === els.docObjective) {
+    els.docObjective.insertAdjacentHTML("afterend", html);
+  } else {
+    els.docContent?.insertAdjacentHTML("afterbegin", html);
+  }
+
+  scheduleSave();
+}
+
+async function copyAssistantText(text = "") {
+  const value = txt(text);
+  if (!value) return false;
+
+  try {
+    await navigator.clipboard.writeText(value);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function normalizeAssistantResponse(raw = {}) {
+  const response = raw?.respuesta && typeof raw.respuesta === "object" ? raw.respuesta : raw;
+
+  return {
+    subtitulo: txt(raw?.subtitulo || "Asistente del documento"),
+    titulo: txt(response?.titulo || "Sugerencia"),
+    modo: txt(response?.modo || "respuesta"),
+    resumen: txt(response?.resumen || ""),
+    cambios: toArray(response?.cambios),
+    textoPropuesto: txt(response?.textoPropuesto || ""),
+    preguntasSeguimiento: toArray(response?.preguntasSeguimiento),
+  };
+}
+
+function renderSelectionResult(raw = {}, actionLabel = "Acción") {
+  const panel = $(CONFIG.selectionResultId);
+  if (!panel) return;
+
+  const data = normalizeAssistantResponse(raw);
+  state.assistantLastResponse = data;
+
+  const copyValue = data.textoPropuesto || data.resumen || "";
+
+  panel.innerHTML = `
+    <div class="doc-selection-result-header">
+      <div>
+        <div class="doc-selection-result-chip">${escapeHtml(actionLabel)}</div>
+        <h3>${escapeHtml(data.titulo)}</h3>
+      </div>
+      <button type="button" class="doc-selection-result-close" data-close-selection-panel>×</button>
+    </div>
+
+    ${
+      data.resumen
+        ? `<p class="doc-selection-result-summary">${escapeHtml(data.resumen)}</p>`
+        : ""
+    }
+
+    ${
+      data.cambios.length
+        ? `
+          <div class="doc-selection-result-section">
+            <div class="doc-selection-result-label">Cambios sugeridos</div>
+            <div class="doc-selection-result-list">
+              ${data.cambios
+                .map((item) => {
+                  const tipo = escapeHtml(item?.tipo || "mejora");
+                  const titulo = escapeHtml(item?.titulo || "Cambio");
+                  const detalle = escapeHtml(item?.detalle || "");
+                  const ejemplo = escapeHtml(item?.ejemplo || "");
+
+                  return `
+                    <article class="doc-selection-change">
+                      <div class="doc-selection-change-top">
+                        <span class="doc-selection-mini-chip">${tipo}</span>
+                        <strong>${titulo}</strong>
+                      </div>
+                      ${detalle ? `<p>${detalle}</p>` : ""}
+                      ${ejemplo ? `<div class="doc-selection-example">${ejemplo}</div>` : ""}
+                    </article>
+                  `;
+                })
+                .join("")}
+            </div>
+          </div>
+        `
+        : ""
+    }
+
+    ${
+      data.textoPropuesto
+        ? `
+          <div class="doc-selection-result-section">
+            <div class="doc-selection-result-label">Texto propuesto</div>
+            <pre class="doc-selection-proposed">${escapeHtml(data.textoPropuesto)}</pre>
+          </div>
+        `
+        : ""
+    }
+
+    ${
+      data.preguntasSeguimiento.length
+        ? `
+          <div class="doc-selection-result-section">
+            <div class="doc-selection-result-label">Siguientes ideas</div>
+            <ul class="doc-selection-followup">
+              ${data.preguntasSeguimiento
+                .map((item) => `<li>${escapeHtml(item)}</li>`)
+                .join("")}
+            </ul>
+          </div>
+        `
+        : ""
+    }
+
+    <div class="doc-selection-result-actions">
+      <button type="button" class="doc-selection-action-btn" data-copy-selection-result>Copiar</button>
+      ${
+        data.textoPropuesto && canEdit()
+          ? `
+            <button type="button" class="doc-selection-action-btn" data-insert-selection-result>Insertar debajo</button>
+            <button type="button" class="doc-selection-action-btn primary" data-replace-selection-result>Reemplazar selección</button>
+          `
+          : ""
+      }
+    </div>
+  `;
+
+  panel.querySelector("[data-close-selection-panel]")?.addEventListener("click", hideSelectionResult);
+  panel.querySelector("[data-copy-selection-result]")?.addEventListener("click", () => copyAssistantText(copyValue));
+  panel.querySelector("[data-insert-selection-result]")?.addEventListener("click", () => insertResultBelowSelection(data.textoPropuesto));
+  panel.querySelector("[data-replace-selection-result]")?.addEventListener("click", () => replaceSelectedTextWithResult(data.textoPropuesto));
+
+  panel.classList.add("show");
+}
+
+async function runSelectionAction(action = "mejorar", label = "Mejorar") {
+  if (state.selectionActionBusy || !state.currentSelectedText) return;
+
+  state.selectionActionBusy = true;
+  hideSelectionToolbar();
+
+  const panel = $(CONFIG.selectionResultId);
+  if (panel) {
+    panel.innerHTML = `
+      <div class="doc-selection-result-header">
+        <div>
+          <div class="doc-selection-result-chip">${escapeHtml(label)}</div>
+          <h3>Generando propuesta...</h3>
+        </div>
+      </div>
+      <p class="doc-selection-result-summary">Estamos analizando el fragmento seleccionado.</p>
+    `;
+    panel.classList.add("show");
+  }
+
+  try {
+    const response = await fetch("/api/preguntar-documento", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        pregunta: getDocumentAssistantQuestion(action, state.currentSelectedText),
+        accion: action,
+        tituloDocumento: txt(els.docTitle?.textContent || ""),
+        objetivoDocumento: stripObjectivePrefix(txt(els.docObjective?.textContent || "")),
+        documentoActual: getPlainDocumentText(),
+        textoSeleccionado: state.currentSelectedText,
+        investigacion: getInvestigacionDocumento(state.currentClaseData || {}),
+        fuentes: getFuentesDocumento(state.currentClaseData || {}),
+        ultimaRespuesta: state.assistantLastResponse,
+      }),
+    });
+
+    const data = await response.json().catch(() => null);
+
+    if (!response.ok || !data?.ok) {
+      throw new Error(data?.error || "No se pudo procesar la selección.");
+    }
+
+    renderSelectionResult(data.respuesta, label);
+  } catch (error) {
+    console.error("Error procesando selección:", error);
+
+    if (panel) {
+      panel.innerHTML = `
+        <div class="doc-selection-result-header">
+          <div>
+            <div class="doc-selection-result-chip">${escapeHtml(label)}</div>
+            <h3>No se pudo generar la sugerencia</h3>
+          </div>
+          <button type="button" class="doc-selection-result-close" data-close-selection-panel>×</button>
+        </div>
+        <p class="doc-selection-result-summary">
+          ${escapeHtml(error?.message || "Hubo un problema al consultar la IA.")}
+        </p>
+      `;
+
+      panel.querySelector("[data-close-selection-panel]")?.addEventListener("click", hideSelectionResult);
+      panel.classList.add("show");
+    }
+  } finally {
+    state.selectionActionBusy = false;
+  }
+}
+
 function ensureSelectionAssistantUi() {
-  if (selectionAssistantInitialized) return;
-  selectionAssistantInitialized = true;
+  if (state.selectionAssistantInitialized) return;
+  state.selectionAssistantInitialized = true;
 
   injectSelectionAssistantStyles();
 
   const toolbar = document.createElement("div");
-  toolbar.id = DOC_SELECTION_TOOLBAR_ID;
+  toolbar.id = CONFIG.selectionToolbarId;
   toolbar.innerHTML = `
     <button type="button" class="doc-selection-tool-btn" data-selection-action="explicar" data-selection-label="Explicar">Explicar</button>
     <button type="button" class="doc-selection-tool-btn" data-selection-action="mejorar" data-selection-label="Mejorar">Mejorar</button>
@@ -2557,52 +2600,46 @@ function ensureSelectionAssistantUi() {
   `;
 
   const resultPanel = document.createElement("aside");
-  resultPanel.id = DOC_SELECTION_RESULT_ID;
+  resultPanel.id = CONFIG.selectionResultId;
 
   document.body.appendChild(toolbar);
   document.body.appendChild(resultPanel);
 
-  toolbar.addEventListener("mousedown", (e) => {
-    e.preventDefault();
-  });
+  toolbar.addEventListener("mousedown", (event) => event.preventDefault());
 
-  toolbar.addEventListener("click", (e) => {
-    const button = e.target.closest("[data-selection-action]");
+  toolbar.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-selection-action]");
     if (!button) return;
-
-    const action = button.getAttribute("data-selection-action") || "mejorar";
-    const label = button.getAttribute("data-selection-label") || "Mejorar";
-    void runSelectionAction(action, label);
+    void runSelectionAction(
+      button.getAttribute("data-selection-action") || "mejorar",
+      button.getAttribute("data-selection-label") || "Mejorar"
+    );
   });
 
-  document.addEventListener("selectionchange", () => {
-    setTimeout(trackSelectedTextForAssistant, 0);
-  });
+  document.addEventListener("selectionchange", () => setTimeout(trackSelectedTextForAssistant, 0));
 
   document.addEventListener(
     "scroll",
     () => {
-      if (!currentSelectedRange) return;
+      if (!state.currentSelectedRange) return;
       const selection = window.getSelection();
       if (!selection || !selection.rangeCount) return;
       const rect = selection.getRangeAt(0).getBoundingClientRect();
-      if (rect && (rect.width || rect.height)) {
-        showSelectionToolbarAt(rect);
-      }
+      if (rect && (rect.width || rect.height)) showSelectionToolbarAt(rect);
     },
     true
   );
 
-  document.addEventListener("mousedown", (e) => {
-    const toolbarEl = document.getElementById(DOC_SELECTION_TOOLBAR_ID);
-    const resultEl = document.getElementById(DOC_SELECTION_RESULT_ID);
+  document.addEventListener("mousedown", (event) => {
+    const toolbarEl = $(CONFIG.selectionToolbarId);
+    const resultEl = $(CONFIG.selectionResultId);
 
     if (
-      toolbarEl?.contains(e.target) ||
-      resultEl?.contains(e.target) ||
-      docContent?.contains(e.target) ||
-      docObjective?.contains(e.target) ||
-      docTitle?.contains(e.target)
+      toolbarEl?.contains(event.target) ||
+      resultEl?.contains(event.target) ||
+      els.docContent?.contains(event.target) ||
+      els.docObjective?.contains(event.target) ||
+      els.docTitle?.contains(event.target)
     ) {
       return;
     }
@@ -2611,151 +2648,13 @@ function ensureSelectionAssistantUi() {
   });
 }
 
-async function resolveClaseFromFirestoreOrLocal(user) {
-  const fallbackOwner = ownerUidFromUrl || user.uid;
-  const localClase = readClaseFromLocalStorage(fallbackOwner, claseIdFromUrl);
+/* =========================
+   INIT
+========================= */
 
-  if (!currentClaseId && localClase?.id) {
-    currentClaseId = localClase.id;
-  }
-
-  if (!currentOwnerUid) {
-    currentOwnerUid = ownerUidFromUrl || localClase?.ownerUid || user.uid;
-  }
-
-  if (!currentClaseId && localClase?.id) {
-    currentClaseId = localClase.id;
-  }
-
-  if (!currentClaseId) {
-    if (localClase) {
-      currentClaseData = localClase;
-      currentRole = currentOwnerUid === user.uid ? "owner" : "viewer";
-
-      if (currentRole === "owner") {
-        clearSharedDocSession();
-      } else {
-        setSharedDocSession(currentRole, user, currentOwnerUid, localClase.id || currentClaseId);
-      }
-
-      if (currentClaseId && currentOwnerUid) {
-        currentClaseRef = doc(db, "usuarios", currentOwnerUid, "clases", currentClaseId);
-      }
-
-      return {
-        clase: localClase,
-        origin: "local"
-      };
-    }
-
-    throw new Error("No se encontró el identificador de la clase.");
-  }
-
-  const claseRef = doc(db, "usuarios", currentOwnerUid, "clases", currentClaseId);
-
-  try {
-    const claseSnap = await getDoc(claseRef);
-
-    if (!claseSnap.exists()) {
-      if (localClase) {
-        currentClaseRef = claseRef;
-        currentClaseData = localClase;
-        currentRole = currentOwnerUid === user.uid ? "owner" : "viewer";
-
-        if (currentRole === "owner") {
-          clearSharedDocSession();
-        } else {
-          setSharedDocSession(currentRole, user, currentOwnerUid, currentClaseId);
-        }
-
-        return {
-          clase: localClase,
-          origin: "local"
-        };
-      }
-
-      throw new Error("La clase no existe o no se pudo encontrar en Firestore.");
-    }
-
-    const claseData = {
-      id: claseSnap.id,
-      ownerUid: currentOwnerUid,
-      ...claseSnap.data()
-    };
-
-    const role = resolveUserRole(claseData, user, currentOwnerUid);
-
-    if (!role) {
-      return {
-        denied: true
-      };
-    }
-
-    currentClaseRef = claseRef;
-    currentClaseData = claseData;
-    currentRole = role;
-    setSharedDocSession(role, user, currentOwnerUid, currentClaseId);
-
-    return {
-      clase: claseData,
-      origin: "firestore"
-    };
-  } catch (error) {
-    if (localClase) {
-      currentClaseRef = claseRef;
-      currentClaseData = localClase;
-      currentRole = currentOwnerUid === user.uid ? "owner" : "viewer";
-
-      if (currentRole === "owner") {
-        clearSharedDocSession();
-      } else {
-        setSharedDocSession(currentRole, user, currentOwnerUid, currentClaseId);
-      }
-
-      return {
-        clase: localClase,
-        origin: "local"
-      };
-    }
-
-    throw error;
-  }
-}
-
-async function loadClase(user) {
-  try {
-    const result = await resolveClaseFromFirestoreOrLocal(user);
-
-    if (result?.denied) {
-      showDenied();
-      return;
-    }
-
-    const claseBase = result?.clase;
-    if (!claseBase) {
-      throw new Error("No se encontró información de la clase.");
-    }
-
-    showDocument();
-    setupShareUi();
-    attachAutosaveListeners();
-    ensureSelectionAssistantUi();
-    setupPresentationExport();
-
-    const claseFinal = await generarDocumentoSiFalta(claseBase);
-
-    currentClaseData = claseFinal;
-    writeClaseToLocalStorage(claseFinal, currentOwnerUid, currentClaseId);
-
-    renderClase(claseFinal);
-    applyRoleUi(currentRole);
-  } catch (error) {
-    console.error("Error al cargar la clase:", error);
-    showDocument();
-    renderError(error?.message || "Hubo un problema al cargar la clase.");
-    applyRoleUi("viewer");
-  }
-}
+if (els.documentApp) els.documentApp.style.display = "";
+els.accessGuard?.classList.remove("show");
+els.docLoading?.classList.add("show");
 
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
@@ -2764,6 +2663,6 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
 
-  currentUser = user;
+  state.currentUser = user;
   await loadClase(user);
 });
