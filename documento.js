@@ -52,13 +52,9 @@ const SUPPORT_PANEL_ID = "document-support-panel";
 const SAVE_DEBOUNCE_MS = 900;
 const GENERATE_TIMEOUT_MS = 90000;
 
-const DOC_CHAT_STYLE_ID = "document-chat-style";
-const DOC_CHAT_LAUNCHER_ID = "document-chat-launcher";
-const DOC_CHAT_PANEL_ID = "document-chat-panel";
-const DOC_CHAT_MESSAGES_ID = "document-chat-messages";
-const DOC_CHAT_FORM_ID = "document-chat-form";
-const DOC_CHAT_INPUT_ID = "document-chat-input";
-const DOC_CHAT_STATUS_ID = "document-chat-status";
+const DOC_SELECTION_STYLE_ID = "doc-selection-style";
+const DOC_SELECTION_TOOLBAR_ID = "doc-selection-toolbar";
+const DOC_SELECTION_RESULT_ID = "doc-selection-result";
 
 let currentUser = null;
 let currentClaseId = claseIdFromUrl || null;
@@ -73,10 +69,11 @@ let autosaveListenersAttached = false;
 let generationPromise = null;
 let lastSavedSignature = "";
 
-let documentChatInitialized = false;
-let documentChatBusy = false;
-let documentChatLastResponse = null;
-let documentChatLastSelection = "";
+let selectionAssistantInitialized = false;
+let selectionActionBusy = false;
+let documentAssistantLastResponse = null;
+let currentSelectedText = "";
+let currentSelectedRange = null;
 
 if (documentApp) {
   documentApp.style.display = "";
@@ -611,17 +608,24 @@ function hideLoading() {
   }
 }
 
-function setDocumentChatVisibility(visible) {
-  const launcher = document.getElementById(DOC_CHAT_LAUNCHER_ID);
-  const panel = document.getElementById(DOC_CHAT_PANEL_ID);
+function setSelectionAssistantVisibility(visible) {
+  const toolbar = document.getElementById(DOC_SELECTION_TOOLBAR_ID);
+  const panel = document.getElementById(DOC_SELECTION_RESULT_ID);
 
-  if (launcher) launcher.style.display = visible ? "" : "none";
-  if (panel && !visible) panel.classList.remove("show");
+  if (toolbar) {
+    toolbar.style.display = visible ? "" : "none";
+    if (!visible) toolbar.classList.remove("show");
+  }
+
+  if (panel) {
+    panel.style.display = visible ? "" : "none";
+    if (!visible) panel.classList.remove("show");
+  }
 }
 
 function showDenied() {
   hideLoading();
-  setDocumentChatVisibility(false);
+  setSelectionAssistantVisibility(false);
   if (documentApp) documentApp.style.display = "none";
   if (accessGuard) accessGuard.classList.add("show");
 }
@@ -630,13 +634,13 @@ function showDocument() {
   hideLoading();
   if (accessGuard) accessGuard.classList.remove("show");
   if (documentApp) documentApp.style.display = "";
-  setDocumentChatVisibility(true);
+  setSelectionAssistantVisibility(true);
 }
 
 function renderError(message) {
   clearSupportPanel();
   hideLoading();
-  setDocumentChatVisibility(false);
+  setSelectionAssistantVisibility(false);
 
   if (docContent) {
     docContent.innerHTML = `
@@ -1368,39 +1372,134 @@ function getPlainDocumentText() {
   return [titulo, objetivo, contenido].filter(Boolean).join("\n\n");
 }
 
-function selectionBelongsToDocument(selection) {
-  if (!selection || !selection.rangeCount) return false;
+function nodeBelongsToDocument(node) {
+  const element =
+    node?.nodeType === Node.ELEMENT_NODE ? node : node?.parentElement;
 
-  const range = selection.getRangeAt(0);
-  const node =
-    range.commonAncestorContainer?.nodeType === Node.ELEMENT_NODE
-      ? range.commonAncestorContainer
-      : range.commonAncestorContainer?.parentElement;
-
-  if (!node) return false;
+  if (!element) return false;
 
   return Boolean(
-    docTitle?.contains(node) ||
-      docObjective?.contains(node) ||
-      docContent?.contains(node)
+    docTitle?.contains(element) ||
+      docObjective?.contains(element) ||
+      docContent?.contains(element)
   );
 }
 
-function getSelectedDocumentText() {
-  const selection = window.getSelection();
-  if (!selection || !selection.rangeCount) return "";
-
-  const text = limpiarTexto(selection.toString());
-  if (!text) return "";
-  if (!selectionBelongsToDocument(selection)) return "";
-
-  return text;
+function rangeBelongsToDocument(range) {
+  if (!range) return false;
+  return (
+    nodeBelongsToDocument(range.startContainer) &&
+    nodeBelongsToDocument(range.endContainer)
+  );
 }
 
-function trackDocumentSelection() {
-  const text = getSelectedDocumentText();
-  if (text) {
-    documentChatLastSelection = text.slice(0, 4000);
+function getClosestEditableRoot(node) {
+  const element =
+    node?.nodeType === Node.ELEMENT_NODE ? node : node?.parentElement;
+
+  if (!element) return null;
+  if (docTitle?.contains(element)) return docTitle;
+  if (docObjective?.contains(element)) return docObjective;
+  if (docContent?.contains(element)) return docContent;
+
+  return null;
+}
+
+function getClosestBlockElement(node) {
+  const element =
+    node?.nodeType === Node.ELEMENT_NODE ? node : node?.parentElement;
+
+  if (!element) return null;
+
+  return element.closest("p, li, h1, h2, h3, blockquote, div");
+}
+
+function hideSelectionToolbar() {
+  const toolbar = document.getElementById(DOC_SELECTION_TOOLBAR_ID);
+  if (toolbar) {
+    toolbar.classList.remove("show");
+  }
+}
+
+function showSelectionToolbarAt(rect) {
+  const toolbar = document.getElementById(DOC_SELECTION_TOOLBAR_ID);
+  if (!toolbar || !rect) return;
+
+  toolbar.classList.add("show");
+
+  const margin = 16;
+  const maxWidth = Math.min(620, window.innerWidth - 32);
+  const toolbarWidth = Math.min(toolbar.offsetWidth || maxWidth, maxWidth);
+  const top = window.scrollY + rect.top - toolbar.offsetHeight - 12;
+  const rawLeft = window.scrollX + rect.left + rect.width / 2 - toolbarWidth / 2;
+  const left = Math.max(
+    window.scrollX + margin,
+    Math.min(rawLeft, window.scrollX + window.innerWidth - toolbarWidth - margin)
+  );
+
+  toolbar.style.top = `${Math.max(window.scrollY + 12, top)}px`;
+  toolbar.style.left = `${left}px`;
+}
+
+function hideSelectionResult() {
+  const panel = document.getElementById(DOC_SELECTION_RESULT_ID);
+  if (panel) {
+    panel.classList.remove("show");
+  }
+}
+
+function trackSelectedTextForAssistant() {
+  if (selectionActionBusy) return;
+
+  const selection = window.getSelection();
+  if (!selection || !selection.rangeCount) {
+    currentSelectedText = "";
+    currentSelectedRange = null;
+    hideSelectionToolbar();
+    return;
+  }
+
+  const text = limpiarTexto(selection.toString());
+  const range = selection.getRangeAt(0);
+
+  if (!text || !rangeBelongsToDocument(range)) {
+    currentSelectedText = "";
+    currentSelectedRange = null;
+    hideSelectionToolbar();
+    return;
+  }
+
+  const rect = range.getBoundingClientRect();
+  if (!rect || (!rect.width && !rect.height)) {
+    hideSelectionToolbar();
+    return;
+  }
+
+  currentSelectedText = text.slice(0, 5000);
+  currentSelectedRange = range.cloneRange();
+  showSelectionToolbarAt(rect);
+}
+
+function getDocumentAssistantQuestion(action, selectedText = "") {
+  const base = limpiarTexto(selectedText);
+
+  switch (action) {
+    case "explicar":
+      return `Explicá mejor el texto seleccionado de forma clara, didáctica y fácil de entender. Si conviene, proponé una versión mejor explicada del fragmento. Texto: ${base}`;
+    case "mejorar":
+      return `Mejorá la redacción del texto seleccionado sin cambiar la idea principal. Texto: ${base}`;
+    case "alargar":
+      return `Alargá el texto seleccionado agregando contenido útil, contexto o desarrollo, sin meter relleno. Texto: ${base}`;
+    case "acortar":
+      return `Acortá el texto seleccionado conservando la idea principal y lo más importante. Texto: ${base}`;
+    case "claro":
+      return `Reescribí el texto seleccionado para que quede más claro, más simple y más fácil de estudiar. Texto: ${base}`;
+    case "formal":
+      return `Reescribí el texto seleccionado con un tono más formal, prolijo y académico. Texto: ${base}`;
+    case "resumir":
+      return `Resumí el texto seleccionado en una versión más breve y directa. Texto: ${base}`;
+    default:
+      return `Ayudame con este texto seleccionado del documento: ${base}`;
   }
 }
 
@@ -1416,236 +1515,238 @@ function plainTextToHtmlBlocks(text = "") {
     .join("");
 }
 
-function appendProposedTextToDocument(text = "") {
-  if (!canEdit() || !docContent) return;
+function restoreStoredSelection() {
+  if (!currentSelectedRange) return false;
 
-  const html = plainTextToHtmlBlocks(text);
+  const selection = window.getSelection();
+  if (!selection) return false;
+
+  selection.removeAllRanges();
+  selection.addRange(currentSelectedRange);
+
+  const root = getClosestEditableRoot(currentSelectedRange.startContainer);
+  root?.focus?.();
+
+  return true;
+}
+
+function replaceSelectedTextWithResult(text = "") {
+  if (!canEdit()) return;
+  const clean = limpiarTexto(text);
+  if (!clean) return;
+  if (!restoreStoredSelection()) return;
+
+  document.execCommand("insertText", false, clean);
+  scheduleSave();
+  hideSelectionToolbar();
+}
+
+function insertResultBelowSelection(text = "") {
+  if (!canEdit()) return;
+  const clean = limpiarTexto(text);
+  if (!clean) return;
+
+  const html = plainTextToHtmlBlocks(clean);
   if (!html) return;
 
-  docContent.insertAdjacentHTML("beforeend", html);
-  docContent.focus();
+  const startNode = currentSelectedRange?.startContainer || null;
+  const root = getClosestEditableRoot(startNode);
+
+  if (root === docContent) {
+    const block = getClosestBlockElement(startNode);
+    if (block && docContent.contains(block)) {
+      block.insertAdjacentHTML("afterend", html);
+    } else {
+      docContent.insertAdjacentHTML("beforeend", html);
+    }
+  } else if (root === docObjective) {
+    docObjective.insertAdjacentHTML("afterend", html);
+  } else {
+    docContent?.insertAdjacentHTML("afterbegin", html);
+  }
+
   scheduleSave();
 }
 
-async function copyTextToClipboard(text = "") {
-  const clean = limpiarTexto(text);
-  if (!clean) return false;
+async function copyAssistantText(text = "") {
+  const value = limpiarTexto(text);
+  if (!value) return false;
 
   try {
-    await navigator.clipboard.writeText(clean);
+    await navigator.clipboard.writeText(value);
     return true;
   } catch {
     return false;
   }
 }
 
-function setDocumentChatStatus(message = "") {
-  const status = document.getElementById(DOC_CHAT_STATUS_ID);
-  if (status) {
-    status.textContent = message;
-  }
-}
-
-function openDocumentChat() {
-  const panel = document.getElementById(DOC_CHAT_PANEL_ID);
-  const input = document.getElementById(DOC_CHAT_INPUT_ID);
-
-  if (!panel) return;
-  panel.classList.add("show");
-
-  setTimeout(() => {
-    input?.focus();
-  }, 50);
-}
-
-function closeDocumentChat() {
-  const panel = document.getElementById(DOC_CHAT_PANEL_ID);
-  if (!panel) return;
-  panel.classList.remove("show");
-}
-
-function addDocumentChatHtml(role = "assistant", html = "") {
-  const messages = document.getElementById(DOC_CHAT_MESSAGES_ID);
-  if (!messages) return;
-
-  const item = document.createElement("div");
-  item.className = `doc-ai-msg ${role}`;
-  item.innerHTML = html;
-
-  messages.appendChild(item);
-  messages.scrollTop = messages.scrollHeight;
-}
-
-function addDocumentChatNode(role = "assistant", node) {
-  const messages = document.getElementById(DOC_CHAT_MESSAGES_ID);
-  if (!messages || !node) return;
-
-  const item = document.createElement("div");
-  item.className = `doc-ai-msg ${role}`;
-  item.appendChild(node);
-
-  messages.appendChild(item);
-  messages.scrollTop = messages.scrollHeight;
-}
-
-function normalizeDocumentAssistantPayload(raw = {}) {
-  const payload = raw?.respuesta && raw?.subtitulo ? raw : raw?.respuesta || raw;
-  const body =
-    payload?.respuesta && typeof payload.respuesta === "object"
-      ? payload.respuesta
-      : payload;
+function normalizeAssistantResponse(raw = {}) {
+  const respuesta =
+    raw?.respuesta && typeof raw.respuesta === "object" ? raw.respuesta : raw;
 
   return {
-    subtitulo: limpiarTexto(payload?.subtitulo || "Asistente del documento"),
-    titulo: limpiarTexto(body?.titulo || "Respuesta sobre el documento"),
-    modo: limpiarTexto(body?.modo || "respuesta"),
-    resumen: limpiarTexto(body?.resumen || ""),
-    cambios: Array.isArray(body?.cambios) ? body.cambios : [],
-    textoPropuesto: limpiarTexto(body?.textoPropuesto || ""),
-    preguntasSeguimiento: Array.isArray(body?.preguntasSeguimiento)
-      ? body.preguntasSeguimiento
+    subtitulo: limpiarTexto(raw?.subtitulo || "Asistente del documento"),
+    titulo: limpiarTexto(respuesta?.titulo || "Sugerencia"),
+    modo: limpiarTexto(respuesta?.modo || "respuesta"),
+    resumen: limpiarTexto(respuesta?.resumen || ""),
+    cambios: Array.isArray(respuesta?.cambios) ? respuesta.cambios : [],
+    textoPropuesto: limpiarTexto(respuesta?.textoPropuesto || ""),
+    preguntasSeguimiento: Array.isArray(respuesta?.preguntasSeguimiento)
+      ? respuesta.preguntasSeguimiento
       : [],
   };
 }
 
-function renderDocumentAssistantResponse(raw = {}) {
-  const data = normalizeDocumentAssistantPayload(raw);
-  documentChatLastResponse = data;
+function renderSelectionResult(raw = {}, actionLabel = "Acción") {
+  const panel = document.getElementById(DOC_SELECTION_RESULT_ID);
+  if (!panel) return;
 
-  const wrapper = document.createElement("div");
-  wrapper.className = "doc-ai-card";
+  const data = normalizeAssistantResponse(raw);
+  documentAssistantLastResponse = data;
 
-  const cambiosHtml = data.cambios.length
-    ? `
-      <div class="doc-ai-section">
-        <div class="doc-ai-section-title">Cambios sugeridos</div>
-        <div class="doc-ai-list">
-          ${data.cambios
-            .map((item) => {
-              const tipo = escapeHtml(item?.tipo || "mejora");
-              const titulo = escapeHtml(item?.titulo || "Mejora");
-              const detalle = escapeHtml(item?.detalle || "");
-              const ejemplo = escapeHtml(item?.ejemplo || "");
+  const suggestedText = data.textoPropuesto || "";
+  const copyValue = suggestedText || data.resumen || "";
 
-              return `
-                <article class="doc-ai-change">
-                  <div class="doc-ai-change-top">
-                    <span class="doc-ai-badge">${tipo}</span>
-                    <strong>${titulo}</strong>
-                  </div>
-                  ${detalle ? `<p>${detalle}</p>` : ""}
-                  ${ejemplo ? `<div class="doc-ai-example">${ejemplo}</div>` : ""}
-                </article>
-              `;
-            })
-            .join("")}
-        </div>
+  panel.innerHTML = `
+    <div class="doc-selection-result-header">
+      <div>
+        <div class="doc-selection-result-chip">${escapeHtml(actionLabel)}</div>
+        <h3>${escapeHtml(data.titulo)}</h3>
       </div>
-    `
-    : "";
+      <button type="button" class="doc-selection-result-close" data-close-selection-panel>×</button>
+    </div>
 
-  const textoPropuestoHtml = data.textoPropuesto
-    ? `
-      <div class="doc-ai-section">
-        <div class="doc-ai-section-title">Texto propuesto</div>
-        <pre class="doc-ai-proposed">${escapeHtml(data.textoPropuesto)}</pre>
-        <div class="doc-ai-actions">
-          <button type="button" class="doc-ai-action-btn" data-action="copy-proposed">
-            Copiar texto
-          </button>
-          ${
-            canEdit()
-              ? `
-                <button type="button" class="doc-ai-action-btn primary" data-action="append-proposed">
-                  Agregar al documento
-                </button>
-              `
-              : ""
-          }
-        </div>
-      </div>
-    `
-    : "";
-
-  const followUpHtml = data.preguntasSeguimiento.length
-    ? `
-      <div class="doc-ai-section">
-        <div class="doc-ai-section-title">Siguientes ideas</div>
-        <ul class="doc-ai-followup">
-          ${data.preguntasSeguimiento
-            .map((item) => `<li>${escapeHtml(item)}</li>`)
-            .join("")}
-        </ul>
-      </div>
-    `
-    : "";
-
-  wrapper.innerHTML = `
-    <div class="doc-ai-subtitle">${escapeHtml(data.subtitulo)}</div>
-    <h4>${escapeHtml(data.titulo)}</h4>
     ${
       data.resumen
-        ? `<p class="doc-ai-summary">${escapeHtml(data.resumen)}</p>`
+        ? `<p class="doc-selection-result-summary">${escapeHtml(data.resumen)}</p>`
         : ""
     }
-    ${cambiosHtml}
-    ${textoPropuestoHtml}
-    ${followUpHtml}
+
+    ${
+      data.cambios.length
+        ? `
+          <div class="doc-selection-result-section">
+            <div class="doc-selection-result-label">Cambios sugeridos</div>
+            <div class="doc-selection-result-list">
+              ${data.cambios
+                .map((item) => {
+                  const tipo = escapeHtml(item?.tipo || "mejora");
+                  const titulo = escapeHtml(item?.titulo || "Cambio");
+                  const detalle = escapeHtml(item?.detalle || "");
+                  const ejemplo = escapeHtml(item?.ejemplo || "");
+
+                  return `
+                    <article class="doc-selection-change">
+                      <div class="doc-selection-change-top">
+                        <span class="doc-selection-mini-chip">${tipo}</span>
+                        <strong>${titulo}</strong>
+                      </div>
+                      ${detalle ? `<p>${detalle}</p>` : ""}
+                      ${ejemplo ? `<div class="doc-selection-example">${ejemplo}</div>` : ""}
+                    </article>
+                  `;
+                })
+                .join("")}
+            </div>
+          </div>
+        `
+        : ""
+    }
+
+    ${
+      suggestedText
+        ? `
+          <div class="doc-selection-result-section">
+            <div class="doc-selection-result-label">Texto propuesto</div>
+            <pre class="doc-selection-proposed">${escapeHtml(suggestedText)}</pre>
+          </div>
+        `
+        : ""
+    }
+
+    ${
+      data.preguntasSeguimiento.length
+        ? `
+          <div class="doc-selection-result-section">
+            <div class="doc-selection-result-label">Siguientes ideas</div>
+            <ul class="doc-selection-followup">
+              ${data.preguntasSeguimiento
+                .map((item) => `<li>${escapeHtml(item)}</li>`)
+                .join("")}
+            </ul>
+          </div>
+        `
+        : ""
+    }
+
+    <div class="doc-selection-result-actions">
+      <button type="button" class="doc-selection-action-btn" data-copy-selection-result>
+        Copiar
+      </button>
+      ${
+        suggestedText && canEdit()
+          ? `
+            <button type="button" class="doc-selection-action-btn" data-insert-selection-result>
+              Insertar debajo
+            </button>
+            <button type="button" class="doc-selection-action-btn primary" data-replace-selection-result>
+              Reemplazar selección
+            </button>
+          `
+          : ""
+      }
+    </div>
   `;
 
-  wrapper
-    .querySelector('[data-action="copy-proposed"]')
-    ?.addEventListener("click", async () => {
-      const ok = await copyTextToClipboard(data.textoPropuesto);
-      setDocumentChatStatus(ok ? "Texto copiado." : "No se pudo copiar el texto.");
-    });
-
-  wrapper
-    .querySelector('[data-action="append-proposed"]')
+  panel
+    .querySelector("[data-close-selection-panel]")
     ?.addEventListener("click", () => {
-      appendProposedTextToDocument(data.textoPropuesto);
-      setDocumentChatStatus("Texto agregado al documento.");
+      hideSelectionResult();
     });
 
-  addDocumentChatNode("assistant", wrapper);
+  panel
+    .querySelector("[data-copy-selection-result]")
+    ?.addEventListener("click", async () => {
+      await copyAssistantText(copyValue);
+    });
+
+  panel
+    .querySelector("[data-insert-selection-result]")
+    ?.addEventListener("click", () => {
+      insertResultBelowSelection(suggestedText);
+    });
+
+  panel
+    .querySelector("[data-replace-selection-result]")
+    ?.addEventListener("click", () => {
+      replaceSelectedTextWithResult(suggestedText);
+    });
+
+  panel.classList.add("show");
 }
 
-async function handleDocumentChatSubmit(e) {
-  e.preventDefault();
+async function runSelectionAction(action = "mejorar", label = "Mejorar") {
+  if (selectionActionBusy) return;
+  if (!currentSelectedText) return;
 
-  if (documentChatBusy) return;
+  selectionActionBusy = true;
+  hideSelectionToolbar();
 
-  const input = document.getElementById(DOC_CHAT_INPUT_ID);
-  const pregunta = limpiarTexto(input?.value || "");
-
-  if (!pregunta) return;
-
-  const tituloDocumento = limpiarTexto(docTitle?.textContent || "");
-  const objetivoDocumento = stripObjectivePrefix(
-    limpiarTexto(docObjective?.textContent || "")
-  );
-  const documentoActual = getPlainDocumentText();
-  const textoSeleccionado = getSelectedDocumentText() || documentChatLastSelection;
-  const investigacion = getInvestigacionDocumento(currentClaseData || {});
-  const fuentes = getFuentesDocumento(currentClaseData || {});
-
-  addDocumentChatHtml(
-    "user",
-    `
-      <div class="doc-ai-user-bubble">
-        <p>${escapeHtml(pregunta)}</p>
-        ${
-          textoSeleccionado
-            ? `<div class="doc-ai-selection-note">Tomando en cuenta el texto seleccionado.</div>`
-            : ""
-        }
+  const panel = document.getElementById(DOC_SELECTION_RESULT_ID);
+  if (panel) {
+    panel.innerHTML = `
+      <div class="doc-selection-result-header">
+        <div>
+          <div class="doc-selection-result-chip">${escapeHtml(label)}</div>
+          <h3>Generando propuesta...</h3>
+        </div>
       </div>
-    `
-  );
-
-  if (input) input.value = "";
-  documentChatBusy = true;
-  setDocumentChatStatus("Pensando...");
+      <p class="doc-selection-result-summary">
+        Estamos analizando el fragmento seleccionado.
+      </p>
+    `;
+    panel.classList.add("show");
+  }
 
   try {
     const response = await fetch("/api/preguntar-documento", {
@@ -1654,114 +1755,150 @@ async function handleDocumentChatSubmit(e) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        pregunta,
-        tituloDocumento,
-        objetivoDocumento,
-        documentoActual,
-        textoSeleccionado,
-        investigacion,
-        fuentes,
-        ultimaRespuesta: documentChatLastResponse,
+        pregunta: getDocumentAssistantQuestion(action, currentSelectedText),
+        tituloDocumento: limpiarTexto(docTitle?.textContent || ""),
+        objetivoDocumento: stripObjectivePrefix(
+          limpiarTexto(docObjective?.textContent || "")
+        ),
+        documentoActual: getPlainDocumentText(),
+        textoSeleccionado: currentSelectedText,
+        investigacion: getInvestigacionDocumento(currentClaseData || {}),
+        fuentes: getFuentesDocumento(currentClaseData || {}),
+        ultimaRespuesta: documentAssistantLastResponse,
       }),
     });
 
     const data = await response.json();
 
     if (!response.ok || !data?.ok) {
-      throw new Error(data?.error || "No se pudo analizar el documento.");
+      throw new Error(data?.error || "No se pudo procesar la selección.");
     }
 
-    renderDocumentAssistantResponse(data.respuesta);
+    renderSelectionResult(data.respuesta, label);
   } catch (error) {
-    console.error("Error en chat de documento:", error);
+    console.error("Error procesando selección:", error);
 
-    addDocumentChatHtml(
-      "assistant",
-      `
-        <div class="doc-ai-card">
-          <div class="doc-ai-subtitle">Asistente del documento</div>
-          <h4>No se pudo responder</h4>
-          <p class="doc-ai-summary">
-            ${escapeHtml(error?.message || "Hubo un problema al consultar la IA.")}
-          </p>
+    if (panel) {
+      panel.innerHTML = `
+        <div class="doc-selection-result-header">
+          <div>
+            <div class="doc-selection-result-chip">${escapeHtml(label)}</div>
+            <h3>No se pudo generar la sugerencia</h3>
+          </div>
+          <button type="button" class="doc-selection-result-close" data-close-selection-panel>×</button>
         </div>
-      `
-    );
+        <p class="doc-selection-result-summary">
+          ${escapeHtml(error?.message || "Hubo un problema al consultar la IA.")}
+        </p>
+      `;
+
+      panel
+        .querySelector("[data-close-selection-panel]")
+        ?.addEventListener("click", () => {
+          hideSelectionResult();
+        });
+
+      panel.classList.add("show");
+    }
   } finally {
-    documentChatBusy = false;
-    setDocumentChatStatus("");
+    selectionActionBusy = false;
   }
 }
 
-function injectDocumentChatStyles() {
-  if (document.getElementById(DOC_CHAT_STYLE_ID)) return;
+function injectSelectionAssistantStyles() {
+  if (document.getElementById(DOC_SELECTION_STYLE_ID)) return;
 
   const style = document.createElement("style");
-  style.id = DOC_CHAT_STYLE_ID;
+  style.id = DOC_SELECTION_STYLE_ID;
   style.textContent = `
-    #${DOC_CHAT_LAUNCHER_ID}{
-      position:fixed;
-      right:22px;
-      bottom:22px;
-      width:58px;
-      height:58px;
-      border:none;
-      border-radius:999px;
-      background:linear-gradient(135deg,#355d95 0%, #4d7bc0 100%);
-      color:#fff;
-      font-size:24px;
-      cursor:pointer;
-      box-shadow:0 18px 40px rgba(40,72,120,.28);
-      z-index:1200;
-    }
-
-    #${DOC_CHAT_PANEL_ID}{
-      position:fixed;
-      right:22px;
-      bottom:92px;
-      width:min(420px, calc(100vw - 28px));
-      height:min(620px, calc(100vh - 130px));
-      background:#fff;
-      border:1px solid rgba(53,93,149,.14);
-      border-radius:24px;
-      box-shadow:0 24px 70px rgba(24,39,75,.18);
+    #${DOC_SELECTION_TOOLBAR_ID}{
+      position:absolute;
+      z-index:1300;
       display:none;
-      flex-direction:column;
-      overflow:hidden;
-      z-index:1200;
+      align-items:center;
+      gap:8px;
+      flex-wrap:wrap;
+      max-width:min(620px, calc(100vw - 32px));
+      padding:10px;
+      border-radius:18px;
+      background:rgba(255,255,255,.96);
+      border:1px solid rgba(53,93,149,.12);
+      box-shadow:0 18px 45px rgba(20,34,60,.18);
+      backdrop-filter:blur(8px);
     }
 
-    #${DOC_CHAT_PANEL_ID}.show{
+    #${DOC_SELECTION_TOOLBAR_ID}.show{
       display:flex;
     }
 
-    .doc-ai-header{
-      padding:16px 16px 12px;
-      border-bottom:1px solid rgba(53,93,149,.10);
-      background:linear-gradient(180deg,#f8fbff 0%, #f4f8ff 100%);
+    .doc-selection-tool-btn{
+      border:none;
+      border-radius:12px;
+      padding:9px 12px;
+      background:#eef4ff;
+      color:#355d95;
+      font-weight:800;
+      font-size:.84rem;
+      cursor:pointer;
+      transition:.18s ease;
+    }
+
+    .doc-selection-tool-btn:hover{
+      background:#e2eeff;
+      transform:translateY(-1px);
+    }
+
+    #${DOC_SELECTION_RESULT_ID}{
+      position:fixed;
+      right:22px;
+      top:96px;
+      width:min(420px, calc(100vw - 28px));
+      max-height:min(75vh, 720px);
+      overflow:auto;
+      z-index:1250;
+      display:none;
+      padding:16px;
+      border-radius:24px;
+      background:#fff;
+      border:1px solid rgba(53,93,149,.12);
+      box-shadow:0 28px 72px rgba(24,39,75,.18);
+    }
+
+    #${DOC_SELECTION_RESULT_ID}.show{
+      display:block;
+    }
+
+    .doc-selection-result-header{
       display:flex;
       align-items:flex-start;
       justify-content:space-between;
       gap:12px;
+      margin-bottom:10px;
     }
 
-    .doc-ai-header h3{
-      margin:0;
-      font-size:1rem;
-      color:#27486d;
+    .doc-selection-result-header h3{
+      margin:6px 0 0;
+      color:#223b59;
+      font-size:1.06rem;
+      line-height:1.35;
       font-weight:800;
     }
 
-    .doc-ai-header p{
-      margin:6px 0 0;
-      color:#5f7186;
-      font-size:.9rem;
-      line-height:1.45;
+    .doc-selection-result-chip{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:5px 10px;
+      border-radius:999px;
+      background:#edf4ff;
+      color:#355d95;
+      font-size:.74rem;
+      font-weight:800;
     }
 
-    .doc-ai-close{
+    .doc-selection-result-close{
       border:none;
-      background:#e9f1ff;
+      background:#eef4ff;
       color:#355d95;
       width:34px;
       height:34px;
@@ -1771,87 +1908,18 @@ function injectDocumentChatStyles() {
       flex-shrink:0;
     }
 
-    #${DOC_CHAT_MESSAGES_ID}{
-      flex:1;
-      overflow:auto;
-      padding:14px;
-      display:flex;
-      flex-direction:column;
-      gap:12px;
-      background:#fbfcfe;
-    }
-
-    .doc-ai-msg.user{
-      display:flex;
-      justify-content:flex-end;
-    }
-
-    .doc-ai-msg.assistant{
-      display:flex;
-      justify-content:flex-start;
-    }
-
-    .doc-ai-user-bubble{
-      max-width:86%;
-      background:linear-gradient(135deg,#355d95 0%, #4d7bc0 100%);
-      color:#fff;
-      padding:12px 14px;
-      border-radius:18px 18px 6px 18px;
-      box-shadow:0 10px 24px rgba(53,93,149,.18);
-    }
-
-    .doc-ai-user-bubble p{
-      margin:0;
-      line-height:1.5;
-      white-space:pre-wrap;
-    }
-
-    .doc-ai-selection-note{
-      margin-top:8px;
-      font-size:.76rem;
-      opacity:.9;
-    }
-
-    .doc-ai-card{
-      width:min(100%, 330px);
-      background:#fff;
-      border:1px solid rgba(53,93,149,.10);
-      border-radius:18px;
-      padding:14px;
-      box-shadow:0 10px 26px rgba(24,39,75,.06);
-    }
-
-    .doc-ai-subtitle{
-      display:inline-flex;
-      padding:5px 10px;
-      border-radius:999px;
-      background:#edf4ff;
-      color:#355d95;
-      font-size:.74rem;
-      font-weight:800;
-      margin-bottom:10px;
-    }
-
-    .doc-ai-card h4{
-      margin:0 0 8px;
-      font-size:1rem;
-      color:#223b59;
-      font-weight:800;
-      line-height:1.35;
-    }
-
-    .doc-ai-summary{
-      margin:0;
-      color:#44576c;
+    .doc-selection-result-summary{
+      margin:0 0 14px;
+      color:#4a6077;
       line-height:1.65;
       white-space:pre-wrap;
     }
 
-    .doc-ai-section{
+    .doc-selection-result-section{
       margin-top:14px;
     }
 
-    .doc-ai-section-title{
+    .doc-selection-result-label{
       margin-bottom:8px;
       color:#2d4f76;
       font-size:.82rem;
@@ -1860,33 +1928,33 @@ function injectDocumentChatStyles() {
       text-transform:uppercase;
     }
 
-    .doc-ai-list{
+    .doc-selection-result-list{
       display:grid;
       gap:8px;
     }
 
-    .doc-ai-change{
+    .doc-selection-change{
       padding:11px 12px;
       border-radius:14px;
       background:#f7faff;
       border:1px solid rgba(53,93,149,.08);
     }
 
-    .doc-ai-change-top{
+    .doc-selection-change-top{
       display:flex;
       align-items:center;
       gap:8px;
-      margin-bottom:6px;
       flex-wrap:wrap;
+      margin-bottom:6px;
     }
 
-    .doc-ai-change p{
+    .doc-selection-change p{
       margin:0;
-      color:#4c6177;
+      color:#4b6177;
       line-height:1.55;
     }
 
-    .doc-ai-badge{
+    .doc-selection-mini-chip{
       display:inline-flex;
       align-items:center;
       justify-content:center;
@@ -1899,181 +1967,155 @@ function injectDocumentChatStyles() {
       text-transform:capitalize;
     }
 
-    .doc-ai-example{
+    .doc-selection-example{
       margin-top:8px;
       padding:10px;
       border-radius:12px;
       background:#fff;
+      border:1px dashed rgba(53,93,149,.16);
       color:#40576f;
       line-height:1.55;
-      border:1px dashed rgba(53,93,149,.16);
       white-space:pre-wrap;
     }
 
-    .doc-ai-proposed{
+    .doc-selection-proposed{
       margin:0;
       padding:12px;
       border-radius:14px;
       background:#f7f9fc;
       border:1px solid rgba(53,93,149,.10);
       color:#33485f;
-      font-size:.9rem;
+      font-size:.92rem;
       line-height:1.6;
       white-space:pre-wrap;
       overflow:auto;
       font-family:Inter, sans-serif;
     }
 
-    .doc-ai-actions{
-      display:flex;
-      gap:8px;
-      flex-wrap:wrap;
-      margin-top:10px;
-    }
-
-    .doc-ai-action-btn{
-      border:none;
-      border-radius:12px;
-      padding:10px 12px;
-      background:#eef4ff;
-      color:#355d95;
-      font-weight:700;
-      cursor:pointer;
-    }
-
-    .doc-ai-action-btn.primary{
-      background:linear-gradient(135deg,#355d95 0%, #4d7bc0 100%);
-      color:#fff;
-    }
-
-    .doc-ai-followup{
+    .doc-selection-followup{
       margin:0;
       padding-left:18px;
       color:#4b6075;
       line-height:1.6;
     }
 
-    #${DOC_CHAT_STATUS_ID}{
-      min-height:22px;
-      padding:0 14px 8px;
-      color:#5f7186;
-      font-size:.82rem;
-    }
-
-    .doc-ai-form{
-      padding:12px;
-      border-top:1px solid rgba(53,93,149,.10);
-      background:#fff;
+    .doc-selection-result-actions{
       display:flex;
       gap:8px;
-      align-items:flex-end;
+      flex-wrap:wrap;
+      margin-top:16px;
     }
 
-    .doc-ai-form textarea{
-      flex:1;
-      resize:none;
-      min-height:48px;
-      max-height:130px;
-      border-radius:14px;
-      border:1px solid rgba(53,93,149,.14);
-      padding:12px 14px;
-      font:inherit;
-      color:#243d59;
-      background:#fbfcff;
-      outline:none;
-    }
-
-    .doc-ai-form button{
+    .doc-selection-action-btn{
       border:none;
-      border-radius:14px;
-      padding:12px 14px;
-      background:linear-gradient(135deg,#355d95 0%, #4d7bc0 100%);
-      color:#fff;
+      border-radius:12px;
+      padding:10px 12px;
+      background:#eef4ff;
+      color:#355d95;
       font-weight:800;
       cursor:pointer;
-      flex-shrink:0;
+    }
+
+    .doc-selection-action-btn.primary{
+      background:linear-gradient(135deg,#355d95 0%, #4d7bc0 100%);
+      color:#fff;
     }
 
     @media (max-width: 768px){
-      #${DOC_CHAT_LAUNCHER_ID}{
-        right:16px;
-        bottom:16px;
-      }
-
-      #${DOC_CHAT_PANEL_ID}{
+      #${DOC_SELECTION_RESULT_ID}{
         right:14px;
         left:14px;
+        top:auto;
+        bottom:18px;
         width:auto;
-        bottom:84px;
-        height:min(70vh, 620px);
+        max-height:58vh;
+      }
+
+      #${DOC_SELECTION_TOOLBAR_ID}{
+        max-width:calc(100vw - 24px);
+      }
+
+      .doc-selection-tool-btn{
+        font-size:.8rem;
+        padding:8px 10px;
       }
     }
   `;
+
   document.head.appendChild(style);
 }
 
-function ensureDocumentChatUi() {
-  if (documentChatInitialized) return;
-  documentChatInitialized = true;
+function ensureSelectionAssistantUi() {
+  if (selectionAssistantInitialized) return;
+  selectionAssistantInitialized = true;
 
-  injectDocumentChatStyles();
+  injectSelectionAssistantStyles();
 
-  const launcher = document.createElement("button");
-  launcher.id = DOC_CHAT_LAUNCHER_ID;
-  launcher.type = "button";
-  launcher.setAttribute("aria-label", "Abrir asistente del documento");
-  launcher.textContent = "✦";
-
-  const panel = document.createElement("aside");
-  panel.id = DOC_CHAT_PANEL_ID;
-  panel.innerHTML = `
-    <div class="doc-ai-header">
-      <div>
-        <h3>Asistente del documento</h3>
-        <p>Preguntá, pedí mejoras, más contenido o una reescritura.</p>
-      </div>
-      <button type="button" class="doc-ai-close" aria-label="Cerrar">×</button>
-    </div>
-
-    <div id="${DOC_CHAT_MESSAGES_ID}"></div>
-    <div id="${DOC_CHAT_STATUS_ID}"></div>
-
-    <form id="${DOC_CHAT_FORM_ID}" class="doc-ai-form">
-      <textarea
-        id="${DOC_CHAT_INPUT_ID}"
-        rows="1"
-        placeholder="Ej: esta introducción quedó corta, alargala un poco"
-      ></textarea>
-      <button type="submit">Enviar</button>
-    </form>
+  const toolbar = document.createElement("div");
+  toolbar.id = DOC_SELECTION_TOOLBAR_ID;
+  toolbar.innerHTML = `
+    <button type="button" class="doc-selection-tool-btn" data-selection-action="explicar" data-selection-label="Explicar">Explicar</button>
+    <button type="button" class="doc-selection-tool-btn" data-selection-action="mejorar" data-selection-label="Mejorar">Mejorar</button>
+    <button type="button" class="doc-selection-tool-btn" data-selection-action="alargar" data-selection-label="Alargar">Alargar</button>
+    <button type="button" class="doc-selection-tool-btn" data-selection-action="acortar" data-selection-label="Acortar">Acortar</button>
+    <button type="button" class="doc-selection-tool-btn" data-selection-action="claro" data-selection-label="Más claro">Más claro</button>
+    <button type="button" class="doc-selection-tool-btn" data-selection-action="formal" data-selection-label="Más formal">Más formal</button>
+    <button type="button" class="doc-selection-tool-btn" data-selection-action="resumir" data-selection-label="Resumir">Resumir</button>
   `;
 
-  document.body.appendChild(launcher);
-  document.body.appendChild(panel);
+  const resultPanel = document.createElement("aside");
+  resultPanel.id = DOC_SELECTION_RESULT_ID;
 
-  launcher.addEventListener("click", openDocumentChat);
-  panel.querySelector(".doc-ai-close")?.addEventListener("click", closeDocumentChat);
-  panel.querySelector(`#${DOC_CHAT_FORM_ID}`)?.addEventListener("submit", handleDocumentChatSubmit);
+  document.body.appendChild(toolbar);
+  document.body.appendChild(resultPanel);
 
-  document.addEventListener("selectionchange", trackDocumentSelection);
+  toolbar.addEventListener("mousedown", (e) => {
+    e.preventDefault();
+  });
 
-  addDocumentChatHtml(
-    "assistant",
-    `
-      <div class="doc-ai-card">
-        <div class="doc-ai-subtitle">Listo para ayudarte</div>
-        <h4>Podés usar este chat para mejorar el documento</h4>
-        <p class="doc-ai-summary">
-          Ejemplos:
-          "explicame mejor este párrafo",
-          "decime qué parte cambiarías",
-          "esta sección quedó corta, alargala",
-          "reescribilo más formal",
-          "resumime esta parte".
-        </p>
-      </div>
-    `
+  toolbar.addEventListener("click", (e) => {
+    const button = e.target.closest("[data-selection-action]");
+    if (!button) return;
+
+    const action = button.getAttribute("data-selection-action") || "mejorar";
+    const label = button.getAttribute("data-selection-label") || "Mejorar";
+    void runSelectionAction(action, label);
+  });
+
+  document.addEventListener("selectionchange", () => {
+    setTimeout(trackSelectedTextForAssistant, 0);
+  });
+
+  document.addEventListener(
+    "scroll",
+    () => {
+      if (!currentSelectedRange) return;
+      const selection = window.getSelection();
+      if (!selection || !selection.rangeCount) return;
+      const rect = selection.getRangeAt(0).getBoundingClientRect();
+      if (rect && (rect.width || rect.height)) {
+        showSelectionToolbarAt(rect);
+      }
+    },
+    true
   );
+
+  document.addEventListener("mousedown", (e) => {
+    const toolbarEl = document.getElementById(DOC_SELECTION_TOOLBAR_ID);
+    const resultEl = document.getElementById(DOC_SELECTION_RESULT_ID);
+
+    if (
+      toolbarEl?.contains(e.target) ||
+      resultEl?.contains(e.target) ||
+      docContent?.contains(e.target) ||
+      docObjective?.contains(e.target) ||
+      docTitle?.contains(e.target)
+    ) {
+      return;
+    }
+
+    hideSelectionToolbar();
+  });
 }
 
 async function resolveClaseFromFirestoreOrLocal(user) {
@@ -2204,7 +2246,7 @@ async function loadClase(user) {
     showDocument();
     setupShareUi();
     attachAutosaveListeners();
-    ensureDocumentChatUi();
+    ensureSelectionAssistantUi();
 
     const claseFinal = await generarDocumentoSiFalta(claseBase);
 
