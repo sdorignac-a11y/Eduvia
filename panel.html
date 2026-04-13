@@ -5,46 +5,46 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Eduvia | Panel</title>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap"
+    rel="stylesheet"
+  />
 
   <style>
     :root{
-      --bg:#f8f3e8;
-      --paper:#fffdf8;
-      --paper-2:#fff7ea;
-      --paper-3:#fffaf2;
-      --text:#2a2532;
-      --muted:#6f6577;
+      --bg:#f4f7f8;
+      --bg-2:#edf3f5;
+      --surface:#ffffff;
+      --surface-soft:#f8fbfc;
+      --surface-tint:#f5fafb;
+      --line:#dbe5e8;
+      --line-strong:#c9d8dd;
 
-      --violet:#7d6bf2;
-      --violet-2:#6c59eb;
-      --violet-soft:#efeaff;
+      --text:#17212b;
+      --muted:#637381;
+      --muted-2:#8c9aa7;
 
-      --yellow:#ffe796;
-      --yellow-soft:#fff5cf;
+      --teal:#11a9c4;
+      --teal-strong:#0f95ae;
+      --teal-soft:#dff7fb;
+      --teal-active:#c9f1f7;
 
-      --mint:#d9f0a1;
-      --mint-soft:#eff8d1;
+      --sidebar:#eef3f4;
+      --sidebar-deep:#e7eef0;
+      --sidebar-border:#d6e1e5;
 
-      --sky:#d9f1ff;
-      --sky-soft:#ecf8ff;
+      --shadow:0 28px 70px rgba(20, 31, 41, 0.10);
+      --shadow-soft:0 16px 34px rgba(20, 31, 41, 0.07);
+      --shadow-card:0 14px 34px rgba(20, 31, 41, 0.06);
+      --shadow-premium:0 18px 46px rgba(17,169,196,.12);
 
-      --orange:#ffb46d;
-      --orange-soft:#fff0df;
+      --radius-xl:32px;
+      --radius-lg:24px;
+      --radius-md:18px;
 
-      --board:#28564a;
-      --board-2:#21483e;
-      --board-3:#19382f;
-
-      --line:rgba(124,108,242,.12);
-      --line-soft:rgba(124,108,242,.08);
-
-      --shadow:0 18px 40px rgba(63,72,138,.08);
-      --shadow-soft:0 10px 24px rgba(63,72,138,.06);
-
-      --sidebar:250px;
+      --sidebar-width:252px;
     }
 
     *{
@@ -61,80 +61,55 @@
       font-family:"Inter",sans-serif;
       color:var(--text);
       background:
-        radial-gradient(circle at top left, rgba(255,255,255,.78), transparent 28%),
-        radial-gradient(circle at bottom right, rgba(255,231,150,.22), transparent 24%),
-        var(--bg);
+        radial-gradient(circle at top left, rgba(17,169,196,.10), transparent 20%),
+        radial-gradient(circle at bottom right, rgba(17,169,196,.07), transparent 22%),
+        linear-gradient(180deg, #f5f8f9 0%, #edf3f5 100%);
       min-height:100vh;
       overflow-x:hidden;
     }
 
-    body::before{
-      content:"";
-      position:fixed;
-      inset:0;
-      background-image:
-        linear-gradient(rgba(124,108,242,.04) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(124,108,242,.04) 1px, transparent 1px);
-      background-size:28px 28px;
-      pointer-events:none;
-      z-index:0;
-      opacity:.65;
-    }
-
-    body::after{
-      content:"";
-      position:fixed;
-      inset:0;
-      background:
-        radial-gradient(circle at 10% 18%, rgba(255,255,255,.45) 0 2px, transparent 2px),
-        radial-gradient(circle at 82% 24%, rgba(255,255,255,.38) 0 2px, transparent 2px),
-        radial-gradient(circle at 28% 84%, rgba(255,255,255,.3) 0 2px, transparent 2px);
-      background-size:180px 180px, 220px 220px, 250px 250px;
-      pointer-events:none;
-      opacity:.4;
-      z-index:0;
-    }
-
     .app{
-      position:relative;
-      z-index:1;
-      display:grid;
-      grid-template-columns:var(--sidebar) 1fr;
       min-height:100vh;
+      display:grid;
+      grid-template-columns:var(--sidebar-width) 1fr;
     }
 
     .sidebar{
       position:sticky;
       top:0;
       height:100vh;
-      background:rgba(255,252,245,.92);
-      backdrop-filter:blur(14px);
-      border-right:2px dashed rgba(124,108,242,.14);
-      padding:22px 18px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.4), rgba(255,255,255,0)),
+        linear-gradient(180deg, var(--sidebar) 0%, var(--sidebar-deep) 100%);
+      border-right:1px solid var(--sidebar-border);
+      padding:22px 16px 18px;
       display:flex;
       flex-direction:column;
       gap:18px;
+      box-shadow:inset -1px 0 0 rgba(255,255,255,.55);
     }
 
     .brand{
       display:flex;
       align-items:center;
       gap:12px;
-      padding:8px 6px 16px;
-      border-bottom:1px dashed rgba(124,108,242,.16);
+      padding:2px 10px 18px;
+      border-bottom:1px solid rgba(214,225,229,.9);
     }
 
     .brand-mark{
-      width:46px;
-      height:46px;
-      border-radius:14px;
+      width:44px;
+      height:44px;
+      border-radius:15px;
       display:grid;
       place-items:center;
-      font-family:"Sora",sans-serif;
-      font-weight:800;
+      background:linear-gradient(135deg, var(--teal), var(--teal-strong));
       color:#fff;
-      background:linear-gradient(135deg, var(--violet), var(--orange));
-      box-shadow:0 12px 24px rgba(124,108,242,.2);
+      font-family:"Sora",sans-serif;
+      font-size:1rem;
+      font-weight:800;
+      letter-spacing:-.04em;
+      box-shadow:0 10px 20px rgba(17,169,196,.24);
       flex:none;
     }
 
@@ -142,183 +117,218 @@
       display:block;
       font-family:"Sora",sans-serif;
       font-size:1rem;
+      line-height:1.05;
       letter-spacing:-.03em;
+      color:var(--text);
     }
 
     .brand-text span{
+      display:block;
+      margin-top:3px;
+      font-size:.82rem;
       color:var(--muted);
-      font-size:.83rem;
     }
 
     .menu{
       display:flex;
       flex-direction:column;
-      gap:8px;
+      gap:7px;
+      padding-top:2px;
     }
 
     .menu a,
     .menu button{
       width:100%;
-      text-decoration:none;
       border:none;
       background:transparent;
+      text-decoration:none;
       text-align:left;
-      color:#4b425a;
-      padding:13px 14px;
-      border-radius:15px;
-      font-weight:700;
+      color:#4e606d;
       font-family:inherit;
-      font-size:1rem;
+      font-size:.95rem;
+      font-weight:700;
+      padding:12px 14px 12px 16px;
+      border-radius:16px;
       cursor:pointer;
-      transition:.2s ease;
+      transition:.18s ease;
+      position:relative;
     }
 
     .menu a:hover,
     .menu button:hover{
-      background:#f7efff;
-      color:#6b5ee8;
-      transform:translateX(4px);
+      background:rgba(255,255,255,.58);
+      color:var(--text);
+      transform:translateX(2px);
     }
 
     .menu a.active{
-      background:linear-gradient(135deg, rgba(124,108,242,.14), rgba(255,179,107,.16));
-      color:#6b5ee8;
-      box-shadow:var(--shadow-soft);
+      background:linear-gradient(180deg, rgba(255,255,255,.76), rgba(255,255,255,.54)), var(--teal-soft);
+      color:#0e778c;
+      box-shadow:0 10px 20px rgba(17,169,196,.10);
     }
 
-    .menu button:focus{
-      outline:none;
-      box-shadow:0 0 0 4px rgba(124,108,242,.08);
+    .menu a.active::before{
+      content:"";
+      position:absolute;
+      left:0;
+      top:10px;
+      bottom:10px;
+      width:4px;
+      border-radius:999px;
+      background:linear-gradient(180deg, var(--teal), #62d2e6);
+      box-shadow:0 0 14px rgba(17,169,196,.28);
     }
 
     .sidebar-note{
       margin-top:auto;
-      background:linear-gradient(180deg, #fff1ad, #ffe291);
-      border:1px solid rgba(255,179,107,.24);
-      border-radius:20px;
-      padding:15px;
+      padding:16px;
+      border-radius:22px;
+      background:linear-gradient(180deg, rgba(255,255,255,.94), rgba(255,255,255,.78));
+      border:1px solid rgba(214,225,229,.92);
       box-shadow:var(--shadow-soft);
-      transform:rotate(-1deg);
     }
 
     .sidebar-note strong{
       display:block;
+      font-size:.9rem;
       margin-bottom:6px;
-      font-size:.95rem;
+      color:var(--text);
     }
 
     .sidebar-note p{
-      color:#635869;
-      font-size:.88rem;
-      line-height:1.55;
+      font-size:.84rem;
+      line-height:1.58;
+      color:var(--muted);
     }
 
     .main{
-      padding:28px;
+      padding:18px 22px 18px 18px;
+      min-width:0;
     }
 
     .page{
-      max-width:1200px;
+      max-width:1380px;
       margin:0 auto;
       display:grid;
-      gap:22px;
+      gap:18px;
     }
 
-    /* HERO PREMIUM */
-    .hero-craft{
+    .hero-shell{
       position:relative;
       overflow:hidden;
-      background:linear-gradient(180deg, var(--paper) 0%, var(--paper-2) 100%);
-      border:2px solid rgba(124,108,242,.08);
-      border-radius:34px;
-      padding:24px 28px 26px;
+      background:linear-gradient(180deg, rgba(255,255,255,.99) 0%, #ffffff 100%);
+      border:1px solid rgba(219,229,232,.98);
+      border-radius:var(--radius-xl);
       box-shadow:var(--shadow);
+      padding:26px;
+      isolation:isolate;
     }
 
-    .hero-craft::before{
+    .hero-shell::before{
       content:"";
       position:absolute;
-      inset:0;
-      background:
-        radial-gradient(circle at 12% 18%, rgba(255,255,255,.78), transparent 20%),
-        radial-gradient(circle at 88% 82%, rgba(255,231,150,.14), transparent 18%);
+      inset:0 0 auto 0;
+      height:180px;
+      background:linear-gradient(180deg, rgba(17,169,196,.07), transparent);
+      pointer-events:none;
+      z-index:0;
+    }
+
+    .hero-shell::after{
+      content:"";
+      position:absolute;
+      top:0;
+      left:24px;
+      right:24px;
+      height:1px;
+      background:linear-gradient(90deg, transparent, rgba(255,255,255,.95), transparent);
+      z-index:1;
       pointer-events:none;
     }
 
-    .craft-stage{
+    .hero-shell > *{
       position:relative;
-      z-index:1;
+      z-index:2;
     }
 
-    .board-header{
+    .hero-top{
       display:flex;
       align-items:center;
       justify-content:space-between;
       gap:14px;
       flex-wrap:wrap;
-      margin-bottom:14px;
+      margin-bottom:18px;
     }
 
-    .board-frame-label{
+    .hero-label{
       display:inline-flex;
       align-items:center;
-      justify-content:center;
-      padding:9px 14px;
+      width:max-content;
+      padding:7px 12px;
       border-radius:999px;
-      background:#f6f0ff;
-      color:#6b5ee8;
-      font-size:.78rem;
+      background:linear-gradient(180deg, rgba(255,255,255,.8), rgba(255,255,255,.45)), var(--teal-soft);
+      color:#0f7f96;
+      font-size:.72rem;
       font-weight:800;
-      letter-spacing:.12em;
+      letter-spacing:.08em;
       text-transform:uppercase;
-      border:1px solid rgba(124,108,242,.12);
-      box-shadow:0 8px 18px rgba(124,108,242,.06);
+      border:1px solid rgba(17,169,196,.10);
+      box-shadow:0 6px 16px rgba(17,169,196,.08);
     }
 
-    .board-tabs{
+    .hero-tabs{
       display:flex;
       flex-wrap:wrap;
       gap:10px;
     }
 
-    .board-tab{
+    .hero-tab{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
       padding:10px 14px;
       border-radius:999px;
-      font-size:.85rem;
+      font-size:.84rem;
       font-weight:800;
-      border:1px solid var(--line);
-      background:rgba(255,255,255,.72);
-      color:#5f5670;
-      box-shadow:0 8px 16px rgba(63,72,138,.04);
+      color:#667887;
+      background:#f7fbfc;
+      border:1px solid rgba(219,229,232,.95);
+      box-shadow:0 8px 18px rgba(20,31,41,.03);
     }
 
-    .board-tab.active{
-      background:linear-gradient(135deg, rgba(124,108,242,.16), rgba(255,179,107,.14));
-      color:#5e4fe0;
+    .hero-tab.active{
+      background:linear-gradient(180deg, rgba(255,255,255,.8), rgba(255,255,255,.46)), var(--teal-soft);
+      border-color:rgba(17,169,196,.18);
+      color:#0f7f96;
     }
 
-    .board-wrap{
+    .hero-grid{
+      display:grid;
+      grid-template-columns:1.18fr .82fr;
+      gap:18px;
+      align-items:stretch;
+    }
+
+    .hero-main{
       position:relative;
-    }
-
-    .modern-board{
-      position:relative;
-      background:
-        radial-gradient(circle at 18% 18%, rgba(255,255,255,.05), transparent 20%),
-        radial-gradient(circle at 72% 30%, rgba(255,255,255,.04), transparent 22%),
-        linear-gradient(180deg, var(--board) 0%, var(--board-2) 54%, var(--board-3) 100%);
-      border:12px solid #c99661;
-      border-bottom-width:16px;
-      border-radius:30px;
-      padding:20px 22px 22px;
-      box-shadow:
-        inset 0 0 0 2px rgba(255,255,255,.04),
-        inset 0 20px 40px rgba(255,255,255,.03),
-        0 22px 30px rgba(35,34,58,.12);
+      min-height:420px;
+      padding:24px;
+      border-radius:28px;
       overflow:hidden;
+      background:
+        radial-gradient(circle at top left, rgba(98,210,230,.16), transparent 26%),
+        radial-gradient(circle at bottom right, rgba(17,169,196,.12), transparent 28%),
+        linear-gradient(180deg, #163842 0%, #112f37 52%, #0e262d 100%);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.08),
+        inset 0 20px 40px rgba(255,255,255,.02),
+        0 20px 34px rgba(15,43,50,.18);
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
     }
 
-    .modern-board::before{
+    .hero-main::before{
       content:"";
       position:absolute;
       inset:0;
@@ -330,29 +340,34 @@
       pointer-events:none;
     }
 
-    .board-topbar{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:14px;
-      margin-bottom:20px;
+    .hero-main-top,
+    .hero-main-bottom,
+    .hero-copy{
       position:relative;
       z-index:2;
     }
 
-    .board-dots{
+    .hero-main-top{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:20px;
+    }
+
+    .hero-dots{
       display:flex;
       gap:8px;
     }
 
-    .board-dot{
+    .hero-dots span{
       width:10px;
       height:10px;
       border-radius:50%;
-      background:rgba(255,255,255,.22);
+      background:rgba(255,255,255,.18);
     }
 
-    .board-status{
+    .hero-status{
       display:inline-flex;
       align-items:center;
       gap:8px;
@@ -360,73 +375,62 @@
       border-radius:999px;
       border:1px solid rgba(255,255,255,.12);
       background:rgba(255,255,255,.06);
-      color:#e8f8f0;
-      font-size:.78rem;
+      color:#eaf9fb;
+      font-size:.76rem;
       font-weight:800;
       letter-spacing:.08em;
       text-transform:uppercase;
     }
 
-    .board-status::before{
+    .hero-status::before{
       content:"";
       width:8px;
       height:8px;
       border-radius:50%;
-      background:#9cf1c4;
-      box-shadow:0 0 0 4px rgba(156,241,196,.14);
+      background:#9df0dc;
+      box-shadow:0 0 0 4px rgba(157,240,220,.12);
     }
 
-    .board-content{
-      position:relative;
-      z-index:2;
-      display:grid;
-      grid-template-columns:1.1fr .9fr;
-      gap:18px;
-      align-items:stretch;
-    }
-
-    .chalk-note.clean{
-      max-width:none;
-    }
-
-    .chalk-note.clean .mini-label{
+    .mini-label{
       display:inline-block;
       margin-bottom:14px;
       padding:8px 12px;
       border-radius:999px;
       border:1px solid rgba(255,255,255,.14);
       background:rgba(255,255,255,.06);
-      color:#e0f3ea;
+      color:#def5f8;
       font-size:.78rem;
       font-weight:800;
       letter-spacing:.11em;
+      text-transform:uppercase;
     }
 
-    .chalk-note.clean h1{
+    .hero-copy h1{
       font-family:"Sora",sans-serif;
-      font-size:clamp(2rem,4vw,3.05rem);
-      line-height:1.03;
-      letter-spacing:-.05em;
-      color:#f7fff9;
+      font-size:clamp(2rem, 3.8vw, 3.2rem);
+      line-height:1.02;
+      letter-spacing:-.055em;
+      color:#f8feff;
       margin-bottom:14px;
-      max-width:640px;
+      max-width:720px;
     }
 
-    .chalk-note.clean p{
-      color:rgba(235,248,241,.88);
-      line-height:1.85;
+    .hero-copy p{
+      color:rgba(235,248,250,.86);
+      line-height:1.82;
       font-size:1rem;
-      max-width:610px;
-      margin-bottom:18px;
+      max-width:640px;
+      margin-bottom:20px;
     }
 
-    .board-feature-row{
+    .hero-feature-row{
       display:flex;
       flex-wrap:wrap;
       gap:10px;
+      margin-bottom:18px;
     }
 
-    .board-feature{
+    .hero-feature{
       display:inline-flex;
       align-items:center;
       justify-content:center;
@@ -434,98 +438,142 @@
       border-radius:15px;
       border:1px solid rgba(255,255,255,.12);
       background:rgba(255,255,255,.075);
-      color:#eefcf4;
+      color:#eefcfb;
       font-size:.9rem;
       font-weight:800;
       box-shadow:0 8px 18px rgba(0,0,0,.05);
     }
 
-    .board-side-cards{
-      display:grid;
-      gap:12px;
-      align-self:stretch;
-    }
-
-    .side-card{
-      background:rgba(255,255,255,.075);
-      border:1px solid rgba(255,255,255,.1);
-      border-radius:18px;
-      padding:16px;
-      backdrop-filter:blur(4px);
-      box-shadow:0 10px 18px rgba(0,0,0,.06);
-    }
-
-    .side-card span{
-      display:block;
-      color:rgba(226,239,233,.72);
-      font-size:.78rem;
-      font-weight:700;
-      margin-bottom:6px;
-      letter-spacing:.03em;
-    }
-
-    .side-card strong{
-      display:block;
-      color:#f4fff8;
-      font-size:1rem;
-      line-height:1.4;
-      letter-spacing:-.02em;
-      margin-bottom:6px;
-    }
-
-    .side-card p{
-      color:rgba(235,248,241,.76);
-      font-size:.9rem;
-      line-height:1.6;
-    }
-
-    .board-bottom{
-      position:relative;
-      z-index:2;
-      margin-top:22px;
-    }
-
-    .chalk-shelf{
+    .hero-actions{
       display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:14px;
+      gap:12px;
       flex-wrap:wrap;
     }
 
-    .chalk-tools{
-      display:flex;
-      gap:8px;
+    .btn{
+      appearance:none;
+      border:none;
+      text-decoration:none;
+      cursor:pointer;
+      display:inline-flex;
       align-items:center;
+      justify-content:center;
+      min-height:48px;
+      padding:13px 20px;
+      border-radius:15px;
+      font-family:inherit;
+      font-size:.94rem;
+      font-weight:800;
+      transition:.18s ease;
     }
 
-    .chalk{
-      width:26px;
-      height:8px;
-      border-radius:999px;
-      display:inline-block;
-      box-shadow:0 2px 6px rgba(0,0,0,.15);
+    .btn:hover{
+      transform:translateY(-1px);
     }
 
-    .chalk.white{ background:#f9fbff; }
-    .chalk.yellow{ background:#ffe796; }
-    .chalk.blue{ background:#c9e7ff; }
-
-    .board-bottom-line{
-      flex:1;
-      min-width:180px;
-      height:6px;
-      border-radius:999px;
-      background:linear-gradient(90deg, rgba(255,255,255,.18), rgba(255,255,255,.04));
+    .btn-primary{
+      background:linear-gradient(135deg, var(--teal), var(--teal-strong));
+      color:#fff;
+      box-shadow:0 14px 26px rgba(17,169,196,.22);
     }
 
-    /* SECCIONES */
+    .btn-soft{
+      background:#fff;
+      color:#223042;
+      border:1px solid rgba(219,229,232,.95);
+      box-shadow:0 8px 20px rgba(23,33,43,.04);
+    }
+
+    .hero-side{
+      display:grid;
+      gap:14px;
+    }
+
+    .hero-side-card{
+      padding:18px;
+      border-radius:24px;
+      border:1px solid rgba(219,229,232,.95);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.96), rgba(255,255,255,.84)),
+        linear-gradient(180deg, #ffffff 0%, #fbfdfe 100%);
+      box-shadow:var(--shadow-card);
+      min-height:126px;
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+    }
+
+    .hero-side-card span{
+      display:block;
+      color:#7e8d99;
+      font-size:.79rem;
+      font-weight:800;
+      letter-spacing:.04em;
+      text-transform:uppercase;
+      margin-bottom:8px;
+    }
+
+    .hero-side-card strong{
+      display:block;
+      color:#16212b;
+      font-size:1.08rem;
+      line-height:1.3;
+      letter-spacing:-.02em;
+      margin-bottom:8px;
+    }
+
+    .hero-side-card p{
+      color:var(--muted);
+      font-size:.92rem;
+      line-height:1.62;
+    }
+
+    .hero-bottom{
+      display:grid;
+      grid-template-columns:repeat(3, 1fr);
+      gap:14px;
+      margin-top:16px;
+    }
+
+    .stat-card{
+      padding:16px 18px;
+      border-radius:22px;
+      background:linear-gradient(180deg, rgba(255,255,255,.96), rgba(255,255,255,.84));
+      border:1px solid rgba(219,229,232,.95);
+      box-shadow:0 10px 22px rgba(23,33,43,.04);
+    }
+
+    .stat-card span{
+      display:block;
+      font-size:.78rem;
+      font-weight:800;
+      color:#80909d;
+      text-transform:uppercase;
+      letter-spacing:.05em;
+      margin-bottom:6px;
+    }
+
+    .stat-card strong{
+      display:block;
+      font-family:"Sora",sans-serif;
+      font-size:1.24rem;
+      color:#12202b;
+      letter-spacing:-.03em;
+      margin-bottom:4px;
+    }
+
+    .stat-card p{
+      color:var(--muted);
+      font-size:.89rem;
+      line-height:1.5;
+    }
+
     .section{
-      background:rgba(255,252,247,.92);
-      border:1px solid rgba(255,255,255,.8);
+      background:rgba(255,255,255,.92);
+      border:1px solid rgba(219,229,232,.95);
       border-radius:30px;
       padding:24px;
-      box-shadow:var(--shadow);
+      box-shadow:var(--shadow-soft);
     }
 
     .section-head{
@@ -539,204 +587,100 @@
 
     .section-head h2{
       font-family:"Sora",sans-serif;
-      font-size:1.55rem;
+      font-size:1.5rem;
       letter-spacing:-.04em;
+      color:#111b24;
+      margin-bottom:6px;
     }
 
     .section-head p{
       color:var(--muted);
-      max-width:700px;
-      line-height:1.75;
+      max-width:760px;
+      line-height:1.74;
+      font-size:.94rem;
     }
 
     .guide-grid{
       display:grid;
-      grid-template-columns:repeat(3,1fr);
-      gap:18px;
+      grid-template-columns:repeat(3, 1fr);
+      gap:16px;
     }
 
     .guide-card{
-      position:relative;
-      border-radius:22px;
       padding:22px;
-      box-shadow:0 14px 26px rgba(63,72,138,.08);
-      overflow:hidden;
-      border:2px solid rgba(0,0,0,.05);
-      transition:.2s ease;
+      border-radius:24px;
+      border:1px solid rgba(219,229,232,.95);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.98), rgba(255,255,255,.90)),
+        linear-gradient(180deg, #ffffff 0%, #f8fbfc 100%);
+      box-shadow:var(--shadow-card);
+      transition:.18s ease;
     }
 
     .guide-card:hover{
-      transform:translateY(-4px);
-    }
-
-    .guide-card:nth-child(1){
-      background:#fff1a8;
-      transform:rotate(-1deg);
-    }
-
-    .guide-card:nth-child(2){
-      background:#d9f0ff;
-      transform:rotate(.8deg);
-    }
-
-    .guide-card:nth-child(3){
-      background:#eadfff;
-      transform:rotate(-.8deg);
-    }
-
-    .guide-card::before{
-      content:"";
-      position:absolute;
-      inset:0;
-      background-image:linear-gradient(transparent 31px, rgba(124,108,242,.045) 32px);
-      background-size:100% 32px;
-      pointer-events:none;
-      opacity:.9;
-    }
-
-    .guide-card::after{
-      content:"";
-      position:absolute;
-      left:20px;
-      top:0;
-      bottom:0;
-      width:2px;
-      background:rgba(255,90,110,.22);
-      pointer-events:none;
-    }
-
-    .guide-card .tape{
-      position:absolute;
-      top:14px;
-      right:18px;
-      width:64px;
-      height:16px;
-      border-radius:5px;
-      background:rgba(255,255,255,.34);
-      transform:rotate(8deg);
-      box-shadow:0 2px 6px rgba(0,0,0,.04);
-      z-index:2;
-    }
-
-    .guide-inner{
-      position:relative;
-      z-index:1;
-      padding-left:18px;
-      padding-top:10px;
+      transform:translateY(-3px);
+      box-shadow:var(--shadow-premium);
+      border-color:rgba(17,169,196,.18);
     }
 
     .step-badge{
       width:46px;
       height:46px;
-      border-radius:15px;
+      border-radius:16px;
       display:grid;
       place-items:center;
       font-family:"Sora",sans-serif;
       font-weight:800;
-      color:var(--violet);
-      background:#fff;
-      border:2px solid var(--violet);
+      color:#0f7f96;
+      background:linear-gradient(180deg, #f7fcfd, #edf8fa);
+      border:1px solid rgba(17,169,196,.14);
       margin-bottom:14px;
-      box-shadow:0 8px 18px rgba(124,108,242,.08);
+      box-shadow:0 8px 18px rgba(17,169,196,.08);
     }
 
     .guide-card h3{
       font-family:"Sora",sans-serif;
-      font-size:1.08rem;
+      font-size:1.05rem;
       margin-bottom:8px;
       letter-spacing:-.03em;
+      color:#17212b;
     }
 
     .guide-card p{
-      color:#4f5a6f;
-      line-height:1.75;
-      font-size:.95rem;
+      color:var(--muted);
+      line-height:1.72;
+      font-size:.93rem;
     }
 
     .quick-grid{
       display:grid;
       grid-template-columns:1fr 1fr;
-      gap:18px;
+      gap:16px;
     }
 
     .prep-card{
-      position:relative;
-      border-radius:22px;
       padding:22px;
-      box-shadow:0 14px 26px rgba(63,72,138,.08);
-      overflow:hidden;
-      border:2px solid rgba(0,0,0,.05);
-      transition:.2s ease;
-    }
-
-    .prep-card:hover{
-      transform:translateY(-4px);
-    }
-
-    .prep-card:nth-child(1){
-      background:#fff1a8;
-      transform:rotate(-1deg);
-    }
-
-    .prep-card:nth-child(2){
-      background:#d9f0ff;
-      transform:rotate(.8deg);
-    }
-
-    .prep-card::before{
-      content:"";
-      position:absolute;
-      inset:0;
-      background-image:linear-gradient(transparent 31px, rgba(124,108,242,.045) 32px);
-      background-size:100% 32px;
-      pointer-events:none;
-      opacity:.9;
-    }
-
-    .prep-card::after{
-      content:"";
-      position:absolute;
-      left:20px;
-      top:0;
-      bottom:0;
-      width:2px;
-      background:rgba(255,90,110,.22);
-      pointer-events:none;
-    }
-
-    .prep-card .tape{
-      position:absolute;
-      top:14px;
-      right:18px;
-      width:64px;
-      height:16px;
-      border-radius:5px;
-      background:rgba(255,255,255,.34);
-      transform:rotate(8deg);
-      box-shadow:0 2px 6px rgba(0,0,0,.04);
-      z-index:2;
-    }
-
-    .prep-inner{
-      position:relative;
-      z-index:1;
-      padding-left:18px;
-      padding-top:10px;
+      border-radius:26px;
+      border:1px solid rgba(219,229,232,.95);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.98), rgba(255,255,255,.90)),
+        linear-gradient(180deg, #ffffff 0%, #f8fbfc 100%);
+      box-shadow:var(--shadow-card);
     }
 
     .prep-badge{
       width:46px;
       height:46px;
-      border-radius:15px;
+      border-radius:16px;
       display:grid;
       place-items:center;
       font-family:"Sora",sans-serif;
       font-weight:800;
-      color:var(--violet);
-      background:#fff;
-      border:2px solid var(--violet);
+      color:#0f7f96;
+      background:linear-gradient(180deg, #f7fcfd, #edf8fa);
+      border:1px solid rgba(17,169,196,.14);
       margin-bottom:14px;
-      box-shadow:0 8px 18px rgba(124,108,242,.08);
+      box-shadow:0 8px 18px rgba(17,169,196,.08);
     }
 
     .prep-card h3{
@@ -744,12 +688,13 @@
       font-size:1.08rem;
       margin-bottom:8px;
       letter-spacing:-.03em;
+      color:#17212b;
     }
 
     .prep-card p{
-      color:#4f5a6f;
-      line-height:1.75;
-      font-size:.95rem;
+      color:var(--muted);
+      line-height:1.72;
+      font-size:.94rem;
       margin-bottom:14px;
     }
 
@@ -762,61 +707,35 @@
     .prep-list div{
       padding:13px 14px;
       border-radius:16px;
-      background:rgba(255,255,255,.78);
-      border:1px solid rgba(124,108,242,.12);
-      color:#465067;
-      font-size:.94rem;
+      background:#fff;
+      border:1px solid rgba(219,229,232,.95);
+      color:#46586a;
+      font-size:.93rem;
       font-weight:600;
-      line-height:1.6;
+      line-height:1.58;
+      box-shadow:0 8px 18px rgba(23,33,43,.03);
     }
 
     .prep-tip{
       margin-top:14px;
       padding:14px 15px;
-      border-radius:16px;
-      background:rgba(255,255,255,.62);
-      border:1px solid rgba(255,179,107,.24);
-      color:#5a4f49;
-      line-height:1.6;
-      font-size:.92rem;
+      border-radius:18px;
+      background:linear-gradient(180deg, rgba(255,255,255,.82), rgba(223,247,251,.56));
+      border:1px solid rgba(17,169,196,.14);
+      color:#51636f;
+      line-height:1.62;
+      font-size:.91rem;
       font-weight:600;
     }
 
-    .btn{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      gap:10px;
-      border:none;
-      text-decoration:none;
-      cursor:pointer;
-      font-family:inherit;
-      font-weight:800;
-      border-radius:999px;
-      padding:14px 20px;
-      transition:.2s ease;
-    }
+    @media (max-width: 1180px){
+      .hero-grid{
+        grid-template-columns:1fr;
+      }
 
-    .btn:hover{
-      transform:translateY(-2px);
-    }
-
-    .btn-primary{
-      color:#fff;
-      background:linear-gradient(135deg, var(--violet), var(--orange));
-      box-shadow:0 14px 28px rgba(124,108,242,.16);
-    }
-
-    .btn-soft{
-      color:var(--violet);
-      background:#efeaff;
-    }
-
-    .hero-actions{
-      display:flex;
-      gap:12px;
-      flex-wrap:wrap;
-      margin-top:18px;
+      .hero-bottom{
+        grid-template-columns:1fr;
+      }
     }
 
     @media (max-width: 1080px){
@@ -826,17 +745,11 @@
       }
     }
 
-    @media (max-width: 980px){
-      .board-content{
-        grid-template-columns:1fr;
-      }
-
-      .board-side-cards{
-        grid-template-columns:1fr;
-      }
-    }
-
     @media (max-width: 820px){
+      body{
+        overflow:auto;
+      }
+
       .app{
         grid-template-columns:1fr;
       }
@@ -845,17 +758,21 @@
         position:relative;
         height:auto;
         border-right:none;
-        border-bottom:2px dashed rgba(124,108,242,.12);
+        border-bottom:1px solid var(--sidebar-border);
       }
 
       .main{
         padding:18px;
       }
 
-      .hero-craft,
+      .hero-shell,
       .section{
-        padding:20px;
         border-radius:24px;
+        padding:20px;
+      }
+
+      .hero-main{
+        min-height:auto;
       }
     }
 
@@ -869,20 +786,26 @@
       }
     }
 
-    @media (max-width: 640px){
-      .modern-board{
-        border-width:9px;
-        border-bottom-width:12px;
-        border-radius:22px;
-        padding:18px;
+    @media (max-width: 620px){
+      .main{
+        padding:14px;
       }
 
-      .chalk-note.clean h1{
-        font-size:2rem;
-      }
-
-      .board-header{
+      .hero-top{
         align-items:flex-start;
+      }
+
+      .hero-main{
+        padding:18px;
+        border-radius:22px;
+      }
+
+      .hero-copy h1{
+        font-size:1.95rem;
+      }
+
+      .section-head h2{
+        font-size:1.3rem;
       }
     }
   </style>
@@ -920,85 +843,98 @@
     <main class="main">
       <div class="page">
 
-        <section class="hero-craft">
-          <div class="craft-stage">
-            <div class="board-header">
-              <div class="board-frame-label">EDUVIA</div>
+        <section class="hero-shell">
+          <div class="hero-top">
+            <span class="hero-label">Panel principal</span>
 
-              <div class="board-tabs">
-                <span class="board-tab active">Panel principal</span>
-                <span class="board-tab">Clases</span>
-                <span class="board-tab">Apuntes</span>
-                <span class="board-tab">IA</span>
+            <div class="hero-tabs">
+              <span class="hero-tab active">Inicio</span>
+              <span class="hero-tab">Clases</span>
+              <span class="hero-tab">Apuntes</span>
+              <span class="hero-tab">IA</span>
+            </div>
+          </div>
+
+          <div class="hero-grid">
+            <div class="hero-main">
+              <div class="hero-main-top">
+                <div class="hero-dots">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </div>
+
+                <div class="hero-status">Estudio activo</div>
+              </div>
+
+              <div class="hero-copy">
+                <span class="mini-label">Espacio de estudio</span>
+                <h1>Aprendé con una experiencia más clara, visual y bien guiada.</h1>
+                <p>
+                  Eduvia convierte el estudio en algo más ordenado y más fácil de seguir.
+                  La IA explica paso a paso, adapta el ritmo según lo que necesites
+                  y acompaña el proceso con apoyo visual para que cada tema quede más claro.
+                </p>
+
+                <div class="hero-feature-row">
+                  <span class="hero-feature">✏️ Explicación guiada</span>
+                  <span class="hero-feature">📘 Apoyo visual</span>
+                  <span class="hero-feature">🧠 A tu ritmo</span>
+                </div>
+              </div>
+
+              <div class="hero-main-bottom">
+                <div class="hero-actions">
+                  <a href="crear-clase.html" class="btn btn-primary">Crear nueva clase</a>
+                  <a href="mis-clases.html" class="btn btn-soft">Ver mis clases</a>
+                </div>
               </div>
             </div>
 
-            <div class="board-wrap">
-              <div class="board modern-board">
-                <div class="board-topbar">
-                  <div class="board-dots">
-                    <span class="board-dot"></span>
-                    <span class="board-dot"></span>
-                    <span class="board-dot"></span>
-                  </div>
-
-                  <div class="board-status">Estudio activo</div>
+            <div class="hero-side">
+              <div class="hero-side-card">
+                <div>
+                  <span>Modalidad</span>
+                  <strong>Clase guiada con IA</strong>
                 </div>
-
-                <div class="board-content">
-                  <div class="chalk-note clean">
-                    <span class="mini-label">Espacio de estudio</span>
-                    <h1>Aprendé con una experiencia más clara, visual y bien guiada.</h1>
-                    <p>
-                      Eduvia convierte el estudio en algo más ordenado y más fácil de seguir.
-                      La IA explica paso a paso, adapta el ritmo según lo que necesites
-                      y acompaña el proceso con apoyo visual para que cada tema quede más claro.
-                    </p>
-
-                    <div class="board-feature-row">
-                      <span class="board-feature">✏️ Explicación guiada</span>
-                      <span class="board-feature">📘 Apoyo visual</span>
-                      <span class="board-feature">🧠 A tu ritmo</span>
-                    </div>
-
-                    <div class="hero-actions">
-                      <a href="crear-clase.html" class="btn btn-primary">Crear nueva clase</a>
-                      <a href="mis-clases.html" class="btn btn-soft">Ver mis clases</a>
-                    </div>
-                  </div>
-
-                  <div class="board-side-cards">
-                    <div class="side-card">
-                      <span>Modalidad</span>
-                      <strong>Clase guiada con IA</strong>
-                      <p>Explicaciones más claras y adaptadas al tema que quieras estudiar.</p>
-                    </div>
-
-                    <div class="side-card">
-                      <span>Apoyo visual</span>
-                      <strong>Pizarra interactiva</strong>
-                      <p>Ideal para procedimientos, ejemplos y explicaciones paso a paso.</p>
-                    </div>
-
-                    <div class="side-card">
-                      <span>Objetivo</span>
-                      <strong>Entender mejor</strong>
-                      <p>No solo avanzar, sino comprender con una lógica mucho más clara.</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="board-bottom">
-                  <div class="chalk-shelf">
-                    <div class="chalk-tools">
-                      <span class="chalk white"></span>
-                      <span class="chalk yellow"></span>
-                      <span class="chalk blue"></span>
-                    </div>
-                    <div class="board-bottom-line"></div>
-                  </div>
-                </div>
+                <p>Explicaciones más claras y adaptadas al tema que quieras estudiar.</p>
               </div>
+
+              <div class="hero-side-card">
+                <div>
+                  <span>Apoyo visual</span>
+                  <strong>Pizarra interactiva</strong>
+                </div>
+                <p>Ideal para procedimientos, ejemplos y explicaciones paso a paso.</p>
+              </div>
+
+              <div class="hero-side-card">
+                <div>
+                  <span>Objetivo</span>
+                  <strong>Entender mejor</strong>
+                </div>
+                <p>No solo avanzar, sino comprender con una lógica mucho más clara.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="hero-bottom">
+            <div class="stat-card">
+              <span>Experiencia</span>
+              <strong>Más clara</strong>
+              <p>Una interfaz limpia para estudiar sin que todo compita al mismo tiempo.</p>
+            </div>
+
+            <div class="stat-card">
+              <span>Ritmo</span>
+              <strong>Más guiado</strong>
+              <p>La IA acompaña el proceso y ayuda a avanzar paso a paso.</p>
+            </div>
+
+            <div class="stat-card">
+              <span>Resultado</span>
+              <strong>Más entendible</strong>
+              <p>El foco no está solo en leer, sino en comprender mejor cada tema.</p>
             </div>
           </div>
         </section>
@@ -1016,39 +952,30 @@
 
           <div class="guide-grid">
             <article class="guide-card">
-              <span class="tape"></span>
-              <div class="guide-inner">
-                <div class="step-badge">1</div>
-                <h3>Elegí qué querés estudiar</h3>
-                <p>
-                  Podés entrar con una materia concreta, un tema puntual o incluso con una duda específica
-                  para que la clase ya empiece enfocada.
-                </p>
-              </div>
+              <div class="step-badge">1</div>
+              <h3>Elegí qué querés estudiar</h3>
+              <p>
+                Podés entrar con una materia concreta, un tema puntual o incluso con una duda específica
+                para que la clase ya empiece enfocada.
+              </p>
             </article>
 
             <article class="guide-card">
-              <span class="tape"></span>
-              <div class="guide-inner">
-                <div class="step-badge">2</div>
-                <h3>Organizá tu espacio</h3>
-                <p>
-                  Eduvia reúne tus clases, materiales y explicaciones dentro del mismo entorno,
-                  para que estudiar se sienta más ordenado y natural.
-                </p>
-              </div>
+              <div class="step-badge">2</div>
+              <h3>Organizá tu espacio</h3>
+              <p>
+                Eduvia reúne tus clases, materiales y explicaciones dentro del mismo entorno,
+                para que estudiar se sienta más ordenado y natural.
+              </p>
             </article>
 
             <article class="guide-card">
-              <span class="tape"></span>
-              <div class="guide-inner">
-                <div class="step-badge">3</div>
-                <h3>La IA te acompaña</h3>
-                <p>
-                  La IA explica, responde preguntas y usa apoyo visual para mostrar ejercicios,
-                  procedimientos y ejemplos de una forma mucho más clara.
-                </p>
-              </div>
+              <div class="step-badge">3</div>
+              <h3>La IA te acompaña</h3>
+              <p>
+                La IA explica, responde preguntas y usa apoyo visual para mostrar ejercicios,
+                procedimientos y ejemplos de una forma mucho más clara.
+              </p>
             </article>
           </div>
         </section>
@@ -1066,48 +993,42 @@
 
           <div class="quick-grid">
             <article class="prep-card">
-              <span class="tape"></span>
-              <div class="prep-inner">
-                <div class="prep-badge">1</div>
-                <h3>Qué vas a encontrar</h3>
-                <p>
-                  La clase está pensada como una sesión de estudio guiada: visual, clara y flexible,
-                  para que no solo leas, sino que realmente entiendas.
-                </p>
+              <div class="prep-badge">1</div>
+              <h3>Qué vas a encontrar</h3>
+              <p>
+                La clase está pensada como una sesión de estudio guiada: visual, clara y flexible,
+                para que no solo leas, sino que realmente entiendas.
+              </p>
 
-                <div class="prep-list">
-                  <div>Explicaciones paso a paso, sin que todo vaya demasiado rápido</div>
-                  <div>Pizarra visual para ejemplos, cuentas y procedimientos</div>
-                  <div>La IA puede repetir, simplificar o cambiar la forma de explicar</div>
-                  <div>Podés empezar con una duda puntual o con una materia completa</div>
-                </div>
+              <div class="prep-list">
+                <div>Explicaciones paso a paso, sin que todo vaya demasiado rápido</div>
+                <div>Pizarra visual para ejemplos, cuentas y procedimientos</div>
+                <div>La IA puede repetir, simplificar o cambiar la forma de explicar</div>
+                <div>Podés empezar con una duda puntual o con una materia completa</div>
+              </div>
 
-                <div class="prep-tip">
-                  Consejo: arrancá con una pregunta concreta o con el tema que más te cuesta. Así la explicación sale mucho más enfocada.
-                </div>
+              <div class="prep-tip">
+                Consejo: arrancá con una pregunta concreta o con el tema que más te cuesta. Así la explicación sale mucho más enfocada.
               </div>
             </article>
 
             <article class="prep-card">
-              <span class="tape"></span>
-              <div class="prep-inner">
-                <div class="prep-badge">2</div>
-                <h3>Cómo aprovecharlo mejor</h3>
-                <p>
-                  Eduvia está pensado para alumnos que quieren una experiencia más cercana,
-                  más visual y mucho más fácil de seguir que una plataforma común.
-                </p>
+              <div class="prep-badge">2</div>
+              <h3>Cómo aprovecharlo mejor</h3>
+              <p>
+                Eduvia está pensado para alumnos que quieren una experiencia más cercana,
+                más visual y mucho más fácil de seguir que una plataforma común.
+              </p>
 
-                <div class="prep-list">
-                  <div>Ideal para entender un tema desde cero</div>
-                  <div>Muy útil para practicar antes de una prueba</div>
-                  <div>Perfecto si aprendés mejor viendo pasos escritos</div>
-                  <div>Podés preguntar sin presión y avanzar a tu propio ritmo</div>
-                </div>
+              <div class="prep-list">
+                <div>Ideal para entender un tema desde cero</div>
+                <div>Muy útil para practicar antes de una prueba</div>
+                <div>Perfecto si aprendés mejor viendo pasos escritos</div>
+                <div>Podés preguntar sin presión y avanzar a tu propio ritmo</div>
+              </div>
 
-                <div class="prep-tip">
-                  La idea es que el panel se sienta como una mesa de estudio digital: ordenada, viva y agradable de usar.
-                </div>
+              <div class="prep-tip">
+                La idea es que el panel se sienta como una mesa de estudio digital: ordenada, viva y agradable de usar.
               </div>
             </article>
           </div>
