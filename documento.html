@@ -12,28 +12,34 @@
   <style>
     :root{
       --bg:#f1f3f4;
-      --bg-soft:#f8f9fa;
       --paper:#ffffff;
       --line:#dadce0;
       --line-soft:#eceff1;
       --text:#202124;
       --muted:#5f6368;
       --blue:#1a73e8;
+      --blue-strong:#0b57d0;
       --blue-soft:#e8f0fe;
+      --success:#1e8e3e;
       --danger:#d93025;
-      --shadow:0 1px 2px rgba(60,64,67,.16), 0 4px 12px rgba(60,64,67,.10);
+
+      --shadow:0 1px 2px rgba(60,64,67,.16),0 4px 12px rgba(60,64,67,.10);
       --shadow-soft:0 18px 44px rgba(15,23,42,.16);
+      --shadow-panel:0 18px 40px rgba(15,23,42,.12);
+      --shadow-chat:0 22px 46px rgba(15,23,42,.16);
+
+      --radius-sm:12px;
+      --radius-md:16px;
+      --radius-lg:20px;
+      --radius-xl:24px;
+      --radius-pill:999px;
+
+      --chat-width:360px;
     }
 
-    *{
-      box-sizing:border-box;
-      margin:0;
-      padding:0;
-    }
+    *{ box-sizing:border-box; margin:0; padding:0; }
 
-    html, body{
-      min-height:100%;
-    }
+    html,body{ min-height:100%; }
 
     body{
       font-family:"Inter",sans-serif;
@@ -41,21 +47,23 @@
       color:var(--text);
     }
 
-    button,
-    input,
-    select{
-      font:inherit;
+    button,input,select,textarea{ font:inherit; }
+    a{ color:inherit; text-decoration:none; }
+    .hidden{ display:none !important; }
+
+    .visually-hidden{
+      position:absolute !important;
+      width:1px !important;
+      height:1px !important;
+      padding:0 !important;
+      margin:-1px !important;
+      overflow:hidden !important;
+      clip:rect(0,0,0,0) !important;
+      white-space:nowrap !important;
+      border:0 !important;
     }
 
-    a{
-      color:inherit;
-      text-decoration:none;
-    }
-
-    .hidden{
-      display:none !important;
-    }
-
+    /* ===== access ===== */
     .access-guard{
       display:none;
       min-height:100vh;
@@ -65,15 +73,13 @@
       background:var(--bg);
     }
 
-    .access-guard.show{
-      display:flex;
-    }
+    .access-guard.show{ display:flex; }
 
     .access-card{
       max-width:520px;
       background:#fff;
       border:1px solid var(--line);
-      border-radius:24px;
+      border-radius:var(--radius-xl);
       box-shadow:var(--shadow);
       padding:32px;
       text-align:center;
@@ -89,6 +95,7 @@
       line-height:1.7;
     }
 
+    /* ===== loading ===== */
     .doc-loading-screen{
       position:fixed;
       inset:0;
@@ -103,12 +110,10 @@
         linear-gradient(180deg, #f7f8fb 0%, #eef2f7 100%);
     }
 
-    .doc-loading-screen.show{
-      display:flex;
-    }
+    .doc-loading-screen.show{ display:flex; }
 
     .doc-loading-card{
-      width:min(100%, 720px);
+      width:min(100%,720px);
       background:rgba(255,255,255,.9);
       border:1px solid rgba(218,220,224,.95);
       border-radius:28px;
@@ -122,7 +127,7 @@
       height:108px;
       margin-bottom:18px;
       border-radius:22px;
-      background:linear-gradient(135deg, #eef4ff 0%, #f8fbff 100%);
+      background:linear-gradient(135deg,#eef4ff 0%,#f8fbff 100%);
       overflow:hidden;
       border:1px solid #e6edf8;
     }
@@ -137,17 +142,8 @@
       box-shadow:0 14px 24px rgba(59,130,246,.08);
     }
 
-    .hero-paper-1{
-      left:92px;
-      top:14px;
-      transform:rotate(-7deg);
-    }
-
-    .hero-paper-2{
-      left:145px;
-      top:8px;
-      transform:rotate(5deg);
-    }
+    .hero-paper-1{ left:92px; top:14px; transform:rotate(-7deg); }
+    .hero-paper-2{ left:145px; top:8px; transform:rotate(5deg); }
 
     .hero-magnifier{
       position:absolute;
@@ -155,8 +151,8 @@
       top:26px;
       width:42px;
       height:42px;
-      border:5px solid #1a73e8;
-      border-radius:999px;
+      border:5px solid var(--blue);
+      border-radius:50%;
     }
 
     .hero-magnifier::after{
@@ -167,7 +163,7 @@
       width:24px;
       height:6px;
       border-radius:999px;
-      background:#1a73e8;
+      background:var(--blue);
       transform:rotate(42deg);
       transform-origin:left center;
     }
@@ -185,19 +181,12 @@
     .hero-lines span{
       height:10px;
       border-radius:999px;
-      background:linear-gradient(90deg, #d6e7ff, #edf4ff);
-      animation: shimmer 1.4s ease-in-out infinite alternate;
+      background:linear-gradient(90deg,#d6e7ff,#edf4ff);
+      animation:shimmer 1.4s ease-in-out infinite alternate;
     }
 
-    .hero-lines span:nth-child(2){
-      width:82%;
-      animation-delay:.15s;
-    }
-
-    .hero-lines span:nth-child(3){
-      width:68%;
-      animation-delay:.3s;
-    }
+    .hero-lines span:nth-child(2){ width:82%; animation-delay:.15s; }
+    .hero-lines span:nth-child(3){ width:68%; animation-delay:.3s; }
 
     @keyframes shimmer{
       from{ opacity:.55; transform:translateX(-2px); }
@@ -208,9 +197,9 @@
       display:inline-flex;
       align-items:center;
       padding:8px 14px;
-      border-radius:999px;
-      background:#e8f0fe;
-      color:#0b57d0;
+      border-radius:var(--radius-pill);
+      background:var(--blue-soft);
+      color:var(--blue-strong);
       font-size:.8rem;
       font-weight:800;
       margin-bottom:12px;
@@ -221,12 +210,11 @@
       font-size:2rem;
       line-height:1.05;
       letter-spacing:-.03em;
-      color:#202124;
       margin-bottom:10px;
     }
 
     .doc-loading-card > p{
-      color:#5f6368;
+      color:var(--muted);
       line-height:1.7;
       font-size:.98rem;
       margin-bottom:22px;
@@ -242,7 +230,7 @@
       display:flex;
       align-items:flex-start;
       gap:12px;
-      padding:14px 14px;
+      padding:14px;
       border-radius:18px;
       border:1px solid #e7ebef;
       background:#f8fafc;
@@ -252,34 +240,32 @@
     .doc-step strong{
       display:block;
       font-size:.95rem;
-      color:#202124;
       margin-bottom:4px;
     }
 
     .doc-step p{
-      margin:0;
       font-size:.85rem;
-      color:#5f6368;
+      color:var(--muted);
       line-height:1.5;
     }
 
     .doc-step-dot{
       width:14px;
       height:14px;
-      border-radius:999px;
+      border-radius:50%;
       background:#cfd8e3;
       margin-top:4px;
       flex:none;
     }
 
     .doc-step.active{
-      background:linear-gradient(135deg, #e8f0fe 0%, #f5f9ff 100%);
+      background:linear-gradient(135deg,#e8f0fe 0%,#f5f9ff 100%);
       border-color:#cfe0ff;
       box-shadow:0 10px 24px rgba(26,115,232,.08);
     }
 
     .doc-step.active .doc-step-dot{
-      background:#1a73e8;
+      background:var(--blue);
       box-shadow:0 0 0 6px rgba(26,115,232,.12);
     }
 
@@ -289,7 +275,7 @@
     }
 
     .doc-step.done .doc-step-dot{
-      background:#1e8e3e;
+      background:var(--success);
       box-shadow:0 0 0 6px rgba(30,142,62,.10);
     }
 
@@ -304,8 +290,8 @@
       width:38%;
       height:100%;
       border-radius:inherit;
-      background:linear-gradient(90deg, #1a73e8, #8ab4f8);
-      animation: progressSlide 1.2s ease-in-out infinite alternate;
+      background:linear-gradient(90deg,var(--blue),#8ab4f8);
+      animation:progressSlide 1.2s ease-in-out infinite alternate;
     }
 
     @keyframes progressSlide{
@@ -313,6 +299,7 @@
       to{ transform:translateX(10%); }
     }
 
+    /* ===== chrome ===== */
     .editor-chrome{
       position:sticky;
       top:0;
@@ -384,22 +371,17 @@
       flex-wrap:wrap;
     }
 
-    .topbar-sub span{
-      white-space:nowrap;
-    }
-
     .topbar-actions{
       display:flex;
       align-items:center;
       gap:8px;
-      margin-left:auto;
-      flex:none;
       flex-wrap:wrap;
+      flex:none;
     }
 
     .btn{
       border:none;
-      border-radius:999px;
+      border-radius:var(--radius-pill);
       padding:8px 14px;
       font-size:.88rem;
       font-weight:700;
@@ -412,13 +394,11 @@
       white-space:nowrap;
     }
 
-    .btn:hover{
-      transform:translateY(-1px);
-    }
+    .btn:hover{ transform:translateY(-1px); }
 
     .btn-soft{
       background:#f1f3f4;
-      color:#202124;
+      color:var(--text);
     }
 
     .btn-soft:hover{
@@ -428,7 +408,7 @@
 
     .btn-outline{
       background:#fff;
-      color:#202124;
+      color:var(--text);
       border:1px solid #d7dde3;
     }
 
@@ -440,9 +420,8 @@
 
     .btn-primary{
       background:#c2e7ff;
-      color:#0b57d0;
+      color:var(--blue-strong);
       padding:9px 16px;
-      box-shadow:none;
     }
 
     .btn-primary:hover{
@@ -469,12 +448,12 @@
       cursor:pointer;
       white-space:nowrap;
       flex:none;
-      transition:background .15s ease, color .15s ease;
+      transition:background .15s ease,color .15s ease;
     }
 
     .menu-link:hover{
       background:#f1f3f4;
-      color:#202124;
+      color:var(--text);
     }
 
     .toolbar-shell{
@@ -520,24 +499,22 @@
       border:none;
       border-radius:8px;
       background:transparent;
-      color:#202124;
+      color:var(--text);
       cursor:pointer;
-      transition:background .15s ease, color .15s ease, box-shadow .15s ease;
       padding:0 8px;
       display:inline-flex;
       align-items:center;
       justify-content:center;
       gap:6px;
       flex:none;
+      transition:background .15s ease,color .15s ease,box-shadow .15s ease;
     }
 
-    .tool-btn:hover{
-      background:#eceff1;
-    }
+    .tool-btn:hover{ background:#eceff1; }
 
     .tool-btn.is-active{
-      background:#e8f0fe;
-      color:#1a73e8;
+      background:var(--blue-soft);
+      color:var(--blue);
       box-shadow:inset 0 0 0 1px rgba(26,115,232,.10);
     }
 
@@ -549,7 +526,6 @@
       stroke-width:2;
       stroke-linecap:round;
       stroke-linejoin:round;
-      flex:none;
     }
 
     .tool-btn.text-btn{
@@ -564,7 +540,7 @@
       border-radius:8px;
       background:transparent;
       padding:0 10px;
-      color:#202124;
+      color:var(--text);
       min-width:110px;
       outline:none;
       font-weight:500;
@@ -575,21 +551,11 @@
     }
 
     .tool-select:hover,
-    .tool-select:focus{
-      background:#eceff1;
-    }
+    .tool-select:focus{ background:#eceff1; }
 
-    .tool-select.style-select{
-      min-width:142px;
-    }
-
-    .tool-select.font-select{
-      min-width:124px;
-    }
-
-    .tool-select.size-select{
-      min-width:68px;
-    }
+    .tool-select.style-select{ min-width:142px; }
+    .tool-select.font-select{ min-width:124px; }
+    .tool-select.size-select{ min-width:68px; }
 
     .tool-label{
       display:inline-flex;
@@ -608,9 +574,7 @@
       flex:none;
     }
 
-    .tool-label:hover{
-      background:#eceff1;
-    }
+    .tool-label:hover{ background:#eceff1; }
 
     .color-wrap{
       position:relative;
@@ -634,9 +598,12 @@
       padding:0;
     }
 
-    .workspace{
-      padding:26px 14px 56px;
-    }
+    /* ===== document ===== */
+    #document-app.document-with-chat .workspace{ padding-right:calc(var(--chat-width) + 42px); }
+    #document-app.document-with-chat .tool-dock{ right:calc(var(--chat-width) + 38px); }
+    #document-app.document-with-chat .tool-panel{ right:calc(var(--chat-width) + 112px); }
+
+    .workspace{ padding:26px 14px 56px; }
 
     .paper-wrap{
       max-width:980px;
@@ -655,9 +622,7 @@
       overflow:hidden;
     }
 
-    .paper-inner{
-      padding:72px 78px 84px;
-    }
+    .paper-inner{ padding:72px 78px 84px; }
 
     .doc-header{
       margin-bottom:34px;
@@ -672,7 +637,7 @@
       letter-spacing:-.04em;
       font-weight:700;
       margin-bottom:14px;
-      color:#202124;
+      color:var(--text);
       outline:none;
     }
 
@@ -699,14 +664,12 @@
     .doc-content{
       font-size:1rem;
       line-height:1.9;
-      color:#202124;
+      color:var(--text);
       outline:none;
       min-height:520px;
     }
 
-    .doc-content:focus{
-      outline:none;
-    }
+    .doc-content:focus{ outline:none; }
 
     .doc-content h2{
       font-family:"Sora",sans-serif;
@@ -714,32 +677,19 @@
       line-height:1.2;
       letter-spacing:-.03em;
       margin:34px 0 14px;
-      color:#202124;
+      color:var(--text);
     }
 
     .doc-content h3{
       font-size:1.08rem;
       margin:24px 0 10px;
-      color:#202124;
+      color:var(--text);
     }
 
-    .doc-content p{
-      margin-bottom:16px;
-      color:#202124;
-    }
-
-    .doc-content ul,
-    .doc-content ol{
-      margin:0 0 18px 24px;
-    }
-
-    .doc-content li{
-      margin-bottom:8px;
-    }
-
-    .doc-content strong{
-      font-weight:800;
-    }
+    .doc-content p{ margin-bottom:16px; }
+    .doc-content ul,.doc-content ol{ margin:0 0 18px 24px; }
+    .doc-content li{ margin-bottom:8px; }
+    .doc-content strong{ font-weight:800; }
 
     .doc-content blockquote{
       margin:18px 0;
@@ -750,11 +700,12 @@
       border-radius:8px;
     }
 
-    .doc-editable[contenteditable="true"]:empty:before{
+    .doc-editable[contenteditable="true"]:empty::before{
       content:attr(data-placeholder);
       color:#9aa0a6;
     }
 
+    /* ===== references ===== */
     .references-panel{
       margin-top:42px;
       padding-top:28px;
@@ -775,11 +726,10 @@
       font-size:1.35rem;
       font-weight:700;
       letter-spacing:-.03em;
-      color:#202124;
     }
 
     .references-sub{
-      color:#5f6368;
+      color:var(--muted);
       font-size:.92rem;
       line-height:1.6;
       margin-bottom:18px;
@@ -794,7 +744,6 @@
     .reference-item{
       padding:0 0 0 22px;
       position:relative;
-      color:#202124;
       line-height:1.8;
       font-size:.97rem;
     }
@@ -806,7 +755,7 @@
       top:.85em;
       width:8px;
       height:8px;
-      border-radius:999px;
+      border-radius:50%;
       background:#d0d7de;
       transform:translateY(-50%);
     }
@@ -817,7 +766,7 @@
     }
 
     .reference-link{
-      color:#0b57d0;
+      color:var(--blue-strong);
       word-break:break-word;
     }
 
@@ -833,20 +782,18 @@
       background:#eef2f7;
       color:#334155;
       padding:8px 12px;
-      border-radius:999px;
+      border-radius:var(--radius-pill);
       font-size:.84rem;
       font-weight:700;
       cursor:pointer;
       transition:.15s ease;
     }
 
-    .toggle-chip:hover{
-      background:#e5ebf2;
-    }
+    .toggle-chip:hover{ background:#e5ebf2; }
 
     .toggle-chip.is-active{
-      background:#e8f0fe;
-      color:#0b57d0;
+      background:var(--blue-soft);
+      color:var(--blue-strong);
       box-shadow:inset 0 0 0 1px rgba(26,115,232,.14);
     }
 
@@ -857,9 +804,9 @@
       min-width:22px;
       height:22px;
       padding:0 8px;
-      border-radius:999px;
+      border-radius:var(--radius-pill);
       background:#eef4ff;
-      color:#0b57d0;
+      color:var(--blue-strong);
       font-size:.76rem;
       font-weight:700;
       vertical-align:middle;
@@ -868,28 +815,316 @@
     }
 
     .apa-inline-citation{
-      color:#5f6368;
+      color:var(--muted);
       font-size:.95em;
       white-space:nowrap;
     }
 
-    .share-modal-backdrop{
+    /* ===== dock / panel ===== */
+    .tool-dock{
+      position:fixed;
+      right:22px;
+      top:170px;
+      z-index:95;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:12px;
+      padding:12px 10px;
+      border-radius:28px;
+      background:linear-gradient(180deg, rgba(255,255,255,.88) 0%, rgba(248,250,252,.96) 100%);
+      border:1px solid rgba(214,220,228,.95);
+      box-shadow:0 20px 44px rgba(15,23,42,.12), inset 0 1px 0 rgba(255,255,255,.7);
+      backdrop-filter:blur(14px);
+    }
+
+    .tool-dock::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      border-radius:inherit;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.24), rgba(255,255,255,0)),
+        radial-gradient(circle at top, rgba(26,115,232,.06), transparent 38%);
+      pointer-events:none;
+    }
+
+    .tool-dock-group{
+      position:relative;
+      z-index:1;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+
+    .tool-dock-divider{
+      position:relative;
+      z-index:1;
+      width:28px;
+      height:1px;
+      background:linear-gradient(90deg, transparent, #d7dee7, transparent);
+      margin:2px 0;
+    }
+
+    .tool-dock-btn{
+      position:relative;
+      width:54px;
+      height:54px;
+      border:none;
+      border-radius:18px;
+      background:linear-gradient(180deg, #fff 0%, #f7f9fc 100%);
+      border:1px solid #e3e8ef;
+      box-shadow:0 10px 24px rgba(15,23,42,.10), inset 0 1px 0 rgba(255,255,255,.95);
+      display:grid;
+      place-items:center;
+      cursor:pointer;
+      color:#475569;
+      transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease, background .18s ease, color .18s ease;
+      backdrop-filter:blur(10px);
+    }
+
+    .tool-dock-btn::after{
+      content:attr(data-tip);
+      position:absolute;
+      right:calc(100% + 12px);
+      top:50%;
+      transform:translateY(-50%) translateX(4px);
+      background:rgba(17,24,39,.92);
+      color:#fff;
+      font-size:.76rem;
+      font-weight:700;
+      padding:8px 10px;
+      border-radius:10px;
+      white-space:nowrap;
+      opacity:0;
+      pointer-events:none;
+      transition:.16s ease;
+      box-shadow:0 10px 24px rgba(15,23,42,.18);
+    }
+
+    .tool-dock-btn:hover::after{
+      opacity:1;
+      transform:translateY(-50%) translateX(0);
+    }
+
+    .tool-dock-btn:hover{
+      transform:translateY(-2px) scale(1.02);
+      color:#1f2937;
+      border-color:#d8e1ec;
+      background:linear-gradient(180deg, #fff 0%, #f2f6fb 100%);
+      box-shadow:0 16px 30px rgba(15,23,42,.14), inset 0 1px 0 rgba(255,255,255,1);
+    }
+
+    .tool-dock-btn:active{ transform:scale(.98); }
+
+    .tool-dock-btn.is-active{
+      color:var(--blue-strong);
+      border-color:#c8dbff;
+      background:linear-gradient(180deg, #eef5ff 0%, #e4efff 100%);
+      box-shadow:0 18px 34px rgba(26,115,232,.18), inset 0 0 0 1px rgba(26,115,232,.08);
+    }
+
+    .tool-dock-btn.is-active::before{
+      content:"";
+      position:absolute;
+      inset:-1px;
+      border-radius:inherit;
+      box-shadow:0 0 0 6px rgba(26,115,232,.10);
+      pointer-events:none;
+    }
+
+    .tool-dock-btn svg{
+      width:22px;
+      height:22px;
+      stroke:currentColor;
+      fill:none;
+      stroke-width:2;
+      stroke-linecap:round;
+      stroke-linejoin:round;
+    }
+
+    .tool-dock-btn.pdf-btn svg{ width:20px; height:20px; }
+
+    .tool-panel-backdrop{
       position:fixed;
       inset:0;
-      background:rgba(15,23,42,.35);
+      background:rgba(15,23,42,.06);
+      opacity:0;
+      pointer-events:none;
+      transition:.18s ease;
+      z-index:96;
+    }
+
+    .tool-panel-backdrop.show{
+      opacity:1;
+      pointer-events:auto;
+    }
+
+    .tool-panel{
+      position:fixed;
+      top:160px;
+      right:96px;
+      bottom:24px;
+      width:340px;
+      overflow:auto;
+      background:#fff;
+      border:1px solid #e5e7eb;
+      border-radius:24px;
+      box-shadow:var(--shadow-panel);
+      padding:18px;
+      z-index:97;
+      opacity:0;
+      pointer-events:none;
+      transform:translateX(18px);
+      transition:opacity .2s ease, transform .2s ease;
+    }
+
+    .tool-panel.show{
+      opacity:1;
+      pointer-events:auto;
+      transform:translateX(0);
+    }
+
+    .tool-panel-head{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:16px;
+      padding-bottom:14px;
+      border-bottom:1px solid #edf1f5;
+    }
+
+    .tool-panel-badge{
+      display:inline-flex;
+      align-items:center;
+      padding:7px 12px;
+      border-radius:var(--radius-pill);
+      background:linear-gradient(180deg, #edf4ff 0%, #e7f0ff 100%);
+      color:var(--blue-strong);
+      font-size:.76rem;
+      font-weight:800;
+      margin-bottom:8px;
+      border:1px solid #d7e5ff;
+    }
+
+    .tool-panel-head h3{
+      font-size:1.12rem;
+      margin-bottom:4px;
+      color:#111827;
+    }
+
+    .tool-panel-head p{
+      color:var(--muted);
+      font-size:.9rem;
+      line-height:1.6;
+    }
+
+    .tool-panel-close{
+      width:40px;
+      height:40px;
+      border:none;
+      border-radius:50%;
+      background:#f3f6fa;
+      color:#334155;
+      cursor:pointer;
+      font-size:1.25rem;
+      flex:none;
+      transition:.16s ease;
+    }
+
+    .tool-panel-close:hover{ background:#e9eef5; }
+
+    .tool-panel-body{
+      display:grid;
+      gap:16px;
+      padding-top:4px;
+    }
+
+    .tool-config{ display:grid; gap:14px; }
+
+    .config-field{
+      display:grid;
+      gap:8px;
+    }
+
+    .config-field span{
+      font-size:.88rem;
+      font-weight:700;
+    }
+
+    .config-field select,
+    .config-field textarea,
+    .config-field input{
+      width:100%;
+      border:1px solid #d9e1e8;
+      border-radius:18px;
+      background:#fcfdff;
+      padding:13px 14px;
+      outline:none;
+      color:#1f2937;
+      transition:border-color .16s ease, box-shadow .16s ease, background .16s ease;
+    }
+
+    .config-field select:hover,
+    .config-field textarea:hover,
+    .config-field input:hover{ background:#fbfdff; }
+
+    .config-field select:focus,
+    .config-field textarea:focus,
+    .config-field input:focus{
+      border-color:var(--blue);
+      box-shadow:0 0 0 4px rgba(26,115,232,.10);
+    }
+
+    .config-field textarea{
+      resize:vertical;
+      min-height:120px;
+    }
+
+    .config-generate-btn{
+      border:none;
+      border-radius:16px;
+      background:linear-gradient(180deg, var(--blue) 0%, #1565d8 100%);
+      color:#fff;
+      font-weight:800;
+      padding:13px 16px;
+      cursor:pointer;
+      transition:.18s ease;
+      box-shadow:0 12px 24px rgba(26,115,232,.18);
+    }
+
+    .config-generate-btn:hover{
+      transform:translateY(-1px);
+      box-shadow:0 16px 28px rgba(26,115,232,.22);
+    }
+
+    /* ===== modals ===== */
+    .share-modal-backdrop,
+    .study-modal-backdrop{
+      position:fixed;
+      inset:0;
       display:none;
       align-items:center;
       justify-content:center;
       padding:18px;
+    }
+
+    .share-modal-backdrop{
+      background:rgba(15,23,42,.35);
       z-index:100;
     }
 
-    .share-modal-backdrop.show{
-      display:flex;
+    .study-modal-backdrop{
+      background:rgba(15,23,42,.42);
+      z-index:140;
     }
 
+    .share-modal-backdrop.show,
+    .study-modal-backdrop.show{ display:flex; }
+
     .share-modal{
-      width:min(100%, 560px);
+      width:min(100%,560px);
       background:#fff;
       border-radius:22px;
       box-shadow:0 20px 50px rgba(15,23,42,.2);
@@ -907,9 +1142,7 @@
       margin-bottom:18px;
     }
 
-    .share-field{
-      margin-bottom:14px;
-    }
+    .share-field{ margin-bottom:14px; }
 
     .share-field label{
       display:block;
@@ -968,23 +1201,8 @@
       min-height:20px;
     }
 
-    .study-modal-backdrop{
-      position:fixed;
-      inset:0;
-      z-index:140;
-      display:none;
-      align-items:center;
-      justify-content:center;
-      padding:18px;
-      background:rgba(15,23,42,.42);
-    }
-
-    .study-modal-backdrop.show{
-      display:flex;
-    }
-
     .study-modal{
-      width:min(100%, 860px);
+      width:min(100%,860px);
       max-height:88vh;
       overflow:auto;
       background:#fff;
@@ -1007,9 +1225,9 @@
       align-items:center;
       justify-content:center;
       padding:7px 12px;
-      border-radius:999px;
-      background:#e8f0fe;
-      color:#0b57d0;
+      border-radius:var(--radius-pill);
+      background:var(--blue-soft);
+      color:var(--blue-strong);
       font-size:.78rem;
       font-weight:800;
       margin-bottom:10px;
@@ -1018,11 +1236,10 @@
     .study-modal-head h3{
       font-size:1.35rem;
       margin-bottom:6px;
-      color:#202124;
     }
 
     .study-modal-head p{
-      color:#5f6368;
+      color:var(--muted);
       line-height:1.6;
     }
 
@@ -1030,9 +1247,9 @@
       width:40px;
       height:40px;
       border:none;
-      border-radius:999px;
+      border-radius:50%;
       background:#f1f3f4;
-      color:#202124;
+      color:var(--text);
       font-size:1.4rem;
       cursor:pointer;
       flex:none;
@@ -1055,10 +1272,7 @@
       cursor:pointer;
     }
 
-    .study-content{
-      display:grid;
-      gap:14px;
-    }
+    .study-content{ display:grid; gap:14px; }
 
     .study-grid{
       display:grid;
@@ -1076,7 +1290,7 @@
     .study-card h4{
       font-size:1rem;
       margin-bottom:10px;
-      color:#202124;
+      color:var(--text);
     }
 
     .study-card p,
@@ -1086,109 +1300,639 @@
     }
 
     .study-card ul,
-    .study-card ol{
-      margin-left:18px;
-    }
-
-    .flashcard-front{
-      font-weight:800;
-      color:#202124;
-      margin-bottom:10px;
-    }
-
-    .flashcard-back{
-      color:#5f6368;
-      line-height:1.7;
-    }
-
-    .study-qa{
-      border:1px solid #e7ebf0;
-      border-radius:18px;
-      padding:14px;
-      background:#fff;
-    }
-
-    .study-qa strong{
-      display:block;
-      margin-bottom:8px;
-      color:#202124;
-      line-height:1.55;
-    }
-
-    .study-answer{
-      margin-top:8px;
-      padding:10px 12px;
-      border-radius:12px;
-      background:#f7f9fc;
-      color:#475569;
-      line-height:1.65;
-    }
-
-    .study-pill{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      padding:6px 10px;
-      border-radius:999px;
-      background:#eef2ff;
-      color:#4338ca;
-      font-size:.76rem;
-      font-weight:800;
-      margin-right:8px;
-      margin-bottom:8px;
-    }
+    .study-card ol{ margin-left:18px; }
 
     .study-empty{
       padding:18px;
       border-radius:18px;
       background:#f8fafc;
-      color:#5f6368;
+      color:var(--muted);
       line-height:1.7;
       border:1px dashed #d7dee7;
     }
 
-    @media (max-width: 900px){
-      .paper-inner{
-        padding:42px 28px 50px;
-      }
+    .study-flip-card{
+      perspective:1200px;
+      min-height:240px;
+      cursor:pointer;
+    }
 
-      .doc-title{
-        font-size:1.8rem;
+    .study-flip-inner{
+      position:relative;
+      width:100%;
+      min-height:240px;
+      transform-style:preserve-3d;
+      transition:transform .55s ease;
+    }
+
+    .study-flip-card.is-flipped .study-flip-inner{
+      transform:rotateY(180deg);
+    }
+
+    .study-flip-face{
+      position:absolute;
+      inset:0;
+      backface-visibility:hidden;
+      border:1px solid #e7ebf0;
+      border-radius:20px;
+      background:#fff;
+      padding:18px;
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+      gap:14px;
+      box-shadow:0 6px 20px rgba(15,23,42,.05);
+    }
+
+    .study-flip-face.back{
+      transform:rotateY(180deg);
+      background:linear-gradient(180deg,#f8fbff 0%, #eef5ff 100%);
+    }
+
+    .study-flip-top{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+
+    .study-flip-top h4{
+      margin:0;
+      font-size:1rem;
+      color:var(--text);
+    }
+
+    .study-flip-hint{
+      font-size:.78rem;
+      font-weight:800;
+      color:var(--blue-strong);
+      background:var(--blue-soft);
+      padding:6px 10px;
+      border-radius:var(--radius-pill);
+    }
+
+    .study-question{
+      font-size:1rem;
+      font-weight:800;
+      line-height:1.55;
+      color:var(--text);
+    }
+
+    .study-solution{
+      font-size:.95rem;
+      line-height:1.7;
+      color:#4b5563;
+    }
+
+    .study-options{
+      display:grid;
+      gap:10px;
+      margin-top:10px;
+    }
+
+    .study-option-btn,
+    .study-tf-btn,
+    .study-check-btn,
+    .study-reveal-btn,
+    .study-keyword-btn{
+      border:none;
+      border-radius:14px;
+      padding:12px 14px;
+      font-size:.92rem;
+      font-weight:700;
+      cursor:pointer;
+      transition:.18s ease;
+    }
+
+    .study-option-btn,
+    .study-tf-btn{
+      width:100%;
+      text-align:left;
+      background:#f8fafc;
+      color:#334155;
+      border:1px solid #e5eaf1;
+    }
+
+    .study-option-btn:hover,
+    .study-tf-btn:hover{
+      background:#f1f5f9;
+      transform:translateY(-1px);
+    }
+
+    .study-option-btn.is-correct,
+    .study-tf-btn.is-correct{
+      background:#ecfdf3;
+      border-color:#b7ebc6;
+      color:#166534;
+    }
+
+    .study-option-btn.is-wrong,
+    .study-tf-btn.is-wrong{
+      background:#fef2f2;
+      border-color:#fecaca;
+      color:#b91c1c;
+    }
+
+    .study-feedback{
+      margin-top:12px;
+      padding:12px 14px;
+      border-radius:14px;
+      background:#f8fafc;
+      color:#475569;
+      line-height:1.65;
+      border:1px solid #e7ebf0;
+    }
+
+    .study-feedback strong{
+      display:block;
+      margin-bottom:6px;
+      color:var(--text);
+    }
+
+    .study-answer-row{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:12px;
+    }
+
+    .study-answer-input{
+      flex:1;
+      min-width:220px;
+      height:46px;
+      border:1px solid #dbe2ea;
+      border-radius:14px;
+      padding:0 14px;
+      outline:none;
+      background:#fff;
+    }
+
+    .study-answer-input:focus{
+      border-color:var(--blue);
+      box-shadow:0 0 0 4px rgba(26,115,232,.10);
+    }
+
+    .study-check-btn{
+      background:var(--blue);
+      color:#fff;
+    }
+
+    .study-check-btn:hover{ background:#1565d8; }
+
+    .study-reveal-btn{
+      background:#eef2f7;
+      color:#334155;
+    }
+
+    .study-reveal-btn:hover{ background:#e2e8f0; }
+
+    .study-complete-result{
+      margin-top:12px;
+      padding:12px 14px;
+      border-radius:14px;
+      font-weight:700;
+      line-height:1.6;
+    }
+
+    .study-complete-result.ok{
+      background:#ecfdf3;
+      color:#166534;
+      border:1px solid #b7ebc6;
+    }
+
+    .study-complete-result.bad{
+      background:#fef2f2;
+      color:#b91c1c;
+      border:1px solid #fecaca;
+    }
+
+    .study-keywords-wrap{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+    }
+
+    .study-keyword-btn{
+      background:#eef2ff;
+      color:#4338ca;
+    }
+
+    .study-keyword-btn:hover{
+      background:#e0e7ff;
+      transform:translateY(-1px);
+    }
+
+    .study-keyword-context{
+      margin-top:14px;
+      padding:14px;
+      border-radius:16px;
+      background:#f8fafc;
+      border:1px solid #e7ebf0;
+      color:#475569;
+      line-height:1.7;
+    }
+
+    .study-checklist{ display:grid; gap:10px; }
+
+    .study-check-item{
+      display:flex;
+      align-items:flex-start;
+      gap:10px;
+      padding:12px 14px;
+      border:1px solid #e7ebf0;
+      border-radius:16px;
+      background:#fff;
+    }
+
+    .study-check-item input{
+      margin-top:4px;
+      width:16px;
+      height:16px;
+    }
+
+    .study-check-item span{
+      color:#475569;
+      line-height:1.65;
+    }
+
+    /* ===== right chat ===== */
+    .doc-chat-panel{
+      position:fixed;
+      top:160px;
+      right:20px;
+      bottom:24px;
+      width:var(--chat-width);
+      z-index:94;
+      display:flex;
+      flex-direction:column;
+      background:rgba(255,255,255,.96);
+      border:1px solid #e4e8ee;
+      border-radius:26px;
+      box-shadow:var(--shadow-chat);
+      backdrop-filter:blur(14px);
+      overflow:hidden;
+    }
+
+    .doc-chat-panel.hidden{ display:none !important; }
+
+    .doc-chat-head{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:12px;
+      padding:18px 18px 14px;
+      border-bottom:1px solid #edf1f5;
+      background:linear-gradient(180deg, #ffffff 0%, #fbfcfe 100%);
+    }
+
+    .doc-chat-head-left{ min-width:0; }
+
+    .doc-chat-badge{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:7px 12px;
+      border-radius:var(--radius-pill);
+      background:var(--blue-soft);
+      color:var(--blue-strong);
+      font-size:.76rem;
+      font-weight:800;
+      margin-bottom:8px;
+    }
+
+    .doc-chat-title{
+      font-size:1.08rem;
+      font-weight:800;
+      color:#111827;
+      margin-bottom:4px;
+      letter-spacing:-.01em;
+    }
+
+    .doc-chat-subtitle{
+      font-size:.88rem;
+      line-height:1.6;
+      color:var(--muted);
+    }
+
+    .doc-chat-close{
+      width:38px;
+      height:38px;
+      border:none;
+      border-radius:50%;
+      background:#f3f6fa;
+      color:#334155;
+      font-size:1.2rem;
+      cursor:pointer;
+      flex:none;
+      transition:.16s ease;
+    }
+
+    .doc-chat-close:hover{ background:#e8eef5; }
+
+    .doc-chat-body{
+      flex:1;
+      overflow:auto;
+      padding:16px;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+      background:linear-gradient(180deg, rgba(248,250,252,.72) 0%, rgba(255,255,255,.92) 100%);
+    }
+
+    .doc-chat-empty{
+      padding:14px 15px;
+      border:1px dashed #d8e1ea;
+      border-radius:16px;
+      background:#f8fafc;
+      color:#64748b;
+      font-size:.9rem;
+      line-height:1.65;
+    }
+
+    .doc-chat-msg{
+      max-width:90%;
+      padding:12px 14px;
+      border-radius:18px;
+      line-height:1.65;
+      font-size:.92rem;
+      word-break:break-word;
+      white-space:pre-wrap;
+    }
+
+    .doc-chat-msg.assistant{
+      align-self:flex-start;
+      background:#fff;
+      border:1px solid #e5eaf1;
+      color:#334155;
+      box-shadow:0 6px 18px rgba(15,23,42,.05);
+    }
+
+    .doc-chat-msg.user{
+      align-self:flex-end;
+      background:linear-gradient(180deg, var(--blue) 0%, #1565d8 100%);
+      color:#fff;
+      box-shadow:0 12px 22px rgba(26,115,232,.18);
+    }
+
+    .doc-chat-meta{
+      margin-top:6px;
+      font-size:.75rem;
+      opacity:.72;
+    }
+
+    .doc-chat-suggestions{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      padding:0 16px 12px;
+      background:#fff;
+      border-top:1px solid #edf1f5;
+    }
+
+    .doc-chat-chip{
+      border:none;
+      border-radius:var(--radius-pill);
+      padding:8px 12px;
+      background:#eef2f7;
+      color:#334155;
+      font-size:.82rem;
+      font-weight:700;
+      cursor:pointer;
+      transition:.15s ease;
+    }
+
+    .doc-chat-chip:hover{ background:#e3eaf2; }
+
+    .doc-chat-form{
+      display:flex;
+      align-items:flex-end;
+      gap:10px;
+      padding:14px 16px 16px;
+      border-top:1px solid #edf1f5;
+      background:#fff;
+    }
+
+    .doc-chat-input-wrap{
+      flex:1;
+      min-width:0;
+      border:1px solid #d9e1e8;
+      border-radius:18px;
+      background:#fcfdff;
+      transition:border-color .16s ease, box-shadow .16s ease;
+    }
+
+    .doc-chat-input-wrap:focus-within{
+      border-color:var(--blue);
+      box-shadow:0 0 0 4px rgba(26,115,232,.10);
+    }
+
+    .doc-chat-input{
+      width:100%;
+      min-height:52px;
+      max-height:140px;
+      resize:none;
+      border:none;
+      background:transparent;
+      padding:14px;
+      outline:none;
+      color:#1f2937;
+      line-height:1.55;
+    }
+
+    .doc-chat-send{
+      height:52px;
+      min-width:52px;
+      padding:0 16px;
+      border:none;
+      border-radius:18px;
+      background:linear-gradient(180deg, var(--blue) 0%, #1565d8 100%);
+      color:#fff;
+      font-weight:800;
+      cursor:pointer;
+      transition:.18s ease;
+      box-shadow:0 12px 24px rgba(26,115,232,.18);
+    }
+
+    .doc-chat-send:hover{
+      transform:translateY(-1px);
+      box-shadow:0 16px 28px rgba(26,115,232,.22);
+    }
+
+    .doc-chat-send:disabled{
+      opacity:.6;
+      cursor:not-allowed;
+      transform:none;
+      box-shadow:none;
+    }
+
+    .doc-chat-toggle{
+      position:fixed;
+      right:22px;
+      bottom:22px;
+      z-index:93;
+      width:58px;
+      height:58px;
+      border:none;
+      border-radius:50%;
+      background:linear-gradient(180deg, var(--blue) 0%, #1565d8 100%);
+      color:#fff;
+      box-shadow:0 18px 34px rgba(26,115,232,.24);
+      cursor:pointer;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      transition:.18s ease;
+    }
+
+    .doc-chat-toggle:hover{ transform:translateY(-2px); }
+
+    .doc-chat-toggle svg{
+      width:24px;
+      height:24px;
+      stroke:currentColor;
+      fill:none;
+      stroke-width:2;
+      stroke-linecap:round;
+      stroke-linejoin:round;
+    }
+
+    /* ===== scrollbars ===== */
+    .doc-menu::-webkit-scrollbar,
+    .toolbar::-webkit-scrollbar{ height:8px; width:8px; }
+
+    .doc-menu::-webkit-scrollbar-thumb,
+    .toolbar::-webkit-scrollbar-thumb{
+      background:#d7dce2;
+      border-radius:999px;
+    }
+
+    /* ===== responsive ===== */
+    @media (max-width:1280px){
+      :root{ --chat-width:340px; }
+    }
+
+    @media (max-width:1100px){
+      #document-app.document-with-chat .workspace{ padding-right:14px; }
+      #document-app.document-with-chat .tool-dock{ right:22px; }
+      #document-app.document-with-chat .tool-panel{ right:96px; }
+
+      .doc-chat-panel{ display:none; }
+      .doc-chat-toggle{ display:flex; }
+
+      .doc-chat-panel.is-open{
+        display:flex;
+        top:auto;
+        left:12px;
+        right:12px;
+        bottom:92px;
+        width:auto;
+        max-height:70vh;
+        z-index:98;
       }
     }
 
-    @media (max-width: 760px){
+    @media (max-width:900px){
+      .paper-inner{ padding:42px 28px 50px; }
+      .doc-title{ font-size:1.8rem; }
+    }
+
+    @media (max-width:820px){
+      .tool-dock{
+        right:12px;
+        left:12px;
+        top:auto;
+        bottom:14px;
+        flex-direction:row;
+        justify-content:flex-start;
+        gap:10px;
+        overflow-x:auto;
+        padding:10px;
+        border-radius:22px;
+      }
+
+      .tool-dock-group{ flex-direction:row; gap:10px; }
+
+      .tool-dock-divider{
+        width:1px;
+        height:28px;
+        margin:0 2px;
+        background:linear-gradient(180deg, transparent, #d7dee7, transparent);
+        flex:none;
+      }
+
+      .tool-dock-btn{
+        width:50px;
+        height:50px;
+        border-radius:16px;
+        flex:none;
+      }
+
+      .tool-dock-btn::after{ display:none; }
+
+      .tool-panel{
+        top:auto;
+        right:12px !important;
+        left:12px;
+        bottom:84px;
+        width:auto;
+        max-height:58vh;
+        border-radius:22px;
+        transform:translateY(14px);
+      }
+
+      .tool-panel.show{ transform:translateY(0); }
+
+      .doc-chat-toggle{
+        right:14px;
+        bottom:84px;
+        width:54px;
+        height:54px;
+      }
+
+      .doc-chat-panel.is-open{
+        bottom:148px;
+        max-height:62vh;
+        border-radius:22px;
+      }
+
+      .doc-chat-form{ padding:12px; }
+      .doc-chat-suggestions{ padding:0 12px 10px; }
+    }
+
+    @media (max-width:760px){
       .study-modal{
         padding:16px;
         border-radius:20px;
       }
 
-      .study-grid{
-        grid-template-columns:1fr;
+      .study-grid{ grid-template-columns:1fr; }
+
+      .study-flip-card,
+      .study-flip-inner{ min-height:220px; }
+
+      .study-flip-face{
+        min-height:220px;
+        padding:16px;
+      }
+
+      .study-answer-row{ flex-direction:column; }
+
+      .study-answer-input{
+        min-width:0;
+        width:100%;
       }
     }
 
-    @media (max-width: 720px){
+    @media (max-width:720px){
       .doc-loading-card{
         padding:20px;
         border-radius:24px;
       }
 
-      .doc-loading-card h2{
-        font-size:1.55rem;
-      }
-
-      .doc-loading-hero{
-        height:92px;
-      }
-
-      .hero-paper-1{
-        left:32px;
-      }
-
-      .hero-paper-2{
-        left:75px;
-      }
+      .doc-loading-card h2{ font-size:1.55rem; }
+      .doc-loading-hero{ height:92px; }
+      .hero-paper-1{ left:32px; }
+      .hero-paper-2{ left:75px; }
 
       .hero-lines{
         left:190px;
@@ -1212,79 +1956,40 @@
       .topbar-actions{
         width:100%;
         justify-content:flex-start;
-        margin-left:0;
       }
 
-      .doc-menu{
-        padding:0 10px 4px;
-      }
+      .doc-menu{ padding:0 10px 4px; }
+      .toolbar-shell{ padding:0 10px 10px; }
+      .toolbar{ padding:6px; border-radius:16px; }
+      .toolbar-group{ padding:0 6px; }
+      .tool-select.style-select{ min-width:132px; }
+      .tool-select.font-select{ min-width:112px; }
 
-      .toolbar-shell{
-        padding:0 10px 10px;
-      }
-
-      .toolbar{
-        padding:6px 6px;
-        border-radius:16px;
-      }
-
-      .toolbar-group{
-        padding:0 6px;
-      }
-
-      .tool-select.style-select{
-        min-width:132px;
-      }
-
-      .tool-select.font-select{
-        min-width:112px;
-      }
-
-      .workspace{
-        padding-top:18px;
-      }
-
-      .paper{
-        min-height:auto;
-      }
-
-      .paper-inner{
-        padding:28px 18px 36px;
-      }
-
-      .doc-title{
-        font-size:1.55rem;
-      }
-
-      .doc-meta{
-        flex-direction:column;
-        gap:8px;
-      }
-
-      .share-row{
-        grid-template-columns:1fr;
-      }
+      .workspace{ padding-top:18px; }
+      .paper{ min-height:auto; }
+      .paper-inner{ padding:28px 18px 36px; }
+      .doc-title{ font-size:1.55rem; }
+      .doc-meta{ flex-direction:column; gap:8px; }
+      .share-row{ grid-template-columns:1fr; }
     }
 
     @media print{
-      body{
-        background:#fff;
+      body{ background:#fff; }
+
+      .editor-chrome,
+      .share-modal-backdrop,
+      .study-modal-backdrop,
+      .tool-dock,
+      .tool-panel,
+      .tool-panel-backdrop,
+      .doc-chat-panel,
+      .doc-chat-toggle,
+      #doc-loading,
+      #access-guard{
+        display:none !important;
       }
 
-.editor-chrome,
-.share-modal-backdrop,
-.study-modal-backdrop,
-.tool-dock,
-.tool-panel,
-.tool-panel-backdrop,
-#doc-loading,
-#access-guard{
-  display:none !important;
-}
-
-      .workspace{
-        padding:0;
-      }
+      .workspace{ padding:0 !important; }
 
       .paper{
         max-width:none;
@@ -1293,658 +1998,8 @@
         border-radius:0;
       }
 
-      .paper-inner{
-        padding:0;
-      }
+      .paper-inner{ padding:0; }
     }
-
-.doc-menu::-webkit-scrollbar,
-.toolbar::-webkit-scrollbar{
-  height:8px;
-  width:8px;
-}
-
-.doc-menu::-webkit-scrollbar-thumb,
-.toolbar::-webkit-scrollbar-thumb{
-  background:#d7dce2;
-  border-radius:999px;
-}
-    
-    .study-flip-card{
-  perspective:1200px;
-  min-height:240px;
-  cursor:pointer;
-}
-
-.study-flip-inner{
-  position:relative;
-  width:100%;
-  min-height:240px;
-  transform-style:preserve-3d;
-  transition:transform .55s ease;
-}
-
-.study-flip-card.is-flipped .study-flip-inner{
-  transform:rotateY(180deg);
-}
-
-.study-flip-face{
-  position:absolute;
-  inset:0;
-  backface-visibility:hidden;
-  border:1px solid #e7ebf0;
-  border-radius:20px;
-  background:#fff;
-  padding:18px;
-  display:flex;
-  flex-direction:column;
-  justify-content:space-between;
-  gap:14px;
-  box-shadow:0 6px 20px rgba(15,23,42,.05);
-}
-
-.study-flip-face.back{
-  transform:rotateY(180deg);
-  background:linear-gradient(180deg,#f8fbff 0%, #eef5ff 100%);
-}
-
-.study-flip-top{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:10px;
-}
-
-.study-flip-top h4{
-  margin:0;
-  font-size:1rem;
-  color:#202124;
-}
-
-.study-flip-hint{
-  font-size:.78rem;
-  font-weight:800;
-  color:#0b57d0;
-  background:#e8f0fe;
-  padding:6px 10px;
-  border-radius:999px;
-}
-
-.study-question{
-  font-size:1rem;
-  font-weight:800;
-  line-height:1.55;
-  color:#202124;
-}
-
-.study-solution{
-  font-size:.95rem;
-  line-height:1.7;
-  color:#4b5563;
-}
-
-.study-options{
-  display:grid;
-  gap:10px;
-  margin-top:10px;
-}
-
-.study-option-btn,
-.study-tf-btn,
-.study-check-btn,
-.study-reveal-btn,
-.study-keyword-btn{
-  border:none;
-  border-radius:14px;
-  padding:12px 14px;
-  font-size:.92rem;
-  font-weight:700;
-  cursor:pointer;
-  transition:.18s ease;
-}
-
-.study-option-btn,
-.study-tf-btn{
-  width:100%;
-  text-align:left;
-  background:#f8fafc;
-  color:#334155;
-  border:1px solid #e5eaf1;
-}
-
-.study-option-btn:hover,
-.study-tf-btn:hover{
-  background:#f1f5f9;
-  transform:translateY(-1px);
-}
-
-.study-option-btn.is-correct,
-.study-tf-btn.is-correct{
-  background:#ecfdf3;
-  border-color:#b7ebc6;
-  color:#166534;
-}
-
-.study-option-btn.is-wrong,
-.study-tf-btn.is-wrong{
-  background:#fef2f2;
-  border-color:#fecaca;
-  color:#b91c1c;
-}
-
-.study-feedback{
-  margin-top:12px;
-  padding:12px 14px;
-  border-radius:14px;
-  background:#f8fafc;
-  color:#475569;
-  line-height:1.65;
-  border:1px solid #e7ebf0;
-}
-
-.study-feedback strong{
-  display:block;
-  margin-bottom:6px;
-  color:#202124;
-}
-
-.study-answer-row{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-  margin-top:12px;
-}
-
-.study-answer-input{
-  flex:1;
-  min-width:220px;
-  height:46px;
-  border:1px solid #dbe2ea;
-  border-radius:14px;
-  padding:0 14px;
-  outline:none;
-  background:#fff;
-}
-
-.study-answer-input:focus{
-  border-color:#1a73e8;
-  box-shadow:0 0 0 4px rgba(26,115,232,.10);
-}
-
-.study-check-btn{
-  background:#1a73e8;
-  color:#fff;
-}
-
-.study-check-btn:hover{
-  background:#1565d8;
-}
-
-.study-reveal-btn{
-  background:#eef2f7;
-  color:#334155;
-}
-
-.study-reveal-btn:hover{
-  background:#e2e8f0;
-}
-
-.study-complete-result{
-  margin-top:12px;
-  padding:12px 14px;
-  border-radius:14px;
-  font-weight:700;
-  line-height:1.6;
-}
-
-.study-complete-result.ok{
-  background:#ecfdf3;
-  color:#166534;
-  border:1px solid #b7ebc6;
-}
-
-.study-complete-result.bad{
-  background:#fef2f2;
-  color:#b91c1c;
-  border:1px solid #fecaca;
-}
-
-.study-keywords-wrap{
-  display:flex;
-  flex-wrap:wrap;
-  gap:10px;
-}
-
-.study-keyword-btn{
-  background:#eef2ff;
-  color:#4338ca;
-}
-
-.study-keyword-btn:hover{
-  background:#e0e7ff;
-  transform:translateY(-1px);
-}
-
-.study-keyword-context{
-  margin-top:14px;
-  padding:14px;
-  border-radius:16px;
-  background:#f8fafc;
-  border:1px solid #e7ebf0;
-  color:#475569;
-  line-height:1.7;
-}
-
-.study-checklist{
-  display:grid;
-  gap:10px;
-}
-
-.study-check-item{
-  display:flex;
-  align-items:flex-start;
-  gap:10px;
-  padding:12px 14px;
-  border:1px solid #e7ebf0;
-  border-radius:16px;
-  background:#fff;
-}
-
-.study-check-item input{
-  margin-top:4px;
-  width:16px;
-  height:16px;
-}
-
-.study-check-item span{
-  color:#475569;
-  line-height:1.65;
-}
-
-@media (max-width:760px){
-  .study-flip-card,
-  .study-flip-inner{
-    min-height:220px;
-  }
-
-  .study-flip-face{
-    min-height:220px;
-    padding:16px;
-  }
-
-  .study-answer-row{
-    flex-direction:column;
-  }
-
-  .study-answer-input{
-    min-width:0;
-    width:100%;
-  }
-}
-.tool-dock{
-  position:fixed;
-  right:22px;
-  top:170px;
-  transform:none;
-  z-index:95;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:12px;
-  padding:12px 10px;
-  border-radius:28px;
-  background:linear-gradient(180deg, rgba(255,255,255,.88) 0%, rgba(248,250,252,.96) 100%);
-  border:1px solid rgba(214,220,228,.95);
-  box-shadow:
-    0 20px 44px rgba(15,23,42,.12),
-    inset 0 1px 0 rgba(255,255,255,.7);
-  backdrop-filter:blur(14px);
-}
-
-.tool-dock::before{
-  content:"";
-  position:absolute;
-  inset:0;
-  border-radius:inherit;
-  background:
-    linear-gradient(180deg, rgba(255,255,255,.24), rgba(255,255,255,0)),
-    radial-gradient(circle at top, rgba(26,115,232,.06), transparent 38%);
-  pointer-events:none;
-}
-
-.tool-dock-group{
-  position:relative;
-  z-index:1;
-  display:flex;
-  flex-direction:column;
-  gap:10px;
-}
-
-.tool-dock-divider{
-  position:relative;
-  z-index:1;
-  width:28px;
-  height:1px;
-  background:linear-gradient(90deg, transparent, #d7dee7, transparent);
-  margin:2px 0;
-}
-
-.tool-dock-btn{
-  position:relative;
-  width:54px;
-  height:54px;
-  border:none;
-  border-radius:18px;
-  background:linear-gradient(180deg, #ffffff 0%, #f7f9fc 100%);
-  border:1px solid #e3e8ef;
-  box-shadow:
-    0 10px 24px rgba(15,23,42,.10),
-    inset 0 1px 0 rgba(255,255,255,.95);
-  display:grid;
-  place-items:center;
-  cursor:pointer;
-  color:#475569;
-  transition:
-    transform .18s ease,
-    box-shadow .18s ease,
-    border-color .18s ease,
-    background .18s ease,
-    color .18s ease;
-  backdrop-filter:blur(10px);
-}
-
-.tool-dock-btn::after{
-  content:attr(data-tip);
-  position:absolute;
-  right:calc(100% + 12px);
-  top:50%;
-  transform:translateY(-50%) translateX(4px);
-  background:rgba(17,24,39,.92);
-  color:#fff;
-  font-size:.76rem;
-  font-weight:700;
-  letter-spacing:.01em;
-  padding:8px 10px;
-  border-radius:10px;
-  white-space:nowrap;
-  opacity:0;
-  pointer-events:none;
-  transition:.16s ease;
-  box-shadow:0 10px 24px rgba(15,23,42,.18);
-}
-
-.tool-dock-btn:hover::after{
-  opacity:1;
-  transform:translateY(-50%) translateX(0);
-}
-
-.tool-dock-btn:hover{
-  transform:translateY(-2px) scale(1.02);
-  color:#1f2937;
-  border-color:#d8e1ec;
-  background:linear-gradient(180deg, #ffffff 0%, #f2f6fb 100%);
-  box-shadow:
-    0 16px 30px rgba(15,23,42,.14),
-    inset 0 1px 0 rgba(255,255,255,1);
-}
-
-.tool-dock-btn:active{
-  transform:scale(.98);
-}
-
-.tool-dock-btn.is-active{
-  color:#0b57d0;
-  border-color:#c8dbff;
-  background:linear-gradient(180deg, #eef5ff 0%, #e4efff 100%);
-  box-shadow:
-    0 18px 34px rgba(26,115,232,.18),
-    inset 0 0 0 1px rgba(26,115,232,.08);
-}
-
-.tool-dock-btn.is-active::before{
-  content:"";
-  position:absolute;
-  inset:-1px;
-  border-radius:inherit;
-  box-shadow:0 0 0 6px rgba(26,115,232,.10);
-  pointer-events:none;
-}
-
-.tool-dock-btn svg{
-  width:22px;
-  height:22px;
-  stroke:currentColor;
-  fill:none;
-  stroke-width:2;
-  stroke-linecap:round;
-  stroke-linejoin:round;
-}
-
-.tool-dock-btn.pdf-btn svg{
-  width:20px;
-  height:20px;
-}
-
-.tool-panel-backdrop{
-  position:fixed;
-  inset:0;
-  background:rgba(15,23,42,.06);
-  opacity:0;
-  pointer-events:none;
-  transition:.18s ease;
-  z-index:96;
-}
-
-.tool-panel-backdrop.show{
-  opacity:1;
-  pointer-events:auto;
-}
-
-.tool-panel{
-  position:fixed;
-  top:160px;
-  right:96px;
-  bottom:24px;
-  width:340px;
-  max-height:none;
-  overflow:auto;
-  background:#ffffff;
-  border:1px solid #e5e7eb;
-  border-radius:24px;
-  box-shadow:0 18px 40px rgba(15,23,42,.12);
-  padding:18px;
-  z-index:97;
-  opacity:0;
-  pointer-events:none;
-  transform:translateX(18px);
-  transition:opacity .2s ease, transform .2s ease;
-}
-
-.tool-panel.show{
-  opacity:1;
-  pointer-events:auto;
-  transform:translateX(0);
-}
-
-.tool-panel-head{
-  display:flex;
-  align-items:flex-start;
-  justify-content:space-between;
-  gap:12px;
-  margin-bottom:16px;
-  padding-bottom:14px;
-  border-bottom:1px solid #edf1f5;
-}
-
-.tool-panel-badge{
-  display:inline-flex;
-  align-items:center;
-  padding:7px 12px;
-  border-radius:999px;
-  background:linear-gradient(180deg, #edf4ff 0%, #e7f0ff 100%);
-  color:#0b57d0;
-  font-size:.76rem;
-  font-weight:800;
-  margin-bottom:8px;
-  border:1px solid #d7e5ff;
-}
-
-.tool-panel-head h3{
-  font-size:1.12rem;
-  margin-bottom:4px;
-  color:#111827;
-}
-
-.tool-panel-head p{
-  color:#5f6368;
-  font-size:.9rem;
-  line-height:1.6;
-}
-
-.tool-panel-close{
-  width:40px;
-  height:40px;
-  border:none;
-  border-radius:999px;
-  background:#f3f6fa;
-  color:#334155;
-  cursor:pointer;
-  font-size:1.25rem;
-  flex:none;
-  transition:.16s ease;
-}
-
-.tool-panel-close:hover{
-  background:#e9eef5;
-}
-
-.tool-panel-body{
-  display:grid;
-  gap:16px;
-  padding-top:4px;
-}
-
-.tool-config{
-  display:grid;
-  gap:14px;
-}
-
-.config-field{
-  display:grid;
-  gap:8px;
-}
-
-.config-field span{
-  font-size:.88rem;
-  font-weight:700;
-  color:#202124;
-}
-
-.config-field select,
-.config-field textarea,
-.config-field input{
-  width:100%;
-  border:1px solid #d9e1e8;
-  border-radius:18px;
-  background:#fcfdff;
-  padding:13px 14px;
-  outline:none;
-  font:inherit;
-  color:#1f2937;
-  transition:border-color .16s ease, box-shadow .16s ease, background .16s ease;
-}
-
-.config-field select:hover,
-.config-field textarea:hover,
-.config-field input:hover{
-  background:#fbfdff;
-}
-
-.config-field select:focus,
-.config-field textarea:focus,
-.config-field input:focus{
-  border-color:#1a73e8;
-  box-shadow:0 0 0 4px rgba(26,115,232,.10);
-}
-
-.config-field textarea{
-  resize:vertical;
-  min-height:120px;
-}
-
-.config-generate-btn{
-  border:none;
-  border-radius:16px;
-  background:linear-gradient(180deg, #1a73e8 0%, #1565d8 100%);
-  color:#fff;
-  font-weight:800;
-  padding:13px 16px;
-  cursor:pointer;
-  transition:.18s ease;
-  box-shadow:0 12px 24px rgba(26,115,232,.18);
-}
-
-.config-generate-btn:hover{
-  transform:translateY(-1px);
-  box-shadow:0 16px 28px rgba(26,115,232,.22);
-}
-
-@media (max-width: 820px){
-  .tool-dock{
-    right:12px;
-    left:12px;
-    top:auto;
-    bottom:14px;
-    transform:none;
-    flex-direction:row;
-    justify-content:flex-start;
-    align-items:center;
-    gap:10px;
-    max-width:none;
-    overflow-x:auto;
-    padding:10px;
-    border-radius:22px;
-  }
-
-  .tool-dock-group{
-    flex-direction:row;
-    gap:10px;
-  }
-
-  .tool-dock-divider{
-    width:1px;
-    height:28px;
-    margin:0 2px;
-    background:linear-gradient(180deg, transparent, #d7dee7, transparent);
-    flex:none;
-  }
-
-  .tool-dock-btn{
-    width:50px;
-    height:50px;
-    border-radius:16px;
-    flex:none;
-  }
-
-  .tool-dock-btn::after{
-    display:none;
-  }
-
-  .tool-panel{
-    top:auto;
-    right:12px;
-    left:12px;
-    bottom:84px;
-    width:auto;
-    max-height:58vh;
-    border-radius:22px;
-    transform:translateY(14px);
-  }
-
-  .tool-panel.show{
-    transform:translateY(0);
-  }
-}
   </style>
 </head>
 <body>
@@ -2018,7 +2073,7 @@
     </div>
   </div>
 
-  <div id="document-app" class="hidden">
+  <div id="document-app" class="hidden document-with-chat">
     <div class="editor-chrome">
       <header class="topbar">
         <div class="topbar-left">
@@ -2052,18 +2107,16 @@
         <button class="menu-link" type="button">Herramientas</button>
       </div>
 
-      <div class="toolbar-shell subbar">
+      <div class="toolbar-shell">
         <div class="toolbar">
           <div class="toolbar-group">
-            <button type="button" class="tool-btn" id="undo-btn" title="Deshacer">
+            <button type="button" class="tool-btn" id="undo-btn" title="Deshacer" aria-label="Deshacer">
               <svg viewBox="0 0 24 24"><path d="M9 14 4 9l5-5"/><path d="M20 20a8 8 0 0 0-8-8H4"/></svg>
             </button>
-
-            <button type="button" class="tool-btn" id="redo-btn" title="Rehacer">
+            <button type="button" class="tool-btn" id="redo-btn" title="Rehacer" aria-label="Rehacer">
               <svg viewBox="0 0 24 24"><path d="m15 14 5-5-5-5"/><path d="M4 20a8 8 0 0 1 8-8h8"/></svg>
             </button>
-
-            <button type="button" class="tool-btn" id="print-btn" title="Imprimir">
+            <button type="button" class="tool-btn" id="print-btn" title="Imprimir" aria-label="Imprimir">
               <svg viewBox="0 0 24 24"><path d="M6 9V3h12v6"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v7H6z"/></svg>
             </button>
           </div>
@@ -2121,11 +2174,9 @@
             <button type="button" class="tool-btn" id="link-btn" title="Insertar link">
               <svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.07 0l2.83-2.83a5 5 0 0 0-7.07-7.07L11 5"/><path d="M14 11a5 5 0 0 0-7.07 0L4.1 13.83a5 5 0 1 0 7.07 7.07L13 19"/></svg>
             </button>
-
             <button type="button" class="tool-btn" id="image-btn" title="Insertar imagen">
               <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="1.5"/><path d="m21 16-5-5L5 19"/></svg>
             </button>
-
             <button type="button" class="tool-btn text-btn" data-command="removeFormat" title="Quitar formato">Tx</button>
           </div>
 
@@ -2133,15 +2184,12 @@
             <button type="button" class="tool-btn" data-command="insertUnorderedList" title="Lista con viñetas">
               <svg viewBox="0 0 24 24"><path d="M9 6h11"/><path d="M9 12h11"/><path d="M9 18h11"/><circle cx="4" cy="6" r="1"/><circle cx="4" cy="12" r="1"/><circle cx="4" cy="18" r="1"/></svg>
             </button>
-
             <button type="button" class="tool-btn" data-command="insertOrderedList" title="Lista numerada">
               <svg viewBox="0 0 24 24"><path d="M10 6h10"/><path d="M10 12h10"/><path d="M10 18h10"/><path d="M4 7V5l-1 1"/><path d="M3 12h2l-2 3h2"/><path d="M3 17c0-.6.4-1 1-1h1c.6 0 1 .4 1 1s-.4 1-1 1H4c-.6 0-1 .4-1 1s.4 1 1 1h1c.6 0 1-.4 1-1"/></svg>
             </button>
-
             <button type="button" class="tool-btn" data-command="outdent" title="Reducir sangría">
               <svg viewBox="0 0 24 24"><path d="M21 6H11"/><path d="M21 12H11"/><path d="M21 18H11"/><path d="m7 8-4 4 4 4"/></svg>
             </button>
-
             <button type="button" class="tool-btn" data-command="indent" title="Aumentar sangría">
               <svg viewBox="0 0 24 24"><path d="M21 6H11"/><path d="M21 12H11"/><path d="M21 18H11"/><path d="m3 8 4 4-4 4"/></svg>
             </button>
@@ -2151,15 +2199,12 @@
             <button type="button" class="tool-btn" data-command="justifyLeft" title="Alinear izquierda">
               <svg viewBox="0 0 24 24"><path d="M4 6h16"/><path d="M4 10h10"/><path d="M4 14h16"/><path d="M4 18h10"/></svg>
             </button>
-
             <button type="button" class="tool-btn" data-command="justifyCenter" title="Centrar">
               <svg viewBox="0 0 24 24"><path d="M4 6h16"/><path d="M7 10h10"/><path d="M4 14h16"/><path d="M7 18h10"/></svg>
             </button>
-
             <button type="button" class="tool-btn" data-command="justifyRight" title="Alinear derecha">
               <svg viewBox="0 0 24 24"><path d="M4 6h16"/><path d="M10 10h10"/><path d="M4 14h16"/><path d="M10 18h10"/></svg>
             </button>
-
             <button type="button" class="tool-btn" data-command="justifyFull" title="Justificar">
               <svg viewBox="0 0 24 24"><path d="M4 6h16"/><path d="M4 10h16"/><path d="M4 14h16"/><path d="M4 18h16"/></svg>
             </button>
@@ -2209,10 +2254,10 @@
             <section class="references-panel" id="references-section">
               <div class="references-top">
                 <div>
-                 <h2 class="references-title" id="references-title">Fuentes</h2>
-<p class="references-sub" id="references-sub">
-  Material utilizado para construir este documento.
-</p>
+                  <h2 class="references-title" id="references-title">Fuentes</h2>
+                  <p class="references-sub" id="references-sub">
+                    Material utilizado para construir este documento.
+                  </p>
                 </div>
 
                 <div class="view-toggle">
@@ -2228,6 +2273,52 @@
       </div>
     </main>
   </div>
+
+  <aside class="doc-chat-panel hidden" id="doc-chat-panel" aria-label="Chat del documento">
+    <div class="doc-chat-head">
+      <div class="doc-chat-head-left">
+        <div class="doc-chat-badge">Asistente IA</div>
+        <div class="doc-chat-title">Completar o corregir contexto</div>
+        <div class="doc-chat-subtitle">
+          Pedí agregar, resumir, alargar o ajustar partes sin rehacer el documento.
+        </div>
+      </div>
+      <button type="button" class="doc-chat-close" id="doc-chat-close" aria-label="Cerrar chat">×</button>
+    </div>
+
+    <div class="doc-chat-body" id="doc-chat-body">
+      <div class="doc-chat-empty" id="doc-chat-empty">
+        Probá con algo como:
+        <br>• “Agregá una conclusión”
+        <br>• “Resumí esta parte”
+        <br>• “Explicalo más simple”
+      </div>
+    </div>
+
+    <div class="doc-chat-suggestions">
+      <button type="button" class="doc-chat-chip" data-chat-chip="Resumí el contenido actual">Resumir</button>
+      <button type="button" class="doc-chat-chip" data-chat-chip="Agregá ejemplos al documento">Agregar ejemplos</button>
+      <button type="button" class="doc-chat-chip" data-chat-chip="Escribí una conclusión para este texto">Conclusión</button>
+    </div>
+
+    <form class="doc-chat-form" id="doc-chat-form">
+      <div class="doc-chat-input-wrap">
+        <textarea
+          id="doc-chat-input"
+          class="doc-chat-input"
+          placeholder="Escribí qué querés cambiar o agregar..."
+          rows="1"
+        ></textarea>
+      </div>
+      <button type="submit" class="doc-chat-send" id="doc-chat-send">→</button>
+    </form>
+  </aside>
+
+  <button type="button" class="doc-chat-toggle" id="doc-chat-toggle" aria-label="Abrir chat">
+    <svg viewBox="0 0 24 24">
+      <path d="M21 15a4 4 0 0 1-4 4H7l-4 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"/>
+    </svg>
+  </button>
 
   <div class="share-modal-backdrop" id="share-modal">
     <div class="share-modal">
@@ -2271,212 +2362,212 @@
     </div>
   </div>
 
-<div class="tool-dock" id="tool-dock">
-  <div class="tool-dock-group">
-    <button type="button" class="tool-dock-btn" data-panel="flashcards-panel" data-tip="Tarjetas" title="Tarjetas">
-      <svg viewBox="0 0 24 24">
-        <path d="M9 3h11v14H9z"/>
-        <path d="M5 7H4a1 1 0 0 0-1 1v11a2 2 0 0 0 2 2h11a1 1 0 0 0 1-1v-1"/>
-        <path d="M12 7h5"/>
-        <path d="M12 11h5"/>
-      </svg>
-    </button>
+  <div class="tool-dock" id="tool-dock">
+    <div class="tool-dock-group">
+      <button type="button" class="tool-dock-btn" data-panel="flashcards-panel" data-tip="Tarjetas" title="Tarjetas">
+        <svg viewBox="0 0 24 24">
+          <path d="M9 3h11v14H9z"/>
+          <path d="M5 7H4a1 1 0 0 0-1 1v11a2 2 0 0 0 2 2h11a1 1 0 0 0 1-1v-1"/>
+          <path d="M12 7h5"/>
+          <path d="M12 11h5"/>
+        </svg>
+      </button>
 
-    <button type="button" class="tool-dock-btn" data-panel="quiz-panel" data-tip="Quiz" title="Quiz">
-      <svg viewBox="0 0 24 24">
-        <path d="M9.09 9a3 3 0 1 1 5.82 1c0 2-3 2-3 4"/>
-        <path d="M12 17h.01"/>
-        <circle cx="12" cy="12" r="9"/>
-      </svg>
-    </button>
+      <button type="button" class="tool-dock-btn" data-panel="quiz-panel" data-tip="Quiz" title="Quiz">
+        <svg viewBox="0 0 24 24">
+          <path d="M9.09 9a3 3 0 1 1 5.82 1c0 2-3 2-3 4"/>
+          <path d="M12 17h.01"/>
+          <circle cx="12" cy="12" r="9"/>
+        </svg>
+      </button>
 
-    <button type="button" class="tool-dock-btn" data-panel="truefalse-panel" data-tip="Verdadero o falso" title="Verdadero o falso">
-      <svg viewBox="0 0 24 24">
-        <path d="m20 6-11 11-5-5"/>
-      </svg>
-    </button>
+      <button type="button" class="tool-dock-btn" data-panel="truefalse-panel" data-tip="Verdadero o falso" title="Verdadero o falso">
+        <svg viewBox="0 0 24 24">
+          <path d="m20 6-11 11-5-5"/>
+        </svg>
+      </button>
 
-    <button type="button" class="tool-dock-btn" data-panel="complete-panel" data-tip="Completar" title="Completar">
-      <svg viewBox="0 0 24 24">
-        <path d="M4 20h16"/>
-        <path d="M8 4h8"/>
-        <path d="M9 4v6"/>
-        <path d="M15 4v6"/>
-        <path d="M7 14h10"/>
-      </svg>
-    </button>
+      <button type="button" class="tool-dock-btn" data-panel="complete-panel" data-tip="Completar" title="Completar">
+        <svg viewBox="0 0 24 24">
+          <path d="M4 20h16"/>
+          <path d="M8 4h8"/>
+          <path d="M9 4v6"/>
+          <path d="M15 4v6"/>
+          <path d="M7 14h10"/>
+        </svg>
+      </button>
 
-    <button type="button" class="tool-dock-btn" data-panel="summary-panel" data-tip="Resumen" title="Resumen">
-      <svg viewBox="0 0 24 24">
-        <path d="M7 4h10"/>
-        <path d="M5 8h14"/>
-        <path d="M5 12h14"/>
-        <path d="M5 16h10"/>
-        <path d="M5 20h6"/>
-      </svg>
-    </button>
+      <button type="button" class="tool-dock-btn" data-panel="summary-panel" data-tip="Resumen" title="Resumen">
+        <svg viewBox="0 0 24 24">
+          <path d="M7 4h10"/>
+          <path d="M5 8h14"/>
+          <path d="M5 12h14"/>
+          <path d="M5 16h10"/>
+          <path d="M5 20h6"/>
+        </svg>
+      </button>
 
-    <button type="button" class="tool-dock-btn" data-panel="keywords-panel" data-tip="Palabras clave" title="Palabras clave">
-      <svg viewBox="0 0 24 24">
-        <circle cx="11" cy="11" r="6"/>
-        <path d="m20 20-4.2-4.2"/>
-      </svg>
-    </button>
+      <button type="button" class="tool-dock-btn" data-panel="keywords-panel" data-tip="Palabras clave" title="Palabras clave">
+        <svg viewBox="0 0 24 24">
+          <circle cx="11" cy="11" r="6"/>
+          <path d="m20 20-4.2-4.2"/>
+        </svg>
+      </button>
 
-    <button type="button" class="tool-dock-btn" data-panel="presentation-panel" data-tip="Presentación" title="Presentación">
-      <svg viewBox="0 0 24 24">
-        <rect x="3" y="4" width="18" height="12" rx="2"/>
-        <path d="M8 20h8"/>
-        <path d="M12 16v4"/>
-        <path d="M7 8h10"/>
-        <path d="M7 11h6"/>
-      </svg>
-    </button>
-  </div>
-
-  <div class="tool-dock-divider"></div>
-
-  <div class="tool-dock-group">
-    <button type="button" class="tool-dock-btn pdf-btn" id="dock-pdf-btn" data-tip="Exportar PDF" title="PDF">
-      <svg viewBox="0 0 24 24">
-        <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/>
-        <path d="M14 3v5h5"/>
-        <path d="M8 13h2.5a1.5 1.5 0 0 0 0-3H8v7"/>
-        <path d="M14 17h1.5a2.5 2.5 0 0 0 0-5H14z"/>
-      </svg>
-    </button>
-  </div>
-</div>
-
-<div class="tool-panel-backdrop" id="tool-panel-backdrop"></div>
-
-<aside class="tool-panel" id="tool-panel">
-  <div class="tool-panel-head">
-    <div>
-      <span class="tool-panel-badge" id="tool-panel-badge">Herramienta</span>
-      <h3 id="tool-panel-title">Configurar</h3>
-      <p id="tool-panel-subtitle">Elegí cómo querés generar este recurso.</p>
-    </div>
-    <button type="button" class="tool-panel-close" id="tool-panel-close">×</button>
-  </div>
-
-  <div class="tool-panel-body">
-    <div class="tool-config hidden" id="flashcards-panel">
-      <label class="config-field">
-        <span>Cantidad de tarjetas</span>
-        <select id="flashcards-count">
-          <option value="4">4</option>
-          <option value="6" selected>6</option>
-          <option value="8">8</option>
-          <option value="10">10</option>
-        </select>
-      </label>
-
-      <label class="config-field">
-        <span>Enfoque</span>
-        <select id="flashcards-focus">
-          <option value="general" selected>General</option>
-          <option value="definitions">Definiciones</option>
-          <option value="concepts">Conceptos clave</option>
-        </select>
-      </label>
-
-      <button type="button" class="config-generate-btn" data-run-tool="flashcards">Generar tarjetas</button>
+      <button type="button" class="tool-dock-btn" data-panel="presentation-panel" data-tip="Presentación" title="Presentación">
+        <svg viewBox="0 0 24 24">
+          <rect x="3" y="4" width="18" height="12" rx="2"/>
+          <path d="M8 20h8"/>
+          <path d="M12 16v4"/>
+          <path d="M7 8h10"/>
+          <path d="M7 11h6"/>
+        </svg>
+      </button>
     </div>
 
-    <div class="tool-config hidden" id="quiz-panel">
-      <label class="config-field">
-        <span>Cantidad de preguntas</span>
-        <select id="quiz-count">
-          <option value="3">3</option>
-          <option value="5" selected>5</option>
-          <option value="7">7</option>
-        </select>
-      </label>
+    <div class="tool-dock-divider"></div>
 
-      <button type="button" class="config-generate-btn" data-run-tool="quiz">Generar quiz</button>
-    </div>
-
-    <div class="tool-config hidden" id="truefalse-panel">
-      <label class="config-field">
-        <span>Cantidad de afirmaciones</span>
-        <select id="truefalse-count">
-          <option value="4">4</option>
-          <option value="6" selected>6</option>
-          <option value="8">8</option>
-        </select>
-      </label>
-
-      <button type="button" class="config-generate-btn" data-run-tool="truefalse">Generar ejercicio</button>
-    </div>
-
-    <div class="tool-config hidden" id="complete-panel">
-      <label class="config-field">
-        <span>Cantidad de frases</span>
-        <select id="complete-count">
-          <option value="4">4</option>
-          <option value="6" selected>6</option>
-          <option value="8">8</option>
-        </select>
-      </label>
-
-      <button type="button" class="config-generate-btn" data-run-tool="complete">Generar práctica</button>
-    </div>
-
-    <div class="tool-config hidden" id="summary-panel">
-      <label class="config-field">
-        <span>Modo de resumen</span>
-        <select id="summary-mode">
-          <option value="express" selected>Express</option>
-          <option value="structured">Estructurado</option>
-        </select>
-      </label>
-
-      <button type="button" class="config-generate-btn" data-run-tool="summary">Generar resumen</button>
-    </div>
-
-    <div class="tool-config hidden" id="keywords-panel">
-      <label class="config-field">
-        <span>Cantidad de palabras clave</span>
-        <select id="keywords-count">
-          <option value="6">6</option>
-          <option value="10" selected>10</option>
-          <option value="12">12</option>
-        </select>
-      </label>
-
-      <button type="button" class="config-generate-btn" data-run-tool="keywords">Generar palabras clave</button>
-    </div>
-
-    <div class="tool-config hidden" id="presentation-panel">
-      <label class="config-field">
-        <span>Cantidad de diapositivas</span>
-        <select id="presentation-pages">
-          <option value="5">5</option>
-          <option value="7" selected>7</option>
-          <option value="10">10</option>
-          <option value="12">12</option>
-        </select>
-      </label>
-
-      <label class="config-field">
-        <span>Estilo visual</span>
-        <select id="presentation-style">
-          <option value="clean" selected>Limpio</option>
-          <option value="academic">Académico</option>
-          <option value="modern">Moderno</option>
-        </select>
-      </label>
-
-      <label class="config-field">
-        <span>Temas que sí o sí querés incluir</span>
-        <textarea id="presentation-topics" rows="5" placeholder="Ej: introducción, causas, consecuencias, conclusión"></textarea>
-      </label>
-
-      <button type="button" class="config-generate-btn" id="generate-presentation-btn">Generar presentación</button>
+    <div class="tool-dock-group">
+      <button type="button" class="tool-dock-btn pdf-btn" id="dock-pdf-btn" data-tip="Exportar PDF" title="PDF">
+        <svg viewBox="0 0 24 24">
+          <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/>
+          <path d="M14 3v5h5"/>
+          <path d="M8 13h2.5a1.5 1.5 0 0 0 0-3H8v7"/>
+          <path d="M14 17h1.5a2.5 2.5 0 0 0 0-5H14z"/>
+        </svg>
+      </button>
     </div>
   </div>
-</aside>
+
+  <div class="tool-panel-backdrop" id="tool-panel-backdrop"></div>
+
+  <aside class="tool-panel" id="tool-panel">
+    <div class="tool-panel-head">
+      <div>
+        <span class="tool-panel-badge" id="tool-panel-badge">Herramienta</span>
+        <h3 id="tool-panel-title">Configurar</h3>
+        <p id="tool-panel-subtitle">Elegí cómo querés generar este recurso.</p>
+      </div>
+      <button type="button" class="tool-panel-close" id="tool-panel-close">×</button>
+    </div>
+
+    <div class="tool-panel-body">
+      <div class="tool-config hidden" id="flashcards-panel">
+        <label class="config-field">
+          <span>Cantidad de tarjetas</span>
+          <select id="flashcards-count">
+            <option value="4">4</option>
+            <option value="6" selected>6</option>
+            <option value="8">8</option>
+            <option value="10">10</option>
+          </select>
+        </label>
+
+        <label class="config-field">
+          <span>Enfoque</span>
+          <select id="flashcards-focus">
+            <option value="general" selected>General</option>
+            <option value="definitions">Definiciones</option>
+            <option value="concepts">Conceptos clave</option>
+          </select>
+        </label>
+
+        <button type="button" class="config-generate-btn" data-run-tool="flashcards">Generar tarjetas</button>
+      </div>
+
+      <div class="tool-config hidden" id="quiz-panel">
+        <label class="config-field">
+          <span>Cantidad de preguntas</span>
+          <select id="quiz-count">
+            <option value="3">3</option>
+            <option value="5" selected>5</option>
+            <option value="7">7</option>
+          </select>
+        </label>
+
+        <button type="button" class="config-generate-btn" data-run-tool="quiz">Generar quiz</button>
+      </div>
+
+      <div class="tool-config hidden" id="truefalse-panel">
+        <label class="config-field">
+          <span>Cantidad de afirmaciones</span>
+          <select id="truefalse-count">
+            <option value="4">4</option>
+            <option value="6" selected>6</option>
+            <option value="8">8</option>
+          </select>
+        </label>
+
+        <button type="button" class="config-generate-btn" data-run-tool="truefalse">Generar ejercicio</button>
+      </div>
+
+      <div class="tool-config hidden" id="complete-panel">
+        <label class="config-field">
+          <span>Cantidad de frases</span>
+          <select id="complete-count">
+            <option value="4">4</option>
+            <option value="6" selected>6</option>
+            <option value="8">8</option>
+          </select>
+        </label>
+
+        <button type="button" class="config-generate-btn" data-run-tool="complete">Generar práctica</button>
+      </div>
+
+      <div class="tool-config hidden" id="summary-panel">
+        <label class="config-field">
+          <span>Modo de resumen</span>
+          <select id="summary-mode">
+            <option value="express" selected>Express</option>
+            <option value="structured">Estructurado</option>
+          </select>
+        </label>
+
+        <button type="button" class="config-generate-btn" data-run-tool="summary">Generar resumen</button>
+      </div>
+
+      <div class="tool-config hidden" id="keywords-panel">
+        <label class="config-field">
+          <span>Cantidad de palabras clave</span>
+          <select id="keywords-count">
+            <option value="6">6</option>
+            <option value="10" selected>10</option>
+            <option value="12">12</option>
+          </select>
+        </label>
+
+        <button type="button" class="config-generate-btn" data-run-tool="keywords">Generar palabras clave</button>
+      </div>
+
+      <div class="tool-config hidden" id="presentation-panel">
+        <label class="config-field">
+          <span>Cantidad de diapositivas</span>
+          <select id="presentation-pages">
+            <option value="5">5</option>
+            <option value="7" selected>7</option>
+            <option value="10">10</option>
+            <option value="12">12</option>
+          </select>
+        </label>
+
+        <label class="config-field">
+          <span>Estilo visual</span>
+          <select id="presentation-style">
+            <option value="clean" selected>Limpio</option>
+            <option value="academic">Académico</option>
+            <option value="modern">Moderno</option>
+          </select>
+        </label>
+
+        <label class="config-field">
+          <span>Temas que sí o sí querés incluir</span>
+          <textarea id="presentation-topics" rows="5" placeholder="Ej: introducción, causas, consecuencias, conclusión"></textarea>
+        </label>
+
+        <button type="button" class="config-generate-btn" id="generate-presentation-btn">Generar presentación</button>
+      </div>
+    </div>
+  </aside>
 
   <div class="study-modal-backdrop" id="study-modal">
     <div class="study-modal">
@@ -2486,7 +2577,6 @@
           <h3 id="study-title">Práctica</h3>
           <p id="study-subtitle">Generado automáticamente a partir del documento actual.</p>
         </div>
-
         <button type="button" class="study-close-btn" id="close-study-btn">×</button>
       </div>
 
@@ -2528,19 +2618,13 @@
         if (stage === "access") {
           title.textContent = "Validando documento";
           text.textContent = message || "Estamos comprobando permisos y preparando el entorno.";
-        }
-
-        if (stage === "sources") {
+        } else if (stage === "sources") {
           title.textContent = "Buscando fuentes";
           text.textContent = message || "Estamos reuniendo información confiable para construir el documento.";
-        }
-
-        if (stage === "analysis") {
+        } else if (stage === "analysis") {
           title.textContent = "Analizando contenido";
           text.textContent = message || "Estamos ordenando ideas, conceptos clave y puntos importantes.";
-        }
-
-        if (stage === "writing") {
+        } else if (stage === "writing") {
           title.textContent = "Redactando documento";
           text.textContent = message || "Estamos preparando el texto final y organizándolo para estudiar.";
         }
@@ -2573,61 +2657,73 @@
         stopAutoFlow();
         title.textContent = "No se pudo preparar el documento";
         text.textContent = message;
-        steps.forEach((step) => {
-          step.classList.remove("active", "done");
-        });
+        steps.forEach((step) => step.classList.remove("active", "done"));
       }
 
       setStage("access");
       startAutoFlow();
 
-      return {
-        setStage,
-        finish,
-        showError,
-        startAutoFlow,
-        stopAutoFlow,
-      };
+      return { setStage, finish, showError, startAutoFlow, stopAutoFlow };
     })();
   </script>
 
   <script>
     (() => {
-      const editableAreas = Array.from(document.querySelectorAll(".doc-editable"));
-      const editor = document.getElementById("doc-content");
+      const $ = (id) => document.getElementById(id);
+      const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
 
-      const formatBlock = document.getElementById("format-block");
-      const fontFamilySelect = document.getElementById("font-family-select");
-      const fontSizeSelect = document.getElementById("font-size-select");
-      const textColor = document.getElementById("text-color");
-      const highlightColor = document.getElementById("highlight-color");
+      const editableAreas = $$(".doc-editable");
+      const editor = $("doc-content");
 
-const toolDockButtons = Array.from(document.querySelectorAll(".tool-dock-btn[data-panel]"));
-const toolPanel = document.getElementById("tool-panel");
-const toolPanelBackdrop = document.getElementById("tool-panel-backdrop");
-const toolPanelClose = document.getElementById("tool-panel-close");
-const toolPanelBadge = document.getElementById("tool-panel-badge");
-const toolPanelTitle = document.getElementById("tool-panel-title");
-const toolPanelSubtitle = document.getElementById("tool-panel-subtitle");
-const toolConfigs = Array.from(document.querySelectorAll(".tool-config"));
-const dockPdfBtn = document.getElementById("dock-pdf-btn");
-const generatePresentationBtn = document.getElementById("generate-presentation-btn");
+      const formatBlock = $("format-block");
+      const fontFamilySelect = $("font-family-select");
+      const fontSizeSelect = $("font-size-select");
+      const textColor = $("text-color");
+      const highlightColor = $("highlight-color");
 
-      const studyModal = document.getElementById("study-modal");
-      const studyBadge = document.getElementById("study-badge");
-      const studyTitle = document.getElementById("study-title");
-      const studySubtitle = document.getElementById("study-subtitle");
-      const studyContent = document.getElementById("study-content");
-      const closeStudyBtn = document.getElementById("close-study-btn");
-      const studyRegenerateBtn = document.getElementById("study-regenerate-btn");
+      const toolDockButtons = $$(".tool-dock-btn[data-panel]");
+      const toolPanel = $("tool-panel");
+      const toolPanelBackdrop = $("tool-panel-backdrop");
+      const toolPanelClose = $("tool-panel-close");
+      const toolPanelBadge = $("tool-panel-badge");
+      const toolPanelTitle = $("tool-panel-title");
+      const toolPanelSubtitle = $("tool-panel-subtitle");
+      const toolConfigs = $$(".tool-config");
+      const dockPdfBtn = $("dock-pdf-btn");
+      const generatePresentationBtn = $("generate-presentation-btn");
 
-      const openShareBtn = document.getElementById("open-share-btn");
+      const studyModal = $("study-modal");
+      const studyBadge = $("study-badge");
+      const studyTitle = $("study-title");
+      const studySubtitle = $("study-subtitle");
+      const studyContent = $("study-content");
+      const closeStudyBtn = $("close-study-btn");
+      const studyRegenerateBtn = $("study-regenerate-btn");
 
-      const linkBtn = document.getElementById("link-btn");
-      const imageBtn = document.getElementById("image-btn");
-      const printBtn = document.getElementById("print-btn");
-      const undoBtn = document.getElementById("undo-btn");
-      const redoBtn = document.getElementById("redo-btn");
+      const openShareBtn = $("open-share-btn");
+      const closeShareBtn = $("close-share-btn");
+      const shareModal = $("share-modal");
+      const copyLinkBtn = $("copy-link-btn");
+      const docLinkInput = $("doc-link");
+      const simpleViewBtn = $("simple-view-btn");
+      const apaViewBtn = $("apa-view-btn");
+      const toggleReferenceViewBtn = $("toggle-reference-view-btn");
+
+      const linkBtn = $("link-btn");
+      const imageBtn = $("image-btn");
+      const printBtn = $("print-btn");
+      const undoBtn = $("undo-btn");
+      const redoBtn = $("redo-btn");
+
+      const chatPanel = $("doc-chat-panel");
+      const chatToggle = $("doc-chat-toggle");
+      const chatClose = $("doc-chat-close");
+      const chatBody = $("doc-chat-body");
+      const chatEmpty = $("doc-chat-empty");
+      const chatForm = $("doc-chat-form");
+      const chatInput = $("doc-chat-input");
+      const chatSend = $("doc-chat-send");
+      const chatChips = $$("[data-chat-chip]");
 
       let activeEditable = editor;
       let savedRange = null;
@@ -2636,51 +2732,49 @@ const generatePresentationBtn = document.getElementById("generate-presentation-b
       const STOPWORDS = new Set([
         "este","esta","estos","estas","sobre","desde","hasta","entre","para","porque","como",
         "donde","cuando","tambien","segun","puede","pueden","tener","tiene","hacer","hacia",
-        "cada","solo","unos","unas","ellos","ellas","nosotros","vosotros","usted",
-        "ustedes","ser","estar","haber","tema","documento","contenido","principal","clase",
-        "materia","nivel","duracion","objetivo","texto","idea","ideas","concepto","conceptos",
-        "explica","explicacion","desarrollo","resumen","parte","partes","más","menos","muy",
-        "con","sin","por","del","las","los","una","uno","unos","unas","que","pero",
-        "para","esto","eso","esa","ese","sus","son","fue","han","hay","será","eran","sea"
+        "cada","solo","unos","unas","ellos","ellas","nosotros","vosotros","usted","ustedes",
+        "ser","estar","haber","tema","documento","contenido","principal","clase","materia",
+        "nivel","duracion","objetivo","texto","idea","ideas","concepto","conceptos","explica",
+        "explicacion","desarrollo","resumen","parte","partes","más","menos","muy","con","sin",
+        "por","del","las","los","una","uno","unos","unas","que","pero","esto","eso","esa",
+        "ese","sus","son","fue","han","hay","será","eran","sea"
       ]);
+
+      function cleanText(value = "") {
+        return String(value || "").replace(/\s+/g, " ").trim();
+      }
+
+      function normalizeCompareText(value = "") {
+        return cleanText(value)
+          .toLowerCase()
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .replace(/[^\w\s]/g, "")
+          .replace(/\s+/g, " ")
+          .trim();
+      }
+
+      function shortenText(text = "", max = 120) {
+        const value = cleanText(text);
+        return value.length <= max ? value : `${value.slice(0, max).trim()}...`;
+      }
+
+      function splitSentences(text = "") {
+        return cleanText(text)
+          .split(/(?<=[.!?])\s+/)
+          .map((s) => s.trim())
+          .filter((s) => s.length > 35);
+      }
 
       function normalizeUrl(value = "") {
         try {
           const url = new URL(String(value).trim(), window.location.origin);
-          if (url.protocol === "http:" || url.protocol === "https:") {
-            return url.href;
-          }
-          return "";
+          return ["http:", "https:"].includes(url.protocol) ? url.href : "";
         } catch {
           return "";
         }
       }
 
-function closeToolPanel() {
-  toolPanel?.classList.remove("show");
-  toolPanelBackdrop?.classList.remove("show");
-  toolDockButtons.forEach((btn) => btn.classList.remove("is-active"));
-  toolConfigs.forEach((panel) => panel.classList.add("hidden"));
-}
-
-function openToolPanel(panelId, meta = {}) {
-  if (!toolPanel) return;
-
-  toolConfigs.forEach((panel) => {
-    panel.classList.toggle("hidden", panel.id !== panelId);
-  });
-
-  toolDockButtons.forEach((btn) => {
-    btn.classList.toggle("is-active", btn.dataset.panel === panelId);
-  });
-
-  toolPanelBadge.textContent = meta.badge || "Herramienta";
-  toolPanelTitle.textContent = meta.title || "Configurar";
-  toolPanelSubtitle.textContent = meta.subtitle || "Elegí cómo querés generar este recurso.";
-
-  toolPanel.classList.add("show");
-  toolPanelBackdrop?.classList.add("show");
-}
       function saveSelection() {
         const selection = window.getSelection();
         if (!selection || !selection.rangeCount || !activeEditable) return;
@@ -2699,16 +2793,16 @@ function openToolPanel(panelId, meta = {}) {
         selection.addRange(savedRange);
       }
 
-      function triggerEditorInput() {
-        if (!activeEditable) return;
-        activeEditable.dispatchEvent(new Event("input", { bubbles: true }));
-      }
-
       function focusEditable() {
         if (!activeEditable) activeEditable = editor;
         if (!activeEditable) return;
         activeEditable.focus({ preventScroll: true });
         restoreSelection();
+      }
+
+      function triggerEditorInput() {
+        if (!activeEditable) return;
+        activeEditable.dispatchEvent(new Event("input", { bubbles: true }));
       }
 
       function exec(command, value = null) {
@@ -2726,142 +2820,14 @@ function openToolPanel(panelId, meta = {}) {
         triggerEditorInput();
       }
 
-      studyContent?.addEventListener("click", (event) => {
-  const flipCard = event.target.closest("[data-flip-card]");
-  if (flipCard) {
-    flipCard.classList.toggle("is-flipped");
-    return;
-  }
-
-  const quizOption = event.target.closest("[data-quiz-option]");
-  if (quizOption) {
-    const card = quizOption.closest("[data-quiz-card]");
-    if (!card || card.dataset.answered === "true") return;
-
-    card.dataset.answered = "true";
-
-    const allOptions = Array.from(card.querySelectorAll("[data-quiz-option]"));
-    const feedback = card.querySelector("[data-quiz-feedback]");
-    const isCorrect = quizOption.dataset.correct === "true";
-
-    allOptions.forEach((btn) => {
-      const btnCorrect = btn.dataset.correct === "true";
-      btn.disabled = true;
-      if (btnCorrect) btn.classList.add("is-correct");
-      else if (btn === quizOption && !isCorrect) btn.classList.add("is-wrong");
-    });
-
-    if (feedback) {
-      feedback.classList.remove("hidden");
-      feedback.querySelector("strong").textContent = isCorrect ? "¡Correcto!" : "Incorrecto";
-    }
-
-    return;
-  }
-
-  const tfChoice = event.target.closest("[data-tf-choice]");
-  if (tfChoice) {
-    const card = tfChoice.closest("[data-tf-card]");
-    if (!card || card.dataset.answered === "true") return;
-
-    card.dataset.answered = "true";
-
-    const answer = card.dataset.answer;
-    const choice = tfChoice.dataset.tfChoice;
-    const buttons = Array.from(card.querySelectorAll("[data-tf-choice]"));
-    const feedback = card.querySelector("[data-tf-feedback]");
-    const isCorrect = choice === answer;
-
-    buttons.forEach((btn) => {
-      btn.disabled = true;
-      if (btn.dataset.tfChoice === answer) btn.classList.add("is-correct");
-      else if (btn === tfChoice && !isCorrect) btn.classList.add("is-wrong");
-    });
-
-    if (feedback) {
-      feedback.classList.remove("hidden");
-      feedback.querySelector("strong").textContent = isCorrect ? "¡Bien!" : "No exactamente";
-    }
-
-    return;
-  }
-
-  const checkComplete = event.target.closest("[data-check-complete]");
-  if (checkComplete) {
-    const card = checkComplete.closest("[data-complete-card]");
-    if (!card) return;
-
-    const input = card.querySelector("[data-complete-input]");
-    const result = card.querySelector("[data-complete-result]");
-    const answer = normalizeCompareText(card.dataset.answer || "");
-    const guess = normalizeCompareText(input?.value || "");
-
-    if (!result) return;
-
-    result.classList.remove("hidden", "ok", "bad");
-
-    if (!guess) {
-      result.classList.add("bad");
-      result.textContent = "Escribí una respuesta antes de revisar.";
-      return;
-    }
-
-    const isCorrect =
-      guess === answer ||
-      guess.includes(answer) ||
-      answer.includes(guess);
-
-    if (isCorrect) {
-      result.classList.add("ok");
-      result.textContent = "¡Correcto! Muy bien.";
-    } else {
-      result.classList.add("bad");
-      result.textContent = "Todavía no. Probá de nuevo o tocá “Mostrar respuesta”.";
-    }
-
-    return;
-  }
-
-  const revealComplete = event.target.closest("[data-reveal-complete]");
-  if (revealComplete) {
-    const card = revealComplete.closest("[data-complete-card]");
-    if (!card) return;
-
-    const result = card.querySelector("[data-complete-result]");
-    if (!result) return;
-
-    result.classList.remove("hidden", "ok", "bad");
-    result.classList.add("ok");
-    result.textContent = `Respuesta: ${card.dataset.answer || ""}`;
-    return;
-  }
-
-  const keywordChip = event.target.closest("[data-keyword-chip]");
-  if (keywordChip) {
-    const wrap = keywordChip.closest(".study-card");
-    const preview = wrap?.querySelector("[data-keyword-preview]");
-    if (!preview) return;
-
-    preview.classList.remove("hidden");
-    preview.innerHTML = `<strong>${keywordChip.textContent}</strong><br>${keywordChip.dataset.keywordContext || ""}`;
-  }
-});
-
       function refreshToolbarState() {
         const commands = new Set([
-          "bold",
-          "italic",
-          "underline",
-          "strikeThrough",
-          "justifyLeft",
-          "justifyCenter",
-          "justifyRight",
-          "justifyFull",
-          "insertOrderedList",
-          "insertUnorderedList",
+          "bold","italic","underline","strikeThrough",
+          "justifyLeft","justifyCenter","justifyRight","justifyFull",
+          "insertOrderedList","insertUnorderedList"
         ]);
 
-        document.querySelectorAll("[data-command]").forEach((btn) => {
+        $$("[data-command]").forEach((btn) => {
           const command = btn.dataset.command;
           if (!commands.has(command)) {
             btn.classList.remove("is-active");
@@ -2869,23 +2835,73 @@ function openToolPanel(panelId, meta = {}) {
           }
 
           try {
-            const active = document.queryCommandState(command);
-            btn.classList.toggle("is-active", !!active);
+            btn.classList.toggle("is-active", !!document.queryCommandState(command));
           } catch {
             btn.classList.remove("is-active");
           }
         });
       }
 
-      function cleanText(value = "") {
-        return String(value || "").replace(/\s+/g, " ").trim();
+      function setReferenceView(mode) {
+        const isApa = mode === "apa";
+        simpleViewBtn?.classList.toggle("is-active", !isApa);
+        apaViewBtn?.classList.toggle("is-active", isApa);
+        if (toggleReferenceViewBtn) {
+          toggleReferenceViewBtn.textContent = isApa ? "Simple" : "APA";
+        }
+        document.body.dataset.referenceView = isApa ? "apa" : "simple";
       }
 
-      function splitSentences(text = "") {
-        return cleanText(text)
-          .split(/(?<=[.!?])\s+/)
-          .map((s) => s.trim())
-          .filter((s) => s.length > 35);
+      function openShareModal() {
+        if (docLinkInput) docLinkInput.value = window.location.href;
+        shareModal?.classList.add("show");
+      }
+
+      function closeShareModal() {
+        shareModal?.classList.remove("show");
+      }
+
+      function closeToolPanel() {
+        toolPanel?.classList.remove("show");
+        toolPanelBackdrop?.classList.remove("show");
+        toolDockButtons.forEach((btn) => btn.classList.remove("is-active"));
+        toolConfigs.forEach((panel) => panel.classList.add("hidden"));
+      }
+
+      function openToolPanel(panelId, meta = {}) {
+        if (!toolPanel) return;
+
+        toolConfigs.forEach((panel) => {
+          panel.classList.toggle("hidden", panel.id !== panelId);
+        });
+
+        toolDockButtons.forEach((btn) => {
+          btn.classList.toggle("is-active", btn.dataset.panel === panelId);
+        });
+
+        toolPanelBadge.textContent = meta.badge || "Herramienta";
+        toolPanelTitle.textContent = meta.title || "Configurar";
+        toolPanelSubtitle.textContent = meta.subtitle || "Elegí cómo querés generar este recurso.";
+
+        toolPanel.classList.add("show");
+        toolPanelBackdrop?.classList.add("show");
+      }
+
+      function openStudyModal() {
+        studyModal?.classList.add("show");
+      }
+
+      function closeStudyModal() {
+        studyModal?.classList.remove("show");
+      }
+
+      function shuffleArray(items = []) {
+        const copy = [...items];
+        for (let i = copy.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [copy[i], copy[j]] = [copy[j], copy[i]];
+        }
+        return copy;
       }
 
       function collectDocumentSections() {
@@ -2948,7 +2964,6 @@ function openToolPanel(panelId, meta = {}) {
       }
 
       function negateSentence(sentence = "") {
-        let result = sentence;
         const replacements = [
           [/\bes\b/i, "no es"],
           [/\bson\b/i, "no son"],
@@ -2961,19 +2976,15 @@ function openToolPanel(panelId, meta = {}) {
         ];
 
         for (const [pattern, replacement] of replacements) {
-          if (pattern.test(result)) {
-            return result.replace(pattern, replacement);
-          }
+          if (pattern.test(sentence)) return sentence.replace(pattern, replacement);
         }
 
-        return `No ${result.charAt(0).toLowerCase()}${result.slice(1)}`;
+        return `No ${sentence.charAt(0).toLowerCase()}${sentence.slice(1)}`;
       }
 
       function getStudyData() {
-        const title = cleanText(document.getElementById("doc-title")?.innerText || "Documento");
-        const objective = cleanText(
-          (document.getElementById("doc-objective")?.innerText || "").replace(/^Objetivo:\s*/i, "")
-        );
+        const title = cleanText($("doc-title")?.innerText || "Documento");
+        const objective = cleanText(($("doc-objective")?.innerText || "").replace(/^Objetivo:\s*/i, ""));
         const sections = collectDocumentSections();
         const allText = cleanText(editor?.innerText || "");
         const sentences = splitSentences(allText);
@@ -2981,387 +2992,458 @@ function openToolPanel(panelId, meta = {}) {
         return { title, objective, sections, allText, sentences };
       }
 
-      function openStudyModal() {
-        studyModal?.classList.add("show");
+      function getContentPool(data) {
+        const pool = [];
+
+        data.sections.forEach((section) => {
+          section.items.forEach((item) => {
+            const clean = cleanText(item);
+            if (clean) pool.push(clean);
+          });
+        });
+
+        data.sentences.forEach((sentence) => {
+          const clean = cleanText(sentence);
+          if (clean) pool.push(clean);
+        });
+
+        return [...new Set(pool)];
       }
 
-      function closeStudyModal() {
-        studyModal?.classList.remove("show");
+      function buildQuizQuestions(data) {
+        const pool = getContentPool(data);
+
+        return data.sections.slice(0, 5).map((section, index) => {
+          const correctBase =
+            cleanText(section.items[0] || "") ||
+            cleanText(data.sentences[index] || "") ||
+            `La sección desarrolla ${section.title}.`;
+
+          const otherPool = pool.filter((item) => item !== correctBase);
+          const distractors = shuffleArray(otherPool)
+            .slice(0, 3)
+            .map((item) => shortenText(item, 95));
+
+          while (distractors.length < 3) {
+            distractors.push(`Opción alternativa ${distractors.length + 1}`);
+          }
+
+          const options = shuffleArray([
+            { text: shortenText(correctBase, 95), correct: true },
+            ...distractors.map((text) => ({ text, correct: false })),
+          ]);
+
+          return {
+            title: section.title || `Sección ${index + 1}`,
+            question: `¿Cuál describe mejor la sección "${section.title || `Sección ${index + 1}`}"?`,
+            explanation: correctBase,
+            options,
+          };
+        }).filter((item) => item.explanation);
       }
 
-function shuffleArray(items = []) {
-  const copy = [...items];
-  for (let i = copy.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [copy[i], copy[j]] = [copy[j], copy[i]];
-  }
-  return copy;
-}
-
-function normalizeCompareText(value = "") {
-  return cleanText(value)
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^\w\s]/g, "")
-    .replace(/\s+/g, " ")
-    .trim();
-}
-
-function shortenText(text = "", max = 120) {
-  const value = cleanText(text);
-  if (value.length <= max) return value;
-  return `${value.slice(0, max).trim()}...`;
-}
-
-function getContentPool(data) {
-  const pool = [];
-
-  data.sections.forEach((section) => {
-    section.items.forEach((item) => {
-      const clean = cleanText(item);
-      if (clean) pool.push(clean);
-    });
-  });
-
-  data.sentences.forEach((sentence) => {
-    const clean = cleanText(sentence);
-    if (clean) pool.push(clean);
-  });
-
-  return [...new Set(pool)];
-}
-
-function buildQuizQuestions(data) {
-  const pool = getContentPool(data);
-
-  return data.sections.slice(0, 5).map((section, index) => {
-    const correctBase =
-      cleanText(section.items[0] || "") ||
-      cleanText(data.sentences[index] || "") ||
-      `La sección desarrolla ${section.title}.`;
-
-    const otherPool = pool.filter((item) => item !== correctBase);
-    const distractors = shuffleArray(otherPool)
-      .slice(0, 3)
-      .map((item) => shortenText(item, 95));
-
-    while (distractors.length < 3) {
-      distractors.push(`Opción alternativa ${distractors.length + 1}`);
-    }
-
-    const options = shuffleArray([
-      { text: shortenText(correctBase, 95), correct: true },
-      ...distractors.map((text) => ({ text, correct: false })),
-    ]);
-
-    return {
-      title: section.title || `Sección ${index + 1}`,
-      question: `¿Cuál describe mejor la sección "${section.title || `Sección ${index + 1}`}"?`,
-      explanation: correctBase,
-      options,
-    };
-  }).filter((item) => item.explanation);
-}
-
-function buildTrueFalseItems(data) {
-  return data.sentences.slice(0, 6).map((sentence, index) => {
-    const isTrue = index % 2 === 0;
-    return {
-      text: isTrue ? sentence : negateSentence(sentence),
-      answer: isTrue ? "verdadero" : "falso",
-      explanation: sentence
-    };
-  });
-}
-
-function buildCompleteItems(data) {
-  return data.sentences.slice(0, 6).map((sentence) => {
-    const keyword = pickKeyword(sentence);
-    if (!keyword) return null;
-
-    const regex = new RegExp(`\\b${keyword}\\b`, "i");
-    return {
-      prompt: sentence.replace(regex, "_____"),
-      answer: keyword,
-      original: sentence
-    };
-  }).filter(Boolean);
-}
-
-function renderFlashcards(data) {
-  const cards = data.sections.slice(0, 8).map((section, index) => ({
-    front: section.title === "Introducción"
-      ? "¿Cuál es la idea principal del documento?"
-      : `¿Qué explica la sección "${section.title}"?`,
-    back: section.items.slice(0, 2).join(" ")
-  })).filter((card) => cleanText(card.back));
-
-  if (!cards.length) {
-    studyContent.innerHTML = `<div class="study-empty">No hay suficiente contenido para crear tarjetas todavía.</div>`;
-    return;
-  }
-
-  studyContent.innerHTML = `
-    <div class="study-grid">
-      ${cards.map((card, index) => `
-        <article class="study-flip-card" data-flip-card>
-          <div class="study-flip-inner">
-            <div class="study-flip-face front">
-              <div class="study-flip-top">
-                <h4>Tarjeta ${index + 1}</h4>
-                <span class="study-flip-hint">Tocá para girar</span>
-              </div>
-              <div class="study-question">${card.front}</div>
-            </div>
-
-            <div class="study-flip-face back">
-              <div class="study-flip-top">
-                <h4>Respuesta</h4>
-                <span class="study-flip-hint">Volver</span>
-              </div>
-              <div class="study-solution">${card.back}</div>
-            </div>
-          </div>
-        </article>
-      `).join("")}
-    </div>
-  `;
-}
-
-function renderQuiz(data) {
-  const questions = buildQuizQuestions(data);
-
-  if (!questions.length) {
-    studyContent.innerHTML = `<div class="study-empty">No hay suficiente contenido para generar preguntas.</div>`;
-    return;
-  }
-
-  studyContent.innerHTML = questions.map((item, index) => `
-    <article class="study-card" data-quiz-card>
-      <h4>Pregunta ${index + 1}</h4>
-      <div class="study-question">${item.question}</div>
-
-      <div class="study-options">
-        ${item.options.map((option) => `
-          <button
-            type="button"
-            class="study-option-btn"
-            data-quiz-option
-            data-correct="${option.correct ? "true" : "false"}"
-          >
-            ${option.text}
-          </button>
-        `).join("")}
-      </div>
-
-      <div class="study-feedback hidden" data-quiz-feedback>
-        <strong>Respuesta correcta</strong>
-        <span>${item.explanation}</span>
-      </div>
-    </article>
-  `).join("");
-}
-
-function renderTrueFalse(data) {
-  const items = buildTrueFalseItems(data);
-
-  if (!items.length) {
-    studyContent.innerHTML = `<div class="study-empty">No hay suficiente texto para crear este ejercicio.</div>`;
-    return;
-  }
-
-  studyContent.innerHTML = items.map((item, index) => `
-    <article class="study-card" data-tf-card data-answer="${item.answer}">
-      <h4>Verdadero o falso ${index + 1}</h4>
-      <div class="study-question">${item.text}</div>
-
-      <div class="study-options">
-        <button type="button" class="study-tf-btn" data-tf-choice="verdadero">Verdadero</button>
-        <button type="button" class="study-tf-btn" data-tf-choice="falso">Falso</button>
-      </div>
-
-      <div class="study-feedback hidden" data-tf-feedback>
-        <strong>Explicación</strong>
-        <span>${item.explanation}</span>
-      </div>
-    </article>
-  `).join("");
-}
-
-function renderComplete(data) {
-  const items = buildCompleteItems(data);
-
-  if (!items.length) {
-    studyContent.innerHTML = `<div class="study-empty">No se encontraron palabras clave suficientes para completar conceptos.</div>`;
-    return;
-  }
-
-  studyContent.innerHTML = items.map((item, index) => `
-    <article class="study-card" data-complete-card data-answer="${item.answer}">
-      <h4>Completar ${index + 1}</h4>
-      <div class="study-question">${item.prompt}</div>
-
-      <div class="study-answer-row">
-        <input
-          type="text"
-          class="study-answer-input"
-          placeholder="Escribí la palabra faltante"
-          data-complete-input
-        >
-        <button type="button" class="study-check-btn" data-check-complete>Revisar</button>
-        <button type="button" class="study-reveal-btn" data-reveal-complete>Mostrar respuesta</button>
-      </div>
-
-      <div class="study-complete-result hidden" data-complete-result></div>
-    </article>
-  `).join("");
-}
-
-function renderSummary(data) {
-  const bullets = [];
-
-  if (data.objective) bullets.push(`Objetivo principal: ${data.objective}`);
-
-  data.sections.slice(0, 5).forEach((section) => {
-    const first = cleanText(section.items[0] || "");
-    if (first) bullets.push(`${section.title}: ${first}`);
-  });
-
-  if (!bullets.length && data.allText) {
-    bullets.push(...data.sentences.slice(0, 5));
-  }
-
-  if (!bullets.length) {
-    studyContent.innerHTML = `<div class="study-empty">Todavía no hay contenido suficiente para resumir.</div>`;
-    return;
-  }
-
-  studyContent.innerHTML = `
-    <article class="study-card">
-      <h4>Resumen express</h4>
-      <div class="study-checklist">
-        ${bullets.map((item, index) => `
-          <label class="study-check-item">
-            <input type="checkbox">
-            <span>${index + 1}. ${item}</span>
-          </label>
-        `).join("")}
-      </div>
-    </article>
-  `;
-}
-
-function renderKeywords(data) {
-  const contexts = [];
-  const words = new Set();
-
-  data.sections.forEach((section) => {
-    const source = `${section.title} ${section.items.join(" ")}`;
-    const keyword = pickKeyword(source);
-    if (keyword && !words.has(keyword)) {
-      words.add(keyword);
-      contexts.push({
-        word: keyword,
-        context: shortenText(section.items[0] || source, 170)
-      });
-    }
-  });
-
-  if (contexts.length < 6) {
-    data.sentences.forEach((sentence) => {
-      const keyword = pickKeyword(sentence);
-      if (keyword && !words.has(keyword)) {
-        words.add(keyword);
-        contexts.push({
-          word: keyword,
-          context: shortenText(sentence, 170)
+      function buildTrueFalseItems(data) {
+        return data.sentences.slice(0, 6).map((sentence, index) => {
+          const isTrue = index % 2 === 0;
+          return {
+            text: isTrue ? sentence : negateSentence(sentence),
+            answer: isTrue ? "verdadero" : "falso",
+            explanation: sentence
+          };
         });
       }
-    });
-  }
 
-  const finalItems = contexts.slice(0, 12);
+      function buildCompleteItems(data) {
+        return data.sentences.slice(0, 6).map((sentence) => {
+          const keyword = pickKeyword(sentence);
+          if (!keyword) return null;
 
-  if (!finalItems.length) {
-    studyContent.innerHTML = `<div class="study-empty">No se detectaron palabras clave todavía.</div>`;
-    return;
-  }
+          const regex = new RegExp(`\\b${keyword}\\b`, "i");
+          return {
+            prompt: sentence.replace(regex, "_____"),
+            answer: keyword,
+            original: sentence
+          };
+        }).filter(Boolean);
+      }
 
-  studyContent.innerHTML = `
-    <article class="study-card">
-      <h4>Palabras clave del documento</h4>
-      <div class="study-keywords-wrap">
-        ${finalItems.map((item) => `
-          <button
-            type="button"
-            class="study-keyword-btn"
-            data-keyword-chip
-            data-keyword-context="${item.context.replace(/"/g, "&quot;")}"
-          >
-            ${item.word}
-          </button>
-        `).join("")}
-      </div>
+      function renderFlashcards(data) {
+        const cards = data.sections.slice(0, 8).map((section, index) => ({
+          front: section.title === "Introducción"
+            ? "¿Cuál es la idea principal del documento?"
+            : `¿Qué explica la sección "${section.title}"?`,
+          back: section.items.slice(0, 2).join(" ")
+        })).filter((card) => cleanText(card.back));
 
-      <div class="study-keyword-context hidden" data-keyword-preview></div>
-    </article>
-  `;
-}
+        if (!cards.length) {
+          studyContent.innerHTML = `<div class="study-empty">No hay suficiente contenido para crear tarjetas todavía.</div>`;
+          return;
+        }
 
-function runStudyTool(tool) {
-  const data = getStudyData();
-  currentStudyTool = tool;
+        studyContent.innerHTML = `
+          <div class="study-grid">
+            ${cards.map((card, index) => `
+              <article class="study-flip-card" data-flip-card>
+                <div class="study-flip-inner">
+                  <div class="study-flip-face front">
+                    <div class="study-flip-top">
+                      <h4>Tarjeta ${index + 1}</h4>
+                      <span class="study-flip-hint">Tocá para girar</span>
+                    </div>
+                    <div class="study-question">${card.front}</div>
+                  </div>
 
-  const config = {
-    flashcards: {
-      badge: "Memoria",
-      title: "Tarjetas de memoria",
-      subtitle: "Tarjetas interactivas para tocar y girar.",
-      render: renderFlashcards
-    },
-    quiz: {
-      badge: "Práctica",
-      title: "Quiz rápido",
-      subtitle: "Respondé opciones y recibí corrección instantánea.",
-      render: renderQuiz
-    },
-    truefalse: {
-      badge: "Juego",
-      title: "Verdadero o falso",
-      subtitle: "Elegí una respuesta y comprobá si entendiste bien el texto.",
-      render: renderTrueFalse
-    },
-    complete: {
-      badge: "Repaso",
-      title: "Completar conceptos",
-      subtitle: "Escribí la palabra faltante y revisá tu respuesta.",
-      render: renderComplete
-    },
-    summary: {
-      badge: "Resumen",
-      title: "Resumen express",
-      subtitle: "Checklist corto para marcar lo que ya repasaste.",
-      render: renderSummary
-    },
-    keywords: {
-      badge: "Claves",
-      title: "Palabras clave",
-      subtitle: "Tocá cada término para ver su contexto en el documento.",
-      render: renderKeywords
-    }
-  };
+                  <div class="study-flip-face back">
+                    <div class="study-flip-top">
+                      <h4>Respuesta</h4>
+                      <span class="study-flip-hint">Volver</span>
+                    </div>
+                    <div class="study-solution">${card.back}</div>
+                  </div>
+                </div>
+              </article>
+            `).join("")}
+          </div>
+        `;
+      }
 
-  const selected = config[tool];
-  if (!selected) return;
+      function renderQuiz(data) {
+        const questions = buildQuizQuestions(data);
 
-  studyBadge.textContent = selected.badge;
-  studyTitle.textContent = selected.title;
-  studySubtitle.textContent = selected.subtitle;
-  selected.render(data);
-  openStudyModal();
-  closeToolPanel();
-}
+        if (!questions.length) {
+          studyContent.innerHTML = `<div class="study-empty">No hay suficiente contenido para generar preguntas.</div>`;
+          return;
+        }
+
+        studyContent.innerHTML = questions.map((item, index) => `
+          <article class="study-card" data-quiz-card>
+            <h4>Pregunta ${index + 1}</h4>
+            <div class="study-question">${item.question}</div>
+
+            <div class="study-options">
+              ${item.options.map((option) => `
+                <button
+                  type="button"
+                  class="study-option-btn"
+                  data-quiz-option
+                  data-correct="${option.correct ? "true" : "false"}"
+                >
+                  ${option.text}
+                </button>
+              `).join("")}
+            </div>
+
+            <div class="study-feedback hidden" data-quiz-feedback>
+              <strong>Respuesta correcta</strong>
+              <span>${item.explanation}</span>
+            </div>
+          </article>
+        `).join("");
+      }
+
+      function renderTrueFalse(data) {
+        const items = buildTrueFalseItems(data);
+
+        if (!items.length) {
+          studyContent.innerHTML = `<div class="study-empty">No hay suficiente texto para crear este ejercicio.</div>`;
+          return;
+        }
+
+        studyContent.innerHTML = items.map((item, index) => `
+          <article class="study-card" data-tf-card data-answer="${item.answer}">
+            <h4>Verdadero o falso ${index + 1}</h4>
+            <div class="study-question">${item.text}</div>
+
+            <div class="study-options">
+              <button type="button" class="study-tf-btn" data-tf-choice="verdadero">Verdadero</button>
+              <button type="button" class="study-tf-btn" data-tf-choice="falso">Falso</button>
+            </div>
+
+            <div class="study-feedback hidden" data-tf-feedback>
+              <strong>Explicación</strong>
+              <span>${item.explanation}</span>
+            </div>
+          </article>
+        `).join("");
+      }
+
+      function renderComplete(data) {
+        const items = buildCompleteItems(data);
+
+        if (!items.length) {
+          studyContent.innerHTML = `<div class="study-empty">No se encontraron palabras clave suficientes para completar conceptos.</div>`;
+          return;
+        }
+
+        studyContent.innerHTML = items.map((item, index) => `
+          <article class="study-card" data-complete-card data-answer="${item.answer}">
+            <h4>Completar ${index + 1}</h4>
+            <div class="study-question">${item.prompt}</div>
+
+            <div class="study-answer-row">
+              <input
+                type="text"
+                class="study-answer-input"
+                placeholder="Escribí la palabra faltante"
+                data-complete-input
+              >
+              <button type="button" class="study-check-btn" data-check-complete>Revisar</button>
+              <button type="button" class="study-reveal-btn" data-reveal-complete>Mostrar respuesta</button>
+            </div>
+
+            <div class="study-complete-result hidden" data-complete-result></div>
+          </article>
+        `).join("");
+      }
+
+      function renderSummary(data) {
+        const bullets = [];
+
+        if (data.objective) bullets.push(`Objetivo principal: ${data.objective}`);
+
+        data.sections.slice(0, 5).forEach((section) => {
+          const first = cleanText(section.items[0] || "");
+          if (first) bullets.push(`${section.title}: ${first}`);
+        });
+
+        if (!bullets.length && data.allText) {
+          bullets.push(...data.sentences.slice(0, 5));
+        }
+
+        if (!bullets.length) {
+          studyContent.innerHTML = `<div class="study-empty">Todavía no hay contenido suficiente para resumir.</div>`;
+          return;
+        }
+
+        studyContent.innerHTML = `
+          <article class="study-card">
+            <h4>Resumen express</h4>
+            <div class="study-checklist">
+              ${bullets.map((item, index) => `
+                <label class="study-check-item">
+                  <input type="checkbox">
+                  <span>${index + 1}. ${item}</span>
+                </label>
+              `).join("")}
+            </div>
+          </article>
+        `;
+      }
+
+      function renderKeywords(data) {
+        const contexts = [];
+        const words = new Set();
+
+        data.sections.forEach((section) => {
+          const source = `${section.title} ${section.items.join(" ")}`;
+          const keyword = pickKeyword(source);
+          if (keyword && !words.has(keyword)) {
+            words.add(keyword);
+            contexts.push({
+              word: keyword,
+              context: shortenText(section.items[0] || source, 170)
+            });
+          }
+        });
+
+        if (contexts.length < 6) {
+          data.sentences.forEach((sentence) => {
+            const keyword = pickKeyword(sentence);
+            if (keyword && !words.has(keyword)) {
+              words.add(keyword);
+              contexts.push({
+                word: keyword,
+                context: shortenText(sentence, 170)
+              });
+            }
+          });
+        }
+
+        const finalItems = contexts.slice(0, 12);
+
+        if (!finalItems.length) {
+          studyContent.innerHTML = `<div class="study-empty">No se detectaron palabras clave todavía.</div>`;
+          return;
+        }
+
+        studyContent.innerHTML = `
+          <article class="study-card">
+            <h4>Palabras clave del documento</h4>
+            <div class="study-keywords-wrap">
+              ${finalItems.map((item) => `
+                <button
+                  type="button"
+                  class="study-keyword-btn"
+                  data-keyword-chip
+                  data-keyword-context="${item.context.replace(/"/g, "&quot;")}"
+                >
+                  ${item.word}
+                </button>
+              `).join("")}
+            </div>
+
+            <div class="study-keyword-context hidden" data-keyword-preview></div>
+          </article>
+        `;
+      }
+
+      function runStudyTool(tool) {
+        const data = getStudyData();
+        currentStudyTool = tool;
+
+        const config = {
+          flashcards: {
+            badge: "Memoria",
+            title: "Tarjetas de memoria",
+            subtitle: "Tarjetas interactivas para tocar y girar.",
+            render: renderFlashcards
+          },
+          quiz: {
+            badge: "Práctica",
+            title: "Quiz rápido",
+            subtitle: "Respondé opciones y recibí corrección instantánea.",
+            render: renderQuiz
+          },
+          truefalse: {
+            badge: "Juego",
+            title: "Verdadero o falso",
+            subtitle: "Elegí una respuesta y comprobá si entendiste bien el texto.",
+            render: renderTrueFalse
+          },
+          complete: {
+            badge: "Repaso",
+            title: "Completar conceptos",
+            subtitle: "Escribí la palabra faltante y revisá tu respuesta.",
+            render: renderComplete
+          },
+          summary: {
+            badge: "Resumen",
+            title: "Resumen express",
+            subtitle: "Checklist corto para marcar lo que ya repasaste.",
+            render: renderSummary
+          },
+          keywords: {
+            badge: "Claves",
+            title: "Palabras clave",
+            subtitle: "Tocá cada término para ver su contexto en el documento.",
+            render: renderKeywords
+          }
+        };
+
+        const selected = config[tool];
+        if (!selected) return;
+
+        studyBadge.textContent = selected.badge;
+        studyTitle.textContent = selected.title;
+        studySubtitle.textContent = selected.subtitle;
+        selected.render(data);
+        openStudyModal();
+        closeToolPanel();
+      }
+
+      function appendChatMessage(role, text) {
+        if (!cleanText(text)) return;
+
+        if (chatEmpty) chatEmpty.remove();
+
+        const bubble = document.createElement("div");
+        bubble.className = `doc-chat-msg ${role}`;
+
+        const content = document.createElement("div");
+        content.textContent = text;
+
+        const meta = document.createElement("div");
+        meta.className = "doc-chat-meta";
+        meta.textContent = role === "user" ? "Vos" : "Eduvia";
+
+        bubble.appendChild(content);
+        bubble.appendChild(meta);
+        chatBody.appendChild(bubble);
+        chatBody.scrollTop = chatBody.scrollHeight;
+      }
+
+      function autoResizeChat() {
+        if (!chatInput) return;
+        chatInput.style.height = "52px";
+        chatInput.style.height = `${Math.min(chatInput.scrollHeight, 140)}px`;
+      }
+
+      function openChat() {
+        if (!chatPanel) return;
+        chatPanel.classList.remove("hidden");
+        if (window.innerWidth <= 1100) {
+          chatPanel.classList.add("is-open");
+        } else {
+          chatPanel.classList.remove("is-open");
+        }
+      }
+
+      function closeChat() {
+        if (!chatPanel) return;
+        if (window.innerWidth <= 1100) {
+          chatPanel.classList.remove("is-open");
+        } else {
+          chatPanel.classList.add("hidden");
+        }
+      }
+
+      function localChatReply(message) {
+        const data = getStudyData();
+        const normalized = normalizeCompareText(message);
+
+        if (!data.allText) {
+          return "Todavía no hay contenido suficiente en el documento. Primero cargá o generá el texto y después pedime cambios.";
+        }
+
+        if (normalized.includes("resum")) {
+          return `Resumen rápido: ${data.sentences.slice(0, 3).join(" ") || shortenText(data.allText, 260)}`;
+        }
+
+        if (normalized.includes("conclusion")) {
+          const lastSection = data.sections[data.sections.length - 1];
+          return `Podés cerrar el documento con una conclusión que retome ${data.title.toLowerCase()} y destaque ${cleanText(lastSection?.title || "las ideas principales")} como síntesis final.`;
+        }
+
+        if (normalized.includes("ejemplo")) {
+          return "Podés sumar un ejemplo concreto después del concepto principal, explicando el caso y cómo se relaciona con la idea teórica.";
+        }
+
+        if (normalized.includes("simple") || normalized.includes("facil")) {
+          return "Para hacerlo más simple, conviene usar oraciones más cortas, menos palabras técnicas y explicar cada concepto con una idea central por párrafo.";
+        }
+
+        if (normalized.includes("alarg")) {
+          return "Para alargarlo bien, agregá una explicación más profunda por sección, un ejemplo por tema y una mini conclusión al final de cada bloque importante.";
+        }
+
+        return "Ya quedó armado el chat lateral. Ahora podés conectarlo con tu lógica de IA real en documento.js para que modifique el documento automáticamente.";
+      }
+
+      async function handleChatSubmit(message) {
+        appendChatMessage("user", message);
+        chatInput.value = "";
+        autoResizeChat();
+        chatSend.disabled = true;
+
+        try {
+          if (typeof window.handleEduviaDocChat === "function") {
+            const reply = await window.handleEduviaDocChat({
+              message,
+              title: cleanText($("doc-title")?.innerText || ""),
+              objective: cleanText($("doc-objective")?.innerText || ""),
+              content: cleanText(editor?.innerText || "")
+            });
+
+            appendChatMessage("assistant", typeof reply === "string" ? reply : localChatReply(message));
+          } else {
+            appendChatMessage("assistant", localChatReply(message));
+          }
+        } catch {
+          appendChatMessage("assistant", "Hubo un problema al procesar el pedido del chat.");
+        } finally {
+          chatSend.disabled = false;
+        }
+      }
 
       editableAreas.forEach((area) => {
         area.addEventListener("focus", () => {
@@ -3380,9 +3462,7 @@ function runStudyTool(tool) {
           refreshToolbarState();
         });
 
-        area.addEventListener("input", () => {
-          saveSelection();
-        });
+        area.addEventListener("input", saveSelection);
       });
 
       document.addEventListener("selectionchange", () => {
@@ -3390,40 +3470,25 @@ function runStudyTool(tool) {
         refreshToolbarState();
       });
 
-      document.querySelectorAll("[data-command]").forEach((btn) => {
+      $$("[data-command]").forEach((btn) => {
         btn.addEventListener("click", () => {
           const command = btn.dataset.command;
-          if (!command) return;
-          exec(command);
+          if (command) exec(command);
         });
       });
 
       formatBlock?.addEventListener("change", () => {
-        const map = {
-          p: "P",
-          h2: "H2",
-          h3: "H3",
-          blockquote: "BLOCKQUOTE",
-        };
-
+        const map = { p: "P", h2: "H2", h3: "H3", blockquote: "BLOCKQUOTE" };
         exec("formatBlock", map[formatBlock.value] || "P");
       });
 
-      fontFamilySelect?.addEventListener("change", () => {
-        exec("fontName", fontFamilySelect.value);
-      });
-
-      fontSizeSelect?.addEventListener("change", () => {
-        exec("fontSize", fontSizeSelect.value);
-      });
-
-      textColor?.addEventListener("input", () => {
-        exec("foreColor", textColor.value);
-      });
-
-      highlightColor?.addEventListener("input", () => {
-        exec("hiliteColor", highlightColor.value);
-      });
+      fontFamilySelect?.addEventListener("change", () => exec("fontName", fontFamilySelect.value));
+      fontSizeSelect?.addEventListener("change", () => exec("fontSize", fontSizeSelect.value));
+      textColor?.addEventListener("input", () => exec("foreColor", textColor.value));
+      highlightColor?.addEventListener("input", () => exec("hiliteColor", highlightColor.value));
+      printBtn?.addEventListener("click", () => window.print());
+      undoBtn?.addEventListener("click", () => exec("undo"));
+      redoBtn?.addEventListener("click", () => exec("redo"));
 
       linkBtn?.addEventListener("click", () => {
         const raw = prompt("Pegá el link que querés insertar:");
@@ -3451,140 +3516,299 @@ function runStudyTool(tool) {
         exec("insertImage", url);
       });
 
-      printBtn?.addEventListener("click", () => {
+      openShareBtn?.addEventListener("click", openShareModal);
+      closeShareBtn?.addEventListener("click", closeShareModal);
+      shareModal?.addEventListener("click", (event) => {
+        if (event.target === shareModal) closeShareModal();
+      });
+
+      copyLinkBtn?.addEventListener("click", async () => {
+        try {
+          await navigator.clipboard.writeText(window.location.href);
+          const status = $("share-status");
+          if (status) status.textContent = "Link copiado.";
+        } catch {
+          const status = $("share-status");
+          if (status) status.textContent = "No se pudo copiar el link.";
+        }
+      });
+
+      simpleViewBtn?.addEventListener("click", () => setReferenceView("simple"));
+      apaViewBtn?.addEventListener("click", () => setReferenceView("apa"));
+      toggleReferenceViewBtn?.addEventListener("click", () => {
+        const next = document.body.dataset.referenceView === "apa" ? "simple" : "apa";
+        setReferenceView(next);
+      });
+
+      const panelMeta = {
+        "flashcards-panel": {
+          badge: "Memoria",
+          title: "Tarjetas de memoria",
+          subtitle: "Configurá cuántas tarjetas querés generar."
+        },
+        "quiz-panel": {
+          badge: "Práctica",
+          title: "Quiz rápido",
+          subtitle: "Generá preguntas automáticas para practicar."
+        },
+        "truefalse-panel": {
+          badge: "Juego",
+          title: "Verdadero o falso",
+          subtitle: "Probá comprensión con afirmaciones automáticas."
+        },
+        "complete-panel": {
+          badge: "Repaso",
+          title: "Completar conceptos",
+          subtitle: "Practicá memoria activa completando frases."
+        },
+        "summary-panel": {
+          badge: "Resumen",
+          title: "Resumen express",
+          subtitle: "Obtené una versión corta del contenido."
+        },
+        "keywords-panel": {
+          badge: "Claves",
+          title: "Palabras clave",
+          subtitle: "Extraé conceptos importantes del documento."
+        },
+        "presentation-panel": {
+          badge: "Slides",
+          title: "Pasar a presentación",
+          subtitle: "Definí páginas, estilo y temas antes de generarla."
+        }
+      };
+
+      toolDockButtons.forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const panelId = btn.dataset.panel;
+          const sameOpen = btn.classList.contains("is-active") && toolPanel?.classList.contains("show");
+
+          if (sameOpen) {
+            closeToolPanel();
+            return;
+          }
+
+          openToolPanel(panelId, panelMeta[panelId] || {});
+        });
+      });
+
+      toolPanelBackdrop?.addEventListener("click", closeToolPanel);
+      toolPanelClose?.addEventListener("click", closeToolPanel);
+
+      $$("[data-run-tool]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const tool = btn.dataset.runTool;
+          if (!tool) return;
+          runStudyTool(tool);
+        });
+      });
+
+      dockPdfBtn?.addEventListener("click", () => {
+        closeToolPanel();
         window.print();
       });
 
-      undoBtn?.addEventListener("click", () => {
-        exec("undo");
+      generatePresentationBtn?.addEventListener("click", () => {
+        const pages = $("presentation-pages")?.value || "7";
+        const style = $("presentation-style")?.value || "clean";
+        const topics = $("presentation-topics")?.value || "";
+
+        closeToolPanel();
+
+        studyBadge.textContent = "Slides";
+        studyTitle.textContent = "Borrador de presentación";
+        studySubtitle.textContent = `Configuración: ${pages} diapositivas · estilo ${style}`;
+
+        const data = getStudyData();
+        const sections = data.sections.slice(0, Number(pages));
+        const extraTopics = topics.split(",").map((item) => cleanText(item)).filter(Boolean);
+
+        studyContent.innerHTML = `
+          <article class="study-card">
+            <h4>Configuración aplicada</h4>
+            <p><strong>Diapositivas:</strong> ${pages}</p>
+            <p><strong>Estilo:</strong> ${style}</p>
+            <p><strong>Temas pedidos:</strong> ${extraTopics.length ? extraTopics.join(", ") : "Ninguno especificado"}</p>
+          </article>
+
+          <article class="study-card">
+            <h4>Estructura sugerida</h4>
+            <div class="study-checklist">
+              ${sections.map((section, index) => `
+                <label class="study-check-item">
+                  <input type="checkbox">
+                  <span><strong>Slide ${index + 1}:</strong> ${section.title} — ${shortenText(section.items[0] || "", 140)}</span>
+                </label>
+              `).join("")}
+            </div>
+          </article>
+        `;
+
+        openStudyModal();
       });
-
-      redoBtn?.addEventListener("click", () => {
-        exec("redo");
-      });
-
-const panelMeta = {
-  "flashcards-panel": {
-    badge: "Memoria",
-    title: "Tarjetas de memoria",
-    subtitle: "Configurá cuántas tarjetas querés generar."
-  },
-  "quiz-panel": {
-    badge: "Práctica",
-    title: "Quiz rápido",
-    subtitle: "Generá preguntas automáticas para practicar."
-  },
-  "truefalse-panel": {
-    badge: "Juego",
-    title: "Verdadero o falso",
-    subtitle: "Probá comprensión con afirmaciones automáticas."
-  },
-  "complete-panel": {
-    badge: "Repaso",
-    title: "Completar conceptos",
-    subtitle: "Practicá memoria activa completando frases."
-  },
-  "summary-panel": {
-    badge: "Resumen",
-    title: "Resumen express",
-    subtitle: "Obtené una versión corta del contenido."
-  },
-  "keywords-panel": {
-    badge: "Claves",
-    title: "Palabras clave",
-    subtitle: "Extraé conceptos importantes del documento."
-  },
-  "presentation-panel": {
-    badge: "Slides",
-    title: "Pasar a presentación",
-    subtitle: "Definí páginas, estilo y temas antes de generarla."
-  }
-};
-
-toolDockButtons.forEach((btn) => {
-  btn.addEventListener("click", () => {
-    const panelId = btn.dataset.panel;
-    const sameOpen = btn.classList.contains("is-active") && toolPanel?.classList.contains("show");
-
-    if (sameOpen) {
-      closeToolPanel();
-      return;
-    }
-
-    openToolPanel(panelId, panelMeta[panelId] || {});
-  });
-});
-
-toolPanelBackdrop?.addEventListener("click", closeToolPanel);
-toolPanelClose?.addEventListener("click", closeToolPanel);
-
-document.querySelectorAll("[data-run-tool]").forEach((btn) => {
-  btn.addEventListener("click", () => {
-    const tool = btn.dataset.runTool;
-    if (!tool) return;
-    closeToolPanel();
-    runStudyTool(tool);
-  });
-});
-
-dockPdfBtn?.addEventListener("click", () => {
-  closeToolPanel();
-  window.print();
-});
-
-generatePresentationBtn?.addEventListener("click", () => {
-  const pages = document.getElementById("presentation-pages")?.value || "7";
-  const style = document.getElementById("presentation-style")?.value || "clean";
-  const topics = document.getElementById("presentation-topics")?.value || "";
-
-  closeToolPanel();
-
-  studyBadge.textContent = "Slides";
-  studyTitle.textContent = "Borrador de presentación";
-  studySubtitle.textContent = `Configuración: ${pages} diapositivas · estilo ${style}`;
-
-  const data = getStudyData();
-  const sections = data.sections.slice(0, Number(pages));
-  const extraTopics = topics
-    .split(",")
-    .map((item) => cleanText(item))
-    .filter(Boolean);
-
-  studyContent.innerHTML = `
-    <article class="study-card">
-      <h4>Configuración aplicada</h4>
-      <p><strong>Diapositivas:</strong> ${pages}</p>
-      <p><strong>Estilo:</strong> ${style}</p>
-      <p><strong>Temas pedidos:</strong> ${extraTopics.length ? extraTopics.join(", ") : "Ninguno especificado"}</p>
-    </article>
-
-    <article class="study-card">
-      <h4>Estructura sugerida</h4>
-      <div class="study-checklist">
-        ${sections.map((section, index) => `
-          <label class="study-check-item">
-            <input type="checkbox">
-            <span><strong>Slide ${index + 1}:</strong> ${section.title} — ${shortenText(section.items[0] || "", 140)}</span>
-          </label>
-        `).join("")}
-      </div>
-    </article>
-  `;
-
-  openStudyModal();
-});
 
       closeStudyBtn?.addEventListener("click", closeStudyModal);
-
       studyModal?.addEventListener("click", (event) => {
         if (event.target === studyModal) closeStudyModal();
       });
 
       studyRegenerateBtn?.addEventListener("click", () => {
-        if (!currentStudyTool) return;
-        runStudyTool(currentStudyTool);
+        if (currentStudyTool) runStudyTool(currentStudyTool);
       });
 
+      studyContent?.addEventListener("click", (event) => {
+        const flipCard = event.target.closest("[data-flip-card]");
+        if (flipCard) {
+          flipCard.classList.toggle("is-flipped");
+          return;
+        }
+
+        const quizOption = event.target.closest("[data-quiz-option]");
+        if (quizOption) {
+          const card = quizOption.closest("[data-quiz-card]");
+          if (!card || card.dataset.answered === "true") return;
+
+          card.dataset.answered = "true";
+
+          const allOptions = Array.from(card.querySelectorAll("[data-quiz-option]"));
+          const feedback = card.querySelector("[data-quiz-feedback]");
+          const isCorrect = quizOption.dataset.correct === "true";
+
+          allOptions.forEach((btn) => {
+            const btnCorrect = btn.dataset.correct === "true";
+            btn.disabled = true;
+            if (btnCorrect) btn.classList.add("is-correct");
+            else if (btn === quizOption && !isCorrect) btn.classList.add("is-wrong");
+          });
+
+          if (feedback) {
+            feedback.classList.remove("hidden");
+            feedback.querySelector("strong").textContent = isCorrect ? "¡Correcto!" : "Incorrecto";
+          }
+
+          return;
+        }
+
+        const tfChoice = event.target.closest("[data-tf-choice]");
+        if (tfChoice) {
+          const card = tfChoice.closest("[data-tf-card]");
+          if (!card || card.dataset.answered === "true") return;
+
+          card.dataset.answered = "true";
+
+          const answer = card.dataset.answer;
+          const choice = tfChoice.dataset.tfChoice;
+          const buttons = Array.from(card.querySelectorAll("[data-tf-choice]"));
+          const feedback = card.querySelector("[data-tf-feedback]");
+          const isCorrect = choice === answer;
+
+          buttons.forEach((btn) => {
+            btn.disabled = true;
+            if (btn.dataset.tfChoice === answer) btn.classList.add("is-correct");
+            else if (btn === tfChoice && !isCorrect) btn.classList.add("is-wrong");
+          });
+
+          if (feedback) {
+            feedback.classList.remove("hidden");
+            feedback.querySelector("strong").textContent = isCorrect ? "¡Bien!" : "No exactamente";
+          }
+
+          return;
+        }
+
+        const checkComplete = event.target.closest("[data-check-complete]");
+        if (checkComplete) {
+          const card = checkComplete.closest("[data-complete-card]");
+          if (!card) return;
+
+          const input = card.querySelector("[data-complete-input]");
+          const result = card.querySelector("[data-complete-result]");
+          const answer = normalizeCompareText(card.dataset.answer || "");
+          const guess = normalizeCompareText(input?.value || "");
+
+          if (!result) return;
+
+          result.classList.remove("hidden", "ok", "bad");
+
+          if (!guess) {
+            result.classList.add("bad");
+            result.textContent = "Escribí una respuesta antes de revisar.";
+            return;
+          }
+
+          const isCorrect = guess === answer || guess.includes(answer) || answer.includes(guess);
+
+          if (isCorrect) {
+            result.classList.add("ok");
+            result.textContent = "¡Correcto! Muy bien.";
+          } else {
+            result.classList.add("bad");
+            result.textContent = "Todavía no. Probá de nuevo o tocá “Mostrar respuesta”.";
+          }
+
+          return;
+        }
+
+        const revealComplete = event.target.closest("[data-reveal-complete]");
+        if (revealComplete) {
+          const card = revealComplete.closest("[data-complete-card]");
+          if (!card) return;
+
+          const result = card.querySelector("[data-complete-result]");
+          if (!result) return;
+
+          result.classList.remove("hidden", "ok", "bad");
+          result.classList.add("ok");
+          result.textContent = `Respuesta: ${card.dataset.answer || ""}`;
+          return;
+        }
+
+        const keywordChip = event.target.closest("[data-keyword-chip]");
+        if (keywordChip) {
+          const wrap = keywordChip.closest(".study-card");
+          const preview = wrap?.querySelector("[data-keyword-preview]");
+          if (!preview) return;
+
+          preview.classList.remove("hidden");
+          preview.innerHTML = `<strong>${keywordChip.textContent}</strong><br>${keywordChip.dataset.keywordContext || ""}`;
+        }
+      });
+
+      chatToggle?.addEventListener("click", openChat);
+      chatClose?.addEventListener("click", closeChat);
+      chatInput?.addEventListener("input", autoResizeChat);
+
+      chatChips.forEach((chip) => {
+        chip.addEventListener("click", () => {
+          if (!chatInput) return;
+          openChat();
+          chatInput.value = chip.dataset.chatChip || chip.textContent.trim();
+          autoResizeChat();
+          chatInput.focus();
+        });
+      });
+
+      chatInput?.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" && !event.shiftKey) {
+          event.preventDefault();
+          chatForm?.requestSubmit();
+        }
+      });
+
+      chatForm?.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const message = cleanText(chatInput?.value || "");
+        if (!message) return;
+        await handleChatSubmit(message);
+      });
+
+      window.addEventListener("resize", () => {
+        if (window.innerWidth > 1100 && chatPanel?.classList.contains("is-open")) {
+          chatPanel.classList.remove("is-open");
+        }
+      });
+
+      setReferenceView("simple");
       refreshToolbarState();
     })();
   </script>
