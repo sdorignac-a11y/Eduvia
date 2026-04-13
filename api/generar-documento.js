@@ -4,6 +4,11 @@ const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
+function toPositiveInt(value, fallback) {
+  const n = Number(value);
+  return Number.isFinite(n) && n > 0 ? Math.floor(n) : fallback;
+}
+
 const RESEARCH_MODEL = process.env.OPENAI_RESEARCH_MODEL || "gpt-5.4-mini";
 const DOCUMENT_MODEL = process.env.OPENAI_MODEL || "gpt-5.4";
 
@@ -11,7 +16,27 @@ const MAX_SOURCE_COUNT = 10;
 const MAX_INVESTIGACION_CHARS = 3500;
 const MAX_FUENTES_TEXTO_CHARS = 900;
 const MAX_CONTENIDO_BASE_CHARS = 5000;
-const MAX_RETRY_DOCUMENTO = 2;
+const MAX_RETRY_DOCUMENTO = toPositiveInt(
+  process.env.EDUVIA_MAX_RETRY_DOCUMENTO,
+  3
+);
+
+const DOCUMENT_MAX_OUTPUT_TOKENS_INITIAL = toPositiveInt(
+  process.env.OPENAI_DOCUMENT_MAX_OUTPUT_TOKENS,
+  12000
+);
+
+const DOCUMENT_MAX_OUTPUT_TOKENS_CAP = toPositiveInt(
+  process.env.OPENAI_DOCUMENT_MAX_OUTPUT_TOKENS_CAP,
+  24000
+);
+
+const RESEARCH_MAX_OUTPUT_TOKENS = toPositiveInt(
+  process.env.OPENAI_RESEARCH_MAX_OUTPUT_TOKENS,
+  5000
+);
+
+const DOCUMENT_MIN_HTML_CHARS = 80;
 
 const DOCUMENTO_SCHEMA = {
   type: "object",
@@ -72,6 +97,27 @@ const RESEARCH_SCHEMA = {
     "resumenInvestigacion",
   ],
 };
+
+class ResponseIncompleteError extends Error {
+  constructor(message, details = {}) {
+    super(message);
+    this.name = "ResponseIncompleteError";
+    this.reason = details.reason || "";
+    this.status = details.status || "";
+    this.partialOutput = details.partialOutput || "";
+  }
+}
+
+class StructuredOutputParseError extends Error {
+  constructor(message, details = {}) {
+    super(message);
+    this.name = "StructuredOutputParseError";
+    this.rawLength = details.rawLength || 0;
+    this.head = details.head || "";
+    this.tail = details.tail || "";
+    this.parseMessage = details.parseMessage || "";
+  }
+}
 
 function limpiarTexto(value = "") {
   return String(value || "").trim();
@@ -371,11 +417,7 @@ function sanitizeContenidoHtml(html = "") {
     /<\s*(\/?)\s*([a-z0-9-]+)([^>]*)>/gi,
     (_, closing, tagName) => {
       const tag = String(tagName || "").toLowerCase();
-
-      if (!allowedTags.has(tag)) {
-        return "";
-      }
-
+      if (!allowedTags.has(tag)) return "";
       return closing ? `</${tag}>` : `<${tag}>`;
     }
   );
@@ -406,7 +448,7 @@ function validarDocumento(documento) {
     throw new Error("Falta resumenCorto.");
   }
 
-  if (!contenidoHtml || contenidoHtml.length < 80) {
+  if (!contenidoHtml || contenidoHtml.length < DOCUMENT_MIN_HTML_CHARS) {
     throw new Error("contenidoHtml llegó vacío o demasiado corto.");
   }
 
@@ -434,48 +476,149 @@ function validarResearch(research) {
   };
 }
 
-function extraerJsonDesdeTexto(raw = "") {
-  const texto = limpiarTexto(raw);
-  if (!texto) throw new Error("La respuesta vino vacía.");
+function getResponseOutputText(response) {
+  const helperText = limpiarTexto(response?.output_text || "");
+  if (helperText) return helperText;
+
+  const parts = [];
+
+  for (const item of Array.isArray(response?.output) ? response.output : []) {
+    if (item?.type !== "message") continue;
+
+    for (const content of Array.isArray(item?.content) ? item.content : []) {
+      if (content?.type === "output_text" && content?.text) {
+        parts.push(String(content.text));
+      }
+    }
+  }
+
+  return limpiarTexto(parts.join("\n"));
+}
+
+function getResponseRefusal(response) {
+  for (const item of Array.isArray(response?.output) ? response.output : []) {
+    if (item?.type !== "message") continue;
+
+    for (const content of Array.isArray(item?.content) ? item.content : []) {
+      if (content?.type === "refusal" && content?.refusal) {
+        return limpiarTexto(content.refusal);
+      }
+    }
+  }
+
+  return "";
+}
+
+function buildRawPreview(raw = "") {
+  const text = String(raw || "");
+  return {
+    rawLength: text.length,
+    head: text.slice(0, 700),
+    tail: text.slice(-700),
+  };
+}
+
+function assertResponseOkBeforeParse(response, label = "respuesta") {
+  if (!response || typeof response !== "object") {
+    throw new Error(`${label}: OpenAI devolvió una respuesta vacía.`);
+  }
+
+  if (response.error?.message) {
+    throw new Error(`${label}: OpenAI devolvió error: ${response.error.message}`);
+  }
+
+  const refusal = getResponseRefusal(response);
+  if (refusal) {
+    throw new Error(`${label}: el modelo rechazó la solicitud. ${refusal}`);
+  }
+
+  if (
+    response.status === "incomplete" ||
+    (response.incomplete_details &&
+      typeof response.incomplete_details === "object")
+  ) {
+    const reason = limpiarTexto(response?.incomplete_details?.reason || "unknown");
+    const partialOutput = getResponseOutputText(response);
+
+    console.error(`${label}: respuesta incompleta`, {
+      status: response?.status || null,
+      incomplete_details: response?.incomplete_details || null,
+      outputTextLen: partialOutput.length,
+      preview: partialOutput.slice(0, 300),
+    });
+
+    throw new ResponseIncompleteError(
+      `${label}: la respuesta quedó incompleta (${reason}).`,
+      {
+        reason,
+        status: response?.status || "",
+        partialOutput,
+      }
+    );
+  }
+}
+
+function parseStructuredJson(raw = "", label = "respuesta") {
+  const texto = limpiarTexto(String(raw || "").replace(/^\uFEFF/, ""));
+  if (!texto) {
+    throw new StructuredOutputParseError(`${label}: la respuesta vino vacía.`, {
+      rawLength: 0,
+    });
+  }
+
+  const textoSinFences = texto
+    .replace(/^```json\s*/i, "")
+    .replace(/^```\s*/i, "")
+    .replace(/\s*```$/i, "")
+    .trim();
 
   try {
-    return JSON.parse(texto);
-  } catch {
-    const start = texto.indexOf("{");
-    const end = texto.lastIndexOf("}");
+    return JSON.parse(textoSinFences);
+  } catch (error) {
+    const preview = buildRawPreview(textoSinFences);
 
-    if (start !== -1 && end !== -1 && end > start) {
-      const fragment = texto.slice(start, end + 1);
-      return JSON.parse(fragment);
-    }
+    console.error(`${label}: JSON.parse falló`, {
+      message: error?.message || "Sin mensaje",
+      rawLength: preview.rawLength,
+      head: preview.head,
+      tail: preview.tail,
+    });
 
-    throw new Error("La respuesta del modelo no fue JSON válido.");
+    throw new StructuredOutputParseError(
+      `${label}: el JSON no pudo parsearse (${error?.message || "error desconocido"}).`,
+      {
+        rawLength: preview.rawLength,
+        head: preview.head,
+        tail: preview.tail,
+        parseMessage: error?.message || "",
+      }
+    );
   }
 }
 
 function parseDocumentoDesdeResponse(response) {
-  const raw = limpiarTexto(response?.output_text || "");
+  assertResponseOkBeforeParse(response, "Documento");
 
+  const raw = getResponseOutputText(response);
   if (!raw) {
-    console.error("Respuesta completa del documento sin output_text:", response);
-    throw new Error(
-      "OpenAI no devolvió output_text en la generación del documento."
-    );
+    console.error("Documento sin output_text utilizable:", response);
+    throw new Error("Documento: OpenAI no devolvió output_text.");
   }
 
-  const parsed = extraerJsonDesdeTexto(raw);
+  const parsed = parseStructuredJson(raw, "Documento");
   return validarDocumento(parsed);
 }
 
 function parseResearchDesdeResponse(response) {
-  const raw = limpiarTexto(response?.output_text || "");
+  assertResponseOkBeforeParse(response, "Investigación");
 
+  const raw = getResponseOutputText(response);
   if (!raw) {
-    console.error("Respuesta completa de research sin output_text:", response);
-    throw new Error("OpenAI no devolvió output_text en la investigación.");
+    console.error("Investigación sin output_text utilizable:", response);
+    throw new Error("Investigación: OpenAI no devolvió output_text.");
   }
 
-  const parsed = extraerJsonDesdeTexto(raw);
+  const parsed = parseStructuredJson(raw, "Investigación");
   return validarResearch(parsed);
 }
 
@@ -519,6 +662,17 @@ function construirFuentesTextoParaModelo(fuentes) {
   return texto.slice(0, MAX_FUENTES_TEXTO_CHARS) || "No disponibles";
 }
 
+function buildUsageLog(usage) {
+  if (!usage || typeof usage !== "object") return null;
+
+  return {
+    input_tokens: usage.input_tokens ?? null,
+    output_tokens: usage.output_tokens ?? null,
+    total_tokens: usage.total_tokens ?? null,
+    reasoning_tokens: usage.output_tokens_details?.reasoning_tokens ?? null,
+  };
+}
+
 async function investigarTemaConWeb({
   materia,
   tema,
@@ -558,12 +712,18 @@ Devolvé SOLO JSON válido.
           schema: RESEARCH_SCHEMA,
         },
       },
+      max_output_tokens: RESEARCH_MAX_OUTPUT_TOKENS,
     });
+
+    const researchOutputText = getResponseOutputText(researchResponse);
 
     console.log("investigarTemaConWeb ok:", {
       model: RESEARCH_MODEL,
-      hasOutputText: Boolean(researchResponse?.output_text),
-      outputTextLen: String(researchResponse?.output_text || "").length,
+      status: researchResponse?.status || null,
+      incomplete_details: researchResponse?.incomplete_details || null,
+      hasOutputText: Boolean(researchOutputText),
+      outputTextLen: researchOutputText.length,
+      usage: buildUsageLog(researchResponse?.usage),
     });
 
     const research = parseResearchDesdeResponse(researchResponse);
@@ -581,10 +741,7 @@ Devolvé SOLO JSON válido.
     };
   } catch (error) {
     console.error("Error en investigarTemaConWeb:", error?.message || error);
-    console.error(
-      "Stack investigarTemaConWeb:",
-      error?.stack || "sin stack"
-    );
+    console.error("Stack investigarTemaConWeb:", error?.stack || "sin stack");
     throw error;
   }
 }
@@ -613,8 +770,10 @@ Respondé en español, breve.
       nivel,
       contenidoBase,
     }),
+    max_output_tokens: 2500,
   });
 
+  assertResponseOkBeforeParse(response, "Fuentes web");
   return extractWebSources(response);
 }
 
@@ -628,20 +787,23 @@ async function generarDocumentoConIA({
   contenidoBase,
   fuentesTexto,
   intento = 1,
+  maxOutputTokens = DOCUMENT_MAX_OUTPUT_TOKENS_INITIAL,
 }) {
   const refuerzo =
     intento > 1
       ? `
 Ajuste adicional para este intento:
-- El contenidoHtml anterior quedó corto o incompleto.
-- Esta vez devolvé un documento más desarrollado y mejor explicado.
-- Asegurate de que haya desarrollo real del tema en varias secciones.
+- El intento anterior falló o quedó corto/incompleto.
+- Priorizá claridad y completitud.
+- Desarrollá el tema en secciones con párrafos reales.
+- Evitá adornos innecesarios.
       `.trim()
       : "";
 
   try {
     const documentoResponse = await client.responses.create({
       model: DOCUMENT_MODEL,
+      reasoning: { effort: "low" },
       truncation: "auto",
       instructions: `
 Sos un profesor excelente de Eduvia.
@@ -677,25 +839,22 @@ ${refuerzo ? `- ${refuerzo.replace(/\n/g, "\n- ")}` : ""}
           schema: DOCUMENTO_SCHEMA,
         },
       },
-      max_output_tokens: 2200,
+      max_output_tokens: maxOutputTokens,
     });
 
-    const outputText = limpiarTexto(documentoResponse?.output_text || "");
+    const outputText = getResponseOutputText(documentoResponse);
 
     console.log("generarDocumentoConIA ok:", {
       model: DOCUMENT_MODEL,
       intento,
+      maxOutputTokens,
+      status: documentoResponse?.status || null,
+      incomplete_details: documentoResponse?.incomplete_details || null,
       hasOutputText: Boolean(outputText),
       outputTextLen: outputText.length,
       preview: outputText.slice(0, 300),
+      usage: buildUsageLog(documentoResponse?.usage),
     });
-
-    if (!outputText) {
-      console.error("documentoResponse sin output_text:", documentoResponse);
-      throw new Error(
-        "OpenAI no devolvió output_text en la generación del documento."
-      );
-    }
 
     return parseDocumentoDesdeResponse(documentoResponse);
   } catch (error) {
@@ -709,6 +868,22 @@ ${refuerzo ? `- ${refuerzo.replace(/\n/g, "\n- ")}` : ""}
     );
     throw error;
   }
+}
+
+function normalizarErrorPublico(error) {
+  if (error instanceof ResponseIncompleteError) {
+    if (error.reason === "max_output_tokens") {
+      return "La respuesta del modelo quedó incompleta por límite de tokens.";
+    }
+
+    return `La respuesta del modelo quedó incompleta (${error.reason || "sin detalle"}).`;
+  }
+
+  if (error instanceof StructuredOutputParseError) {
+    return error.message;
+  }
+
+  return limpiarTexto(error?.message || "Error desconocido");
 }
 
 export default async function handler(req, res) {
@@ -818,6 +993,7 @@ export default async function handler(req, res) {
 
     let documento = null;
     let ultimoErrorDocumento = null;
+    let currentMaxOutputTokens = DOCUMENT_MAX_OUTPUT_TOKENS_INITIAL;
 
     for (let intento = 1; intento <= MAX_RETRY_DOCUMENTO; intento += 1) {
       try {
@@ -831,23 +1007,46 @@ export default async function handler(req, res) {
           contenidoBase: contenidoBaseLimpio,
           fuentesTexto,
           intento,
+          maxOutputTokens: currentMaxOutputTokens,
         });
 
-        if (documento?.contenidoHtml && documento.contenidoHtml.length >= 80) {
+        if (
+          documento?.contenidoHtml &&
+          documento.contenidoHtml.length >= DOCUMENT_MIN_HTML_CHARS
+        ) {
           break;
         }
 
         throw new Error("El documento generado quedó demasiado corto.");
       } catch (error) {
         ultimoErrorDocumento = error;
+
         console.error(
           `Intento ${intento} de documento falló:`,
           error?.message || error
         );
-        console.error(
-          `Stack intento ${intento}:`,
-          error?.stack || "sin stack"
-        );
+        console.error(`Stack intento ${intento}:`, error?.stack || "sin stack");
+
+        const puedeSubirTokens =
+          error instanceof ResponseIncompleteError &&
+          error.reason === "max_output_tokens";
+
+        if (puedeSubirTokens) {
+          const nuevoLimite = Math.min(
+            currentMaxOutputTokens * 2,
+            DOCUMENT_MAX_OUTPUT_TOKENS_CAP
+          );
+
+          if (nuevoLimite > currentMaxOutputTokens) {
+            console.warn("Aumentando max_output_tokens para reintentar", {
+              intento,
+              anterior: currentMaxOutputTokens,
+              nuevo: nuevoLimite,
+            });
+
+            currentMaxOutputTokens = nuevoLimite;
+          }
+        }
 
         if (intento === MAX_RETRY_DOCUMENTO) {
           throw error;
@@ -879,7 +1078,7 @@ export default async function handler(req, res) {
     return res.status(500).json({
       ok: false,
       error: "No se pudo generar el documento.",
-      detail: limpiarTexto(error?.message || "Error desconocido"),
+      detail: normalizarErrorPublico(error),
     });
   }
 }
