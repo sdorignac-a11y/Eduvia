@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Eduvia | Herramientas</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  />
+
+  <style>
+    :root{
+      --bg:#f6f7fb;
+      --sidebar:#ffffff;
+      --surface:#ffffff;
+      --surface-2:#fbfbfe;
+      --line:#ececf3;
+      --line-soft:#f2f3f8;
+      --text:#20243a;
+      --muted:#7a8198;
+
+      --brand:#1fb8c9;
+      --brand-dark:#1498a8;
+      --brand-soft:#e9fbfd;
+
+      --active-bg:#eff0fa;
+      --active-text:#167f9c;
+
+      --featured-bg:#fff5c9;
+      --featured-border:#f0d65f;
+      --featured-star:#ffd84d;
+
+      --shadow:0 10px 30px rgba(31, 42, 68, .07);
+      --radius-xl:26px;
+      --radius-lg:20px;
+      --radius-md:16px;
+      --radius-sm:12px;
+    }
+
+    *{
+      box-sizing:border-box;
+      margin:0;
+      padding:0;
+    }
+
+    html,body{
+      width:100%;
+      min-height:100%;
+      font-family:"Nunito", system-ui, sans-serif;
+      background:var(--bg);
+      color:var(--text);
+    }
+
+    a{
+      color:inherit;
+      text-decoration:none;
+    }
+
+    button,
+    input{
+      font:inherit;
+    }
+
+    .app{
+      min-height:100vh;
+      display:grid;
+      grid-template-columns:280px 1fr;
+    }
+
+    /* SIDEBAR */
+    .sidebar{
+      background:var(--sidebar);
+      border-right:1px solid var(--line);
+      padding:26px 18px 18px;
+      display:flex;
+      flex-direction:column;
+      gap:22px;
+      position:sticky;
+      top:0;
+      height:100vh;
+      z-index:20;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      padding:4px 8px 8px;
+    }
+
+    .brand-badge{
+      width:42px;
+      height:42px;
+      border-radius:14px;
+      display:grid;
+      place-items:center;
+      background:linear-gradient(180deg, #87e8ef 0%, #1fb8c9 100%);
+      color:white;
+      box-shadow:0 10px 20px rgba(31,184,201,.18);
+      flex-shrink:0;
+    }
+
+    .brand-text{
+      font-size:2rem;
+      font-weight:800;
+      line-height:1;
+      letter-spacing:-0.03em;
+      background:linear-gradient(90deg, #31d2d8 0%, #5f8cff 100%);
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+      background-clip:text;
+    }
+
+    .nav{
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      margin-top:8px;
+    }
+
+    .nav-link{
+      display:flex;
+      align-items:center;
+      gap:14px;
+      padding:14px 16px;
+      border-radius:16px;
+      color:#6f778e;
+      font-weight:700;
+      transition:.2s ease;
+      position:relative;
+    }
+
+    .nav-link:hover{
+      background:#f7f8fc;
+      color:#374056;
+    }
+
+    .nav-link.active{
+      background:var(--active-bg);
+      color:var(--active-text);
+    }
+
+    .nav-link.active::before{
+      content:"";
+      position:absolute;
+      left:-18px;
+      top:10px;
+      bottom:10px;
+      width:6px;
+      border-radius:999px;
+      background:var(--brand);
+    }
+
+    .nav-icon{
+      width:18px;
+      height:18px;
+      opacity:.9;
+      flex-shrink:0;
+    }
+
+    .nav-badge{
+      margin-left:auto;
+      font-size:.72rem;
+      font-weight:800;
+      color:white;
+      background:linear-gradient(90deg, #1fb8c9, #1876ff);
+      padding:5px 10px;
+      border-radius:999px;
+      line-height:1;
+    }
+
+    .sidebar-footer{
+      margin-top:auto;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      padding-top:14px;
+      border-top:1px solid var(--line-soft);
+    }
+
+    .logout-btn{
+      width:100%;
+      border:none;
+      background:#f5f7fb;
+      color:#48516b;
+      padding:13px 14px;
+      border-radius:14px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      font-weight:800;
+      cursor:pointer;
+      transition:.2s ease;
+    }
+
+    .logout-btn:hover{
+      background:#eef2f8;
+    }
+
+    /* MAIN */
+    .main{
+      min-width:0;
+      display:flex;
+      flex-direction:column;
+    }
+
+    .topbar{
+      position:sticky;
+      top:0;
+      z-index:15;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      padding:18px 26px;
+      background:rgba(246,247,251,.85);
+      backdrop-filter:blur(10px);
+      border-bottom:1px solid rgba(236,236,243,.7);
+    }
+
+    .topbar-left{
+      display:flex;
+      align-items:center;
+      gap:14px;
+      min-width:0;
+      flex:1;
+    }
+
+    .menu-btn{
+      width:48px;
+      height:48px;
+      border:none;
+      background:white;
+      border:1px solid var(--line);
+      border-radius:16px;
+      display:grid;
+      place-items:center;
+      cursor:pointer;
+      color:#667089;
+      box-shadow:var(--shadow);
+      flex-shrink:0;
+    }
+
+    .search-wrap{
+      position:relative;
+      flex:1;
+      max-width:760px;
+    }
+
+    .search-wrap i{
+      position:absolute;
+      left:18px;
+      top:50%;
+      transform:translateY(-50%);
+      width:18px;
+      height:18px;
+      color:#9199ad;
+    }
+
+    .search-input{
+      width:100%;
+      height:52px;
+      border:1px solid var(--line);
+      background:white;
+      border-radius:18px;
+      padding:0 18px 0 48px;
+      color:var(--text);
+      outline:none;
+      font-weight:700;
+      box-shadow:var(--shadow);
+    }
+
+    .search-input::placeholder{
+      color:#9aa2b5;
+      font-weight:700;
+    }
+
+    .topbar-right{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      flex-shrink:0;
+    }
+
+    .icon-btn{
+      width:48px;
+      height:48px;
+      border:none;
+      background:white;
+      border:1px solid var(--line);
+      border-radius:16px;
+      display:grid;
+      place-items:center;
+      cursor:pointer;
+      color:#6d7690;
+      box-shadow:var(--shadow);
+      position:relative;
+    }
+
+    .icon-btn .dot{
+      position:absolute;
+      top:11px;
+      right:11px;
+      width:8px;
+      height:8px;
+      border-radius:999px;
+      background:#ffbf47;
+      border:2px solid white;
+    }
+
+    .avatar{
+      width:48px;
+      height:48px;
+      border-radius:50%;
+      border:3px solid #7ed5de;
+      background:linear-gradient(180deg, #ffffff 0%, #eef5ff 100%);
+      display:grid;
+      place-items:center;
+      color:#4b5671;
+      font-size:1rem;
+      font-weight:900;
+      box-shadow:var(--shadow);
+    }
+
+    .content{
+      padding:28px 26px 34px;
+      display:flex;
+      flex-direction:column;
+      gap:28px;
+    }
+
+    .section-head{
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:16px;
+      flex-wrap:wrap;
+    }
+
+    .section-title{
+      font-size:2rem;
+      font-weight:900;
+      letter-spacing:-0.03em;
+      color:#232843;
+    }
+
+    .section-subtitle{
+      margin-top:6px;
+      color:var(--muted);
+      font-weight:700;
+    }
+
+    .section-meta{
+      background:white;
+      border:1px solid var(--line);
+      padding:12px 16px;
+      border-radius:16px;
+      color:#68718b;
+      font-weight:800;
+      box-shadow:var(--shadow);
+    }
+
+    .tools-grid{
+      display:grid;
+      grid-template-columns:repeat(4, minmax(0, 1fr));
+      gap:22px;
+    }
+
+    .tool-card{
+      position:relative;
+      background:var(--surface);
+      border:1px solid var(--line);
+      border-radius:24px;
+      padding:22px 22px 20px;
+      min-height:245px;
+      box-shadow:0 8px 22px rgba(25,35,68,.04);
+      transition:transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+      cursor:pointer;
+      display:flex;
+      flex-direction:column;
+    }
+
+    .tool-card:hover{
+      transform:translateY(-4px);
+      box-shadow:0 14px 30px rgba(31,42,68,.09);
+      border-color:#dfe3ef;
+    }
+
+    .tool-card.featured{
+      background:var(--featured-bg);
+      border:2px solid var(--featured-border);
+      box-shadow:0 12px 28px rgba(227, 197, 63, .12);
+    }
+
+    .tool-top{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:18px;
+    }
+
+    .tool-icon{
+      width:62px;
+      height:62px;
+      border-radius:50%;
+      display:grid;
+      place-items:center;
+      background:linear-gradient(180deg, #149fb0 0%, #107b8f 100%);
+      color:white;
+      box-shadow:0 8px 16px rgba(17,125,143,.18);
+      flex-shrink:0;
+    }
+
+    .tool-icon i{
+      width:28px;
+      height:28px;
+    }
+
+    .star-btn{
+      border:none;
+      background:transparent;
+      color:#eadf97;
+      cursor:pointer;
+      padding:2px;
+      border-radius:12px;
+      transition:.2s ease;
+      flex-shrink:0;
+    }
+
+    .star-btn i{
+      width:18px;
+      height:18px;
+    }
+
+    .tool-card.featured .star-btn{
+      color:var(--featured-star);
+    }
+
+    .star-btn.active{
+      color:#ffd84d !important;
+    }
+
+    .tool-title{
+      font-size:1.9rem;
+      line-height:1.12;
+      font-weight:900;
+      letter-spacing:-0.03em;
+      margin-bottom:12px;
+      color:#20243a;
+    }
+
+    .tool-desc{
+      color:#5f667d;
+      font-size:1.08rem;
+      line-height:1.72;
+      font-weight:700;
+      margin-bottom:18px;
+    }
+
+    .tool-foot{
+      margin-top:auto;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+    }
+
+    .tool-tag{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      background:rgba(255,255,255,.7);
+      border:1px solid rgba(255,255,255,.7);
+      color:#677089;
+      font-weight:800;
+      padding:9px 12px;
+      border-radius:999px;
+      font-size:.88rem;
+    }
+
+    .tool-card:not(.featured) .tool-tag{
+      background:#f8f9fd;
+      border-color:#eef1f8;
+    }
+
+    .tool-open{
+      color:#127f94;
+      font-weight:900;
+      font-size:.95rem;
+    }
+
+    .empty-state{
+      display:none;
+      background:white;
+      border:1px dashed #d7dceb;
+      color:#6c7590;
+      border-radius:22px;
+      padding:38px 22px;
+      text-align:center;
+      font-weight:800;
+      box-shadow:var(--shadow);
+    }
+
+    /* responsive */
+    @media (max-width: 1280px){
+      .tools-grid{
+        grid-template-columns:repeat(3, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 980px){
+      .app{
+        grid-template-columns:1fr;
+      }
+
+      .sidebar{
+        position:fixed;
+        left:0;
+        top:0;
+        bottom:0;
+        width:280px;
+        transform:translateX(-100%);
+        transition:transform .25s ease;
+        box-shadow:0 20px 50px rgba(18,27,52,.18);
+      }
+
+      .sidebar.open{
+        transform:translateX(0);
+      }
+
+      .tools-grid{
+        grid-template-columns:repeat(2, minmax(0, 1fr));
+      }
+
+      .section-title{
+        font-size:1.7rem;
+      }
+    }
+
+    @media (max-width: 640px){
+      .topbar{
+        padding:16px;
+      }
+
+      .content{
+        padding:20px 16px 26px;
+      }
+
+      .tools-grid{
+        grid-template-columns:1fr;
+        gap:18px;
+      }
+
+      .tool-card{
+        min-height:220px;
+      }
+
+      .tool-title{
+        font-size:1.6rem;
+      }
+
+      .search-input{
+        height:48px;
+      }
+
+      .icon-btn,
+      .menu-btn,
+      .avatar{
+        width:44px;
+        height:44px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <div class="brand-badge">
+          <i data-lucide="graduation-cap"></i>
+        </div>
+        <div class="brand-text">Eduvia</div>
+      </div>
+
+      <nav class="nav">
+        <a href="panel.html" class="nav-link">
+          <i class="nav-icon" data-lucide="house"></i>
+          <span>Inicio</span>
+        </a>
+
+        <a href="herramientas.html" class="nav-link active">
+          <i class="nav-icon" data-lucide="briefcase"></i>
+          <span>Herramientas</span>
+        </a>
+
+        <a href="mis-clases.html" class="nav-link">
+          <i class="nav-icon" data-lucide="folder-open"></i>
+          <span>Mis clases</span>
+        </a>
+
+        <a href="crear-clase.html" class="nav-link">
+          <i class="nav-icon" data-lucide="plus-square"></i>
+          <span>Crear clase</span>
+        </a>
+
+        <a href="aula.html" class="nav-link">
+          <i class="nav-icon" data-lucide="monitor-play"></i>
+          <span>Aula</span>
+          <span class="nav-badge">Beta</span>
+        </a>
+
+        <a href="historial.html" class="nav-link">
+          <i class="nav-icon" data-lucide="history"></i>
+          <span>Historial</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button class="logout-btn" id="logoutBtn">
+          <i data-lucide="log-out"></i>
+          <span>Cerrar sesión</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="main">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="menu-btn" id="menuBtn" aria-label="Abrir menú">
+            <i data-lucide="menu"></i>
+          </button>
+
+          <div class="search-wrap">
+            <i data-lucide="search"></i>
+            <input
+              id="searchInput"
+              class="search-input"
+              type="text"
+              placeholder="Buscar herramientas"
+            />
+          </div>
+        </div>
+
+        <div class="topbar-right">
+          <button class="icon-btn" aria-label="Notificaciones">
+            <i data-lucide="bell"></i>
+            <span class="dot"></span>
+          </button>
+
+          <div class="avatar" title="Perfil">S</div>
+        </div>
+      </header>
+
+      <section class="content">
+        <div class="section-head">
+          <div>
+            <h1 class="section-title">Herramientas de Eduvia</h1>
+            <p class="section-subtitle">
+              Accesos rápidos para crear clases, resúmenes, actividades y materiales.
+            </p>
+          </div>
+
+          <div class="section-meta" id="toolCount">
+            8 herramientas disponibles
+          </div>
+        </div>
+
+        <div class="tools-grid" id="toolsGrid">
+          <!-- destacadas -->
+          <article class="tool-card featured" data-title="Generador de introducción" data-desc="Crea una introducción clara y atractiva para tu clase o documento." data-href="crear-clase.html">
+            <div class="tool-top">
+              <div class="tool-icon">
+                <i data-lucide="file-pen-line"></i>
+              </div>
+              <button class="star-btn active" type="button" aria-label="Favorito">
+                <i data-lucide="star"></i>
+              </button>
+            </div>
+            <h3 class="tool-title">Generador de introducción</h3>
+            <p class="tool-desc">
+              Redacta una apertura clara para una clase, guía o documento educativo.
+            </p>
+            <div class="tool-foot">
+              <span class="tool-tag">
+                <i data-lucide="sparkles" style="width:14px;height:14px;"></i>
+                IA rápida
+              </span>
+              <span class="tool-open">Abrir</span>
+            </div>
+          </article>
+
+          <article class="tool-card featured" data-title="Generador de conclusión" data-desc="Crea un cierre final para clases, trabajos o actividades." data-href="crear-clase.html">
+            <div class="tool-top">
+              <div class="tool-icon">
+                <i data-lucide="notebook-pen"></i>
+              </div>
+              <button class="star-btn active" type="button" aria-label="Favorito">
+                <i data-lucide="star"></i>
+              </button>
+            </div>
+            <h3 class="tool-title">Generador de conclusión</h3>
+            <p class="tool-desc">
+              Cierra una clase o contenido con un párrafo sólido, simple y bien armado.
+            </p>
+            <div class="tool-foot">
+              <span class="tool-tag">
+                <i data-lucide="sparkles" style="width:14px;height:14px;"></i>
+                IA rápida
+              </span>
+              <span class="tool-open">Abrir</span>
+            </div>
+          </article>
+
+          <article class="tool-card featured" data-title="Mejorador de contenido" data-desc="Reformula tus textos para que suenen más claros y ordenados." data-href="crear-clase.html">
+            <div class="tool-top">
+              <div class="tool-icon">
+                <i data-lucide="plus"></i>
+              </div>
+              <button class="star-btn active" type="button" aria-label="Favorito">
+                <i data-lucide="star"></i>
+              </button>
+            </div>
+            <h3 class="tool-title">Mejorador de contenido</h3>
+            <p class="tool-desc">
+              Mejora explicaciones, actividades o textos para que queden más prolijos y útiles.
+            </p>
+            <div class="tool-foot">
+              <span class="tool-tag">
+                <i data-lucide="sparkles" style="width:14px;height:14px;"></i>
+                Optimizar
+              </span>
+              <span class="tool-open">Abrir</span>
+            </div>
+          </article>
+
+          <article class="tool-card featured" data-title="Generador de párrafos" data-desc="Crea párrafos completos para tus materiales." data-href="crear-clase.html">
+            <div class="tool-top">
+              <div class="tool-icon">
+                <i data-lucide="list"></i>
+              </div>
+              <button class="star-btn active" type="button" aria-label="Favorito">
+                <i data-lucide="star"></i>
+              </button>
+            </div>
+            <h3 class="tool-title">Generador de párrafos</h3>
+            <p class="tool-desc">
+              Genera bloques de texto para clases, explicaciones y recursos didácticos.
+            </p>
+            <div class="tool-foot">
+              <span class="tool-tag">
+                <i data-lucide="sparkles" style="width:14px;height:14px;"></i>
+                Texto
+              </span>
+              <span class="tool-open">Abrir</span>
+            </div>
+          </article>
+
+          <!-- normales -->
+          <article class="tool-card" data-title="Resumen inteligente" data-desc="Resume textos largos de forma clara." data-href="crear-clase.html">
+            <div class="tool-top">
+              <div class="tool-icon">
+                <i data-lucide="filter"></i>
+              </div>
+              <button class="star-btn" type="button" aria-label="Favorito">
+                <i data-lucide="star"></i>
+              </button>
+            </div>
+            <h3 class="tool-title">Resumen inteligente</h3>
+            <p class="tool-desc">
+              Convierte textos extensos en ideas clave para estudiar o preparar clases.
+            </p>
+            <div class="tool-foot">
+              <span class="tool-tag">Estudio</span>
+              <span class="tool-open">Abrir</span>
+            </div>
+          </article>
+
+          <article class="tool-card" data-title="Quiz interactivo" data-desc="Genera preguntas y respuestas automáticamente." data-href="crear-clase.html">
+            <div class="tool-top">
+              <div class="tool-icon">
+                <i data-lucide="between-horizontal-start"></i>
+              </div>
+              <button class="star-btn" type="button" aria-label="Favorito">
+                <i data-lucide="star"></i>
+              </button>
+            </div>
+            <h3 class="tool-title">Quiz interactivo</h3>
+            <p class="tool-desc">
+              Crea preguntas tipo examen o práctica a partir del tema que estés trabajando.
+            </p>
+            <div class="tool-foot">
+              <span class="tool-tag">Evaluación</span>
+              <span class="tool-open">Abrir</span>
+            </div>
+          </article>
+
+          <article class="tool-card" data-title="Explicación simple" data-desc="Reescribe temas difíciles de forma más fácil." data-href="crear-clase.html">
+            <div class="tool-top">
+              <div class="tool-icon">
+                <i data-lucide="circle-help"></i>
+              </div>
+              <button class="star-btn" type="button" aria-label="Favorito">
+                <i data-lucide="star"></i>
+              </button>
+            </div>
+            <h3 class="tool-title">Explicación simple</h3>
+            <p class="tool-desc">
+              Toma conceptos complejos y los convierte en explicaciones más claras y directas.
+            </p>
+            <div class="tool-foot">
+              <span class="tool-tag">Comprensión</span>
+              <span class="tool-open">Abrir</span>
+            </div>
+          </article>
+
+          <article class="tool-card" data-title="Presentación rápida" data-desc="Arma una estructura de presentación en segundos." data-href="crear-clase.html">
+            <div class="tool-top">
+              <div class="tool-icon">
+                <i data-lucide="presentation"></i>
+              </div>
+              <button class="star-btn" type="button" aria-label="Favorito">
+                <i data-lucide="star"></i>
+              </button>
+            </div>
+            <h3 class="tool-title">Presentación rápida</h3>
+            <p class="tool-desc">
+              Organiza el contenido en diapositivas o bloques para exponerlo más fácil.
+            </p>
+            <div class="tool-foot">
+              <span class="tool-tag">Slides</span>
+              <span class="tool-open">Abrir</span>
+            </div>
+          </article>
+        </div>
+
+        <div class="empty-state" id="emptyState">
+          No encontré herramientas con ese nombre.
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    lucide.createIcons();
+
+    const sidebar = document.getElementById("sidebar");
+    const menuBtn = document.getElementById("menuBtn");
+    const searchInput = document.getElementById("searchInput");
+    const toolsGrid = document.getElementById("toolsGrid");
+    const cards = [...document.querySelectorAll(".tool-card")];
+    const emptyState = document.getElementById("emptyState");
+    const toolCount = document.getElementById("toolCount");
+    const logoutBtn = document.getElementById("logoutBtn");
+
+    menuBtn.addEventListener("click", () => {
+      sidebar.classList.toggle("open");
+    });
+
+    document.addEventListener("click", (e) => {
+      const clickedInsideSidebar = sidebar.contains(e.target);
+      const clickedMenu = menuBtn.contains(e.target);
+
+      if (window.innerWidth <= 980 && !clickedInsideSidebar && !clickedMenu) {
+        sidebar.classList.remove("open");
+      }
+    });
+
+    searchInput.addEventListener("input", () => {
+      const value = searchInput.value.trim().toLowerCase();
+      let visible = 0;
+
+      cards.forEach(card => {
+        const title = (card.dataset.title || "").toLowerCase();
+        const desc = (card.dataset.desc || "").toLowerCase();
+        const match = title.includes(value) || desc.includes(value);
+
+        card.style.display = match ? "" : "none";
+        if (match) visible++;
+      });
+
+      emptyState.style.display = visible === 0 ? "block" : "none";
+      toolCount.textContent = `${visible} herramienta${visible === 1 ? "" : "s"} disponible${visible === 1 ? "" : "s"}`;
+    });
+
+    document.querySelectorAll(".star-btn").forEach(btn => {
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        btn.classList.toggle("active");
+      });
+    });
+
+    cards.forEach(card => {
+      card.addEventListener("click", () => {
+        const href = card.dataset.href;
+        if (href) window.location.href = href;
+      });
+    });
+
+    logoutBtn.addEventListener("click", () => {
+      window.location.href = "login.html";
+    });
+  </script>
+</body>
+</html>
