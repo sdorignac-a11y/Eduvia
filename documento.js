@@ -138,6 +138,23 @@ const hasRealStructuredDoc = (obj) => {
   );
 };
 
+const stripHtmlTags = (value = "") =>
+  String(value || "").replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+
+function isTemporaryDocumentPlaceholder(value = "") {
+  const clean = txt(stripHtmlTags(value)).toLowerCase();
+  if (!clean) return false;
+
+  return (
+    clean.includes("generando documento") ||
+    clean.includes("estamos investigando y armando el contenido completo") ||
+    clean.includes("cuando termine, el apunte se pega automáticamente acá") ||
+    clean.includes("no se pudo cargar el documento") ||
+    clean.includes("esta sección debería aparecer la explicación principal") ||
+    clean.includes("este documento quedó como base visual")
+  );
+}
+
 function sanitizeCssStyle(styleText = "") {
   if (!styleText || typeof styleText !== "string") return "";
 
@@ -345,6 +362,7 @@ const state = {
   lastSavedSignature: "",
 
   generationPromise: null,
+  isGeneratingDocument: false,
 
   shareBound: false,
   autosaveBound: false,
@@ -617,11 +635,15 @@ function getDocumentoPlainTextRaw(clase = {}) {
 }
 
 function hasDocumentoReal(clase = {}) {
-  return (
-    hasRealHtml(getDocumentoHtmlRaw(clase)) ||
-    hasRealText(getDocumentoPlainTextRaw(clase)) ||
-    hasRealStructuredDoc(getDocumentoStructuredRaw(clase))
-  );
+  const rawHtml = getDocumentoHtmlRaw(clase);
+  const rawText = getDocumentoPlainTextRaw(clase);
+  const structured = getDocumentoStructuredRaw(clase);
+
+  const htmlValido = hasRealHtml(rawHtml) && !isTemporaryDocumentPlaceholder(rawHtml);
+  const textValido = hasRealText(rawText) && !isTemporaryDocumentPlaceholder(rawText);
+  const structuredValido = hasRealStructuredDoc(structured);
+
+  return htmlValido || textValido || structuredValido;
 }
 
 function normalizeGeneratedDocumentResult(apiDocumento = {}, claseBase = {}) {
@@ -1200,8 +1222,15 @@ async function writeDocumentPayload(payload) {
 
 async function saveDocumentEdits(force = false) {
   if (!state.currentClaseRef || !canEdit()) return;
+  if (state.isGeneratingDocument) return;
 
   const payload = getCurrentDocumentPayload();
+
+  if (isTemporaryDocumentPlaceholder(payload.contenidoHtml)) {
+    setLastSaveLabel("Esperando contenido final...");
+    return;
+  }
+
   const signature = getPayloadSignature(payload);
 
   if (!force && signature === state.lastSavedSignature) {
@@ -1459,9 +1488,27 @@ async function fetchJsonWithTimeout(url, options = {}, timeoutMs = CONFIG.genera
 
   try {
     const response = await fetch(url, { ...options, signal: controller.signal });
-    const data = await response.json().catch(() => null);
+    const rawText = await response.text();
 
-    if (!data) throw new Error("El servidor devolvió un JSON inválido.");
+    let data = null;
+    try {
+      data = rawText ? JSON.parse(rawText) : null;
+    } catch {
+      data = null;
+    }
+
+    if (!data) {
+      console.error("Respuesta no JSON del servidor:", {
+        status: response?.status,
+        statusText: response?.statusText,
+        preview: String(rawText || "").slice(0, 800),
+      });
+
+      throw new Error(
+        `El servidor no devolvió JSON válido. HTTP ${response?.status || "desconocido"}.`
+      );
+    }
+
     return { response, data };
   } catch (error) {
     if (error.name === "AbortError") {
@@ -1486,106 +1533,112 @@ async function generarDocumentoSiFalta(clase = {}) {
       throw new Error("Faltan materia, tema o nivel para generar el documento.");
     }
 
-    renderGeneratingDocument(clase);
-    setLoadingStage("sources", "Estamos buscando fuentes confiables para construir el documento.");
+    state.isGeneratingDocument = true;
 
-    const payload = {
-      materia: clase.materia || "",
-      tema: clase.tema || "",
-      nivel: clase.nivel || "",
-      duracion: clase.duracion || "",
-      objetivo: clase.objetivo || clase.objetivoDocumento || "",
-      investigacion: getInvestigacionDocumento(clase),
-      fuentes: getFuentesDocumento(clase),
-      contenidoBase: getDocumentoPlainTextRaw(clase),
-    };
+    try {
+      renderGeneratingDocument(clase);
+      setLoadingStage("sources", "Estamos buscando fuentes confiables para construir el documento.");
 
-    console.log("CLASE BASE:", clase);
-    console.log("INVESTIGACION ENVIADA:", payload.investigacion);
-    console.log("FUENTES ENVIADAS:", payload.fuentes);
-    console.log("TEXTO BASE:", payload.contenidoBase);
+      const payload = {
+        materia: clase.materia || "",
+        tema: clase.tema || "",
+        nivel: clase.nivel || "",
+        duracion: clase.duracion || "",
+        objetivo: clase.objetivo || clase.objetivoDocumento || "",
+        investigacion: getInvestigacionDocumento(clase),
+        fuentes: getFuentesDocumento(clase),
+        contenidoBase: getDocumentoPlainTextRaw(clase),
+      };
 
-const { response, data } = await fetchJsonWithTimeout("/api/generar-documento", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-  },
-  body: JSON.stringify(payload),
-});
+      console.log("CLASE BASE:", clase);
+      console.log("INVESTIGACION ENVIADA:", payload.investigacion);
+      console.log("FUENTES ENVIADAS:", payload.fuentes);
+      console.log("TEXTO BASE:", payload.contenidoBase);
 
-console.log("RESPUESTA /api/generar-documento:", {
-  status: response?.status,
-  okHttp: response?.ok,
-  okBody: data?.ok,
-  error: data?.error,
-  detail: data?.detail,
-  hasDocumento: Boolean(data?.documento),
-});
+      const { response, data } = await fetchJsonWithTimeout("/api/generar-documento", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
 
-setLoadingStage(
-  "analysis",
-  "Ordenando la investigación y preparando la mejor versión del contenido."
-);
+      console.log("RESPUESTA /api/generar-documento:", {
+        status: response?.status,
+        okHttp: response?.ok,
+        okBody: data?.ok,
+        error: data?.error,
+        detail: data?.detail,
+        hasDocumento: Boolean(data?.documento),
+      });
 
-if (!response.ok || !data?.ok || !data?.documento) {
-  console.error("Respuesta completa del backend:", data);
-  throw new Error(data?.detail || data?.error || "No se pudo generar el documento.");
-}
+      setLoadingStage(
+        "analysis",
+        "Ordenando la investigación y preparando la mejor versión del contenido."
+      );
 
-const normalizedDoc = normalizeGeneratedDocumentResult(data.documento, clase);
-
-const documentoGeneradoValido =
-  hasRealHtml(normalizedDoc.contenidoHtml) ||
-  hasRealText(normalizedDoc.documentoTexto) ||
-  hasRealStructuredDoc(normalizedDoc.documento);
-
-if (!documentoGeneradoValido) {
-  console.error("Respuesta cruda del backend:", data);
-  throw new Error(
-    data?.detail || "La IA respondió, pero no devolvió contenido utilizable."
-  );
-}
-
-setLoadingStage("writing", "Pegando el contenido final y terminando el documento.");
-
-    const merged = {
-      ...clase,
-      tituloDocumento: normalizedDoc.tituloDocumento,
-      objetivoDocumento: normalizedDoc.objetivoDocumento,
-      contenidoHtml: normalizedDoc.contenidoHtml || "",
-      documento: normalizedDoc.documento || null,
-      documentoTexto: normalizedDoc.documentoTexto || "",
-      resumenDocumento: normalizedDoc.resumenDocumento || "",
-      investigacion: txt(data.investigacion || getInvestigacionDocumento(clase)),
-      fuentes: toArray(data.fuentes).length ? data.fuentes : getFuentesDocumento(clase),
-      updatedAt: new Date().toISOString(),
-    };
-
-    if (state.currentClaseRef && canEdit()) {
-      try {
-        await setDoc(
-          state.currentClaseRef,
-          {
-            tituloDocumento: merged.tituloDocumento,
-            objetivoDocumento: merged.objetivoDocumento,
-            contenidoHtml: merged.contenidoHtml || "",
-            documento: merged.documento || null,
-            documentoTexto: merged.documentoTexto || "",
-            resumenDocumento: merged.resumenDocumento || "",
-            investigacion: merged.investigacion,
-            fuentes: merged.fuentes,
-            updatedAt: serverTimestamp(),
-          },
-          { merge: true }
-        );
-      } catch (error) {
-        console.error("Error guardando documento generado:", error);
+      if (!response.ok || !data?.ok || !data?.documento) {
+        console.error("Respuesta completa del backend:", data);
+        throw new Error(data?.detail || data?.error || "No se pudo generar el documento.");
       }
-    }
 
-    state.currentClaseData = merged;
-    writeClaseToLocalStorage(merged, state.currentOwnerUid, state.currentClaseId);
-    return merged;
+      const normalizedDoc = normalizeGeneratedDocumentResult(data.documento, clase);
+
+      const documentoGeneradoValido =
+        hasRealHtml(normalizedDoc.contenidoHtml) ||
+        hasRealText(normalizedDoc.documentoTexto) ||
+        hasRealStructuredDoc(normalizedDoc.documento);
+
+      if (!documentoGeneradoValido) {
+        console.error("Respuesta cruda del backend:", data);
+        throw new Error(
+          data?.detail || "La IA respondió, pero no devolvió contenido utilizable."
+        );
+      }
+
+      setLoadingStage("writing", "Pegando el contenido final y terminando el documento.");
+
+      const merged = {
+        ...clase,
+        tituloDocumento: normalizedDoc.tituloDocumento,
+        objetivoDocumento: normalizedDoc.objetivoDocumento,
+        contenidoHtml: normalizedDoc.contenidoHtml || "",
+        documento: normalizedDoc.documento || null,
+        documentoTexto: normalizedDoc.documentoTexto || "",
+        resumenDocumento: normalizedDoc.resumenDocumento || "",
+        investigacion: txt(data.investigacion || getInvestigacionDocumento(clase)),
+        fuentes: toArray(data.fuentes).length ? data.fuentes : getFuentesDocumento(clase),
+        updatedAt: new Date().toISOString(),
+      };
+
+      if (state.currentClaseRef && canEdit()) {
+        try {
+          await setDoc(
+            state.currentClaseRef,
+            {
+              tituloDocumento: merged.tituloDocumento,
+              objetivoDocumento: merged.objetivoDocumento,
+              contenidoHtml: merged.contenidoHtml || "",
+              documento: merged.documento || null,
+              documentoTexto: merged.documentoTexto || "",
+              resumenDocumento: merged.resumenDocumento || "",
+              investigacion: merged.investigacion,
+              fuentes: merged.fuentes,
+              updatedAt: serverTimestamp(),
+            },
+            { merge: true }
+          );
+        } catch (error) {
+          console.error("Error guardando documento generado:", error);
+        }
+      }
+
+      state.currentClaseData = merged;
+      writeClaseToLocalStorage(merged, state.currentOwnerUid, state.currentClaseId);
+      return merged;
+    } finally {
+      state.isGeneratingDocument = false;
+    }
   })();
 
   try {
