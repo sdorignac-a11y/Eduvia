@@ -1721,6 +1721,215 @@
     width:100%;
   }
 }
+    .tool-dock{
+  position:fixed;
+  right:18px;
+  top:50%;
+  transform:translateY(-50%);
+  z-index:95;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.tool-dock-btn{
+  width:46px;
+  height:46px;
+  border:none;
+  border-radius:16px;
+  background:rgba(255,255,255,.96);
+  border:1px solid #e5e7eb;
+  box-shadow:0 12px 34px rgba(15,23,42,.12);
+  display:grid;
+  place-items:center;
+  cursor:pointer;
+  color:#202124;
+  font-weight:800;
+  transition:.18s ease;
+  backdrop-filter:blur(10px);
+}
+
+.tool-dock-btn:hover{
+  transform:translateY(-2px);
+  background:#f8fafc;
+}
+
+.tool-dock-btn.is-active{
+  background:#e8f0fe;
+  color:#0b57d0;
+  border-color:#cfe0ff;
+}
+
+.tool-panel-backdrop{
+  position:fixed;
+  inset:0;
+  background:rgba(15,23,42,.18);
+  opacity:0;
+  pointer-events:none;
+  transition:.18s ease;
+  z-index:96;
+}
+
+.tool-panel-backdrop.show{
+  opacity:1;
+  pointer-events:auto;
+}
+
+.tool-panel{
+  position:fixed;
+  top:50%;
+  right:78px;
+  transform:translateY(-50%) translateX(12px);
+  width:min(360px, calc(100vw - 110px));
+  max-height:82vh;
+  overflow:auto;
+  background:rgba(255,255,255,.98);
+  border:1px solid #e5e7eb;
+  border-radius:24px;
+  box-shadow:0 24px 60px rgba(15,23,42,.18);
+  padding:18px;
+  z-index:97;
+  opacity:0;
+  pointer-events:none;
+  transition:.18s ease;
+  backdrop-filter:blur(12px);
+}
+
+.tool-panel.show{
+  opacity:1;
+  pointer-events:auto;
+  transform:translateY(-50%) translateX(0);
+}
+
+.tool-panel-head{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:16px;
+}
+
+.tool-panel-badge{
+  display:inline-flex;
+  align-items:center;
+  padding:7px 12px;
+  border-radius:999px;
+  background:#e8f0fe;
+  color:#0b57d0;
+  font-size:.76rem;
+  font-weight:800;
+  margin-bottom:8px;
+}
+
+.tool-panel-head h3{
+  font-size:1.12rem;
+  margin-bottom:4px;
+}
+
+.tool-panel-head p{
+  color:#5f6368;
+  font-size:.9rem;
+  line-height:1.55;
+}
+
+.tool-panel-close{
+  width:38px;
+  height:38px;
+  border:none;
+  border-radius:999px;
+  background:#f1f3f4;
+  cursor:pointer;
+  font-size:1.3rem;
+  flex:none;
+}
+
+.tool-panel-body{
+  display:grid;
+  gap:14px;
+}
+
+.tool-config{
+  display:grid;
+  gap:14px;
+}
+
+.config-field{
+  display:grid;
+  gap:8px;
+}
+
+.config-field span{
+  font-size:.88rem;
+  font-weight:700;
+  color:#202124;
+}
+
+.config-field select,
+.config-field textarea,
+.config-field input{
+  width:100%;
+  border:1px solid #d7dde3;
+  border-radius:14px;
+  background:#fff;
+  padding:12px 14px;
+  outline:none;
+  font:inherit;
+}
+
+.config-field select:focus,
+.config-field textarea:focus,
+.config-field input:focus{
+  border-color:#1a73e8;
+  box-shadow:0 0 0 4px rgba(26,115,232,.10);
+}
+
+.config-field textarea{
+  resize:vertical;
+  min-height:120px;
+}
+
+.config-generate-btn{
+  border:none;
+  border-radius:14px;
+  background:#1a73e8;
+  color:#fff;
+  font-weight:800;
+  padding:13px 16px;
+  cursor:pointer;
+  transition:.18s ease;
+}
+
+.config-generate-btn:hover{
+  background:#1565d8;
+}
+
+@media (max-width: 820px){
+  .tool-dock{
+    right:12px;
+    top:auto;
+    bottom:16px;
+    transform:none;
+    flex-direction:row;
+    flex-wrap:nowrap;
+    overflow:auto;
+    max-width:calc(100vw - 24px);
+    padding:2px;
+  }
+
+  .tool-panel{
+    top:auto;
+    right:12px;
+    left:12px;
+    bottom:78px;
+    width:auto;
+    max-height:60vh;
+    transform:translateY(12px);
+  }
+
+  .tool-panel.show{
+    transform:translateY(0);
+  }
+}
   </style>
 </head>
 <body>
@@ -1986,10 +2195,10 @@
             <section class="references-panel" id="references-section">
               <div class="references-top">
                 <div>
-                  <h2 class="references-title" id="references-title">Referencias</h2>
-                  <p class="references-sub" id="references-sub">
-                    Fuentes utilizadas por Eduvia para construir este documento.
-                  </p>
+                 <h2 class="references-title" id="references-title">Fuentes</h2>
+<p class="references-sub" id="references-sub">
+  Material utilizado para construir este documento.
+</p>
                 </div>
 
                 <div class="view-toggle">
@@ -2048,92 +2257,169 @@
     </div>
   </div>
 
-  <div class="more-backdrop" id="more-backdrop"></div>
+  <div class="tool-dock" id="tool-dock">
+  <button type="button" class="tool-dock-btn" data-panel="flashcards-panel" title="Tarjetas">
+    <span>🧠</span>
+  </button>
 
-  <div class="more-dropdown" id="more-dropdown" aria-hidden="true">
-    <div class="more-header">
-      <h3>Herramientas de estudio</h3>
-      <p>Convertí este documento en materiales para repasar, practicar y estudiar mejor.</p>
+  <button type="button" class="tool-dock-btn" data-panel="quiz-panel" title="Quiz">
+    <span>❓</span>
+  </button>
+
+  <button type="button" class="tool-dock-btn" data-panel="truefalse-panel" title="Verdadero o falso">
+    <span>✅</span>
+  </button>
+
+  <button type="button" class="tool-dock-btn" data-panel="complete-panel" title="Completar">
+    <span>✍️</span>
+  </button>
+
+  <button type="button" class="tool-dock-btn" data-panel="summary-panel" title="Resumen">
+    <span>⚡</span>
+  </button>
+
+  <button type="button" class="tool-dock-btn" data-panel="keywords-panel" title="Palabras clave">
+    <span>🔎</span>
+  </button>
+
+  <button type="button" class="tool-dock-btn" data-panel="presentation-panel" title="Presentación">
+    <span>🎞️</span>
+  </button>
+
+  <button type="button" class="tool-dock-btn" id="dock-pdf-btn" title="PDF">
+    <span>PDF</span>
+  </button>
+</div>
+
+<div class="tool-panel-backdrop" id="tool-panel-backdrop"></div>
+
+<aside class="tool-panel" id="tool-panel">
+  <div class="tool-panel-head">
+    <div>
+      <span class="tool-panel-badge" id="tool-panel-badge">Herramienta</span>
+      <h3 id="tool-panel-title">Configurar</h3>
+      <p id="tool-panel-subtitle">Elegí cómo querés generar este recurso.</p>
+    </div>
+    <button type="button" class="tool-panel-close" id="tool-panel-close">×</button>
+  </div>
+
+  <div class="tool-panel-body">
+    <div class="tool-config hidden" id="flashcards-panel">
+      <label class="config-field">
+        <span>Cantidad de tarjetas</span>
+        <select id="flashcards-count">
+          <option value="4">4</option>
+          <option value="6" selected>6</option>
+          <option value="8">8</option>
+          <option value="10">10</option>
+        </select>
+      </label>
+
+      <label class="config-field">
+        <span>Enfoque</span>
+        <select id="flashcards-focus">
+          <option value="general" selected>General</option>
+          <option value="definitions">Definiciones</option>
+          <option value="concepts">Conceptos clave</option>
+        </select>
+      </label>
+
+      <button type="button" class="config-generate-btn" data-run-tool="flashcards">Generar tarjetas</button>
     </div>
 
-    <div class="more-list">
-      <button type="button" class="more-item" id="action-flashcards">
-        <span class="more-item-icon">🧠</span>
-        <span class="more-item-main">
-          <span class="more-item-title">Tarjetas de memoria</span>
-          <span class="more-item-desc">Genera tarjetas rápidas con conceptos importantes del documento.</span>
-        </span>
-        <span class="more-item-arrow">›</span>
-      </button>
+    <div class="tool-config hidden" id="quiz-panel">
+      <label class="config-field">
+        <span>Cantidad de preguntas</span>
+        <select id="quiz-count">
+          <option value="3">3</option>
+          <option value="5" selected>5</option>
+          <option value="7">7</option>
+        </select>
+      </label>
 
-      <button type="button" class="more-item" id="action-quiz">
-        <span class="more-item-icon">❓</span>
-        <span class="more-item-main">
-          <span class="more-item-title">Quiz rápido</span>
-          <span class="more-item-desc">Crea preguntas para practicar con base en el contenido actual.</span>
-        </span>
-        <span class="more-item-arrow">›</span>
-      </button>
-
-      <button type="button" class="more-item" id="action-truefalse">
-        <span class="more-item-icon">✅</span>
-        <span class="more-item-main">
-          <span class="more-item-title">Verdadero o falso</span>
-          <span class="more-item-desc">Arma afirmaciones para comprobar si entendiste el tema.</span>
-        </span>
-        <span class="more-item-arrow">›</span>
-      </button>
-
-      <button type="button" class="more-item" id="action-complete">
-        <span class="more-item-icon">✍️</span>
-        <span class="more-item-main">
-          <span class="more-item-title">Completar conceptos</span>
-          <span class="more-item-desc">Oculta palabras clave del texto para practicar memoria activa.</span>
-        </span>
-        <span class="more-item-arrow">›</span>
-      </button>
-
-      <button type="button" class="more-item" id="action-summary">
-        <span class="more-item-icon">⚡</span>
-        <span class="more-item-main">
-          <span class="more-item-title">Resumen express</span>
-          <span class="more-item-desc">Reduce el documento a una versión corta para repasar antes de estudiar.</span>
-        </span>
-        <span class="more-item-arrow">›</span>
-      </button>
-
-      <button type="button" class="more-item" id="action-keywords">
-        <span class="more-item-icon">🔎</span>
-        <span class="more-item-main">
-          <span class="more-item-title">Palabras clave</span>
-          <span class="more-item-desc">Extrae los términos más importantes del documento.</span>
-        </span>
-        <span class="more-item-arrow">›</span>
-      </button>
-
-      <button type="button" class="more-item" id="action-presentation">
-        <span class="more-item-icon">🎞️</span>
-        <span class="more-item-main">
-          <span class="more-item-title">Pasar a presentación</span>
-          <span class="more-item-desc">Convierte el contenido en una versión tipo diapositivas.</span>
-        </span>
-        <span class="more-item-arrow">›</span>
-      </button>
-
-      <button type="button" class="more-item" id="action-pdf">
-        <span class="more-item-icon">PDF</span>
-        <span class="more-item-main">
-          <span class="more-item-title">Descargar PDF</span>
-          <span class="more-item-desc">Abre impresión para guardar el documento como PDF.</span>
-        </span>
-        <span class="more-item-arrow">›</span>
-      </button>
+      <button type="button" class="config-generate-btn" data-run-tool="quiz">Generar quiz</button>
     </div>
 
-    <div class="more-footer">
-      <div class="more-status" id="more-status"></div>
+    <div class="tool-config hidden" id="truefalse-panel">
+      <label class="config-field">
+        <span>Cantidad de afirmaciones</span>
+        <select id="truefalse-count">
+          <option value="4">4</option>
+          <option value="6" selected>6</option>
+          <option value="8">8</option>
+        </select>
+      </label>
+
+      <button type="button" class="config-generate-btn" data-run-tool="truefalse">Generar ejercicio</button>
+    </div>
+
+    <div class="tool-config hidden" id="complete-panel">
+      <label class="config-field">
+        <span>Cantidad de frases</span>
+        <select id="complete-count">
+          <option value="4">4</option>
+          <option value="6" selected>6</option>
+          <option value="8">8</option>
+        </select>
+      </label>
+
+      <button type="button" class="config-generate-btn" data-run-tool="complete">Generar práctica</button>
+    </div>
+
+    <div class="tool-config hidden" id="summary-panel">
+      <label class="config-field">
+        <span>Modo de resumen</span>
+        <select id="summary-mode">
+          <option value="express" selected>Express</option>
+          <option value="structured">Estructurado</option>
+        </select>
+      </label>
+
+      <button type="button" class="config-generate-btn" data-run-tool="summary">Generar resumen</button>
+    </div>
+
+    <div class="tool-config hidden" id="keywords-panel">
+      <label class="config-field">
+        <span>Cantidad de palabras clave</span>
+        <select id="keywords-count">
+          <option value="6">6</option>
+          <option value="10" selected>10</option>
+          <option value="12">12</option>
+        </select>
+      </label>
+
+      <button type="button" class="config-generate-btn" data-run-tool="keywords">Generar palabras clave</button>
+    </div>
+
+    <div class="tool-config hidden" id="presentation-panel">
+      <label class="config-field">
+        <span>Cantidad de diapositivas</span>
+        <select id="presentation-pages">
+          <option value="5">5</option>
+          <option value="7" selected>7</option>
+          <option value="10">10</option>
+          <option value="12">12</option>
+        </select>
+      </label>
+
+      <label class="config-field">
+        <span>Estilo visual</span>
+        <select id="presentation-style">
+          <option value="clean" selected>Limpio</option>
+          <option value="academic">Académico</option>
+          <option value="modern">Moderno</option>
+        </select>
+      </label>
+
+      <label class="config-field">
+        <span>Temas que sí o sí querés incluir</span>
+        <textarea id="presentation-topics" rows="5" placeholder="Ej: introducción, causas, consecuencias, conclusión"></textarea>
+      </label>
+
+      <button type="button" class="config-generate-btn" id="generate-presentation-btn">Generar presentación</button>
     </div>
   </div>
+</aside>
 
   <div class="study-modal-backdrop" id="study-modal">
     <div class="study-modal">
@@ -2259,18 +2545,16 @@
       const textColor = document.getElementById("text-color");
       const highlightColor = document.getElementById("highlight-color");
 
-      const openMoreBtn = document.getElementById("open-more-btn");
-      const moreDropdown = document.getElementById("more-dropdown");
-      const moreBackdrop = document.getElementById("more-backdrop");
-      const moreStatus = document.getElementById("more-status");
-
-      const actionFlashcards = document.getElementById("action-flashcards");
-      const actionQuiz = document.getElementById("action-quiz");
-      const actionTrueFalse = document.getElementById("action-truefalse");
-      const actionComplete = document.getElementById("action-complete");
-      const actionSummary = document.getElementById("action-summary");
-      const actionKeywords = document.getElementById("action-keywords");
-      const actionPdf = document.getElementById("action-pdf");
+const toolDockButtons = Array.from(document.querySelectorAll(".tool-dock-btn[data-panel]"));
+const toolPanel = document.getElementById("tool-panel");
+const toolPanelBackdrop = document.getElementById("tool-panel-backdrop");
+const toolPanelClose = document.getElementById("tool-panel-close");
+const toolPanelBadge = document.getElementById("tool-panel-badge");
+const toolPanelTitle = document.getElementById("tool-panel-title");
+const toolPanelSubtitle = document.getElementById("tool-panel-subtitle");
+const toolConfigs = Array.from(document.querySelectorAll(".tool-config"));
+const dockPdfBtn = document.getElementById("dock-pdf-btn");
+const generatePresentationBtn = document.getElementById("generate-presentation-btn");
 
       const studyModal = document.getElementById("study-modal");
       const studyBadge = document.getElementById("study-badge");
@@ -2315,45 +2599,31 @@
         }
       }
 
-      function setMoreStatus(message = "") {
-        if (moreStatus) moreStatus.textContent = message;
-      }
+function closeToolPanel() {
+  toolPanel?.classList.remove("show");
+  toolPanelBackdrop?.classList.remove("show");
+  toolDockButtons.forEach((btn) => btn.classList.remove("is-active"));
+  toolConfigs.forEach((panel) => panel.classList.add("hidden"));
+}
 
-      window.setMoreStatus = setMoreStatus;
+function openToolPanel(panelId, meta = {}) {
+  if (!toolPanel) return;
 
-      function positionMoreDropdown() {
-        if (!openMoreBtn || !moreDropdown) return;
+  toolConfigs.forEach((panel) => {
+    panel.classList.toggle("hidden", panel.id !== panelId);
+  });
 
-        const rect = openMoreBtn.getBoundingClientRect();
-        const dropdownWidth = Math.min(380, window.innerWidth - 24);
-        let left = rect.right - dropdownWidth;
-        const top = rect.bottom + 10;
+  toolDockButtons.forEach((btn) => {
+    btn.classList.toggle("is-active", btn.dataset.panel === panelId);
+  });
 
-        if (left < 12) left = 12;
-        if (left + dropdownWidth > window.innerWidth - 12) {
-          left = window.innerWidth - dropdownWidth - 12;
-        }
+  toolPanelBadge.textContent = meta.badge || "Herramienta";
+  toolPanelTitle.textContent = meta.title || "Configurar";
+  toolPanelSubtitle.textContent = meta.subtitle || "Elegí cómo querés generar este recurso.";
 
-        moreDropdown.style.top = `${top}px`;
-        moreDropdown.style.left = `${left}px`;
-        moreDropdown.style.right = "auto";
-      }
-
-      function openMoreDropdown() {
-        if (!moreDropdown || !moreBackdrop) return;
-        positionMoreDropdown();
-        moreDropdown.classList.add("show");
-        moreBackdrop.classList.add("show");
-        openMoreBtn?.setAttribute("aria-expanded", "true");
-        setMoreStatus("");
-      }
-
-      function closeMoreDropdown() {
-        moreDropdown?.classList.remove("show");
-        moreBackdrop?.classList.remove("show");
-        openMoreBtn?.setAttribute("aria-expanded", "false");
-        setMoreStatus("");
-      }
+  toolPanel.classList.add("show");
+  toolPanelBackdrop?.classList.add("show");
+}
 
       window.closeMoreDropdown = closeMoreDropdown;
 
@@ -3036,8 +3306,7 @@ function runStudyTool(tool) {
   studySubtitle.textContent = selected.subtitle;
   selected.render(data);
   openStudyModal();
-  closeMoreDropdown();
-  setMoreStatus(`${selected.title} generado.`);
+  closeToolPanel();
 }
 
       editableAreas.forEach((area) => {
@@ -3140,39 +3409,116 @@ function runStudyTool(tool) {
         exec("redo");
       });
 
-      openMoreBtn?.addEventListener("click", () => {
-        const isOpen = moreDropdown?.classList.contains("show");
-        if (isOpen) closeMoreDropdown();
-        else openMoreDropdown();
-      });
+const panelMeta = {
+  "flashcards-panel": {
+    badge: "Memoria",
+    title: "Tarjetas de memoria",
+    subtitle: "Configurá cuántas tarjetas querés generar."
+  },
+  "quiz-panel": {
+    badge: "Práctica",
+    title: "Quiz rápido",
+    subtitle: "Generá preguntas automáticas para practicar."
+  },
+  "truefalse-panel": {
+    badge: "Juego",
+    title: "Verdadero o falso",
+    subtitle: "Probá comprensión con afirmaciones automáticas."
+  },
+  "complete-panel": {
+    badge: "Repaso",
+    title: "Completar conceptos",
+    subtitle: "Practicá memoria activa completando frases."
+  },
+  "summary-panel": {
+    badge: "Resumen",
+    title: "Resumen express",
+    subtitle: "Obtené una versión corta del contenido."
+  },
+  "keywords-panel": {
+    badge: "Claves",
+    title: "Palabras clave",
+    subtitle: "Extraé conceptos importantes del documento."
+  },
+  "presentation-panel": {
+    badge: "Slides",
+    title: "Pasar a presentación",
+    subtitle: "Definí páginas, estilo y temas antes de generarla."
+  }
+};
 
-      moreBackdrop?.addEventListener("click", closeMoreDropdown);
+toolDockButtons.forEach((btn) => {
+  btn.addEventListener("click", () => {
+    const panelId = btn.dataset.panel;
+    const sameOpen = btn.classList.contains("is-active") && toolPanel?.classList.contains("show");
 
-      window.addEventListener("resize", () => {
-        if (moreDropdown?.classList.contains("show")) {
-          positionMoreDropdown();
-        }
-      });
+    if (sameOpen) {
+      closeToolPanel();
+      return;
+    }
 
-      document.addEventListener("keydown", (event) => {
-        if (event.key === "Escape") {
-          closeMoreDropdown();
-          closeStudyModal();
-        }
-      });
+    openToolPanel(panelId, panelMeta[panelId] || {});
+  });
+});
 
-      actionFlashcards?.addEventListener("click", () => runStudyTool("flashcards"));
-      actionQuiz?.addEventListener("click", () => runStudyTool("quiz"));
-      actionTrueFalse?.addEventListener("click", () => runStudyTool("truefalse"));
-      actionComplete?.addEventListener("click", () => runStudyTool("complete"));
-      actionSummary?.addEventListener("click", () => runStudyTool("summary"));
-      actionKeywords?.addEventListener("click", () => runStudyTool("keywords"));
+toolPanelBackdrop?.addEventListener("click", closeToolPanel);
+toolPanelClose?.addEventListener("click", closeToolPanel);
 
-      actionPdf?.addEventListener("click", () => {
-        closeMoreDropdown();
-        setMoreStatus("Se abrió la impresión para guardarlo como PDF.");
-        window.print();
-      });
+document.querySelectorAll("[data-run-tool]").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    const tool = btn.dataset.runTool;
+    if (!tool) return;
+    closeToolPanel();
+    runStudyTool(tool);
+  });
+});
+
+dockPdfBtn?.addEventListener("click", () => {
+  closeToolPanel();
+  window.print();
+});
+
+generatePresentationBtn?.addEventListener("click", () => {
+  const pages = document.getElementById("presentation-pages")?.value || "7";
+  const style = document.getElementById("presentation-style")?.value || "clean";
+  const topics = document.getElementById("presentation-topics")?.value || "";
+
+  closeToolPanel();
+
+  studyBadge.textContent = "Slides";
+  studyTitle.textContent = "Borrador de presentación";
+  studySubtitle.textContent = `Configuración: ${pages} diapositivas · estilo ${style}`;
+
+  const data = getStudyData();
+  const sections = data.sections.slice(0, Number(pages));
+  const extraTopics = topics
+    .split(",")
+    .map((item) => cleanText(item))
+    .filter(Boolean);
+
+  studyContent.innerHTML = `
+    <article class="study-card">
+      <h4>Configuración aplicada</h4>
+      <p><strong>Diapositivas:</strong> ${pages}</p>
+      <p><strong>Estilo:</strong> ${style}</p>
+      <p><strong>Temas pedidos:</strong> ${extraTopics.length ? extraTopics.join(", ") : "Ninguno especificado"}</p>
+    </article>
+
+    <article class="study-card">
+      <h4>Estructura sugerida</h4>
+      <div class="study-checklist">
+        ${sections.map((section, index) => `
+          <label class="study-check-item">
+            <input type="checkbox">
+            <span><strong>Slide ${index + 1}:</strong> ${section.title} — ${shortenText(section.items[0] || "", 140)}</span>
+          </label>
+        `).join("")}
+      </div>
+    </article>
+  `;
+
+  openStudyModal();
+});
 
       closeStudyBtn?.addEventListener("click", closeStudyModal);
 
