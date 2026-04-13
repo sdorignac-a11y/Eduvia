@@ -1584,8 +1584,8 @@
 .tool-dock{
   position:fixed;
   right:22px;
-  top:50%;
-  transform:translateY(-50%);
+  top:170px;
+  transform:none;
   z-index:95;
   display:flex;
   flex-direction:column;
@@ -1593,10 +1593,10 @@
   gap:12px;
   padding:12px 10px;
   border-radius:28px;
-  background:linear-gradient(180deg, rgba(255,255,255,.82) 0%, rgba(248,250,252,.92) 100%);
-  border:1px solid rgba(214,220,228,.9);
+  background:linear-gradient(180deg, rgba(255,255,255,.88) 0%, rgba(248,250,252,.96) 100%);
+  border:1px solid rgba(214,220,228,.95);
   box-shadow:
-    0 24px 55px rgba(15,23,42,.14),
+    0 20px 44px rgba(15,23,42,.12),
     inset 0 1px 0 rgba(255,255,255,.7);
   backdrop-filter:blur(14px);
 }
@@ -1728,12 +1728,11 @@
 .tool-panel-backdrop{
   position:fixed;
   inset:0;
-  background:rgba(15,23,42,.22);
+  background:rgba(15,23,42,.06);
   opacity:0;
   pointer-events:none;
-  transition:.2s ease;
+  transition:.18s ease;
   z-index:96;
-  backdrop-filter:blur(2px);
 }
 
 .tool-panel-backdrop.show{
@@ -1743,30 +1742,28 @@
 
 .tool-panel{
   position:fixed;
-  top:50%;
+  top:160px;
   right:96px;
-  transform:translateY(-50%) translateX(16px) scale(.985);
-  width:min(380px, calc(100vw - 140px));
-  max-height:82vh;
+  bottom:24px;
+  width:340px;
+  max-height:none;
   overflow:auto;
-  background:rgba(255,255,255,.97);
-  border:1px solid rgba(226,232,240,.95);
-  border-radius:28px;
-  box-shadow:
-    0 28px 70px rgba(15,23,42,.18),
-    inset 0 1px 0 rgba(255,255,255,.85);
-  padding:20px;
+  background:#ffffff;
+  border:1px solid #e5e7eb;
+  border-radius:24px;
+  box-shadow:0 18px 40px rgba(15,23,42,.12);
+  padding:18px;
   z-index:97;
   opacity:0;
   pointer-events:none;
-  transition:.2s ease;
-  backdrop-filter:blur(18px);
+  transform:translateX(18px);
+  transition:opacity .2s ease, transform .2s ease;
 }
 
 .tool-panel.show{
   opacity:1;
   pointer-events:auto;
-  transform:translateY(-50%) translateX(0) scale(1);
+  transform:translateX(0);
 }
 
 .tool-panel-head{
@@ -1774,7 +1771,9 @@
   align-items:flex-start;
   justify-content:space-between;
   gap:12px;
-  margin-bottom:18px;
+  margin-bottom:16px;
+  padding-bottom:14px;
+  border-bottom:1px solid #edf1f5;
 }
 
 .tool-panel-badge{
@@ -1821,7 +1820,8 @@
 
 .tool-panel-body{
   display:grid;
-  gap:14px;
+  gap:16px;
+  padding-top:4px;
 }
 
 .tool-config{
@@ -1844,12 +1844,13 @@
 .config-field textarea,
 .config-field input{
   width:100%;
-  border:1px solid #dbe2ea;
-  border-radius:16px;
-  background:#fff;
-  padding:12px 14px;
+  border:1px solid #d9e1e8;
+  border-radius:18px;
+  background:#fcfdff;
+  padding:13px 14px;
   outline:none;
   font:inherit;
+  color:#1f2937;
   transition:border-color .16s ease, box-shadow .16s ease, background .16s ease;
 }
 
@@ -1935,12 +1936,13 @@
     left:12px;
     bottom:84px;
     width:auto;
-    max-height:62vh;
-    transform:translateY(14px) scale(.99);
+    max-height:58vh;
+    border-radius:22px;
+    transform:translateY(14px);
   }
 
   .tool-panel.show{
-    transform:translateY(0) scale(1);
+    transform:translateY(0);
   }
 }
   </style>
