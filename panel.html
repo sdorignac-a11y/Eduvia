@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap"
     rel="stylesheet"
   />
 
@@ -29,7 +29,6 @@
       --teal:#11a9c4;
       --teal-strong:#0f95ae;
       --teal-soft:#dff7fb;
-      --teal-active:#c9f1f7;
 
       --sidebar:#eef3f4;
       --sidebar-deep:#e7eef0;
@@ -40,9 +39,9 @@
       --shadow-card:0 14px 34px rgba(20, 31, 41, 0.06);
       --shadow-premium:0 18px 46px rgba(17,169,196,.12);
 
-      --radius-xl:32px;
-      --radius-lg:24px;
-      --radius-md:18px;
+      --radius-xl:30px;
+      --radius-lg:22px;
+      --radius-md:16px;
 
       --sidebar-width:252px;
     }
@@ -182,7 +181,7 @@
     .sidebar-note{
       margin-top:auto;
       padding:16px;
-      border-radius:22px;
+      border-radius:20px;
       background:linear-gradient(180deg, rgba(255,255,255,.94), rgba(255,255,255,.78));
       border:1px solid rgba(214,225,229,.92);
       box-shadow:var(--shadow-soft);
@@ -190,14 +189,14 @@
 
     .sidebar-note strong{
       display:block;
-      font-size:.9rem;
+      font-size:.88rem;
       margin-bottom:6px;
       color:var(--text);
     }
 
     .sidebar-note p{
-      font-size:.84rem;
-      line-height:1.58;
+      font-size:.83rem;
+      line-height:1.55;
       color:var(--muted);
     }
 
@@ -207,247 +206,37 @@
     }
 
     .page{
-      max-width:1380px;
+      max-width:1320px;
       margin:0 auto;
       display:grid;
       gap:18px;
     }
 
-    .hero-shell{
-      position:relative;
-      overflow:hidden;
-      background:linear-gradient(180deg, rgba(255,255,255,.99) 0%, #ffffff 100%);
+    .topbar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      padding:22px 24px;
       border:1px solid rgba(219,229,232,.98);
-      border-radius:var(--radius-xl);
-      box-shadow:var(--shadow);
-      padding:26px;
-      isolation:isolate;
-    }
-
-    .hero-shell::before{
-      content:"";
-      position:absolute;
-      inset:0 0 auto 0;
-      height:180px;
-      background:linear-gradient(180deg, rgba(17,169,196,.07), transparent);
-      pointer-events:none;
-      z-index:0;
-    }
-
-    .hero-shell::after{
-      content:"";
-      position:absolute;
-      top:0;
-      left:24px;
-      right:24px;
-      height:1px;
-      background:linear-gradient(90deg, transparent, rgba(255,255,255,.95), transparent);
-      z-index:1;
-      pointer-events:none;
-    }
-
-    .hero-shell > *{
-      position:relative;
-      z-index:2;
-    }
-
-    .hero-top{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:14px;
-      flex-wrap:wrap;
-      margin-bottom:18px;
-    }
-
-    .hero-label{
-      display:inline-flex;
-      align-items:center;
-      width:max-content;
-      padding:7px 12px;
-      border-radius:999px;
-      background:linear-gradient(180deg, rgba(255,255,255,.8), rgba(255,255,255,.45)), var(--teal-soft);
-      color:#0f7f96;
-      font-size:.72rem;
-      font-weight:800;
-      letter-spacing:.08em;
-      text-transform:uppercase;
-      border:1px solid rgba(17,169,196,.10);
-      box-shadow:0 6px 16px rgba(17,169,196,.08);
-    }
-
-    .hero-tabs{
-      display:flex;
-      flex-wrap:wrap;
-      gap:10px;
-    }
-
-    .hero-tab{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      padding:10px 14px;
-      border-radius:999px;
-      font-size:.84rem;
-      font-weight:800;
-      color:#667887;
-      background:#f7fbfc;
-      border:1px solid rgba(219,229,232,.95);
-      box-shadow:0 8px 18px rgba(20,31,41,.03);
-    }
-
-    .hero-tab.active{
-      background:linear-gradient(180deg, rgba(255,255,255,.8), rgba(255,255,255,.46)), var(--teal-soft);
-      border-color:rgba(17,169,196,.18);
-      color:#0f7f96;
-    }
-
-    .hero-grid{
-      display:grid;
-      grid-template-columns:1.18fr .82fr;
-      gap:18px;
-      align-items:stretch;
-    }
-
-    .hero-main{
-      position:relative;
-      min-height:420px;
-      padding:24px;
       border-radius:28px;
-      overflow:hidden;
-      background:
-        radial-gradient(circle at top left, rgba(98,210,230,.16), transparent 26%),
-        radial-gradient(circle at bottom right, rgba(17,169,196,.12), transparent 28%),
-        linear-gradient(180deg, #163842 0%, #112f37 52%, #0e262d 100%);
-      box-shadow:
-        inset 0 1px 0 rgba(255,255,255,.08),
-        inset 0 20px 40px rgba(255,255,255,.02),
-        0 20px 34px rgba(15,43,50,.18);
-      display:flex;
-      flex-direction:column;
-      justify-content:space-between;
+      background:linear-gradient(180deg, rgba(255,255,255,.99) 0%, #ffffff 100%);
+      box-shadow:var(--shadow-soft);
     }
 
-    .hero-main::before{
-      content:"";
-      position:absolute;
-      inset:0;
-      background:
-        linear-gradient(transparent 43px, rgba(255,255,255,.018) 44px),
-        radial-gradient(circle at top left, rgba(255,255,255,.04), transparent 30%);
-      background-size:100% 44px, auto;
-      opacity:.45;
-      pointer-events:none;
-    }
-
-    .hero-main-top,
-    .hero-main-bottom,
-    .hero-copy{
-      position:relative;
-      z-index:2;
-    }
-
-    .hero-main-top{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
-      margin-bottom:20px;
-    }
-
-    .hero-dots{
-      display:flex;
-      gap:8px;
-    }
-
-    .hero-dots span{
-      width:10px;
-      height:10px;
-      border-radius:50%;
-      background:rgba(255,255,255,.18);
-    }
-
-    .hero-status{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding:8px 12px;
-      border-radius:999px;
-      border:1px solid rgba(255,255,255,.12);
-      background:rgba(255,255,255,.06);
-      color:#eaf9fb;
-      font-size:.76rem;
-      font-weight:800;
-      letter-spacing:.08em;
-      text-transform:uppercase;
-    }
-
-    .hero-status::before{
-      content:"";
-      width:8px;
-      height:8px;
-      border-radius:50%;
-      background:#9df0dc;
-      box-shadow:0 0 0 4px rgba(157,240,220,.12);
-    }
-
-    .mini-label{
-      display:inline-block;
-      margin-bottom:14px;
-      padding:8px 12px;
-      border-radius:999px;
-      border:1px solid rgba(255,255,255,.14);
-      background:rgba(255,255,255,.06);
-      color:#def5f8;
-      font-size:.78rem;
-      font-weight:800;
-      letter-spacing:.11em;
-      text-transform:uppercase;
-    }
-
-    .hero-copy h1{
+    .topbar-copy h1{
       font-family:"Sora",sans-serif;
-      font-size:clamp(2rem, 3.8vw, 3.2rem);
-      line-height:1.02;
-      letter-spacing:-.055em;
-      color:#f8feff;
-      margin-bottom:14px;
-      max-width:720px;
+      font-size:clamp(1.6rem, 2vw, 2rem);
+      line-height:1;
+      letter-spacing:-.04em;
+      color:#111b24;
+      margin-bottom:6px;
     }
 
-    .hero-copy p{
-      color:rgba(235,248,250,.86);
-      line-height:1.82;
-      font-size:1rem;
-      max-width:640px;
-      margin-bottom:20px;
-    }
-
-    .hero-feature-row{
-      display:flex;
-      flex-wrap:wrap;
-      gap:10px;
-      margin-bottom:18px;
-    }
-
-    .hero-feature{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      padding:11px 14px;
-      border-radius:15px;
-      border:1px solid rgba(255,255,255,.12);
-      background:rgba(255,255,255,.075);
-      color:#eefcfb;
-      font-size:.9rem;
-      font-weight:800;
-      box-shadow:0 8px 18px rgba(0,0,0,.05);
-    }
-
-    .hero-actions{
-      display:flex;
-      gap:12px;
-      flex-wrap:wrap;
+    .topbar-copy p{
+      color:var(--muted);
+      font-size:.92rem;
+      line-height:1.5;
     }
 
     .btn{
@@ -465,6 +254,7 @@
       font-size:.94rem;
       font-weight:800;
       transition:.18s ease;
+      white-space:nowrap;
     }
 
     .btn:hover{
@@ -484,263 +274,282 @@
       box-shadow:0 8px 20px rgba(23,33,43,.04);
     }
 
-    .hero-side{
+    .section{
+      border:1px solid rgba(219,229,232,.98);
+      border-radius:28px;
+      background:linear-gradient(180deg, rgba(255,255,255,.99) 0%, #ffffff 100%);
+      box-shadow:var(--shadow-soft);
+      overflow:hidden;
+    }
+
+    .section-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      padding:20px 22px;
+      border-bottom:1px solid rgba(219,229,232,.78);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.72), rgba(255,255,255,0)),
+        linear-gradient(180deg, #fbfeff 0%, #f6fbfc 100%);
+    }
+
+    .section-head h2{
+      font-family:"Sora",sans-serif;
+      font-size:1.12rem;
+      line-height:1;
+      letter-spacing:-.03em;
+      color:#111b24;
+    }
+
+    .section-head a{
+      text-decoration:none;
+      font-size:.88rem;
+      font-weight:800;
+      color:#0f7f96;
+    }
+
+    .section-body{
+      padding:20px 22px 22px;
+    }
+
+    .action-grid{
       display:grid;
+      grid-template-columns:repeat(4, minmax(0, 1fr));
       gap:14px;
     }
 
-    .hero-side-card{
-      padding:18px;
-      border-radius:24px;
+    .action-card{
+      text-decoration:none;
+      color:inherit;
       border:1px solid rgba(219,229,232,.95);
+      border-radius:22px;
       background:
         linear-gradient(180deg, rgba(255,255,255,.96), rgba(255,255,255,.84)),
         linear-gradient(180deg, #ffffff 0%, #fbfdfe 100%);
-      box-shadow:var(--shadow-card);
-      min-height:126px;
+      padding:18px;
+      min-height:142px;
       display:flex;
       flex-direction:column;
       justify-content:space-between;
+      transition:.18s ease;
+      box-shadow:0 10px 22px rgba(23,33,43,.04);
     }
 
-    .hero-side-card span{
-      display:block;
-      color:#7e8d99;
-      font-size:.79rem;
+    .action-card:hover{
+      transform:translateY(-3px);
+      border-color:rgba(17,169,196,.22);
+      box-shadow:var(--shadow-premium);
+    }
+
+    .action-icon{
+      width:42px;
+      height:42px;
+      border-radius:14px;
+      display:grid;
+      place-items:center;
+      background:linear-gradient(180deg, #f7fbfc, #eef6f8);
+      color:#0f7f96;
+      font-size:.8rem;
       font-weight:800;
-      letter-spacing:.04em;
+      border:1px solid #e2edf0;
+      box-shadow:0 8px 18px rgba(20,31,41,.04);
+      margin-bottom:14px;
+    }
+
+    .action-card strong{
+      display:block;
+      font-size:1rem;
+      letter-spacing:-.02em;
+      color:#17212b;
+      margin-bottom:6px;
+    }
+
+    .action-card p{
+      color:var(--muted);
+      font-size:.88rem;
+      line-height:1.52;
+    }
+
+    .content-grid{
+      display:grid;
+      grid-template-columns:1.1fr .9fr;
+      gap:18px;
+    }
+
+    .recent-list{
+      display:grid;
+      gap:12px;
+    }
+
+    .recent-item{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+      padding:15px 16px;
+      border:1px solid rgba(219,229,232,.95);
+      border-radius:18px;
+      background:#fff;
+      box-shadow:0 8px 18px rgba(23,33,43,.03);
+    }
+
+    .recent-left{
+      min-width:0;
+      display:flex;
+      align-items:center;
+      gap:12px;
+    }
+
+    .recent-icon{
+      width:40px;
+      height:40px;
+      border-radius:14px;
+      display:grid;
+      place-items:center;
+      background:linear-gradient(180deg, #f7fbfc, #eef6f8);
+      border:1px solid #e2edf0;
+      color:#0f7f96;
+      font-size:.76rem;
+      font-weight:800;
+      flex:none;
+    }
+
+    .recent-copy{
+      min-width:0;
+    }
+
+    .recent-copy strong{
+      display:block;
+      font-size:.95rem;
+      color:#17212b;
+      line-height:1.25;
+      margin-bottom:4px;
+    }
+
+    .recent-copy span{
+      display:block;
+      color:var(--muted);
+      font-size:.84rem;
+      line-height:1.4;
+    }
+
+    .recent-actions{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+      flex:none;
+    }
+
+    .mini-btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-height:38px;
+      padding:9px 13px;
+      border-radius:12px;
+      text-decoration:none;
+      font-size:.82rem;
+      font-weight:800;
+      border:1px solid rgba(219,229,232,.95);
+      background:#fff;
+      color:#223042;
+      transition:.18s ease;
+    }
+
+    .mini-btn:hover{
+      transform:translateY(-1px);
+    }
+
+    .mini-btn.primary{
+      background:linear-gradient(135deg, var(--teal), var(--teal-strong));
+      color:#fff;
+      border-color:transparent;
+    }
+
+    .mini-btn.ghost{
+      color:#0f7f96;
+      background:#f7fbfc;
+    }
+
+    .continue-grid{
+      display:grid;
+      gap:12px;
+    }
+
+    .continue-card{
+      padding:16px;
+      border:1px solid rgba(219,229,232,.95);
+      border-radius:20px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.96), rgba(255,255,255,.84)),
+        linear-gradient(180deg, #ffffff 0%, #fbfdfe 100%);
+      box-shadow:0 8px 20px rgba(23,33,43,.03);
+    }
+
+    .continue-card span{
+      display:block;
+      font-size:.76rem;
+      font-weight:800;
+      color:#80909d;
       text-transform:uppercase;
+      letter-spacing:.05em;
       margin-bottom:8px;
     }
 
-    .hero-side-card strong{
+    .continue-card strong{
       display:block;
-      color:#16212b;
-      font-size:1.08rem;
+      font-size:1rem;
+      color:#17212b;
       line-height:1.3;
       letter-spacing:-.02em;
       margin-bottom:8px;
     }
 
-    .hero-side-card p{
+    .continue-card p{
       color:var(--muted);
-      font-size:.92rem;
-      line-height:1.62;
+      font-size:.88rem;
+      line-height:1.55;
+      margin-bottom:14px;
     }
 
-    .hero-bottom{
+    .quick-links{
       display:grid;
-      grid-template-columns:repeat(3, 1fr);
-      gap:14px;
-      margin-top:16px;
+      grid-template-columns:repeat(3, minmax(0, 1fr));
+      gap:12px;
     }
 
-    .stat-card{
-      padding:16px 18px;
-      border-radius:22px;
-      background:linear-gradient(180deg, rgba(255,255,255,.96), rgba(255,255,255,.84));
-      border:1px solid rgba(219,229,232,.95);
-      box-shadow:0 10px 22px rgba(23,33,43,.04);
-    }
-
-    .stat-card span{
-      display:block;
-      font-size:.78rem;
-      font-weight:800;
-      color:#80909d;
-      text-transform:uppercase;
-      letter-spacing:.05em;
-      margin-bottom:6px;
-    }
-
-    .stat-card strong{
-      display:block;
-      font-family:"Sora",sans-serif;
-      font-size:1.24rem;
-      color:#12202b;
-      letter-spacing:-.03em;
-      margin-bottom:4px;
-    }
-
-    .stat-card p{
-      color:var(--muted);
-      font-size:.89rem;
-      line-height:1.5;
-    }
-
-    .section{
-      background:rgba(255,255,255,.92);
-      border:1px solid rgba(219,229,232,.95);
-      border-radius:30px;
-      padding:24px;
-      box-shadow:var(--shadow-soft);
-    }
-
-    .section-head{
+    .quick-link{
       display:flex;
-      align-items:flex-end;
-      justify-content:space-between;
-      gap:16px;
-      margin-bottom:18px;
-      flex-wrap:wrap;
-    }
-
-    .section-head h2{
-      font-family:"Sora",sans-serif;
-      font-size:1.5rem;
-      letter-spacing:-.04em;
-      color:#111b24;
-      margin-bottom:6px;
-    }
-
-    .section-head p{
-      color:var(--muted);
-      max-width:760px;
-      line-height:1.74;
-      font-size:.94rem;
-    }
-
-    .guide-grid{
-      display:grid;
-      grid-template-columns:repeat(3, 1fr);
-      gap:16px;
-    }
-
-    .guide-card{
-      padding:22px;
-      border-radius:24px;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+      min-height:66px;
+      padding:14px;
+      border-radius:18px;
       border:1px solid rgba(219,229,232,.95);
-      background:
-        linear-gradient(180deg, rgba(255,255,255,.98), rgba(255,255,255,.90)),
-        linear-gradient(180deg, #ffffff 0%, #f8fbfc 100%);
-      box-shadow:var(--shadow-card);
+      background:#fff;
+      text-decoration:none;
+      color:#223042;
+      font-size:.9rem;
+      font-weight:800;
+      box-shadow:0 8px 18px rgba(23,33,43,.03);
       transition:.18s ease;
     }
 
-    .guide-card:hover{
-      transform:translateY(-3px);
-      box-shadow:var(--shadow-premium);
+    .quick-link:hover{
+      transform:translateY(-2px);
       border-color:rgba(17,169,196,.18);
-    }
-
-    .step-badge{
-      width:46px;
-      height:46px;
-      border-radius:16px;
-      display:grid;
-      place-items:center;
-      font-family:"Sora",sans-serif;
-      font-weight:800;
       color:#0f7f96;
-      background:linear-gradient(180deg, #f7fcfd, #edf8fa);
-      border:1px solid rgba(17,169,196,.14);
-      margin-bottom:14px;
-      box-shadow:0 8px 18px rgba(17,169,196,.08);
     }
 
-    .guide-card h3{
-      font-family:"Sora",sans-serif;
-      font-size:1.05rem;
-      margin-bottom:8px;
-      letter-spacing:-.03em;
-      color:#17212b;
-    }
-
-    .guide-card p{
-      color:var(--muted);
-      line-height:1.72;
-      font-size:.93rem;
-    }
-
-    .quick-grid{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:16px;
-    }
-
-    .prep-card{
-      padding:22px;
-      border-radius:26px;
-      border:1px solid rgba(219,229,232,.95);
-      background:
-        linear-gradient(180deg, rgba(255,255,255,.98), rgba(255,255,255,.90)),
-        linear-gradient(180deg, #ffffff 0%, #f8fbfc 100%);
-      box-shadow:var(--shadow-card);
-    }
-
-    .prep-badge{
-      width:46px;
-      height:46px;
-      border-radius:16px;
-      display:grid;
-      place-items:center;
-      font-family:"Sora",sans-serif;
-      font-weight:800;
-      color:#0f7f96;
-      background:linear-gradient(180deg, #f7fcfd, #edf8fa);
-      border:1px solid rgba(17,169,196,.14);
-      margin-bottom:14px;
-      box-shadow:0 8px 18px rgba(17,169,196,.08);
-    }
-
-    .prep-card h3{
-      font-family:"Sora",sans-serif;
-      font-size:1.08rem;
-      margin-bottom:8px;
-      letter-spacing:-.03em;
-      color:#17212b;
-    }
-
-    .prep-card p{
-      color:var(--muted);
-      line-height:1.72;
-      font-size:.94rem;
-      margin-bottom:14px;
-    }
-
-    .prep-list{
-      display:grid;
-      gap:10px;
-      margin-top:12px;
-    }
-
-    .prep-list div{
-      padding:13px 14px;
-      border-radius:16px;
-      background:#fff;
-      border:1px solid rgba(219,229,232,.95);
-      color:#46586a;
-      font-size:.93rem;
-      font-weight:600;
-      line-height:1.58;
-      box-shadow:0 8px 18px rgba(23,33,43,.03);
-    }
-
-    .prep-tip{
-      margin-top:14px;
-      padding:14px 15px;
-      border-radius:18px;
-      background:linear-gradient(180deg, rgba(255,255,255,.82), rgba(223,247,251,.56));
-      border:1px solid rgba(17,169,196,.14);
-      color:#51636f;
-      line-height:1.62;
-      font-size:.91rem;
-      font-weight:600;
-    }
-
-    @media (max-width: 1180px){
-      .hero-grid{
-        grid-template-columns:1fr;
+    @media (max-width: 1160px){
+      .action-grid{
+        grid-template-columns:repeat(2, minmax(0, 1fr));
       }
 
-      .hero-bottom{
-        grid-template-columns:1fr;
-      }
-    }
-
-    @media (max-width: 1080px){
-      .guide-grid,
-      .quick-grid{
+      .content-grid{
         grid-template-columns:1fr;
       }
     }
@@ -765,47 +574,42 @@
         padding:18px;
       }
 
-      .hero-shell,
+      .topbar,
       .section{
         border-radius:24px;
-        padding:20px;
-      }
-
-      .hero-main{
-        min-height:auto;
       }
     }
 
-    @media (max-width: 720px){
-      .hero-actions{
-        flex-direction:column;
-      }
-
-      .hero-actions .btn{
-        width:100%;
-      }
-    }
-
-    @media (max-width: 620px){
+    @media (max-width: 680px){
       .main{
         padding:14px;
       }
 
-      .hero-top{
+      .topbar{
+        flex-direction:column;
+        align-items:stretch;
+      }
+
+      .topbar .btn{
+        width:100%;
+      }
+
+      .action-grid{
+        grid-template-columns:1fr;
+      }
+
+      .quick-links{
+        grid-template-columns:1fr;
+      }
+
+      .recent-item{
+        flex-direction:column;
         align-items:flex-start;
       }
 
-      .hero-main{
-        padding:18px;
-        border-radius:22px;
-      }
-
-      .hero-copy h1{
-        font-size:1.95rem;
-      }
-
-      .section-head h2{
-        font-size:1.3rem;
+      .recent-actions{
+        width:100%;
+        justify-content:flex-start;
       }
     }
   </style>
@@ -823,8 +627,7 @@
 
       <nav class="menu">
         <a href="#" class="active">Inicio</a>
-        <a href="crear-clase.html">Crear nueva clase</a>
-        <a href="#guia">Cómo funciona</a>
+        <a href="crear-clase.html">Crear contenido</a>
         <a href="mis-clases.html">Mis clases</a>
         <a href="#">Historial</a>
         <a href="#">Ajustes</a>
@@ -832,207 +635,148 @@
       </nav>
 
       <div class="sidebar-note">
-        <strong>Idea principal</strong>
-        <p>
-          Un panel que se sienta como tu espacio de estudio: claro, visual y con herramientas
-          para seguir aprendiendo sin vueltas.
-        </p>
+        <strong>Acceso rápido</strong>
+        <p>Usá el panel para crear, seguir o abrir contenido sin pasos extra.</p>
       </div>
     </aside>
 
     <main class="main">
       <div class="page">
 
-        <section class="hero-shell">
-          <div class="hero-top">
-            <span class="hero-label">Panel principal</span>
-
-            <div class="hero-tabs">
-              <span class="hero-tab active">Inicio</span>
-              <span class="hero-tab">Clases</span>
-              <span class="hero-tab">Apuntes</span>
-              <span class="hero-tab">IA</span>
-            </div>
+        <section class="topbar">
+          <div class="topbar-copy">
+            <h1>Panel</h1>
+            <p>Elegí qué querés hacer.</p>
           </div>
 
-          <div class="hero-grid">
-            <div class="hero-main">
-              <div class="hero-main-top">
-                <div class="hero-dots">
-                  <span></span>
-                  <span></span>
-                  <span></span>
-                </div>
-
-                <div class="hero-status">Estudio activo</div>
-              </div>
-
-              <div class="hero-copy">
-                <span class="mini-label">Espacio de estudio</span>
-                <h1>Aprendé con una experiencia más clara, visual y bien guiada.</h1>
-                <p>
-                  Eduvia convierte el estudio en algo más ordenado y más fácil de seguir.
-                  La IA explica paso a paso, adapta el ritmo según lo que necesites
-                  y acompaña el proceso con apoyo visual para que cada tema quede más claro.
-                </p>
-
-                <div class="hero-feature-row">
-                  <span class="hero-feature">✏️ Explicación guiada</span>
-                  <span class="hero-feature">📘 Apoyo visual</span>
-                  <span class="hero-feature">🧠 A tu ritmo</span>
-                </div>
-              </div>
-
-              <div class="hero-main-bottom">
-                <div class="hero-actions">
-                  <a href="crear-clase.html" class="btn btn-primary">Crear nueva clase</a>
-                  <a href="mis-clases.html" class="btn btn-soft">Ver mis clases</a>
-                </div>
-              </div>
-            </div>
-
-            <div class="hero-side">
-              <div class="hero-side-card">
-                <div>
-                  <span>Modalidad</span>
-                  <strong>Clase guiada con IA</strong>
-                </div>
-                <p>Explicaciones más claras y adaptadas al tema que quieras estudiar.</p>
-              </div>
-
-              <div class="hero-side-card">
-                <div>
-                  <span>Apoyo visual</span>
-                  <strong>Pizarra interactiva</strong>
-                </div>
-                <p>Ideal para procedimientos, ejemplos y explicaciones paso a paso.</p>
-              </div>
-
-              <div class="hero-side-card">
-                <div>
-                  <span>Objetivo</span>
-                  <strong>Entender mejor</strong>
-                </div>
-                <p>No solo avanzar, sino comprender con una lógica mucho más clara.</p>
-              </div>
-            </div>
-          </div>
-
-          <div class="hero-bottom">
-            <div class="stat-card">
-              <span>Experiencia</span>
-              <strong>Más clara</strong>
-              <p>Una interfaz limpia para estudiar sin que todo compita al mismo tiempo.</p>
-            </div>
-
-            <div class="stat-card">
-              <span>Ritmo</span>
-              <strong>Más guiado</strong>
-              <p>La IA acompaña el proceso y ayuda a avanzar paso a paso.</p>
-            </div>
-
-            <div class="stat-card">
-              <span>Resultado</span>
-              <strong>Más entendible</strong>
-              <p>El foco no está solo en leer, sino en comprender mejor cada tema.</p>
-            </div>
-          </div>
-        </section>
-
-        <section class="section" id="guia">
-          <div class="section-head">
-            <div>
-              <h2>Cómo funciona Eduvia</h2>
-              <p>
-                Todo está pensado para que la experiencia se sienta simple, visual y cercana,
-                como si alguien hubiese preparado tu espacio de estudio antes de empezar.
-              </p>
-            </div>
-          </div>
-
-          <div class="guide-grid">
-            <article class="guide-card">
-              <div class="step-badge">1</div>
-              <h3>Elegí qué querés estudiar</h3>
-              <p>
-                Podés entrar con una materia concreta, un tema puntual o incluso con una duda específica
-                para que la clase ya empiece enfocada.
-              </p>
-            </article>
-
-            <article class="guide-card">
-              <div class="step-badge">2</div>
-              <h3>Organizá tu espacio</h3>
-              <p>
-                Eduvia reúne tus clases, materiales y explicaciones dentro del mismo entorno,
-                para que estudiar se sienta más ordenado y natural.
-              </p>
-            </article>
-
-            <article class="guide-card">
-              <div class="step-badge">3</div>
-              <h3>La IA te acompaña</h3>
-              <p>
-                La IA explica, responde preguntas y usa apoyo visual para mostrar ejercicios,
-                procedimientos y ejemplos de una forma mucho más clara.
-              </p>
-            </article>
-          </div>
+          <a href="crear-clase.html" class="btn btn-primary">Crear contenido</a>
         </section>
 
         <section class="section">
           <div class="section-head">
-            <div>
-              <h2>Antes de empezar</h2>
-              <p>
-                Antes de ponerte a estudiar, Eduvia te da un entorno más simple y más claro
-                para que aproveches mejor la clase desde el primer minuto.
-              </p>
+            <h2>Acciones rápidas</h2>
+          </div>
+
+          <div class="section-body">
+            <div class="action-grid">
+              <a href="crear-clase.html" class="action-card">
+                <div>
+                  <div class="action-icon">CL</div>
+                  <strong>Crear clase</strong>
+                  <p>Empezá una clase guiada desde cero.</p>
+                </div>
+              </a>
+
+              <a href="crear-clase.html" class="action-card">
+                <div>
+                  <div class="action-icon">RS</div>
+                  <strong>Crear resumen</strong>
+                  <p>Generá una explicación clara de un tema.</p>
+                </div>
+              </a>
+
+              <a href="crear-clase.html" class="action-card">
+                <div>
+                  <div class="action-icon">AN</div>
+                  <strong>Crear análisis</strong>
+                  <p>Desarrollá un tema con más profundidad.</p>
+                </div>
+              </a>
+
+              <a href="mis-clases.html" class="action-card">
+                <div>
+                  <div class="action-icon">MC</div>
+                  <strong>Ver mis clases</strong>
+                  <p>Abrí el contenido que ya generaste.</p>
+                </div>
+              </a>
             </div>
           </div>
-
-          <div class="quick-grid">
-            <article class="prep-card">
-              <div class="prep-badge">1</div>
-              <h3>Qué vas a encontrar</h3>
-              <p>
-                La clase está pensada como una sesión de estudio guiada: visual, clara y flexible,
-                para que no solo leas, sino que realmente entiendas.
-              </p>
-
-              <div class="prep-list">
-                <div>Explicaciones paso a paso, sin que todo vaya demasiado rápido</div>
-                <div>Pizarra visual para ejemplos, cuentas y procedimientos</div>
-                <div>La IA puede repetir, simplificar o cambiar la forma de explicar</div>
-                <div>Podés empezar con una duda puntual o con una materia completa</div>
-              </div>
-
-              <div class="prep-tip">
-                Consejo: arrancá con una pregunta concreta o con el tema que más te cuesta. Así la explicación sale mucho más enfocada.
-              </div>
-            </article>
-
-            <article class="prep-card">
-              <div class="prep-badge">2</div>
-              <h3>Cómo aprovecharlo mejor</h3>
-              <p>
-                Eduvia está pensado para alumnos que quieren una experiencia más cercana,
-                más visual y mucho más fácil de seguir que una plataforma común.
-              </p>
-
-              <div class="prep-list">
-                <div>Ideal para entender un tema desde cero</div>
-                <div>Muy útil para practicar antes de una prueba</div>
-                <div>Perfecto si aprendés mejor viendo pasos escritos</div>
-                <div>Podés preguntar sin presión y avanzar a tu propio ritmo</div>
-              </div>
-
-              <div class="prep-tip">
-                La idea es que el panel se sienta como una mesa de estudio digital: ordenada, viva y agradable de usar.
-              </div>
-            </article>
-          </div>
         </section>
+
+        <div class="content-grid">
+          <section class="section">
+            <div class="section-head">
+              <h2>Recientes</h2>
+              <a href="mis-clases.html">Ver todo</a>
+            </div>
+
+            <div class="section-body">
+              <div class="recent-list">
+                <div class="recent-item">
+                  <div class="recent-left">
+                    <div class="recent-icon">DC</div>
+                    <div class="recent-copy">
+                      <strong>Arquitectura de Roma</strong>
+                      <span>Documento • Editado hace poco</span>
+                    </div>
+                  </div>
+
+                  <div class="recent-actions">
+                    <a href="#" class="mini-btn ghost">Continuar</a>
+                    <a href="#" class="mini-btn">Abrir</a>
+                  </div>
+                </div>
+
+                <div class="recent-item">
+                  <div class="recent-left">
+                    <div class="recent-icon">CL</div>
+                    <div class="recent-copy">
+                      <strong>Revolución Francesa</strong>
+                      <span>Clase • Secundaria</span>
+                    </div>
+                  </div>
+
+                  <div class="recent-actions">
+                    <a href="#" class="mini-btn ghost">Continuar</a>
+                    <a href="#" class="mini-btn">Abrir</a>
+                  </div>
+                </div>
+
+                <div class="recent-item">
+                  <div class="recent-left">
+                    <div class="recent-icon">RS</div>
+                    <div class="recent-copy">
+                      <strong>Resumen de fotosíntesis</strong>
+                      <span>Resumen • Documento</span>
+                    </div>
+                  </div>
+
+                  <div class="recent-actions">
+                    <a href="#" class="mini-btn ghost">Continuar</a>
+                    <a href="#" class="mini-btn">Abrir</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="section">
+            <div class="section-head">
+              <h2>Seguir</h2>
+            </div>
+
+            <div class="section-body">
+              <div class="continue-grid">
+                <div class="continue-card">
+                  <span>Último trabajo</span>
+                  <strong>Seguir con Arquitectura de Roma</strong>
+                  <p>Retomá el último contenido que estabas armando.</p>
+                  <a href="#" class="mini-btn primary">Continuar</a>
+                </div>
+
+                <div class="continue-card">
+                  <span>Accesos</span>
+                  <div class="quick-links">
+                    <a href="crear-clase.html" class="quick-link">Nuevo contenido</a>
+                    <a href="mis-clases.html" class="quick-link">Mis clases</a>
+                    <a href="#" class="quick-link">Historial</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
 
       </div>
     </main>
