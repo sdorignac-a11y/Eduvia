@@ -968,140 +968,6 @@
       min-height:20px;
     }
 
-    .more-backdrop{
-      position:fixed;
-      inset:0;
-      background:transparent;
-      opacity:0;
-      pointer-events:none;
-      z-index:89;
-    }
-
-    .more-backdrop.show{
-      opacity:1;
-      pointer-events:auto;
-    }
-
-    .more-dropdown{
-      position:fixed;
-      top:78px;
-      right:20px;
-      width:min(380px, calc(100vw - 24px));
-      background:#fff;
-      border:1px solid #e5e7eb;
-      border-radius:20px;
-      box-shadow:var(--shadow-soft);
-      opacity:0;
-      transform:translateY(-8px) scale(.98);
-      pointer-events:none;
-      transition:.16s ease;
-      z-index:90;
-      overflow:hidden;
-    }
-
-    .more-dropdown.show{
-      opacity:1;
-      transform:translateY(0) scale(1);
-      pointer-events:auto;
-    }
-
-    .more-header{
-      padding:18px 18px 14px;
-      border-bottom:1px solid #eef1f4;
-      background:linear-gradient(180deg, #ffffff 0%, #fbfcff 100%);
-    }
-
-    .more-header h3{
-      font-size:1rem;
-      font-weight:700;
-      margin-bottom:4px;
-    }
-
-    .more-header p{
-      color:#5f6368;
-      line-height:1.5;
-      font-size:.88rem;
-    }
-
-    .more-list{
-      padding:8px;
-      max-height:420px;
-      overflow:auto;
-    }
-
-    .more-item{
-      width:100%;
-      border:none;
-      background:#fff;
-      border-radius:14px;
-      padding:12px 12px;
-      display:flex;
-      align-items:center;
-      gap:12px;
-      cursor:pointer;
-      text-align:left;
-      transition:.14s ease;
-    }
-
-    .more-item:hover{
-      background:#f8f9fa;
-    }
-
-    .more-item + .more-item{
-      margin-top:4px;
-    }
-
-    .more-item-icon{
-      width:36px;
-      height:36px;
-      border-radius:10px;
-      display:grid;
-      place-items:center;
-      background:#f1f3f4;
-      color:#202124;
-      font-size:1rem;
-      flex:none;
-    }
-
-    .more-item-main{
-      min-width:0;
-      flex:1;
-      display:flex;
-      flex-direction:column;
-      gap:2px;
-    }
-
-    .more-item-title{
-      font-size:.94rem;
-      font-weight:700;
-      color:#202124;
-    }
-
-    .more-item-desc{
-      font-size:.82rem;
-      color:#5f6368;
-      line-height:1.45;
-    }
-
-    .more-item-arrow{
-      color:#9aa0a6;
-      font-size:1.15rem;
-      flex:none;
-    }
-
-    .more-footer{
-      padding:12px 18px 16px;
-      border-top:1px solid #eef1f4;
-    }
-
-    .more-status{
-      min-height:20px;
-      font-size:.85rem;
-      color:#0b57d0;
-      font-weight:600;
-      line-height:1.4;
-    }
-
     .study-modal-backdrop{
       position:fixed;
       inset:0;
@@ -1398,12 +1264,6 @@
       .share-row{
         grid-template-columns:1fr;
       }
-
-      .more-dropdown{
-        right:12px !important;
-        left:12px !important;
-        width:auto;
-      }
     }
 
     @media print{
@@ -1411,15 +1271,16 @@
         background:#fff;
       }
 
-      .editor-chrome,
-      .share-modal-backdrop,
-      .more-dropdown,
-      .more-backdrop,
-      .study-modal-backdrop,
-      #doc-loading,
-      #access-guard{
-        display:none !important;
-      }
+.editor-chrome,
+.share-modal-backdrop,
+.study-modal-backdrop,
+.tool-dock,
+.tool-panel,
+.tool-panel-backdrop,
+#doc-loading,
+#access-guard{
+  display:none !important;
+}
 
       .workspace{
         padding:0;
@@ -1439,14 +1300,12 @@
 
     .doc-menu::-webkit-scrollbar,
     .toolbar::-webkit-scrollbar,
-    .more-list::-webkit-scrollbar{
       height:8px;
       width:8px;
     }
 
     .doc-menu::-webkit-scrollbar-thumb,
     .toolbar::-webkit-scrollbar-thumb,
-    .more-list::-webkit-scrollbar-thumb{
       background:#d7dce2;
       border-radius:999px;
     }
@@ -2024,7 +1883,6 @@
         <div class="topbar-actions">
           <a href="crear-clase.html" class="btn btn-outline">← Volver</a>
           <button type="button" class="btn btn-soft" id="toggle-reference-view-btn">APA</button>
-          <button type="button" class="btn btn-soft" id="open-more-btn" aria-expanded="false">Más ▾</button>
           <button type="button" class="btn btn-primary" id="open-share-btn">Compartir</button>
         </div>
       </header>
@@ -2624,9 +2482,6 @@ function openToolPanel(panelId, meta = {}) {
   toolPanel.classList.add("show");
   toolPanelBackdrop?.classList.add("show");
 }
-
-      window.closeMoreDropdown = closeMoreDropdown;
-
       function saveSelection() {
         const selection = window.getSelection();
         if (!selection || !selection.rangeCount || !activeEditable) return;
