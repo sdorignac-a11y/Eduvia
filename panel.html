@@ -36,6 +36,7 @@
 
       --sidebar-w:270px;
       --topbar-h:82px;
+      --danger:#d9534f;
     }
 
     *{
@@ -284,6 +285,7 @@
       color:var(--primary-dark);
       background:linear-gradient(135deg, #dff7fb, #c9eff5);
       border:1px solid #cfe8ee;
+      text-transform:uppercase;
     }
 
     .user-meta{
@@ -299,6 +301,17 @@
     .user-meta span{
       font-size:.8rem;
       color:var(--muted);
+    }
+
+    .logout-btn{
+      height:42px;
+      padding:0 16px;
+      border-radius:14px;
+      background:#fff;
+      border:1px solid #ead6d5;
+      color:#b14944;
+      font-weight:700;
+      box-shadow: var(--shadow-soft);
     }
 
     .content{
@@ -375,6 +388,25 @@
       color:rgba(255,255,255,.9);
       line-height:1.65;
       font-size:.98rem;
+    }
+
+    .hero-stats{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-top:18px;
+    }
+
+    .hero-stat{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:9px 12px;
+      border-radius:999px;
+      background:rgba(255,255,255,.14);
+      border:1px solid rgba(255,255,255,.18);
+      font-size:.84rem;
+      font-weight:700;
     }
 
     .hero-actions{
@@ -467,6 +499,12 @@
       color:var(--text);
       line-height:1.35;
       word-break:break-word;
+    }
+
+    .info-sub{
+      margin-top:8px;
+      font-size:.88rem;
+      color:var(--muted);
     }
 
     .info-link{
@@ -577,47 +615,46 @@
       justify-content:center;
     }
 
-    .quick-grid{
-      display:grid;
-      grid-template-columns: repeat(2, minmax(0,1fr));
-      gap:14px;
-    }
-
-    .quick-link{
-      min-height:98px;
-      padding:18px;
-      border-radius:20px;
-      border:1px solid #e2eaed;
-      background:linear-gradient(180deg, #fcfeff 0%, #f6fbfc 100%);
-      box-shadow: var(--shadow-soft);
-      transition:.18s ease;
+    .recent-list{
       display:flex;
       flex-direction:column;
-      justify-content:space-between;
       gap:12px;
     }
 
-    .quick-link:hover{
-      transform:translateY(-2px);
-      border-color:#d2e4e9;
-    }
-
-    .quick-top{
+    .recent-item{
       display:flex;
       align-items:center;
       justify-content:space-between;
-      gap:10px;
+      gap:14px;
+      padding:16px;
+      border-radius:18px;
+      border:1px solid #e4ecef;
+      background:linear-gradient(180deg, #fcfeff 0%, #f7fbfc 100%);
     }
 
-    .quick-top strong{
-      font-size:1rem;
-      letter-spacing:-0.02em;
+    .recent-item-main{
+      min-width:0;
+      display:flex;
+      flex-direction:column;
+      gap:6px;
     }
 
-    .quick-link p{
+    .recent-item-main strong{
+      font-size:.98rem;
+      line-height:1.35;
+      word-break:break-word;
+    }
+
+    .recent-item-main span{
+      font-size:.86rem;
       color:var(--muted);
-      font-size:.9rem;
-      line-height:1.5;
+    }
+
+    .recent-item-badge{
+      flex-shrink:0;
+      font-size:.82rem;
+      font-weight:700;
+      color:var(--primary-dark);
     }
 
     .bottom-grid{
@@ -657,6 +694,14 @@
       line-height:1.58;
     }
 
+    .simple-strong{
+      font-size:1rem;
+      font-weight:700;
+      color:var(--text);
+      line-height:1.45;
+      word-break:break-word;
+    }
+
     .simple-link{
       font-size:.88rem;
       font-weight:700;
@@ -671,6 +716,10 @@
       fill:none;
       stroke-linecap:round;
       stroke-linejoin:round;
+    }
+
+    .hidden{
+      display:none !important;
     }
 
     @media (max-width: 1240px){
@@ -725,9 +774,9 @@
       .topbar-right{
         width:100%;
         justify-content:space-between;
+        flex-wrap:wrap;
       }
 
-      .quick-grid,
       .bottom-grid{
         grid-template-columns:1fr;
       }
@@ -736,6 +785,11 @@
       .card,
       .simple-card{
         padding:20px;
+      }
+
+      .recent-item{
+        flex-direction:column;
+        align-items:flex-start;
       }
     }
   </style>
@@ -760,7 +814,7 @@
       <nav class="nav">
         <div class="nav-label">Principal</div>
 
-        <a href="#" class="active">
+        <a href="panel.html" class="active">
           <span class="nav-icon">
             <svg viewBox="0 0 24 24">
               <path d="M3 10.5 12 3l9 7.5"></path>
@@ -770,7 +824,7 @@
           Inicio
         </a>
 
-        <a href="#">
+        <a href="documento.html">
           <span class="nav-icon">
             <svg viewBox="0 0 24 24">
               <path d="M12 20h9"></path>
@@ -780,7 +834,7 @@
           Crear documento
         </a>
 
-        <a href="#">
+        <a href="documento.html">
           <span class="nav-icon">
             <svg viewBox="0 0 24 24">
               <path d="M5 4.5h10l4 4V19a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-13a1 1 0 0 1 1-1Z"></path>
@@ -790,7 +844,7 @@
           Documentos
         </a>
 
-        <a href="#">
+        <a href="crear-clase.html">
           <span class="nav-icon">
             <svg viewBox="0 0 24 24">
               <path d="M4 7h16"></path>
@@ -798,49 +852,14 @@
               <path d="M4 17h13"></path>
             </svg>
           </span>
-          Resúmenes
-        </a>
-
-        <a href="#">
-          <span class="nav-icon">
-            <svg viewBox="0 0 24 24">
-              <path d="M4 5h16v14H4z"></path>
-              <path d="m10 9 5 3-5 3Z"></path>
-            </svg>
-          </span>
-          Presentaciones
-        </a>
-
-        <div class="nav-label">Cuenta</div>
-
-        <a href="#">
-          <span class="nav-icon">
-            <svg viewBox="0 0 24 24">
-              <circle cx="12" cy="8" r="3.5"></circle>
-              <path d="M5 19a7 7 0 0 1 14 0"></path>
-            </svg>
-          </span>
-          Mi perfil
-        </a>
-
-        <a href="#">
-          <span class="nav-icon">
-            <svg viewBox="0 0 24 24">
-              <path d="M12 3v3"></path>
-              <path d="M12 18v3"></path>
-              <path d="M3 12h3"></path>
-              <path d="M18 12h3"></path>
-              <circle cx="12" cy="12" r="3.5"></circle>
-            </svg>
-          </span>
-          Configuración
+          Clases
         </a>
       </nav>
 
       <div class="sidebar-bottom">
         <h4>Nuevo trabajo</h4>
-        <p>Empezá un documento nuevo o seguí con la herramienta que estés usando.</p>
-        <button class="mini-btn">Crear ahora</button>
+        <p>Creá un documento o seguí con una clase guardada en tu cuenta.</p>
+        <a class="mini-btn" href="documento.html">Crear ahora</a>
       </div>
     </aside>
 
@@ -857,18 +876,20 @@
 
           <div class="page-head">
             <h1>Panel principal</h1>
-            <p>Accedé rápido a tus herramientas y a tu contenido.</p>
+            <p>Información real de tu cuenta, tus documentos y tus clases.</p>
           </div>
         </div>
 
         <div class="topbar-right">
           <div class="user-chip">
-            <div class="avatar">S</div>
+            <div class="avatar" id="userAvatar">U</div>
             <div class="user-meta">
-              <strong>Simón</strong>
-              <span>Cuenta activa</span>
+              <strong id="userName">Usuario</strong>
+              <span id="userEmail">Cargando...</span>
             </div>
           </div>
+
+          <button class="logout-btn" id="logout">Cerrar sesión</button>
         </div>
       </header>
 
@@ -876,17 +897,27 @@
         <section class="hero">
           <div class="hero-main">
             <div class="hero-body">
-              <div class="eyebrow">Eduvia</div>
-              <h2>Un panel más claro para empezar rápido</h2>
-              <p>
-                Entrá directo a tus herramientas principales, retomá tu trabajo
-                y mantené tu espacio de estudio simple y ordenado.
+              <div class="eyebrow" id="welcomeBadge">Eduvia</div>
+              <h2 id="heroTitle">Cargando tu panel...</h2>
+              <p id="heroText">
+                Estamos trayendo tu información real desde Firebase.
               </p>
+
+              <div class="hero-stats">
+                <div class="hero-stat">
+                  <span id="docsCount">0</span>
+                  <span>documentos</span>
+                </div>
+                <div class="hero-stat">
+                  <span id="classesCount">0</span>
+                  <span>clases</span>
+                </div>
+              </div>
             </div>
 
             <div class="hero-actions">
-              <button class="btn btn-primary">Crear documento</button>
-              <button class="btn btn-secondary">Ver documentos</button>
+              <a class="btn btn-primary" href="documento.html">Crear documento</a>
+              <a class="btn btn-secondary" href="crear-clase.html">Crear clase</a>
             </div>
           </div>
 
@@ -903,8 +934,9 @@
                   <span>Último documento</span>
                 </div>
               </div>
-              <div class="info-value">Todavía no hay un documento reciente.</div>
-              <a href="#" class="info-link">Crear documento</a>
+              <div class="info-value" id="lastDocTitle">Sin documentos todavía.</div>
+              <div class="info-sub" id="lastDocDate">—</div>
+              <a href="documento.html" class="info-link" id="lastDocLink">Crear documento</a>
             </article>
 
             <article class="info-card">
@@ -917,11 +949,12 @@
                       <path d="M4 17h13"></path>
                     </svg>
                   </div>
-                  <span>Herramienta reciente</span>
+                  <span>Última clase</span>
                 </div>
               </div>
-              <div class="info-value">Todavía no usaste una herramienta recientemente.</div>
-              <a href="#" class="info-link">Explorar herramientas</a>
+              <div class="info-value" id="lastClassTitle">Sin clases todavía.</div>
+              <div class="info-sub" id="lastClassDate">—</div>
+              <a href="crear-clase.html" class="info-link" id="lastClassLink">Crear clase</a>
             </article>
           </div>
         </section>
@@ -931,12 +964,14 @@
             <div class="card-header">
               <div>
                 <h3>Documentos recientes</h3>
-                <p>Mostrá acá solo contenido real cuando exista.</p>
+                <p>Últimos documentos guardados en tu cuenta.</p>
               </div>
-              <span class="tag">Vacío</span>
+              <span class="tag" id="docsTag">0</span>
             </div>
 
-            <div class="empty-state">
+            <div class="recent-list hidden" id="docsRecentList"></div>
+
+            <div class="empty-state" id="docsEmptyState">
               <div class="empty-box">
                 <div class="empty-icon">
                   <svg viewBox="0 0 24 24">
@@ -945,11 +980,8 @@
                   </svg>
                 </div>
                 <h4>Todavía no hay documentos para mostrar</h4>
-                <p>
-                  Cuando crees o abras documentos, este espacio puede mostrar
-                  tus últimos trabajos reales.
-                </p>
-                <button class="ghost-btn">Crear primer documento</button>
+                <p>Cuando guardes documentos, se van a listar acá automáticamente.</p>
+                <a class="ghost-btn" href="documento.html">Crear primer documento</a>
               </div>
             </div>
           </article>
@@ -957,65 +989,27 @@
           <article class="card">
             <div class="card-header">
               <div>
-                <h3>Accesos rápidos</h3>
-                <p>Entradas directas a las acciones principales.</p>
+                <h3>Clases recientes</h3>
+                <p>Últimas clases guardadas en tu cuenta.</p>
               </div>
+              <span class="tag" id="classesTag">0</span>
             </div>
 
-            <div class="quick-grid">
-              <a href="#" class="quick-link">
-                <div class="quick-top">
-                  <strong>Documento</strong>
-                  <div class="icon-wrap">
-                    <svg viewBox="0 0 24 24">
-                      <path d="M12 20h9"></path>
-                      <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z"></path>
-                    </svg>
-                  </div>
-                </div>
-                <p>Empezá un texto nuevo o retomá uno existente.</p>
-              </a>
+            <div class="recent-list hidden" id="classesRecentList"></div>
 
-              <a href="#" class="quick-link">
-                <div class="quick-top">
-                  <strong>Resumen</strong>
-                  <div class="icon-wrap">
-                    <svg viewBox="0 0 24 24">
-                      <path d="M4 7h16"></path>
-                      <path d="M4 12h10"></path>
-                      <path d="M4 17h13"></path>
-                    </svg>
-                  </div>
+            <div class="empty-state" id="classesEmptyState">
+              <div class="empty-box">
+                <div class="empty-icon">
+                  <svg viewBox="0 0 24 24">
+                    <path d="M4 7h16"></path>
+                    <path d="M4 12h10"></path>
+                    <path d="M4 17h13"></path>
+                  </svg>
                 </div>
-                <p>Convertí contenido largo en una versión más clara.</p>
-              </a>
-
-              <a href="#" class="quick-link">
-                <div class="quick-top">
-                  <strong>Presentación</strong>
-                  <div class="icon-wrap">
-                    <svg viewBox="0 0 24 24">
-                      <path d="M4 5h16v14H4z"></path>
-                      <path d="m10 9 5 3-5 3Z"></path>
-                    </svg>
-                  </div>
-                </div>
-                <p>Prepará material visual de forma más rápida.</p>
-              </a>
-
-              <a href="#" class="quick-link">
-                <div class="quick-top">
-                  <strong>Biblioteca</strong>
-                  <div class="icon-wrap">
-                    <svg viewBox="0 0 24 24">
-                      <path d="M5 19.5h14"></path>
-                      <path d="M6 4.5h12a1 1 0 0 1 1 1v11H7a1 1 0 0 0-1 1v2"></path>
-                      <path d="M7 16.5V5.5a1 1 0 0 0-1-1H5"></path>
-                    </svg>
-                  </div>
-                </div>
-                <p>Accedé a tus documentos y materiales guardados.</p>
-              </a>
+                <h4>Todavía no hay clases para mostrar</h4>
+                <p>Cuando guardes clases, se van a listar acá automáticamente.</p>
+                <a class="ghost-btn" href="crear-clase.html">Crear primera clase</a>
+              </div>
             </div>
           </article>
         </section>
@@ -1025,33 +1019,14 @@
             <div class="simple-head">
               <div class="icon-wrap">
                 <svg viewBox="0 0 24 24">
-                  <path d="M12 3v3"></path>
-                  <path d="M12 18v3"></path>
-                  <path d="M3 12h3"></path>
-                  <path d="M18 12h3"></path>
-                  <circle cx="12" cy="12" r="3.5"></circle>
+                  <circle cx="12" cy="8" r="3.5"></circle>
+                  <path d="M5 19a7 7 0 0 1 14 0"></path>
                 </svg>
               </div>
               <h4>Tu cuenta</h4>
             </div>
-            <p>Revisá tu perfil, tus ajustes y la información principal de tu espacio.</p>
-            <a href="#" class="simple-link">Ir a configuración</a>
-          </article>
-
-          <article class="simple-card">
-            <div class="simple-head">
-              <div class="icon-wrap">
-                <svg viewBox="0 0 24 24">
-                  <path d="M7 4.5h10"></path>
-                  <path d="M7 8.5h10"></path>
-                  <path d="M7 12.5h6"></path>
-                  <path d="M5 19.5h14"></path>
-                </svg>
-              </div>
-              <h4>Espacio ordenado</h4>
-            </div>
-            <p>Mantené tus herramientas a mano y evitá que el panel se sienta cargado.</p>
-            <a href="#" class="simple-link">Ver documentos</a>
+            <div class="simple-strong" id="accountFullName">Cargando...</div>
+            <p id="accountEmailFull">—</p>
           </article>
 
           <article class="simple-card">
@@ -1064,19 +1039,52 @@
                   <rect x="4" y="4" width="16" height="16" rx="2"></rect>
                 </svg>
               </div>
-              <h4>Próximo paso</h4>
+              <h4>Última actualización</h4>
             </div>
-            <p>El siguiente paso lógico es conectar este panel con datos reales de Firebase.</p>
-            <a href="#" class="simple-link">Seguir editando</a>
+            <div class="simple-strong" id="accountUpdatedAt">—</div>
+            <p>Fecha real del documento del usuario en Firestore.</p>
+          </article>
+
+          <article class="simple-card">
+            <div class="simple-head">
+              <div class="icon-wrap">
+                <svg viewBox="0 0 24 24">
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                  <path d="M16 17l5-5-5-5"></path>
+                  <path d="M21 12H9"></path>
+                </svg>
+              </div>
+              <h4>Sesión</h4>
+            </div>
+            <div class="simple-strong">Cuenta activa</div>
+            <button class="logout-btn" id="logoutBottom">Cerrar sesión</button>
           </article>
         </section>
       </section>
     </main>
   </div>
 
-  <script>
-    const menuBtn = document.getElementById("menuBtn");
-    const sidebar = document.getElementById("sidebar");
+  <script type="module">
+    import { auth, db } from "./firebase.js?v=3";
+    import {
+      onAuthStateChanged,
+      signOut
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import {
+      doc,
+      getDoc,
+      collection,
+      query,
+      orderBy,
+      limit,
+      getDocs,
+      getCountFromServer
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const $ = (id) => document.getElementById(id);
+
+    const menuBtn = $("menuBtn");
+    const sidebar = $("sidebar");
 
     if (menuBtn && sidebar) {
       menuBtn.addEventListener("click", () => {
@@ -1098,6 +1106,270 @@
         }
       });
     }
+
+    function escapeHtml(value = "") {
+      return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function formatDate(value) {
+      if (!value) return "Sin fecha";
+      const date = value?.toDate ? value.toDate() : new Date(value);
+      if (Number.isNaN(date.getTime())) return "Sin fecha";
+
+      return new Intl.DateTimeFormat("es-AR", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit"
+      }).format(date);
+    }
+
+    function getInitial(name = "") {
+      return String(name).trim().charAt(0).toUpperCase() || "U";
+    }
+
+    function pickUserName(userData, authUser) {
+      const nombre = userData?.nombre?.trim();
+      const apellido = userData?.apellido?.trim();
+
+      if (nombre && apellido) return `${nombre} ${apellido}`;
+      if (nombre) return nombre;
+      if (authUser?.displayName?.trim()) return authUser.displayName.trim();
+      if (authUser?.email) return authUser.email.split("@")[0];
+      return "Usuario";
+    }
+
+    function getDocumentTitle(item = {}) {
+      if (item.badgeText && String(item.badgeText).trim()) {
+        return String(item.badgeText).trim();
+      }
+
+      if (item.titulo && String(item.titulo).trim()) {
+        return String(item.titulo).trim();
+      }
+
+      if (item.contenido && String(item.contenido).trim()) {
+        return String(item.contenido).trim().slice(0, 80);
+      }
+
+      return "Documento sin título";
+    }
+
+    function stripHtml(html = "") {
+      const div = document.createElement("div");
+      div.innerHTML = html;
+      return (div.textContent || div.innerText || "").replace(/\s+/g, " ").trim();
+    }
+
+    function getClassTitle(item = {}) {
+      if (item.titulo && String(item.titulo).trim()) {
+        return String(item.titulo).trim();
+      }
+
+      if (item.badgeText && String(item.badgeText).trim()) {
+        return String(item.badgeText).trim();
+      }
+
+      if (item.contenidoHtml && String(item.contenidoHtml).trim()) {
+        const div = document.createElement("div");
+        div.innerHTML = item.contenidoHtml;
+
+        const heading = div.querySelector("h1, h2, h3, strong");
+        if (heading?.textContent?.trim()) {
+          return heading.textContent.trim().slice(0, 90);
+        }
+
+        const text = stripHtml(item.contenidoHtml);
+        if (text) return text.slice(0, 90);
+      }
+
+      if (item.contenido && String(item.contenido).trim()) {
+        return String(item.contenido).trim().slice(0, 90);
+      }
+
+      return "Clase sin título";
+    }
+
+    function renderRecentItems({ items, listEl, emptyEl, type }) {
+      if (!listEl || !emptyEl) return;
+
+      if (!items.length) {
+        listEl.innerHTML = "";
+        listEl.classList.add("hidden");
+        emptyEl.classList.remove("hidden");
+        return;
+      }
+
+      emptyEl.classList.add("hidden");
+      listEl.classList.remove("hidden");
+
+      listEl.innerHTML = items.map((item) => {
+        const title = type === "doc" ? getDocumentTitle(item) : getClassTitle(item);
+        const date = formatDate(item.actualizadoEn);
+        const href =
+          type === "doc"
+            ? `documento.html?id=${encodeURIComponent(item.id)}`
+            : `crear-clase.html?id=${encodeURIComponent(item.id)}`;
+
+        return `
+          <a class="recent-item" href="${href}">
+            <div class="recent-item-main">
+              <strong>${escapeHtml(title)}</strong>
+              <span>Actualizado: ${escapeHtml(date)}</span>
+            </div>
+            <div class="recent-item-badge">Abrir</div>
+          </a>
+        `;
+      }).join("");
+    }
+
+    function setText(id, value) {
+      const el = $(id);
+      if (el) el.textContent = value;
+    }
+
+    function setHref(id, value) {
+      const el = $(id);
+      if (el) el.href = value;
+    }
+
+    async function loadPanel(user) {
+      const userRef = doc(db, "usuarios", user.uid);
+      const userSnap = await getDoc(userRef);
+
+      const userData = userSnap.exists() ? userSnap.data() : {};
+      const fullName = pickUserName(userData, user);
+      const email = userData?.email || user.email || "Sin email";
+      const updatedAt = userData?.actualizadoEn || null;
+
+      setText("userName", fullName);
+      setText("userEmail", email);
+      setText("userAvatar", getInitial(fullName));
+
+      setText("accountFullName", fullName);
+      setText("accountEmailFull", email);
+      setText("accountUpdatedAt", formatDate(updatedAt));
+
+      setText("welcomeBadge", "Cuenta activa");
+      setText("heroTitle", `Bienvenido, ${fullName}`);
+
+      const docsCol = collection(db, "usuarios", user.uid, "documentos");
+      const classesCol = collection(db, "usuarios", user.uid, "clases");
+
+      const [
+        docsCountSnap,
+        classesCountSnap,
+        docsRecentSnap,
+        classesRecentSnap
+      ] = await Promise.all([
+        getCountFromServer(docsCol),
+        getCountFromServer(classesCol),
+        getDocs(query(docsCol, orderBy("actualizadoEn", "desc"), limit(4))),
+        getDocs(query(classesCol, orderBy("actualizadoEn", "desc"), limit(4)))
+      ]);
+
+      const docsCount = docsCountSnap.data().count || 0;
+      const classesCount = classesCountSnap.data().count || 0;
+
+      setText("docsCount", String(docsCount));
+      setText("classesCount", String(classesCount));
+      setText("docsTag", `${docsCount} total`);
+      setText("classesTag", `${classesCount} total`);
+
+      if (docsCount === 0 && classesCount === 0) {
+        setText(
+          "heroText",
+          "Todavía no tenés contenido guardado. Cuando empieces a crear documentos o clases, este panel se va a llenar automáticamente con información real."
+        );
+      } else {
+        setText(
+          "heroText",
+          `Actualmente tenés ${docsCount} documento(s) y ${classesCount} clase(s) guardados en tu cuenta.`
+        );
+      }
+
+      const docs = docsRecentSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      const classes = classesRecentSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
+
+      if (docs.length) {
+        const latestDoc = docs[0];
+        setText("lastDocTitle", getDocumentTitle(latestDoc));
+        setText("lastDocDate", formatDate(latestDoc.actualizadoEn));
+        setHref("lastDocLink", `documento.html?id=${encodeURIComponent(latestDoc.id)}`);
+        $("lastDocLink").textContent = "Abrir documento";
+      } else {
+        setText("lastDocTitle", "Sin documentos todavía.");
+        setText("lastDocDate", "—");
+        setHref("lastDocLink", "documento.html");
+        $("lastDocLink").textContent = "Crear documento";
+      }
+
+      if (classes.length) {
+        const latestClass = classes[0];
+        setText("lastClassTitle", getClassTitle(latestClass));
+        setText("lastClassDate", formatDate(latestClass.actualizadoEn));
+        setHref("lastClassLink", `crear-clase.html?id=${encodeURIComponent(latestClass.id)}`);
+        $("lastClassLink").textContent = "Abrir clase";
+      } else {
+        setText("lastClassTitle", "Sin clases todavía.");
+        setText("lastClassDate", "—");
+        setHref("lastClassLink", "crear-clase.html");
+        $("lastClassLink").textContent = "Crear clase";
+      }
+
+      renderRecentItems({
+        items: docs,
+        listEl: $("docsRecentList"),
+        emptyEl: $("docsEmptyState"),
+        type: "doc"
+      });
+
+      renderRecentItems({
+        items: classes,
+        listEl: $("classesRecentList"),
+        emptyEl: $("classesEmptyState"),
+        type: "class"
+      });
+    }
+
+    async function handleLogout(button) {
+      try {
+        if (button) button.disabled = true;
+        await signOut(auth);
+        window.location.href = "login.html";
+      } catch (error) {
+        console.error("Error al cerrar sesión:", error);
+        if (button) button.disabled = false;
+      }
+    }
+
+    $("logout")?.addEventListener("click", () => handleLogout($("logout")));
+    $("logoutBottom")?.addEventListener("click", () => handleLogout($("logoutBottom")));
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        window.location.href = "login.html";
+        return;
+      }
+
+      try {
+        await loadPanel(user);
+      } catch (error) {
+        console.error("Error cargando panel:", error);
+
+        setText("heroTitle", "No se pudo cargar el panel");
+        setText(
+          "heroText",
+          "Hubo un problema trayendo la información desde Firebase. Revisá la consola y las reglas de Firestore."
+        );
+      }
+    });
   </script>
 </body>
 </html>
