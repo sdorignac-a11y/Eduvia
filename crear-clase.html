@@ -201,7 +201,7 @@
     }
 
     .main{
-      padding:22px 26px 22px 22px;
+      padding:18px 22px 18px 18px;
       min-width:0;
       height:100vh;
     }
@@ -210,26 +210,26 @@
       max-width:1380px;
       margin:0 auto;
       display:grid;
-      gap:16px;
-      height:calc(100dvh - 44px);
+      gap:12px;
+      height:calc(100dvh - 36px);
     }
 
     .page-header{
       display:grid;
-      gap:10px;
-      max-width:700px;
-      padding:4px 4px 0;
+      gap:6px;
+      max-width:none;
+      padding:2px 4px 0;
     }
 
     .eyebrow{
       display:inline-flex;
       align-items:center;
       width:max-content;
-      padding:8px 13px;
+      padding:7px 12px;
       border-radius:999px;
       background:linear-gradient(180deg, rgba(255,255,255,.75), rgba(255,255,255,.4)), var(--teal-soft);
       color:#0f7f96;
-      font-size:.75rem;
+      font-size:.72rem;
       font-weight:800;
       letter-spacing:.08em;
       text-transform:uppercase;
@@ -238,18 +238,19 @@
 
     .page-header h1{
       font-family:"Sora",sans-serif;
-      font-size:clamp(2rem, 2.8vw, 2.7rem);
-      line-height:1.01;
-      letter-spacing:-.05em;
+      font-size:clamp(1.85rem, 2.3vw, 2.35rem);
+      line-height:1;
+      letter-spacing:-.045em;
       color:#111b24;
-      max-width:11ch;
+      max-width:none;
+      white-space:nowrap;
     }
 
     .page-header p{
       color:var(--muted);
-      line-height:1.6;
-      font-size:1rem;
-      max-width:620px;
+      line-height:1.48;
+      font-size:.95rem;
+      max-width:760px;
     }
 
     .editor-shell{
@@ -272,7 +273,7 @@
       content:"";
       position:absolute;
       inset:0 0 auto 0;
-      height:120px;
+      height:100px;
       background:linear-gradient(180deg, rgba(17,169,196,.05), transparent);
       pointer-events:none;
       z-index:0;
@@ -284,7 +285,7 @@
     }
 
     .stepper-wrap{
-      padding:20px 28px 16px;
+      padding:16px 24px 12px;
       border-bottom:1px solid rgba(219,229,232,.95);
       background:linear-gradient(180deg, #fbfeff 0%, #f5fafb 100%);
       flex:none;
@@ -293,14 +294,14 @@
     .stepper{
       display:grid;
       grid-template-columns:repeat(4, 1fr);
-      gap:12px;
+      gap:10px;
       align-items:start;
     }
 
     .stepper-item{
       display:flex;
       align-items:flex-start;
-      gap:12px;
+      gap:10px;
       min-width:0;
       cursor:pointer;
       user-select:none;
@@ -310,9 +311,9 @@
     .stepper-item:not(:last-child)::after{
       content:"";
       position:absolute;
-      top:20px;
-      left:50px;
-      right:-10px;
+      top:18px;
+      left:46px;
+      right:-8px;
       height:2px;
       background:linear-gradient(90deg, rgba(201,216,221,.95), rgba(201,216,221,.55));
       z-index:0;
@@ -326,14 +327,14 @@
     .stepper-dot{
       position:relative;
       z-index:1;
-      width:38px;
-      height:38px;
+      width:34px;
+      height:34px;
       border-radius:999px;
       border:1.5px solid var(--line-strong);
       background:#fff;
       display:grid;
       place-items:center;
-      font-size:.84rem;
+      font-size:.8rem;
       font-weight:800;
       color:#728191;
       flex:none;
@@ -343,12 +344,12 @@
 
     .stepper-copy{
       min-width:0;
-      padding-top:3px;
+      padding-top:2px;
     }
 
     .stepper-copy strong{
       display:block;
-      font-size:.92rem;
+      font-size:.88rem;
       color:#7b8793;
       font-weight:800;
       line-height:1.06;
@@ -357,10 +358,10 @@
 
     .stepper-copy span{
       display:block;
-      margin-top:4px;
-      font-size:.79rem;
+      margin-top:3px;
+      font-size:.75rem;
       color:#99a5b2;
-      line-height:1.25;
+      line-height:1.2;
     }
 
     .stepper-item.active .stepper-dot{
@@ -386,7 +387,7 @@
     }
 
     .form-stage{
-      padding:24px 28px;
+      padding:18px 24px;
       flex:1;
       overflow-y:auto;
       min-height:0;
@@ -426,29 +427,30 @@
 
     .section-head{
       display:grid;
-      gap:7px;
-      margin-bottom:18px;
+      gap:5px;
+      margin-bottom:14px;
     }
 
     .section-head h2{
       font-family:"Sora",sans-serif;
-      font-size:1.16rem;
-      line-height:1.08;
+      font-size:1.08rem;
+      line-height:1.05;
       letter-spacing:-.03em;
       color:#111b24;
     }
 
     .section-head p{
       color:var(--muted);
-      line-height:1.58;
-      font-size:.94rem;
+      line-height:1.5;
+      font-size:.9rem;
       max-width:640px;
     }
 
     .type-grid{
       display:grid;
-      grid-template-columns:repeat(2, minmax(0, 1fr));
-      gap:14px;
+      grid-template-columns:repeat(3, minmax(0, 1fr));
+      gap:12px;
+      align-items:stretch;
     }
 
     .type-option{
@@ -465,13 +467,13 @@
 
     .type-card{
       height:100%;
-      min-height:104px;
-      padding:16px;
-      border-radius:22px;
+      min-height:90px;
+      padding:14px;
+      border-radius:20px;
       border:1px solid rgba(219,229,232,.95);
       background:linear-gradient(180deg, #ffffff 0%, #fbfdfe 100%);
       display:grid;
-      gap:10px;
+      gap:8px;
       transition:.18s ease;
       box-shadow:0 8px 22px rgba(23,33,43,.03);
     }
@@ -492,18 +494,18 @@
       display:flex;
       align-items:flex-start;
       justify-content:space-between;
-      gap:12px;
+      gap:10px;
     }
 
     .type-icon{
-      width:38px;
-      height:38px;
-      border-radius:13px;
+      width:34px;
+      height:34px;
+      border-radius:12px;
       display:grid;
       place-items:center;
       background:#f3f8fa;
       color:#0f7f96;
-      font-size:.76rem;
+      font-size:.72rem;
       font-weight:800;
       letter-spacing:-.03em;
       border:1px solid #e2edf0;
@@ -513,11 +515,11 @@
     .type-badge{
       display:inline-flex;
       align-items:center;
-      padding:6px 10px;
+      padding:5px 9px;
       border-radius:999px;
       background:#f6fbfc;
       border:1px solid #e2edf0;
-      font-size:.72rem;
+      font-size:.68rem;
       font-weight:800;
       color:#7b8895;
       letter-spacing:.03em;
@@ -532,18 +534,18 @@
 
     .type-card strong{
       display:block;
-      font-size:1rem;
+      font-size:.95rem;
       color:#17212b;
       letter-spacing:-.02em;
-      line-height:1.14;
-      margin-bottom:5px;
+      line-height:1.12;
+      margin-bottom:4px;
     }
 
     .type-card p{
       color:var(--muted);
-      font-size:.89rem;
-      line-height:1.5;
-      max-width:32ch;
+      font-size:.84rem;
+      line-height:1.42;
+      max-width:30ch;
     }
 
     .dynamic-shell{
@@ -795,7 +797,7 @@
       align-items:center;
       justify-content:space-between;
       gap:12px;
-      padding:16px 28px 20px;
+      padding:14px 24px 18px;
       border-top:1px solid rgba(219,229,232,.95);
       background:linear-gradient(180deg, #ffffff 0%, #fbfdfe 100%);
       margin-top:auto;
@@ -831,8 +833,8 @@
       display:inline-flex;
       align-items:center;
       justify-content:center;
-      min-height:50px;
-      padding:14px 22px;
+      min-height:48px;
+      padding:13px 20px;
       border-radius:15px;
       font-family:inherit;
       font-size:.94rem;
@@ -861,14 +863,23 @@
       display:none !important;
     }
 
+    @media (max-width: 1180px){
+      .type-grid{
+        grid-template-columns:repeat(2, minmax(0, 1fr));
+      }
+    }
+
     @media (max-width: 1100px){
       .page{
         max-width:100%;
       }
 
-      .type-grid,
       .form-grid{
         grid-template-columns:1fr;
+      }
+
+      .page-header h1{
+        white-space:normal;
       }
     }
 
@@ -917,6 +928,10 @@
       .form-stage{
         overflow:visible;
       }
+
+      .page-header h1{
+        white-space:normal;
+      }
     }
 
     @media (max-width: 620px){
@@ -933,8 +948,7 @@
       }
 
       .page-header h1{
-        font-size:1.9rem;
-        max-width:100%;
+        font-size:1.78rem;
       }
 
       .stepper-wrap,
@@ -965,6 +979,14 @@
 
       .stepper{
         grid-template-columns:1fr;
+      }
+
+      .type-grid{
+        grid-template-columns:1fr;
+      }
+
+      .type-card{
+        min-height:unset;
       }
     }
   </style>
