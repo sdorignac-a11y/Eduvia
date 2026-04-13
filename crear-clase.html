@@ -210,47 +210,8 @@
       max-width:1380px;
       margin:0 auto;
       display:grid;
-      gap:12px;
+      gap:0;
       height:calc(100dvh - 36px);
-    }
-
-    .page-header{
-      display:grid;
-      gap:6px;
-      max-width:none;
-      padding:2px 4px 0;
-    }
-
-    .eyebrow{
-      display:inline-flex;
-      align-items:center;
-      width:max-content;
-      padding:7px 12px;
-      border-radius:999px;
-      background:linear-gradient(180deg, rgba(255,255,255,.75), rgba(255,255,255,.4)), var(--teal-soft);
-      color:#0f7f96;
-      font-size:.72rem;
-      font-weight:800;
-      letter-spacing:.08em;
-      text-transform:uppercase;
-      border:1px solid rgba(17,169,196,.10);
-    }
-
-    .page-header h1{
-      font-family:"Sora",sans-serif;
-      font-size:clamp(1.85rem, 2.3vw, 2.35rem);
-      line-height:1;
-      letter-spacing:-.045em;
-      color:#111b24;
-      max-width:none;
-      white-space:nowrap;
-    }
-
-    .page-header p{
-      color:var(--muted);
-      line-height:1.48;
-      font-size:.95rem;
-      max-width:760px;
     }
 
     .editor-shell{
@@ -273,7 +234,7 @@
       content:"";
       position:absolute;
       inset:0 0 auto 0;
-      height:100px;
+      height:110px;
       background:linear-gradient(180deg, rgba(17,169,196,.05), transparent);
       pointer-events:none;
       z-index:0;
@@ -284,8 +245,48 @@
       z-index:1;
     }
 
+    .card-header{
+      display:grid;
+      gap:4px;
+      padding:18px 24px 12px;
+      border-bottom:1px solid rgba(219,229,232,.75);
+      background:linear-gradient(180deg, #fbfeff 0%, #f7fbfc 100%);
+    }
+
+    .eyebrow{
+      display:inline-flex;
+      align-items:center;
+      width:max-content;
+      padding:6px 11px;
+      border-radius:999px;
+      background:linear-gradient(180deg, rgba(255,255,255,.75), rgba(255,255,255,.4)), var(--teal-soft);
+      color:#0f7f96;
+      font-size:.7rem;
+      font-weight:800;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      border:1px solid rgba(17,169,196,.10);
+    }
+
+    .card-header h1{
+      font-family:"Sora",sans-serif;
+      font-size:clamp(1.75rem, 2.2vw, 2.2rem);
+      line-height:1;
+      letter-spacing:-.045em;
+      color:#111b24;
+      margin:0;
+    }
+
+    .card-header p{
+      color:var(--muted);
+      line-height:1.42;
+      font-size:.92rem;
+      max-width:760px;
+      margin:0;
+    }
+
     .stepper-wrap{
-      padding:16px 24px 12px;
+      padding:12px 24px 10px;
       border-bottom:1px solid rgba(219,229,232,.95);
       background:linear-gradient(180deg, #fbfeff 0%, #f5fafb 100%);
       flex:none;
@@ -877,10 +878,6 @@
       .form-grid{
         grid-template-columns:1fr;
       }
-
-      .page-header h1{
-        white-space:normal;
-      }
     }
 
     @media (max-width: 940px){
@@ -925,12 +922,22 @@
         min-height:unset;
       }
 
-      .form-stage{
-        overflow:visible;
+      .card-header{
+        padding:16px 18px 10px;
       }
 
-      .page-header h1{
+      .stepper-wrap,
+      .form-stage{
+        padding-left:18px;
+        padding-right:18px;
+      }
+
+      .card-header h1{
         white-space:normal;
+      }
+
+      .form-stage{
+        overflow:visible;
       }
     }
 
@@ -939,22 +946,17 @@
         padding:14px;
       }
 
-      .page{
-        gap:12px;
+      .card-header{
+        gap:5px;
+        padding:15px 18px 10px;
       }
 
-      .page-header{
-        max-width:100%;
+      .card-header h1{
+        font-size:1.65rem;
       }
 
-      .page-header h1{
-        font-size:1.78rem;
-      }
-
-      .stepper-wrap,
-      .form-stage{
-        padding-left:18px;
-        padding-right:18px;
+      .card-header p{
+        font-size:.9rem;
       }
 
       .wizard-footer{
@@ -1022,15 +1024,15 @@
 
     <main class="main">
       <div class="page">
-        <header class="page-header">
-          <span class="eyebrow">Crear con Eduvia</span>
-          <h1>Armá tu contenido paso a paso.</h1>
-          <p>
-            Elegí el tipo, completá lo importante y definí cómo querés verlo al final.
-          </p>
-        </header>
-
         <section class="editor-shell">
+          <div class="card-header">
+            <span class="eyebrow">Crear con Eduvia</span>
+            <h1>Armá tu contenido paso a paso.</h1>
+            <p>
+              Elegí el tipo, completá lo importante y definí cómo querés verlo al final.
+            </p>
+          </div>
+
           <form id="clase-form" style="display:flex; flex-direction:column; height:100%; min-height:0;">
             <div class="stepper-wrap">
               <div class="stepper" id="stepper">
