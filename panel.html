@@ -36,7 +36,6 @@
 
       --sidebar-w:270px;
       --topbar-h:82px;
-      --danger:#d9534f;
     }
 
     *{
@@ -169,6 +168,7 @@
       align-items:center;
       justify-content:center;
       color:inherit;
+      flex-shrink:0;
     }
 
     .main{
@@ -728,14 +728,14 @@
           Inicio
         </a>
 
-        <a href="crear-documento.html">
+        <a href="crear-clase.html">
           <span class="nav-icon">
             <svg viewBox="0 0 24 24">
               <path d="M12 20h9"></path>
               <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z"></path>
             </svg>
           </span>
-          Crear documento
+          Crear clase
         </a>
 
         <a href="mis-clases.html">
@@ -746,7 +746,20 @@
               <path d="M4 17h13"></path>
             </svg>
           </span>
-          Clases
+          Mis clases
+        </a>
+
+        <a href="herramientas.html">
+          <span class="nav-icon">
+            <svg viewBox="0 0 24 24">
+              <path d="M12 3v6"></path>
+              <path d="M12 15v6"></path>
+              <path d="M3 12h6"></path>
+              <path d="M15 12h6"></path>
+              <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+          </span>
+          Herramientas
         </a>
       </nav>
     </aside>
@@ -804,7 +817,7 @@
             </div>
 
             <div class="hero-actions">
-              <a class="btn btn-primary" href="crear-documento.html">Crear documento</a>
+              <a class="btn btn-primary" href="crear-clase.html">Crear clase</a>
               <a class="btn btn-secondary" href="mis-clases.html">Ver clases</a>
             </div>
           </div>
@@ -824,7 +837,7 @@
               </div>
               <div class="info-value" id="lastDocTitle">Sin documentos todavía.</div>
               <div class="info-sub" id="lastDocDate">—</div>
-              <a href="crear-documento.html" class="info-link" id="lastDocLink">Crear documento</a>
+              <a href="crear-clase.html" class="info-link" id="lastDocLink">Crear clase</a>
             </article>
 
             <article class="info-card">
@@ -869,7 +882,7 @@
                 </div>
                 <h4>Todavía no hay documentos para mostrar</h4>
                 <p>Cuando guardes documentos, se van a listar acá automáticamente.</p>
-                <a class="ghost-btn" href="crear-documento.html">Crear primer documento</a>
+                <a class="ghost-btn" href="crear-clase.html">Crear primera clase</a>
               </div>
             </div>
           </article>
@@ -896,7 +909,7 @@
                 </div>
                 <h4>Todavía no hay clases para mostrar</h4>
                 <p>Cuando guardes clases, se van a listar acá automáticamente.</p>
-                <a class="ghost-btn" href="mis-clases.html">Ver clases</a>
+                <a class="ghost-btn" href="crear-clase.html">Crear primera clase</a>
               </div>
             </div>
           </article>
@@ -1098,7 +1111,7 @@
 
         const href =
           type === "doc"
-            ? `crear-documento.html?id=${encodeURIComponent(item.id)}`
+            ? `crear-clase.html?id=${encodeURIComponent(item.id)}`
             : `mis-clases.html?id=${encodeURIComponent(item.id)}`;
 
         return `
@@ -1146,10 +1159,6 @@
         getCollectionItems(["usuarios", user.uid, "clases"])
       ]);
 
-      console.log("UID actual:", user.uid);
-      console.log("Documentos encontrados:", docs);
-      console.log("Clases encontradas:", classes);
-
       setText("docsCount", String(docs.length));
       setText("classesCount", String(classes.length));
       setText("docsTag", `${docs.length} total`);
@@ -1158,7 +1167,7 @@
       if (docs.length === 0 && classes.length === 0) {
         setText(
           "heroText",
-          "Todavía no tenés contenido guardado. Cuando empieces a crear documentos o clases, este panel se va a llenar automáticamente con información real."
+          "Todavía no tenés contenido guardado. Cuando empieces a crear clases, este panel se va a llenar automáticamente con información real."
         );
       } else {
         setText(
@@ -1179,13 +1188,13 @@
 
         setText("lastDocTitle", getDocumentTitle(latestDoc));
         setText("lastDocDate", formatDate(latestDocDate));
-        setHref("lastDocLink", `crear-documento.html?id=${encodeURIComponent(latestDoc.id)}`);
-        $("lastDocLink").textContent = "Abrir documento";
+        setHref("lastDocLink", `crear-clase.html?id=${encodeURIComponent(latestDoc.id)}`);
+        $("lastDocLink").textContent = "Abrir";
       } else {
         setText("lastDocTitle", "Sin documentos todavía.");
         setText("lastDocDate", "—");
-        setHref("lastDocLink", "crear-documento.html");
-        $("lastDocLink").textContent = "Crear documento";
+        setHref("lastDocLink", "crear-clase.html");
+        $("lastDocLink").textContent = "Crear clase";
       }
 
       if (classes.length) {
