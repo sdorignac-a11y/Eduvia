@@ -15,28 +15,27 @@
   <style>
     :root{
       --bg:#f4f7f8;
-      --bg-2:#edf3f5;
+      --bg-2:#ecf2f4;
       --surface:#ffffff;
       --surface-soft:#f8fbfc;
-      --surface-tint:#f4f9fb;
       --line:#dbe5e8;
-      --line-strong:#c8d7dc;
+      --line-strong:#ccd8dc;
       --text:#122027;
-      --muted:#62757d;
-      --primary:#19b4c6;
-      --primary-dark:#1094a5;
-      --primary-soft:#e7f9fc;
-      --accent:#7dd3c7;
-      --shadow:0 16px 34px rgba(16, 44, 56, 0.08);
-      --shadow-soft:0 10px 24px rgba(16, 44, 56, 0.05);
+      --muted:#667980;
+
+      --primary:#18b3c5;
+      --primary-dark:#0f95a7;
+      --primary-soft:#e8f8fb;
+
+      --shadow:0 14px 34px rgba(17, 40, 49, 0.08);
+      --shadow-soft:0 8px 22px rgba(17, 40, 49, 0.05);
+
       --radius-xl:28px;
       --radius-lg:22px;
       --radius-md:16px;
-      --sidebar-w:280px;
+
+      --sidebar-w:270px;
       --topbar-h:82px;
-      --danger:#e25555;
-      --success:#1fa971;
-      --warning:#f0a43a;
     }
 
     *{
@@ -52,15 +51,15 @@
 
     body{
       font-family:"Inter", sans-serif;
-      background:
-        radial-gradient(circle at top left, rgba(25,180,198,.08), transparent 30%),
-        linear-gradient(180deg, var(--bg) 0%, var(--bg-2) 100%);
       color:var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(24,179,197,.06), transparent 28%),
+        linear-gradient(180deg, var(--bg) 0%, var(--bg-2) 100%);
     }
 
     a{
-      color:inherit;
       text-decoration:none;
+      color:inherit;
     }
 
     button{
@@ -76,18 +75,17 @@
       grid-template-columns: var(--sidebar-w) 1fr;
     }
 
-    /* SIDEBAR */
     .sidebar{
       position:sticky;
       top:0;
       height:100vh;
-      background:rgba(255,255,255,0.78);
-      backdrop-filter: blur(12px);
-      border-right:1px solid rgba(219,229,232,0.85);
       padding:24px 18px;
+      border-right:1px solid rgba(219,229,232,.9);
+      background:rgba(255,255,255,.78);
+      backdrop-filter: blur(14px);
       display:flex;
       flex-direction:column;
-      gap:22px;
+      gap:24px;
       z-index:20;
     }
 
@@ -102,12 +100,12 @@
       width:44px;
       height:44px;
       border-radius:14px;
-      display:grid;
-      place-items:center;
-      background:linear-gradient(135deg, var(--primary-soft), #ffffff);
+      background:linear-gradient(135deg, #effbfd, #ffffff);
       border:1px solid var(--line);
       box-shadow: var(--shadow-soft);
-      font-size:22px;
+      display:grid;
+      place-items:center;
+      color:var(--primary-dark);
     }
 
     .brand-text{
@@ -118,8 +116,7 @@
 
     .brand-text strong{
       font-family:"Sora", sans-serif;
-      font-size:1.28rem;
-      line-height:1;
+      font-size:1.2rem;
       letter-spacing:-0.03em;
     }
 
@@ -135,79 +132,80 @@
     }
 
     .nav-label{
-      font-size:.78rem;
-      color:var(--muted);
-      font-weight:700;
+      padding:8px 12px 2px;
+      font-size:.77rem;
+      font-weight:800;
       letter-spacing:.08em;
       text-transform:uppercase;
-      padding:8px 12px 2px;
+      color:var(--muted);
     }
 
     .nav a{
       display:flex;
       align-items:center;
       gap:12px;
-      padding:14px 14px;
+      padding:13px 14px;
       border-radius:16px;
-      color:#2b3f47;
       font-weight:600;
-      transition:.2s ease;
+      color:#2e4047;
+      transition:.18s ease;
     }
 
     .nav a:hover{
-      background:#f4fafb;
+      background:#f5fafb;
     }
 
     .nav a.active{
-      background:linear-gradient(135deg, #ebfbfd, #f6ffff);
-      color:#0e7c89;
-      box-shadow: inset 0 0 0 1px #d6f2f6;
+      background:linear-gradient(135deg, #ecfbfd, #f8feff);
+      color:#0e7d8b;
+      box-shadow: inset 0 0 0 1px #d7eff3;
     }
 
-    .nav .icon{
-      width:20px;
+    .nav-icon{
+      width:18px;
+      height:18px;
       display:inline-flex;
+      align-items:center;
       justify-content:center;
-      font-size:1.05rem;
+      color:inherit;
     }
 
-    .sidebar-card{
+    .sidebar-bottom{
       margin-top:auto;
-      background:linear-gradient(180deg, #f7fdfe 0%, #effbfc 100%);
-      border:1px solid #d9eef2;
-      border-radius:22px;
       padding:18px;
+      border-radius:22px;
+      background:linear-gradient(180deg, #f7fdfe 0%, #f0fafc 100%);
+      border:1px solid #dcecef;
       box-shadow: var(--shadow-soft);
     }
 
-    .sidebar-card h4{
+    .sidebar-bottom h4{
       font-family:"Sora", sans-serif;
       font-size:1rem;
       margin-bottom:8px;
+      letter-spacing:-0.02em;
     }
 
-    .sidebar-card p{
-      color:var(--muted);
+    .sidebar-bottom p{
       font-size:.92rem;
-      line-height:1.5;
+      line-height:1.55;
+      color:var(--muted);
       margin-bottom:14px;
     }
 
     .mini-btn{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      gap:8px;
       height:42px;
       padding:0 16px;
       border-radius:14px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
       font-weight:700;
+      color:#fff;
       background:linear-gradient(135deg, var(--primary), var(--primary-dark));
-      color:white;
-      box-shadow:0 12px 24px rgba(25,180,198,.18);
+      box-shadow:0 12px 24px rgba(24,179,197,.18);
     }
 
-    /* MAIN */
     .main{
       min-width:0;
       display:flex;
@@ -219,14 +217,14 @@
       top:0;
       z-index:10;
       height:var(--topbar-h);
+      padding:18px 28px;
       display:flex;
       align-items:center;
       justify-content:space-between;
       gap:16px;
-      padding:18px 28px;
-      background:rgba(244,247,248,0.75);
-      backdrop-filter: blur(10px);
-      border-bottom:1px solid rgba(219,229,232,0.85);
+      border-bottom:1px solid rgba(219,229,232,.85);
+      background:rgba(244,247,248,.76);
+      backdrop-filter: blur(12px);
     }
 
     .topbar-left{
@@ -241,21 +239,22 @@
       height:46px;
       border-radius:14px;
       border:1px solid var(--line);
-      background:white;
+      background:#fff;
       box-shadow: var(--shadow-soft);
-      font-size:1.1rem;
+      align-items:center;
+      justify-content:center;
     }
 
     .page-head h1{
       font-family:"Sora", sans-serif;
-      font-size:1.4rem;
+      font-size:1.35rem;
       letter-spacing:-0.03em;
     }
 
     .page-head p{
       margin-top:4px;
+      font-size:.94rem;
       color:var(--muted);
-      font-size:.95rem;
     }
 
     .topbar-right{
@@ -264,25 +263,13 @@
       gap:12px;
     }
 
-    .icon-btn{
-      width:46px;
-      height:46px;
-      border-radius:14px;
-      background:#fff;
-      border:1px solid var(--line);
-      box-shadow: var(--shadow-soft);
-      display:grid;
-      place-items:center;
-      font-size:1.05rem;
-    }
-
     .user-chip{
       display:flex;
       align-items:center;
       gap:10px;
       padding:8px 10px 8px 8px;
       border-radius:999px;
-      background:white;
+      background:#fff;
       border:1px solid var(--line);
       box-shadow: var(--shadow-soft);
     }
@@ -291,12 +278,12 @@
       width:38px;
       height:38px;
       border-radius:50%;
-      background:linear-gradient(135deg, #dff9fc, #c8f3f8);
-      border:1px solid #c7eaf0;
       display:grid;
       place-items:center;
       font-weight:800;
-      color:#0f8f9f;
+      color:var(--primary-dark);
+      background:linear-gradient(135deg, #dff7fb, #c9eff5);
+      border:1px solid #cfe8ee;
     }
 
     .user-meta{
@@ -318,51 +305,47 @@
       padding:28px;
       display:flex;
       flex-direction:column;
-      gap:24px;
+      gap:22px;
     }
 
-    /* HERO + METRICS */
-    .hero-grid{
+    .hero{
       display:grid;
-      grid-template-columns: 1.55fr 1fr;
-      gap:22px;
+      grid-template-columns: 1.35fr .95fr;
+      gap:20px;
       align-items:stretch;
     }
 
-    .hero-card{
-      position:relative;
-      overflow:hidden;
-      min-height:290px;
-      padding:28px;
+    .hero-main{
       border-radius:var(--radius-xl);
+      padding:28px;
       background:
-        radial-gradient(circle at top right, rgba(125,211,199,.22), transparent 26%),
-        linear-gradient(135deg, #0f8593 0%, #14a8b8 55%, #25bfd1 100%);
-      color:white;
-      box-shadow:0 24px 46px rgba(15,133,147,.22);
+        radial-gradient(circle at top right, rgba(255,255,255,.12), transparent 26%),
+        linear-gradient(135deg, #108997 0%, #14a4b5 55%, #1db8c9 100%);
+      color:#fff;
+      box-shadow:0 22px 44px rgba(16,137,151,.2);
+      min-height:260px;
       display:flex;
       flex-direction:column;
       justify-content:space-between;
+      overflow:hidden;
+      position:relative;
     }
 
-    .hero-card::after{
+    .hero-main::after{
       content:"";
       position:absolute;
-      right:-50px;
-      bottom:-50px;
-      width:220px;
-      height:220px;
+      right:-56px;
+      bottom:-56px;
+      width:200px;
+      height:200px;
       border-radius:50%;
       background:rgba(255,255,255,.08);
     }
 
-    .hero-top{
+    .hero-body,
+    .hero-actions{
       position:relative;
       z-index:1;
-      display:flex;
-      justify-content:space-between;
-      gap:18px;
-      align-items:flex-start;
     }
 
     .eyebrow{
@@ -373,185 +356,135 @@
       border-radius:999px;
       background:rgba(255,255,255,.14);
       border:1px solid rgba(255,255,255,.18);
-      font-size:.84rem;
+      font-size:.82rem;
       font-weight:700;
       margin-bottom:16px;
-      backdrop-filter: blur(6px);
     }
 
-    .hero-title{
+    .hero-main h2{
       font-family:"Sora", sans-serif;
-      font-size:clamp(1.7rem, 2vw, 2.25rem);
-      line-height:1.05;
+      font-size:clamp(1.6rem, 2.4vw, 2.15rem);
+      line-height:1.06;
       letter-spacing:-0.04em;
       margin-bottom:12px;
       max-width:620px;
     }
 
-    .hero-text{
+    .hero-main p{
       max-width:620px;
       color:rgba(255,255,255,.9);
       line-height:1.65;
-      font-size:1rem;
-    }
-
-    .hero-badge{
-      padding:12px 14px;
-      min-width:150px;
-      border-radius:18px;
-      background:rgba(255,255,255,.12);
-      border:1px solid rgba(255,255,255,.18);
-      backdrop-filter: blur(8px);
-    }
-
-    .hero-badge span{
-      display:block;
-      font-size:.8rem;
-      opacity:.88;
-      margin-bottom:6px;
-    }
-
-    .hero-badge strong{
-      font-size:1rem;
-      font-weight:800;
-    }
-
-    .hero-bottom{
-      position:relative;
-      z-index:1;
-      display:grid;
-      grid-template-columns: repeat(3, minmax(0,1fr));
-      gap:14px;
-      margin-top:26px;
-    }
-
-    .hero-mini{
-      background:rgba(255,255,255,.1);
-      border:1px solid rgba(255,255,255,.16);
-      border-radius:18px;
-      padding:14px 15px;
-      backdrop-filter: blur(6px);
-    }
-
-    .hero-mini span{
-      display:block;
-      font-size:.8rem;
-      opacity:.84;
-      margin-bottom:6px;
-    }
-
-    .hero-mini strong{
-      font-size:1rem;
-      font-weight:800;
-      line-height:1.3;
+      font-size:.98rem;
     }
 
     .hero-actions{
       display:flex;
       flex-wrap:wrap;
       gap:12px;
-      margin-top:18px;
+      margin-top:24px;
     }
 
     .btn{
-      height:48px;
-      border-radius:15px;
-      padding:0 18px;
-      font-weight:700;
+      height:46px;
+      padding:0 17px;
+      border-radius:14px;
       display:inline-flex;
       align-items:center;
       justify-content:center;
       gap:9px;
-      transition:.2s ease;
+      font-weight:700;
+      transition:.18s ease;
     }
 
     .btn-primary{
       background:#fff;
-      color:#0d7e8c;
-      box-shadow:0 16px 24px rgba(0,0,0,.08);
-    }
-
-    .btn-primary:hover{
-      transform:translateY(-1px);
+      color:#0e7f8d;
+      box-shadow:0 16px 22px rgba(0,0,0,.08);
     }
 
     .btn-secondary{
-      background:rgba(255,255,255,.13);
       color:#fff;
+      background:rgba(255,255,255,.12);
       border:1px solid rgba(255,255,255,.2);
       backdrop-filter: blur(6px);
     }
 
-    .stats-grid{
+    .hero-side{
       display:grid;
-      grid-template-columns: repeat(2, minmax(0,1fr));
-      gap:16px;
+      grid-template-columns: 1fr;
+      gap:14px;
     }
 
-    .stat-card{
-      background:rgba(255,255,255,.86);
-      border:1px solid rgba(219,229,232,.95);
+    .info-card{
+      background:rgba(255,255,255,.88);
+      border:1px solid rgba(219,229,232,.94);
       border-radius:24px;
-      padding:22px 20px;
+      padding:20px;
       box-shadow: var(--shadow);
+      min-height:123px;
       display:flex;
       flex-direction:column;
       justify-content:space-between;
-      min-height:136px;
     }
 
-    .stat-top{
+    .info-top{
       display:flex;
       align-items:center;
       justify-content:space-between;
       gap:10px;
-      margin-bottom:18px;
+      margin-bottom:14px;
     }
 
-    .stat-label{
+    .info-label{
       display:flex;
       align-items:center;
       gap:10px;
-      font-weight:700;
-      color:#26414a;
+      min-width:0;
     }
 
-    .stat-icon{
+    .icon-wrap{
       width:38px;
       height:38px;
       border-radius:12px;
       display:grid;
       place-items:center;
       background:var(--primary-soft);
-      color:#0d8b9b;
-      border:1px solid #d4eff3;
-      font-size:1rem;
+      border:1px solid #d7eef2;
+      color:var(--primary-dark);
       flex-shrink:0;
     }
 
-    .stat-value{
-      font-family:"Sora", sans-serif;
-      font-size:1.9rem;
-      line-height:1;
-      letter-spacing:-0.04em;
-      margin-bottom:8px;
+    .info-label span{
+      font-weight:700;
+      color:#31434a;
+      font-size:.95rem;
     }
 
-    .stat-help{
-      color:var(--muted);
-      font-size:.9rem;
+    .info-value{
+      font-size:1rem;
+      font-weight:700;
+      letter-spacing:-0.02em;
+      color:var(--text);
+      line-height:1.35;
+      word-break:break-word;
     }
 
-    /* SECONDARY GRID */
-    .section-grid{
+    .info-link{
+      margin-top:10px;
+      font-size:.88rem;
+      font-weight:700;
+      color:var(--primary-dark);
+    }
+
+    .grid-2{
       display:grid;
-      grid-template-columns: 1.25fr .9fr;
-      gap:22px;
+      grid-template-columns: 1.15fr .9fr;
+      gap:20px;
     }
 
     .card{
-      background:rgba(255,255,255,.88);
-      border:1px solid rgba(219,229,232,.95);
+      background:rgba(255,255,255,.9);
+      border:1px solid rgba(219,229,232,.94);
       border-radius:var(--radius-xl);
       padding:24px;
       box-shadow: var(--shadow);
@@ -565,83 +498,83 @@
       margin-bottom:18px;
     }
 
-    .card-header h2{
+    .card-header h3{
       font-family:"Sora", sans-serif;
-      font-size:1.22rem;
+      font-size:1.14rem;
       letter-spacing:-0.03em;
-      margin-bottom:6px;
-    }
-
-    .card-header p{
-      color:var(--muted);
-      line-height:1.55;
-      font-size:.94rem;
-    }
-
-    .tag{
-      flex-shrink:0;
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding:9px 12px;
-      border-radius:999px;
-      background:var(--surface-tint);
-      border:1px solid var(--line);
-      color:#3d5760;
-      font-size:.82rem;
-      font-weight:700;
-    }
-
-    .activity-list{
-      display:flex;
-      flex-direction:column;
-      gap:14px;
-    }
-
-    .activity-item{
-      display:flex;
-      gap:14px;
-      align-items:flex-start;
-      padding:14px;
-      border-radius:18px;
-      background:linear-gradient(180deg, #fbfdfe, #f7fbfc);
-      border:1px solid #e4ecef;
-    }
-
-    .activity-dot{
-      width:42px;
-      height:42px;
-      flex-shrink:0;
-      border-radius:14px;
-      display:grid;
-      place-items:center;
-      background:#ecfbfd;
-      border:1px solid #d9f0f4;
-      font-size:1rem;
-      color:#0e8e9d;
-    }
-
-    .activity-body{
-      min-width:0;
-    }
-
-    .activity-body strong{
-      display:block;
-      font-size:.98rem;
       margin-bottom:5px;
     }
 
-    .activity-body p{
-      color:var(--muted);
+    .card-header p{
+      font-size:.93rem;
       line-height:1.55;
-      font-size:.92rem;
+      color:var(--muted);
     }
 
-    .activity-time{
-      margin-top:7px;
-      font-size:.8rem;
-      color:#7a9098;
+    .tag{
+      padding:8px 11px;
+      border-radius:999px;
+      font-size:.78rem;
+      font-weight:800;
+      color:#50656d;
+      background:#f5fafb;
+      border:1px solid #e0eaed;
+      white-space:nowrap;
+    }
+
+    .empty-state{
+      min-height:230px;
+      border-radius:22px;
+      border:1px dashed #cfdde1;
+      background:linear-gradient(180deg, #fbfdfe 0%, #f6fafb 100%);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+      padding:28px;
+    }
+
+    .empty-box{
+      max-width:360px;
+    }
+
+    .empty-icon{
+      width:56px;
+      height:56px;
+      margin:0 auto 16px;
+      border-radius:18px;
+      display:grid;
+      place-items:center;
+      background:var(--primary-soft);
+      border:1px solid #d7eef2;
+      color:var(--primary-dark);
+    }
+
+    .empty-box h4{
+      font-family:"Sora", sans-serif;
+      font-size:1.05rem;
+      letter-spacing:-0.02em;
+      margin-bottom:8px;
+    }
+
+    .empty-box p{
+      color:var(--muted);
+      line-height:1.6;
+      font-size:.94rem;
+      margin-bottom:16px;
+    }
+
+    .empty-box .ghost-btn{
+      height:42px;
+      padding:0 16px;
+      border-radius:14px;
+      border:1px solid #d9e6ea;
+      background:#fff;
+      color:#274048;
       font-weight:700;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
     }
 
     .quick-grid{
@@ -650,157 +583,119 @@
       gap:14px;
     }
 
-    .quick-btn{
-      min-height:102px;
+    .quick-link{
+      min-height:98px;
       padding:18px;
       border-radius:20px;
-      border:1px solid #e0e9ed;
-      background:linear-gradient(180deg, #fcfeff 0%, #f5fbfc 100%);
-      display:flex;
-      flex-direction:column;
-      align-items:flex-start;
-      justify-content:space-between;
-      text-align:left;
-      transition:.2s ease;
+      border:1px solid #e2eaed;
+      background:linear-gradient(180deg, #fcfeff 0%, #f6fbfc 100%);
       box-shadow: var(--shadow-soft);
-    }
-
-    .quick-btn:hover{
-      transform:translateY(-2px);
-      border-color:#cfe5ea;
-    }
-
-    .quick-icon{
-      width:42px;
-      height:42px;
-      border-radius:14px;
-      display:grid;
-      place-items:center;
-      background:#e9fafc;
-      color:#0f94a3;
-      border:1px solid #d7f0f4;
-      font-size:1.05rem;
-    }
-
-    .quick-btn strong{
-      font-size:1rem;
-    }
-
-    .quick-btn span{
-      color:var(--muted);
-      font-size:.88rem;
-      line-height:1.45;
-      margin-top:6px;
-    }
-
-    /* SUBJECTS */
-    .subjects-grid{
-      display:grid;
-      grid-template-columns: repeat(4, minmax(0,1fr));
-      gap:18px;
-    }
-
-    .subject-card{
-      background:rgba(255,255,255,.9);
-      border:1px solid rgba(219,229,232,.95);
-      border-radius:24px;
-      padding:20px;
-      box-shadow: var(--shadow);
+      transition:.18s ease;
       display:flex;
       flex-direction:column;
-      gap:14px;
-    }
-
-    .subject-top{
-      display:flex;
       justify-content:space-between;
-      align-items:flex-start;
       gap:12px;
     }
 
-    .subject-icon{
-      width:48px;
-      height:48px;
-      border-radius:16px;
+    .quick-link:hover{
+      transform:translateY(-2px);
+      border-color:#d2e4e9;
+    }
+
+    .quick-top{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+
+    .quick-top strong{
+      font-size:1rem;
+      letter-spacing:-0.02em;
+    }
+
+    .quick-link p{
+      color:var(--muted);
+      font-size:.9rem;
+      line-height:1.5;
+    }
+
+    .bottom-grid{
       display:grid;
-      place-items:center;
-      background:linear-gradient(135deg, #eefbfd, #e6f7fa);
-      border:1px solid #d8eef2;
-      font-size:1.15rem;
-      color:#0e92a1;
+      grid-template-columns: repeat(3, minmax(0,1fr));
+      gap:18px;
     }
 
-    .subject-status{
-      padding:7px 10px;
-      border-radius:999px;
-      background:#f5fafb;
-      border:1px solid #e0ebee;
-      font-size:.76rem;
-      font-weight:800;
-      color:#5d747c;
+    .simple-card{
+      background:rgba(255,255,255,.9);
+      border:1px solid rgba(219,229,232,.94);
+      border-radius:24px;
+      padding:20px;
+      box-shadow: var(--shadow);
+      min-height:160px;
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+      gap:12px;
     }
 
-    .subject-card h3{
+    .simple-head{
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+
+    .simple-head h4{
       font-family:"Sora", sans-serif;
       font-size:1rem;
       letter-spacing:-0.02em;
     }
 
-    .subject-card p{
+    .simple-card p{
       color:var(--muted);
-      font-size:.9rem;
-      line-height:1.55;
+      font-size:.92rem;
+      line-height:1.58;
     }
 
-    .subject-meta{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:12px;
+    .simple-link{
       font-size:.88rem;
-      color:#4e6670;
       font-weight:700;
+      color:var(--primary-dark);
     }
 
-    .progress{
-      width:100%;
-      height:9px;
-      border-radius:999px;
-      background:#edf4f6;
-      overflow:hidden;
+    svg{
+      width:18px;
+      height:18px;
+      stroke:currentColor;
+      stroke-width:1.9;
+      fill:none;
+      stroke-linecap:round;
+      stroke-linejoin:round;
     }
 
-    .progress > span{
-      display:block;
-      height:100%;
-      border-radius:inherit;
-      background:linear-gradient(90deg, var(--primary), #4bcfdd);
-    }
-
-    /* RESPONSIVE */
-    @media (max-width: 1260px){
-      .hero-grid,
-      .section-grid{
-        grid-template-columns: 1fr;
+    @media (max-width: 1240px){
+      .hero,
+      .grid-2{
+        grid-template-columns:1fr;
       }
 
-      .subjects-grid{
-        grid-template-columns: repeat(2, minmax(0,1fr));
+      .bottom-grid{
+        grid-template-columns:1fr 1fr;
       }
     }
 
     @media (max-width: 960px){
       .app{
-        grid-template-columns: 1fr;
+        grid-template-columns:1fr;
       }
 
       .sidebar{
         position:fixed;
         inset:0 auto 0 0;
-        width:min(88vw, 320px);
+        width:min(86vw, 320px);
         transform:translateX(-100%);
-        transition:.25s ease;
-        box-shadow: 24px 0 60px rgba(12,26,35,.16);
+        transition:.22s ease;
+        box-shadow: 24px 0 60px rgba(17, 35, 44, 0.16);
       }
 
       .sidebar.open{
@@ -808,8 +703,7 @@
       }
 
       .menu-btn{
-        display:grid;
-        place-items:center;
+        display:inline-flex;
       }
 
       .content{
@@ -824,8 +718,8 @@
     @media (max-width: 720px){
       .topbar{
         height:auto;
-        align-items:flex-start;
         flex-direction:column;
+        align-items:flex-start;
       }
 
       .topbar-right{
@@ -833,28 +727,15 @@
         justify-content:space-between;
       }
 
-      .stats-grid{
-        grid-template-columns:1fr;
-      }
-
-      .hero-bottom,
       .quick-grid,
-      .subjects-grid{
+      .bottom-grid{
         grid-template-columns:1fr;
       }
 
-      .hero-card{
-        padding:22px;
-      }
-
+      .hero-main,
       .card,
-      .stat-card{
+      .simple-card{
         padding:20px;
-      }
-
-      .user-chip{
-        flex:1;
-        justify-content:flex-end;
       }
     }
   </style>
@@ -863,7 +744,13 @@
   <div class="app">
     <aside class="sidebar" id="sidebar">
       <div class="brand">
-        <div class="brand-mark">✦</div>
+        <div class="brand-mark">
+          <svg viewBox="0 0 24 24">
+            <path d="M5 19.5h14"></path>
+            <path d="M6 4.5h12a1 1 0 0 1 1 1v11H7a1 1 0 0 0-1 1v2"></path>
+            <path d="M7 16.5V5.5a1 1 0 0 0-1-1H5"></path>
+          </svg>
+        </div>
         <div class="brand-text">
           <strong>Eduvia</strong>
           <span>Tu espacio de estudio</span>
@@ -872,299 +759,315 @@
 
       <nav class="nav">
         <div class="nav-label">Principal</div>
-        <a href="#" class="active"><span class="icon">🏠</span> Inicio</a>
-        <a href="#"><span class="icon">📝</span> Crear documento</a>
-        <a href="#"><span class="icon">📚</span> Resúmenes</a>
-        <a href="#"><span class="icon">🎞️</span> Presentaciones</a>
-        <a href="#"><span class="icon">🧪</span> Laboratorio</a>
 
-        <div class="nav-label">Tu espacio</div>
-        <a href="#"><span class="icon">📂</span> Documentos</a>
-        <a href="#"><span class="icon">🕘</span> Historial</a>
-        <a href="#"><span class="icon">⚙️</span> Configuración</a>
+        <a href="#" class="active">
+          <span class="nav-icon">
+            <svg viewBox="0 0 24 24">
+              <path d="M3 10.5 12 3l9 7.5"></path>
+              <path d="M5 9.5V20h14V9.5"></path>
+            </svg>
+          </span>
+          Inicio
+        </a>
+
+        <a href="#">
+          <span class="nav-icon">
+            <svg viewBox="0 0 24 24">
+              <path d="M12 20h9"></path>
+              <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z"></path>
+            </svg>
+          </span>
+          Crear documento
+        </a>
+
+        <a href="#">
+          <span class="nav-icon">
+            <svg viewBox="0 0 24 24">
+              <path d="M5 4.5h10l4 4V19a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-13a1 1 0 0 1 1-1Z"></path>
+              <path d="M14 4.5V9h4"></path>
+            </svg>
+          </span>
+          Documentos
+        </a>
+
+        <a href="#">
+          <span class="nav-icon">
+            <svg viewBox="0 0 24 24">
+              <path d="M4 7h16"></path>
+              <path d="M4 12h10"></path>
+              <path d="M4 17h13"></path>
+            </svg>
+          </span>
+          Resúmenes
+        </a>
+
+        <a href="#">
+          <span class="nav-icon">
+            <svg viewBox="0 0 24 24">
+              <path d="M4 5h16v14H4z"></path>
+              <path d="m10 9 5 3-5 3Z"></path>
+            </svg>
+          </span>
+          Presentaciones
+        </a>
+
+        <div class="nav-label">Cuenta</div>
+
+        <a href="#">
+          <span class="nav-icon">
+            <svg viewBox="0 0 24 24">
+              <circle cx="12" cy="8" r="3.5"></circle>
+              <path d="M5 19a7 7 0 0 1 14 0"></path>
+            </svg>
+          </span>
+          Mi perfil
+        </a>
+
+        <a href="#">
+          <span class="nav-icon">
+            <svg viewBox="0 0 24 24">
+              <path d="M12 3v3"></path>
+              <path d="M12 18v3"></path>
+              <path d="M3 12h3"></path>
+              <path d="M18 12h3"></path>
+              <circle cx="12" cy="12" r="3.5"></circle>
+            </svg>
+          </span>
+          Configuración
+        </a>
       </nav>
 
-      <div class="sidebar-card">
-        <h4>Seguí avanzando</h4>
-        <p>
-          Volvé a tus últimos trabajos, organizá tus materias y usá las herramientas
-          de Eduvia para estudiar más rápido.
-        </p>
-        <button class="mini-btn">+ Nuevo documento</button>
+      <div class="sidebar-bottom">
+        <h4>Nuevo trabajo</h4>
+        <p>Empezá un documento nuevo o seguí con la herramienta que estés usando.</p>
+        <button class="mini-btn">Crear ahora</button>
       </div>
     </aside>
 
     <main class="main">
       <header class="topbar">
         <div class="topbar-left">
-          <button class="menu-btn" id="menuBtn">☰</button>
+          <button class="menu-btn" id="menuBtn" aria-label="Abrir menú">
+            <svg viewBox="0 0 24 24">
+              <path d="M4 7h16"></path>
+              <path d="M4 12h16"></path>
+              <path d="M4 17h16"></path>
+            </svg>
+          </button>
 
           <div class="page-head">
             <h1>Panel principal</h1>
-            <p>Todo tu estudio en un solo lugar, ordenado y listo para continuar.</p>
+            <p>Accedé rápido a tus herramientas y a tu contenido.</p>
           </div>
         </div>
 
         <div class="topbar-right">
-          <button class="icon-btn" aria-label="Notificaciones">🔔</button>
-
           <div class="user-chip">
             <div class="avatar">S</div>
             <div class="user-meta">
               <strong>Simón</strong>
-              <span>Estudiante activo</span>
+              <span>Cuenta activa</span>
             </div>
           </div>
         </div>
       </header>
 
       <section class="content">
-        <div class="hero-grid">
-          <section class="hero-card">
-            <div class="hero-top">
-              <div>
-                <div class="eyebrow">📘 Tu espacio de estudio</div>
-                <h2 class="hero-title">Seguí estudiando justo donde lo dejaste</h2>
-                <p class="hero-text">
-                  Accedé rápido a tus últimos trabajos, retomá tus herramientas más usadas
-                  y mantené organizado tu progreso académico desde un solo panel.
-                </p>
-              </div>
-
-              <div class="hero-badge">
-                <span>Estado actual</span>
-                <strong>Sesión productiva</strong>
-              </div>
+        <section class="hero">
+          <div class="hero-main">
+            <div class="hero-body">
+              <div class="eyebrow">Eduvia</div>
+              <h2>Un panel más claro para empezar rápido</h2>
+              <p>
+                Entrá directo a tus herramientas principales, retomá tu trabajo
+                y mantené tu espacio de estudio simple y ordenado.
+              </p>
             </div>
 
-            <div>
-              <div class="hero-bottom">
-                <div class="hero-mini">
+            <div class="hero-actions">
+              <button class="btn btn-primary">Crear documento</button>
+              <button class="btn btn-secondary">Ver documentos</button>
+            </div>
+          </div>
+
+          <div class="hero-side">
+            <article class="info-card">
+              <div class="info-top">
+                <div class="info-label">
+                  <div class="icon-wrap">
+                    <svg viewBox="0 0 24 24">
+                      <path d="M5 4.5h10l4 4V19a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-13a1 1 0 0 1 1-1Z"></path>
+                      <path d="M14 4.5V9h4"></path>
+                    </svg>
+                  </div>
                   <span>Último documento</span>
-                  <strong>Ensayo sobre Ormuz</strong>
-                </div>
-
-                <div class="hero-mini">
-                  <span>Última herramienta</span>
-                  <strong>Resumen</strong>
-                </div>
-
-                <div class="hero-mini">
-                  <span>Materia destacada</span>
-                  <strong>Historia</strong>
                 </div>
               </div>
-
-              <div class="hero-actions">
-                <button class="btn btn-primary">Continuar trabajo</button>
-                <button class="btn btn-secondary">Crear nuevo</button>
-              </div>
-            </div>
-          </section>
-
-          <section class="stats-grid">
-            <article class="stat-card">
-              <div class="stat-top">
-                <div class="stat-label">
-                  <div class="stat-icon">📄</div>
-                  <span>Documentos creados</span>
-                </div>
-              </div>
-              <div class="stat-value">12</div>
-              <div class="stat-help">Entre ensayos, apuntes y textos largos.</div>
+              <div class="info-value">Todavía no hay un documento reciente.</div>
+              <a href="#" class="info-link">Crear documento</a>
             </article>
 
-            <article class="stat-card">
-              <div class="stat-top">
-                <div class="stat-label">
-                  <div class="stat-icon">🧠</div>
-                  <span>Resúmenes generados</span>
+            <article class="info-card">
+              <div class="info-top">
+                <div class="info-label">
+                  <div class="icon-wrap">
+                    <svg viewBox="0 0 24 24">
+                      <path d="M4 7h16"></path>
+                      <path d="M4 12h10"></path>
+                      <path d="M4 17h13"></path>
+                    </svg>
+                  </div>
+                  <span>Herramienta reciente</span>
                 </div>
               </div>
-              <div class="stat-value">8</div>
-              <div class="stat-help">Tus herramientas más usadas esta semana.</div>
+              <div class="info-value">Todavía no usaste una herramienta recientemente.</div>
+              <a href="#" class="info-link">Explorar herramientas</a>
             </article>
+          </div>
+        </section>
 
-            <article class="stat-card">
-              <div class="stat-top">
-                <div class="stat-label">
-                  <div class="stat-icon">🎞️</div>
-                  <span>Presentaciones</span>
-                </div>
-              </div>
-              <div class="stat-value">4</div>
-              <div class="stat-help">Material visual listo para exponer.</div>
-            </article>
-
-            <article class="stat-card">
-              <div class="stat-top">
-                <div class="stat-label">
-                  <div class="stat-icon">⏳</div>
-                  <span>Tiempo estudiado</span>
-                </div>
-              </div>
-              <div class="stat-value">6.5 h</div>
-              <div class="stat-help">Tiempo acumulado durante los últimos días.</div>
-            </article>
-          </section>
-        </div>
-
-        <div class="section-grid">
-          <section class="card">
+        <section class="grid-2">
+          <article class="card">
             <div class="card-header">
               <div>
-                <h2>Actividad reciente</h2>
-                <p>Un vistazo rápido a lo último que hiciste dentro de Eduvia.</p>
+                <h3>Documentos recientes</h3>
+                <p>Mostrá acá solo contenido real cuando exista.</p>
               </div>
-              <div class="tag">Actualizado hace 2 min</div>
+              <span class="tag">Vacío</span>
             </div>
 
-            <div class="activity-list">
-              <article class="activity-item">
-                <div class="activity-dot">✍️</div>
-                <div class="activity-body">
-                  <strong>Editaste “El Túnel”</strong>
-                  <p>
-                    Seguiste trabajando en el análisis literario y agregaste nuevos
-                    fragmentos al desarrollo principal.
-                  </p>
-                  <div class="activity-time">Hoy · 18:10</div>
+            <div class="empty-state">
+              <div class="empty-box">
+                <div class="empty-icon">
+                  <svg viewBox="0 0 24 24">
+                    <path d="M5 4.5h10l4 4V19a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-13a1 1 0 0 1 1-1Z"></path>
+                    <path d="M14 4.5V9h4"></path>
+                  </svg>
                 </div>
-              </article>
-
-              <article class="activity-item">
-                <div class="activity-dot">📚</div>
-                <div class="activity-body">
-                  <strong>Generaste un resumen de Historia</strong>
-                  <p>
-                    Creaste una versión más breve y clara del contenido para estudiar
-                    antes de la entrega.
-                  </p>
-                  <div class="activity-time">Ayer · 20:42</div>
-                </div>
-              </article>
-
-              <article class="activity-item">
-                <div class="activity-dot">🎞️</div>
-                <div class="activity-body">
-                  <strong>Preparaste una presentación</strong>
-                  <p>
-                    Organizaste una exposición con estructura visual para trabajar
-                    un tema de clase de forma más ordenada.
-                  </p>
-                  <div class="activity-time">Hace 2 días</div>
-                </div>
-              </article>
+                <h4>Todavía no hay documentos para mostrar</h4>
+                <p>
+                  Cuando crees o abras documentos, este espacio puede mostrar
+                  tus últimos trabajos reales.
+                </p>
+                <button class="ghost-btn">Crear primer documento</button>
+              </div>
             </div>
-          </section>
+          </article>
 
-          <section class="card">
+          <article class="card">
             <div class="card-header">
               <div>
-                <h2>Accesos rápidos</h2>
-                <p>Entrá directo a las herramientas principales sin perder tiempo.</p>
+                <h3>Accesos rápidos</h3>
+                <p>Entradas directas a las acciones principales.</p>
               </div>
             </div>
 
             <div class="quick-grid">
-              <button class="quick-btn">
-                <div class="quick-icon">📝</div>
-                <div>
+              <a href="#" class="quick-link">
+                <div class="quick-top">
                   <strong>Documento</strong>
-                  <span>Empezá a escribir desde cero o retomá uno existente.</span>
+                  <div class="icon-wrap">
+                    <svg viewBox="0 0 24 24">
+                      <path d="M12 20h9"></path>
+                      <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z"></path>
+                    </svg>
+                  </div>
                 </div>
-              </button>
+                <p>Empezá un texto nuevo o retomá uno existente.</p>
+              </a>
 
-              <button class="quick-btn">
-                <div class="quick-icon">📚</div>
-                <div>
+              <a href="#" class="quick-link">
+                <div class="quick-top">
                   <strong>Resumen</strong>
-                  <span>Convertí textos largos en contenido más claro y breve.</span>
+                  <div class="icon-wrap">
+                    <svg viewBox="0 0 24 24">
+                      <path d="M4 7h16"></path>
+                      <path d="M4 12h10"></path>
+                      <path d="M4 17h13"></path>
+                    </svg>
+                  </div>
                 </div>
-              </button>
+                <p>Convertí contenido largo en una versión más clara.</p>
+              </a>
 
-              <button class="quick-btn">
-                <div class="quick-icon">🎞️</div>
-                <div>
+              <a href="#" class="quick-link">
+                <div class="quick-top">
                   <strong>Presentación</strong>
-                  <span>Transformá información en una exposición más visual.</span>
+                  <div class="icon-wrap">
+                    <svg viewBox="0 0 24 24">
+                      <path d="M4 5h16v14H4z"></path>
+                      <path d="m10 9 5 3-5 3Z"></path>
+                    </svg>
+                  </div>
                 </div>
-              </button>
+                <p>Prepará material visual de forma más rápida.</p>
+              </a>
 
-              <button class="quick-btn">
-                <div class="quick-icon">🧪</div>
-                <div>
-                  <strong>Laboratorio</strong>
-                  <span>Probá ideas, estructuras y nuevos formatos de estudio.</span>
+              <a href="#" class="quick-link">
+                <div class="quick-top">
+                  <strong>Biblioteca</strong>
+                  <div class="icon-wrap">
+                    <svg viewBox="0 0 24 24">
+                      <path d="M5 19.5h14"></path>
+                      <path d="M6 4.5h12a1 1 0 0 1 1 1v11H7a1 1 0 0 0-1 1v2"></path>
+                      <path d="M7 16.5V5.5a1 1 0 0 0-1-1H5"></path>
+                    </svg>
+                  </div>
                 </div>
-              </button>
-            </div>
-          </section>
-        </div>
-
-        <section class="subjects-grid">
-          <article class="subject-card">
-            <div class="subject-top">
-              <div class="subject-icon">🏛️</div>
-              <div class="subject-status">Activa</div>
-            </div>
-            <div>
-              <h3>Historia</h3>
-              <p>Ensayos, resúmenes y presentaciones sobre procesos históricos y análisis.</p>
-            </div>
-            <div class="progress"><span style="width:74%"></span></div>
-            <div class="subject-meta">
-              <span>Progreso</span>
-              <span>74%</span>
+                <p>Accedé a tus documentos y materiales guardados.</p>
+              </a>
             </div>
           </article>
+        </section>
 
-          <article class="subject-card">
-            <div class="subject-top">
-              <div class="subject-icon">📖</div>
-              <div class="subject-status">En curso</div>
+        <section class="bottom-grid">
+          <article class="simple-card">
+            <div class="simple-head">
+              <div class="icon-wrap">
+                <svg viewBox="0 0 24 24">
+                  <path d="M12 3v3"></path>
+                  <path d="M12 18v3"></path>
+                  <path d="M3 12h3"></path>
+                  <path d="M18 12h3"></path>
+                  <circle cx="12" cy="12" r="3.5"></circle>
+                </svg>
+              </div>
+              <h4>Tu cuenta</h4>
             </div>
-            <div>
-              <h3>Literatura</h3>
-              <p>Análisis de obras, personajes, simbolismos y desarrollo de argumentos.</p>
-            </div>
-            <div class="progress"><span style="width:68%"></span></div>
-            <div class="subject-meta">
-              <span>Progreso</span>
-              <span>68%</span>
-            </div>
+            <p>Revisá tu perfil, tus ajustes y la información principal de tu espacio.</p>
+            <a href="#" class="simple-link">Ir a configuración</a>
           </article>
 
-          <article class="subject-card">
-            <div class="subject-top">
-              <div class="subject-icon">🇫🇷</div>
-              <div class="subject-status">Práctica</div>
+          <article class="simple-card">
+            <div class="simple-head">
+              <div class="icon-wrap">
+                <svg viewBox="0 0 24 24">
+                  <path d="M7 4.5h10"></path>
+                  <path d="M7 8.5h10"></path>
+                  <path d="M7 12.5h6"></path>
+                  <path d="M5 19.5h14"></path>
+                </svg>
+              </div>
+              <h4>Espacio ordenado</h4>
             </div>
-            <div>
-              <h3>Francés</h3>
-              <p>Descripciones, vocabulario y estructuras para exposiciones y evaluaciones.</p>
-            </div>
-            <div class="progress"><span style="width:52%"></span></div>
-            <div class="subject-meta">
-              <span>Progreso</span>
-              <span>52%</span>
-            </div>
+            <p>Mantené tus herramientas a mano y evitá que el panel se sienta cargado.</p>
+            <a href="#" class="simple-link">Ver documentos</a>
           </article>
 
-          <article class="subject-card">
-            <div class="subject-top">
-              <div class="subject-icon">🧬</div>
-              <div class="subject-status">Nueva</div>
+          <article class="simple-card">
+            <div class="simple-head">
+              <div class="icon-wrap">
+                <svg viewBox="0 0 24 24">
+                  <path d="M8 7h8"></path>
+                  <path d="M8 12h8"></path>
+                  <path d="M8 17h5"></path>
+                  <rect x="4" y="4" width="16" height="16" rx="2"></rect>
+                </svg>
+              </div>
+              <h4>Próximo paso</h4>
             </div>
-            <div>
-              <h3>Biología</h3>
-              <p>Material de apoyo, resúmenes y recursos para estudiar temas complejos.</p>
-            </div>
-            <div class="progress"><span style="width:39%"></span></div>
-            <div class="subject-meta">
-              <span>Progreso</span>
-              <span>39%</span>
-            </div>
+            <p>El siguiente paso lógico es conectar este panel con datos reales de Firebase.</p>
+            <a href="#" class="simple-link">Seguir editando</a>
           </article>
         </section>
       </section>
@@ -1181,10 +1084,10 @@
       });
 
       document.addEventListener("click", (e) => {
-        const clickedInsideSidebar = sidebar.contains(e.target);
-        const clickedMenuBtn = menuBtn.contains(e.target);
+        const insideSidebar = sidebar.contains(e.target);
+        const insideButton = menuBtn.contains(e.target);
 
-        if (window.innerWidth <= 960 && !clickedInsideSidebar && !clickedMenuBtn) {
+        if (window.innerWidth <= 960 && !insideSidebar && !insideButton) {
           sidebar.classList.remove("open");
         }
       });
