@@ -171,42 +171,6 @@
       color:inherit;
     }
 
-    .sidebar-bottom{
-      margin-top:auto;
-      padding:18px;
-      border-radius:22px;
-      background:linear-gradient(180deg, #f7fdfe 0%, #f0fafc 100%);
-      border:1px solid #dcecef;
-      box-shadow: var(--shadow-soft);
-    }
-
-    .sidebar-bottom h4{
-      font-family:"Sora", sans-serif;
-      font-size:1rem;
-      margin-bottom:8px;
-      letter-spacing:-0.02em;
-    }
-
-    .sidebar-bottom p{
-      font-size:.92rem;
-      line-height:1.55;
-      color:var(--muted);
-      margin-bottom:14px;
-    }
-
-    .mini-btn{
-      height:42px;
-      padding:0 16px;
-      border-radius:14px;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      font-weight:700;
-      color:#fff;
-      background:linear-gradient(135deg, var(--primary), var(--primary-dark));
-      box-shadow:0 12px 24px rgba(24,179,197,.18);
-    }
-
     .main{
       min-width:0;
       display:flex;
@@ -657,57 +621,6 @@
       color:var(--primary-dark);
     }
 
-    .bottom-grid{
-      display:grid;
-      grid-template-columns: repeat(3, minmax(0,1fr));
-      gap:18px;
-    }
-
-    .simple-card{
-      background:rgba(255,255,255,.9);
-      border:1px solid rgba(219,229,232,.94);
-      border-radius:24px;
-      padding:20px;
-      box-shadow: var(--shadow);
-      min-height:160px;
-      display:flex;
-      flex-direction:column;
-      justify-content:space-between;
-      gap:12px;
-    }
-
-    .simple-head{
-      display:flex;
-      align-items:center;
-      gap:10px;
-    }
-
-    .simple-head h4{
-      font-family:"Sora", sans-serif;
-      font-size:1rem;
-      letter-spacing:-0.02em;
-    }
-
-    .simple-card p{
-      color:var(--muted);
-      font-size:.92rem;
-      line-height:1.58;
-    }
-
-    .simple-strong{
-      font-size:1rem;
-      font-weight:700;
-      color:var(--text);
-      line-height:1.45;
-      word-break:break-word;
-    }
-
-    .simple-link{
-      font-size:.88rem;
-      font-weight:700;
-      color:var(--primary-dark);
-    }
-
     svg{
       width:18px;
       height:18px;
@@ -726,10 +639,6 @@
       .hero,
       .grid-2{
         grid-template-columns:1fr;
-      }
-
-      .bottom-grid{
-        grid-template-columns:1fr 1fr;
       }
     }
 
@@ -777,13 +686,8 @@
         flex-wrap:wrap;
       }
 
-      .bottom-grid{
-        grid-template-columns:1fr;
-      }
-
       .hero-main,
-      .card,
-      .simple-card{
+      .card{
         padding:20px;
       }
 
@@ -811,40 +715,40 @@
         </div>
       </div>
 
-<nav class="nav">
-  <div class="nav-label">Principal</div>
+      <nav class="nav">
+        <div class="nav-label">Principal</div>
 
-  <a href="panel.html" class="active">
-    <span class="nav-icon">
-      <svg viewBox="0 0 24 24">
-        <path d="M3 10.5 12 3l9 7.5"></path>
-        <path d="M5 9.5V20h14V9.5"></path>
-      </svg>
-    </span>
-    Inicio
-  </a>
+        <a href="panel.html" class="active">
+          <span class="nav-icon">
+            <svg viewBox="0 0 24 24">
+              <path d="M3 10.5 12 3l9 7.5"></path>
+              <path d="M5 9.5V20h14V9.5"></path>
+            </svg>
+          </span>
+          Inicio
+        </a>
 
-  <a href="crear-clase.html">
-    <span class="nav-icon">
-      <svg viewBox="0 0 24 24">
-        <path d="M12 20h9"></path>
-        <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z"></path>
-      </svg>
-    </span>
-    Crear documento
-  </a>
+        <a href="crear-documento.html">
+          <span class="nav-icon">
+            <svg viewBox="0 0 24 24">
+              <path d="M12 20h9"></path>
+              <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z"></path>
+            </svg>
+          </span>
+          Crear documento
+        </a>
 
-  <a href="mis-clases.html">
-    <span class="nav-icon">
-      <svg viewBox="0 0 24 24">
-        <path d="M4 7h16"></path>
-        <path d="M4 12h10"></path>
-        <path d="M4 17h13"></path>
-      </svg>
-    </span>
-    Clases
-  </a>
-</nav>
+        <a href="mis-clases.html">
+          <span class="nav-icon">
+            <svg viewBox="0 0 24 24">
+              <path d="M4 7h16"></path>
+              <path d="M4 12h10"></path>
+              <path d="M4 17h13"></path>
+            </svg>
+          </span>
+          Clases
+        </a>
+      </nav>
     </aside>
 
     <main class="main">
@@ -899,10 +803,10 @@
               </div>
             </div>
 
-<div class="hero-actions">
-  <a class="btn btn-primary" href="crear-documentto.html">Crear documento</a>
-  <a class="btn btn-secondary" href="mis-documentos.html">Ver clases</a>
-</div>
+            <div class="hero-actions">
+              <a class="btn btn-primary" href="crear-documento.html">Crear documento</a>
+              <a class="btn btn-secondary" href="mis-clases.html">Ver clases</a>
+            </div>
           </div>
 
           <div class="hero-side">
@@ -920,7 +824,7 @@
               </div>
               <div class="info-value" id="lastDocTitle">Sin documentos todavía.</div>
               <div class="info-sub" id="lastDocDate">—</div>
-              <a href="documento.html" class="info-link" id="lastDocLink">Crear documento</a>
+              <a href="crear-documento.html" class="info-link" id="lastDocLink">Crear documento</a>
             </article>
 
             <article class="info-card">
@@ -938,7 +842,7 @@
               </div>
               <div class="info-value" id="lastClassTitle">Sin clases todavía.</div>
               <div class="info-sub" id="lastClassDate">—</div>
-              <a href="crear-clase.html" class="info-link" id="lastClassLink">Crear clase</a>
+              <a href="mis-clases.html" class="info-link" id="lastClassLink">Ver clases</a>
             </article>
           </div>
         </section>
@@ -965,7 +869,7 @@
                 </div>
                 <h4>Todavía no hay documentos para mostrar</h4>
                 <p>Cuando guardes documentos, se van a listar acá automáticamente.</p>
-                <a class="ghost-btn" href="documento.html">Crear primer documento</a>
+                <a class="ghost-btn" href="crear-documento.html">Crear primer documento</a>
               </div>
             </div>
           </article>
@@ -992,243 +896,90 @@
                 </div>
                 <h4>Todavía no hay clases para mostrar</h4>
                 <p>Cuando guardes clases, se van a listar acá automáticamente.</p>
-                <a class="ghost-btn" href="crear-clase.html">Crear primera clase</a>
+                <a class="ghost-btn" href="mis-clases.html">Ver clases</a>
               </div>
             </div>
-          </article>
-        </section>
-
-        <section class="bottom-grid">
-          <article class="simple-card">
-            <div class="simple-head">
-              <div class="icon-wrap">
-                <svg viewBox="0 0 24 24">
-                  <circle cx="12" cy="8" r="3.5"></circle>
-                  <path d="M5 19a7 7 0 0 1 14 0"></path>
-                </svg>
-              </div>
-              <h4>Tu cuenta</h4>
-            </div>
-            <div class="simple-strong" id="accountFullName">Cargando...</div>
-            <p id="accountEmailFull">—</p>
-          </article>
-
-          <article class="simple-card">
-            <div class="simple-head">
-              <div class="icon-wrap">
-                <svg viewBox="0 0 24 24">
-                  <path d="M8 7h8"></path>
-                  <path d="M8 12h8"></path>
-                  <path d="M8 17h5"></path>
-                  <rect x="4" y="4" width="16" height="16" rx="2"></rect>
-                </svg>
-              </div>
-              <h4>Última actualización</h4>
-            </div>
-            <div class="simple-strong" id="accountUpdatedAt">—</div>
-            <p>Fecha real del documento del usuario en Firestore.</p>
-          </article>
-
-          <article class="simple-card">
-            <div class="simple-head">
-              <div class="icon-wrap">
-                <svg viewBox="0 0 24 24">
-                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                  <path d="M16 17l5-5-5-5"></path>
-                  <path d="M21 12H9"></path>
-                </svg>
-              </div>
-              <h4>Sesión</h4>
-            </div>
-            <div class="simple-strong">Cuenta activa</div>
-            <button class="logout-btn" id="logoutBottom">Cerrar sesión</button>
           </article>
         </section>
       </section>
     </main>
   </div>
 
- <script type="module">
-  import { auth, db } from "./firebase.js?v=3";
-  import {
-    onAuthStateChanged,
-    signOut
-  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-  import {
-    doc,
-    getDoc,
-    collection,
-    getDocs
-  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+  <script type="module">
+    import { auth, db } from "./firebase.js?v=3";
+    import {
+      onAuthStateChanged,
+      signOut
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import {
+      doc,
+      getDoc,
+      collection,
+      getDocs
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-  const $ = (id) => document.getElementById(id);
+    const $ = (id) => document.getElementById(id);
 
-  const menuBtn = $("menuBtn");
-  const sidebar = $("sidebar");
+    const menuBtn = $("menuBtn");
+    const sidebar = $("sidebar");
 
-  if (menuBtn && sidebar) {
-    menuBtn.addEventListener("click", () => {
-      sidebar.classList.toggle("open");
-    });
+    if (menuBtn && sidebar) {
+      menuBtn.addEventListener("click", () => {
+        sidebar.classList.toggle("open");
+      });
 
-    document.addEventListener("click", (e) => {
-      const insideSidebar = sidebar.contains(e.target);
-      const insideButton = menuBtn.contains(e.target);
+      document.addEventListener("click", (e) => {
+        const insideSidebar = sidebar.contains(e.target);
+        const insideButton = menuBtn.contains(e.target);
 
-      if (window.innerWidth <= 960 && !insideSidebar && !insideButton) {
-        sidebar.classList.remove("open");
-      }
-    });
+        if (window.innerWidth <= 960 && !insideSidebar && !insideButton) {
+          sidebar.classList.remove("open");
+        }
+      });
 
-    window.addEventListener("resize", () => {
-      if (window.innerWidth > 960) {
-        sidebar.classList.remove("open");
-      }
-    });
-  }
-
-  function escapeHtml(value = "") {
-    return String(value)
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;")
-      .replace(/'/g, "&#039;");
-  }
-
-  function setText(id, value) {
-    const el = $(id);
-    if (el) el.textContent = value;
-  }
-
-  function setHref(id, value) {
-    const el = $(id);
-    if (el) el.href = value;
-  }
-
-  function getInitial(name = "") {
-    return String(name).trim().charAt(0).toUpperCase() || "U";
-  }
-
-  function pickUserName(userData, authUser) {
-    const nombre = userData?.nombre?.trim();
-    const apellido = userData?.apellido?.trim();
-
-    if (nombre && apellido) return `${nombre} ${apellido}`;
-    if (nombre) return nombre;
-    if (authUser?.displayName?.trim()) return authUser.displayName.trim();
-    if (authUser?.email) return authUser.email.split("@")[0];
-    return "Usuario";
-  }
-
-  function getTimestampValue(item = {}) {
-    const raw =
-      item.actualizadoEn ||
-      item.updatedAt ||
-      item.creadoEn ||
-      item.createdAt ||
-      item.fecha ||
-      null;
-
-    if (!raw) return 0;
-
-    if (typeof raw?.toDate === "function") {
-      return raw.toDate().getTime();
+      window.addEventListener("resize", () => {
+        if (window.innerWidth > 960) {
+          sidebar.classList.remove("open");
+        }
+      });
     }
 
-    const parsed = new Date(raw).getTime();
-    return Number.isNaN(parsed) ? 0 : parsed;
-  }
-
-  function formatDate(value) {
-    if (!value) return "Sin fecha";
-
-    let date = null;
-
-    if (typeof value?.toDate === "function") {
-      date = value.toDate();
-    } else {
-      date = new Date(value);
+    function escapeHtml(value = "") {
+      return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
     }
 
-    if (!date || Number.isNaN(date.getTime())) return "Sin fecha";
-
-    return new Intl.DateTimeFormat("es-AR", {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit"
-    }).format(date);
-  }
-
-  function stripHtml(html = "") {
-    const div = document.createElement("div");
-    div.innerHTML = html;
-    return (div.textContent || div.innerText || "").replace(/\s+/g, " ").trim();
-  }
-
-  function getDocumentTitle(item = {}) {
-    if (item.badgeText && String(item.badgeText).trim()) {
-      return String(item.badgeText).trim();
+    function setText(id, value) {
+      const el = $(id);
+      if (el) el.textContent = value;
     }
 
-    if (item.titulo && String(item.titulo).trim()) {
-      return String(item.titulo).trim();
+    function setHref(id, value) {
+      const el = $(id);
+      if (el) el.href = value;
     }
 
-    if (item.nombre && String(item.nombre).trim()) {
-      return String(item.nombre).trim();
+    function getInitial(name = "") {
+      return String(name).trim().charAt(0).toUpperCase() || "U";
     }
 
-    if (item.contenido && String(item.contenido).trim()) {
-      return String(item.contenido).trim().slice(0, 90);
+    function pickUserName(userData, authUser) {
+      const nombre = userData?.nombre?.trim();
+      const apellido = userData?.apellido?.trim();
+
+      if (nombre && apellido) return `${nombre} ${apellido}`;
+      if (nombre) return nombre;
+      if (authUser?.displayName?.trim()) return authUser.displayName.trim();
+      if (authUser?.email) return authUser.email.split("@")[0];
+      return "Usuario";
     }
 
-    return "Documento sin título";
-  }
-
-  function getClassTitle(item = {}) {
-    if (item.titulo && String(item.titulo).trim()) {
-      return String(item.titulo).trim();
-    }
-
-    if (item.badgeText && String(item.badgeText).trim()) {
-      return String(item.badgeText).trim();
-    }
-
-    if (item.nombre && String(item.nombre).trim()) {
-      return String(item.nombre).trim();
-    }
-
-    if (item.contenidoHtml && String(item.contenidoHtml).trim()) {
-      const text = stripHtml(item.contenidoHtml);
-      if (text) return text.slice(0, 90);
-    }
-
-    if (item.contenido && String(item.contenido).trim()) {
-      return String(item.contenido).trim().slice(0, 90);
-    }
-
-    return "Clase sin título";
-  }
-
-  function renderRecentItems({ items, listEl, emptyEl, type }) {
-    if (!listEl || !emptyEl) return;
-
-    if (!items.length) {
-      listEl.innerHTML = "";
-      listEl.classList.add("hidden");
-      emptyEl.classList.remove("hidden");
-      return;
-    }
-
-    emptyEl.classList.add("hidden");
-    listEl.classList.remove("hidden");
-
-    listEl.innerHTML = items.map((item) => {
-      const title = type === "doc" ? getDocumentTitle(item) : getClassTitle(item);
-      const dateRaw =
+    function getTimestampValue(item = {}) {
+      const raw =
         item.actualizadoEn ||
         item.updatedAt ||
         item.creadoEn ||
@@ -1236,173 +987,274 @@
         item.fecha ||
         null;
 
-      const date = formatDate(dateRaw);
+      if (!raw) return 0;
 
-      const href =
-        type === "doc"
-          ? `crear-documentto.html?id=${encodeURIComponent(item.id)}`
-          : `mis-documentos.html?id=${encodeURIComponent(item.id)}`;
+      if (typeof raw?.toDate === "function") {
+        return raw.toDate().getTime();
+      }
 
-      return `
-        <a class="recent-item" href="${href}">
-          <div class="recent-item-main">
-            <strong>${escapeHtml(title)}</strong>
-            <span>Actualizado: ${escapeHtml(date)}</span>
-          </div>
-          <div class="recent-item-badge">Abrir</div>
-        </a>
-      `;
-    }).join("");
-  }
-
-  async function getCollectionItems(pathParts) {
-    const ref = collection(db, ...pathParts);
-    const snap = await getDocs(ref);
-
-    const items = snap.docs.map((d) => ({
-      id: d.id,
-      ...d.data()
-    }));
-
-    items.sort((a, b) => getTimestampValue(b) - getTimestampValue(a));
-    return items;
-  }
-
-  async function loadPanel(user) {
-    const userRef = doc(db, "usuarios", user.uid);
-    const userSnap = await getDoc(userRef);
-
-    const userData = userSnap.exists() ? userSnap.data() : {};
-    const fullName = pickUserName(userData, user);
-    const email = userData?.email || user.email || "Sin email";
-    const updatedAt = userData?.actualizadoEn || null;
-
-    setText("userName", fullName);
-    setText("userEmail", email);
-    setText("userAvatar", getInitial(fullName));
-
-    setText("accountFullName", fullName);
-    setText("accountEmailFull", email);
-    setText("accountUpdatedAt", formatDate(updatedAt));
-
-    setText("welcomeBadge", "Cuenta activa");
-    setText("heroTitle", `Bienvenido, ${fullName}`);
-
-    const [docs, classes] = await Promise.all([
-      getCollectionItems(["usuarios", user.uid, "documentos"]),
-      getCollectionItems(["usuarios", user.uid, "clases"])
-    ]);
-
-    console.log("UID actual:", user.uid);
-    console.log("Documentos encontrados:", docs);
-    console.log("Clases encontradas:", classes);
-
-    setText("docsCount", String(docs.length));
-    setText("classesCount", String(classes.length));
-    setText("docsTag", `${docs.length} total`);
-    setText("classesTag", `${classes.length} total`);
-
-    if (docs.length === 0 && classes.length === 0) {
-      setText(
-        "heroText",
-        "Todavía no tenés contenido guardado. Cuando empieces a crear documentos o clases, este panel se va a llenar automáticamente con información real."
-      );
-    } else {
-      setText(
-        "heroText",
-        `Actualmente tenés ${docs.length} documento(s) y ${classes.length} clase(s) guardados en tu cuenta.`
-      );
+      const parsed = new Date(raw).getTime();
+      return Number.isNaN(parsed) ? 0 : parsed;
     }
 
-    if (docs.length) {
-      const latestDoc = docs[0];
-      const latestDocDate =
-        latestDoc.actualizadoEn ||
-        latestDoc.updatedAt ||
-        latestDoc.creadoEn ||
-        latestDoc.createdAt ||
-        latestDoc.fecha ||
-        null;
+    function formatDate(value) {
+      if (!value) return "Sin fecha";
 
-      setText("lastDocTitle", getDocumentTitle(latestDoc));
-      setText("lastDocDate", formatDate(latestDocDate));
-      setHref("lastDocLink", `crear-documentto.html?id=${encodeURIComponent(latestDoc.id)}`);
-      $("lastDocLink").textContent = "Abrir documento";
-    } else {
-      setText("lastDocTitle", "Sin documentos todavía.");
-      setText("lastDocDate", "—");
-      setHref("lastDocLink", "crear-documentto.html");
-      $("lastDocLink").textContent = "Crear documento";
+      let date = null;
+
+      if (typeof value?.toDate === "function") {
+        date = value.toDate();
+      } else {
+        date = new Date(value);
+      }
+
+      if (!date || Number.isNaN(date.getTime())) return "Sin fecha";
+
+      return new Intl.DateTimeFormat("es-AR", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit"
+      }).format(date);
     }
 
-    if (classes.length) {
-      const latestClass = classes[0];
-      const latestClassDate =
-        latestClass.actualizadoEn ||
-        latestClass.updatedAt ||
-        latestClass.creadoEn ||
-        latestClass.createdAt ||
-        latestClass.fecha ||
-        null;
-
-      setText("lastClassTitle", getClassTitle(latestClass));
-      setText("lastClassDate", formatDate(latestClassDate));
-      setHref("lastClassLink", `mis-documentos.html?id=${encodeURIComponent(latestClass.id)}`);
-      $("lastClassLink").textContent = "Abrir clase";
-    } else {
-      setText("lastClassTitle", "Sin clases todavía.");
-      setText("lastClassDate", "—");
-      setHref("lastClassLink", "mis-documentos.html");
-      $("lastClassLink").textContent = "Ver clases";
+    function stripHtml(html = "") {
+      const div = document.createElement("div");
+      div.innerHTML = html;
+      return (div.textContent || div.innerText || "").replace(/\s+/g, " ").trim();
     }
 
-    renderRecentItems({
-      items: docs.slice(0, 4),
-      listEl: $("docsRecentList"),
-      emptyEl: $("docsEmptyState"),
-      type: "doc"
+    function getDocumentTitle(item = {}) {
+      if (item.badgeText && String(item.badgeText).trim()) {
+        return String(item.badgeText).trim();
+      }
+
+      if (item.titulo && String(item.titulo).trim()) {
+        return String(item.titulo).trim();
+      }
+
+      if (item.nombre && String(item.nombre).trim()) {
+        return String(item.nombre).trim();
+      }
+
+      if (item.contenido && String(item.contenido).trim()) {
+        return String(item.contenido).trim().slice(0, 90);
+      }
+
+      return "Documento sin título";
+    }
+
+    function getClassTitle(item = {}) {
+      if (item.titulo && String(item.titulo).trim()) {
+        return String(item.titulo).trim();
+      }
+
+      if (item.badgeText && String(item.badgeText).trim()) {
+        return String(item.badgeText).trim();
+      }
+
+      if (item.nombre && String(item.nombre).trim()) {
+        return String(item.nombre).trim();
+      }
+
+      if (item.contenidoHtml && String(item.contenidoHtml).trim()) {
+        const text = stripHtml(item.contenidoHtml);
+        if (text) return text.slice(0, 90);
+      }
+
+      if (item.contenido && String(item.contenido).trim()) {
+        return String(item.contenido).trim().slice(0, 90);
+      }
+
+      return "Clase sin título";
+    }
+
+    function renderRecentItems({ items, listEl, emptyEl, type }) {
+      if (!listEl || !emptyEl) return;
+
+      if (!items.length) {
+        listEl.innerHTML = "";
+        listEl.classList.add("hidden");
+        emptyEl.classList.remove("hidden");
+        return;
+      }
+
+      emptyEl.classList.add("hidden");
+      listEl.classList.remove("hidden");
+
+      listEl.innerHTML = items.map((item) => {
+        const title = type === "doc" ? getDocumentTitle(item) : getClassTitle(item);
+
+        const dateRaw =
+          item.actualizadoEn ||
+          item.updatedAt ||
+          item.creadoEn ||
+          item.createdAt ||
+          item.fecha ||
+          null;
+
+        const date = formatDate(dateRaw);
+
+        const href =
+          type === "doc"
+            ? `crear-documento.html?id=${encodeURIComponent(item.id)}`
+            : `mis-clases.html?id=${encodeURIComponent(item.id)}`;
+
+        return `
+          <a class="recent-item" href="${href}">
+            <div class="recent-item-main">
+              <strong>${escapeHtml(title)}</strong>
+              <span>Actualizado: ${escapeHtml(date)}</span>
+            </div>
+            <div class="recent-item-badge">Abrir</div>
+          </a>
+        `;
+      }).join("");
+    }
+
+    async function getCollectionItems(pathParts) {
+      const ref = collection(db, ...pathParts);
+      const snap = await getDocs(ref);
+
+      const items = snap.docs.map((d) => ({
+        id: d.id,
+        ...d.data()
+      }));
+
+      items.sort((a, b) => getTimestampValue(b) - getTimestampValue(a));
+      return items;
+    }
+
+    async function loadPanel(user) {
+      const userRef = doc(db, "usuarios", user.uid);
+      const userSnap = await getDoc(userRef);
+
+      const userData = userSnap.exists() ? userSnap.data() : {};
+      const fullName = pickUserName(userData, user);
+      const email = userData?.email || user.email || "Sin email";
+
+      setText("userName", fullName);
+      setText("userEmail", email);
+      setText("userAvatar", getInitial(fullName));
+
+      setText("welcomeBadge", "Cuenta activa");
+      setText("heroTitle", `Bienvenido, ${fullName}`);
+
+      const [docs, classes] = await Promise.all([
+        getCollectionItems(["usuarios", user.uid, "documentos"]),
+        getCollectionItems(["usuarios", user.uid, "clases"])
+      ]);
+
+      console.log("UID actual:", user.uid);
+      console.log("Documentos encontrados:", docs);
+      console.log("Clases encontradas:", classes);
+
+      setText("docsCount", String(docs.length));
+      setText("classesCount", String(classes.length));
+      setText("docsTag", `${docs.length} total`);
+      setText("classesTag", `${classes.length} total`);
+
+      if (docs.length === 0 && classes.length === 0) {
+        setText(
+          "heroText",
+          "Todavía no tenés contenido guardado. Cuando empieces a crear documentos o clases, este panel se va a llenar automáticamente con información real."
+        );
+      } else {
+        setText(
+          "heroText",
+          `Actualmente tenés ${docs.length} documento(s) y ${classes.length} clase(s) guardados en tu cuenta.`
+        );
+      }
+
+      if (docs.length) {
+        const latestDoc = docs[0];
+        const latestDocDate =
+          latestDoc.actualizadoEn ||
+          latestDoc.updatedAt ||
+          latestDoc.creadoEn ||
+          latestDoc.createdAt ||
+          latestDoc.fecha ||
+          null;
+
+        setText("lastDocTitle", getDocumentTitle(latestDoc));
+        setText("lastDocDate", formatDate(latestDocDate));
+        setHref("lastDocLink", `crear-documento.html?id=${encodeURIComponent(latestDoc.id)}`);
+        $("lastDocLink").textContent = "Abrir documento";
+      } else {
+        setText("lastDocTitle", "Sin documentos todavía.");
+        setText("lastDocDate", "—");
+        setHref("lastDocLink", "crear-documento.html");
+        $("lastDocLink").textContent = "Crear documento";
+      }
+
+      if (classes.length) {
+        const latestClass = classes[0];
+        const latestClassDate =
+          latestClass.actualizadoEn ||
+          latestClass.updatedAt ||
+          latestClass.creadoEn ||
+          latestClass.createdAt ||
+          latestClass.fecha ||
+          null;
+
+        setText("lastClassTitle", getClassTitle(latestClass));
+        setText("lastClassDate", formatDate(latestClassDate));
+        setHref("lastClassLink", `mis-clases.html?id=${encodeURIComponent(latestClass.id)}`);
+        $("lastClassLink").textContent = "Abrir clase";
+      } else {
+        setText("lastClassTitle", "Sin clases todavía.");
+        setText("lastClassDate", "—");
+        setHref("lastClassLink", "mis-clases.html");
+        $("lastClassLink").textContent = "Ver clases";
+      }
+
+      renderRecentItems({
+        items: docs.slice(0, 4),
+        listEl: $("docsRecentList"),
+        emptyEl: $("docsEmptyState"),
+        type: "doc"
+      });
+
+      renderRecentItems({
+        items: classes.slice(0, 4),
+        listEl: $("classesRecentList"),
+        emptyEl: $("classesEmptyState"),
+        type: "class"
+      });
+    }
+
+    async function handleLogout(button) {
+      try {
+        if (button) button.disabled = true;
+        await signOut(auth);
+        window.location.href = "login.html";
+      } catch (error) {
+        console.error("Error al cerrar sesión:", error);
+        if (button) button.disabled = false;
+      }
+    }
+
+    $("logout")?.addEventListener("click", () => handleLogout($("logout")));
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        window.location.href = "login.html";
+        return;
+      }
+
+      try {
+        await loadPanel(user);
+      } catch (error) {
+        console.error("Error cargando panel:", error);
+
+        setText("heroTitle", "No se pudo cargar el panel");
+        setText(
+          "heroText",
+          "Hubo un problema trayendo la información desde Firebase. Revisá la consola y la estructura exacta de tus colecciones."
+        );
+      }
     });
-
-    renderRecentItems({
-      items: classes.slice(0, 4),
-      listEl: $("classesRecentList"),
-      emptyEl: $("classesEmptyState"),
-      type: "class"
-    });
-  }
-
-  async function handleLogout(button) {
-    try {
-      if (button) button.disabled = true;
-      await signOut(auth);
-      window.location.href = "login.html";
-    } catch (error) {
-      console.error("Error al cerrar sesión:", error);
-      if (button) button.disabled = false;
-    }
-  }
-
-  $("logout")?.addEventListener("click", () => handleLogout($("logout")));
-  $("logoutBottom")?.addEventListener("click", () => handleLogout($("logoutBottom")));
-
-  onAuthStateChanged(auth, async (user) => {
-    if (!user) {
-      window.location.href = "login.html";
-      return;
-    }
-
-    try {
-      await loadPanel(user);
-    } catch (error) {
-      console.error("Error cargando panel:", error);
-
-      setText("heroTitle", "No se pudo cargar el panel");
-      setText(
-        "heroText",
-        "Hubo un problema trayendo la información desde Firebase. Revisá la consola y la estructura exacta de tus colecciones."
-      );
-    }
-  });
-</script>
+  </script>
 </body>
 </html>
