@@ -1655,8 +1655,14 @@ async function resolveClaseFromFirestoreOrLocal(user) {
     if (localClase) {
       state.currentClaseData = localClase;
       state.currentRole = state.currentOwnerUid === user.uid ? "owner" : "viewer";
+      state.currentClaseRef = doc(db, "usuarios", state.currentOwnerUid, "clases", localClase.id);
+
+      if (state.currentRole === "owner") clearSharedDocSession();
+      else setSharedDocSession(state.currentRole, user, state.currentOwnerUid, localClase.id);
+
       return { clase: localClase, origin: "local" };
     }
+
     throw new Error("No se encontró el identificador del documento.");
   }
 
@@ -1671,25 +1677,41 @@ async function resolveClaseFromFirestoreOrLocal(user) {
       ];
 
   for (const ref of refs) {
-    const snap = await getDoc(ref);
-    if (!snap.exists()) continue;
+    try {
+      const snap = await getDoc(ref);
+      if (!snap.exists()) continue;
 
-    const data = {
-      id: snap.id,
-      ownerUid: state.currentOwnerUid,
-      ...snap.data(),
-    };
+      const claseData = {
+        id: snap.id,
+        ownerUid: state.currentOwnerUid,
+        ...snap.data(),
+      };
 
-    state.currentClaseRef = ref;
-    state.currentClaseData = data;
-    state.currentRole = state.currentOwnerUid === user.uid ? "owner" : "viewer";
+      const role = resolveUserRole(claseData, user, state.currentOwnerUid);
 
-    return { clase: data, origin: "firestore" };
+      if (!role) {
+        return { denied: true };
+      }
+
+      state.currentClaseRef = ref;
+      state.currentClaseData = claseData;
+      state.currentRole = role;
+      setSharedDocSession(role, user, state.currentOwnerUid, state.currentClaseId);
+
+      return { clase: claseData, origin: "firestore" };
+    } catch (error) {
+      console.error("Error leyendo documento:", error);
+    }
   }
 
   if (localClase) {
     state.currentClaseData = localClase;
     state.currentRole = state.currentOwnerUid === user.uid ? "owner" : "viewer";
+    state.currentClaseRef = doc(db, "usuarios", state.currentOwnerUid, "clases", localClase.id);
+
+    if (state.currentRole === "owner") clearSharedDocSession();
+    else setSharedDocSession(state.currentRole, user, state.currentOwnerUid, localClase.id);
+
     return { clase: localClase, origin: "local" };
   }
 
