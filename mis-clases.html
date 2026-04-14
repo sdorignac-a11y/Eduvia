@@ -665,6 +665,27 @@
       background:#eef4f8;
     }
 
+    .create-empty-card{
+  cursor:pointer;
+  border:1.5px dashed #d8d6ff;
+  background:linear-gradient(180deg, #ffffff 0%, #faf8ff 100%);
+}
+
+.create-empty-card:hover{
+  border-color:#bfb7ff;
+  box-shadow:0 16px 32px rgba(124,108,255,.12);
+}
+
+.create-empty-card .open-link{
+  color:#6d5ef6;
+}
+
+.create-empty-card .mini-btn{
+  background:#f0edff;
+  color:#6c5cff;
+  border-color:#ddd7ff;
+}
+
     .loading-state,
     .empty-state{
       background:white;
@@ -925,7 +946,7 @@
           </div>
 
           <div class="quick-actions">
-            <a href="crear-clase.html" class="quick-btn primary">+ Crear nuevo</a>
+            <button class="quick-btn primary" id="createDocTopBtn" type="button">+ Documento vacío</button>
             <button class="quick-btn" id="reloadBtn" type="button">Actualizar</button>
           </div>
         </div>
@@ -949,7 +970,12 @@
   <script type="module">
     import { auth, db } from "./firebase.js?v=1";
     import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import {
+  collection,
+  getDocs,
+  addDoc,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
     lucide.createIcons();
 
@@ -1114,63 +1140,134 @@ async function getCollectionItems(uid, name, fallbackType) {
   }
 }
 
-    function renderCards(items) {
-      cardsGrid.innerHTML = "";
+    async function createEmptyDocument() {
+  const user = auth.currentUser;
 
-      if (!items.length) {
-        cardsGrid.classList.add("hidden");
-        emptyState.classList.remove("hidden");
-        totalCount.textContent = "0 elementos";
-        return;
-      }
+  if (!user) {
+    window.location.href = "login.html";
+    return;
+  }
 
-      const html = items.map(item => `
-        <article class="item-card" data-type="${item.type}" data-title="${escapeHtml(item.title)}" data-description="${escapeHtml(item.description)}">
-          <div class="item-top">
-            <div class="item-icon ${item.type}">
-              <i data-lucide="${item.type === "clase" ? "graduation-cap" : "file-text"}"></i>
-            </div>
-            <span class="badge ${item.type}">
-              ${item.type === "clase" ? "Clase" : "Documento"}
-            </span>
-          </div>
+  try {
+    const ref = await addDoc(collection(db, "usuarios", user.uid, "documentos"), {
+      titulo: "Documento sin título",
+      descripcion: "Documento vacío creado en Eduvia.",
+      contenido: "",
+      tipo: "documento",
+      formato: "documento",
+      origen: "vacio",
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp()
+    });
 
-          <h3 class="item-title">${escapeHtml(item.title)}</h3>
-          <p class="item-desc">${escapeHtml(item.description)}</p>
+    window.location.href = `documento.html?id=${encodeURIComponent(ref.id)}&owner=${encodeURIComponent(user.uid)}&source=documentos`;
+  } catch (error) {
+    console.error("Error creando documento vacío:", error);
+    alert("No se pudo crear el documento vacío.");
+  }
+}
 
-          <div class="item-meta">
-            <span class="meta-pill">
-              <i data-lucide="calendar-days" style="width:14px;height:14px;"></i>
-              ${formatDate(item.updatedAt)}
-            </span>
+function renderCards(items) {
+  cardsGrid.innerHTML = "";
 
-            <span class="meta-pill">
-              <i data-lucide="${item.type === "clase" ? "monitor-play" : "files"}" style="width:14px;height:14px;"></i>
-              ${item.type === "clase" ? "Aula" : "Documento"}
-            </span>
-          </div>
+  const createCardHtml = `
+    <article class="item-card create-empty-card" data-create-empty="documento">
+      <div class="item-top">
+        <div class="item-icon documento">
+          <i data-lucide="file-plus-2"></i>
+        </div>
+        <span class="badge documento">Nuevo</span>
+      </div>
 
-          <div class="item-footer">
-            <a class="open-link" href="${item.openUrl}">
-              ${item.type === "clase" ? "Abrir aula" : "Abrir documento"}
-            </a>
+      <h3 class="item-title">Generar documento vacío</h3>
+      <p class="item-desc">
+        Creá un documento limpio, sin contenido inicial, para empezar a escribir desde cero.
+      </p>
 
-            <div class="item-menu">
-              <button class="mini-btn" type="button" onclick="window.location.href='${item.openUrl}'">
-                Abrir
-              </button>
-            </div>
-          </div>
-        </article>
-      `).join("");
+      <div class="item-meta">
+        <span class="meta-pill">
+          <i data-lucide="sparkles" style="width:14px;height:14px;"></i>
+          Sin IA
+        </span>
 
-      cardsGrid.innerHTML = html;
-      cardsGrid.classList.remove("hidden");
-      emptyState.classList.add("hidden");
-      totalCount.textContent = `${items.length} elemento${items.length === 1 ? "" : "s"}`;
+        <span class="meta-pill">
+          <i data-lucide="files" style="width:14px;height:14px;"></i>
+          Documento
+        </span>
+      </div>
 
-      lucide.createIcons();
-    }
+      <div class="item-footer">
+        <span class="open-link">Crear documento</span>
+
+        <div class="item-menu">
+          <button class="mini-btn" type="button">
+            Crear
+          </button>
+        </div>
+      </div>
+    </article>
+  `;
+
+  const itemsHtml = items.map(item => `
+    <article class="item-card" data-type="${item.type}" data-title="${escapeHtml(item.title)}" data-description="${escapeHtml(item.description)}">
+      <div class="item-top">
+        <div class="item-icon ${item.type}">
+          <i data-lucide="${item.type === "clase" ? "graduation-cap" : "file-text"}"></i>
+        </div>
+        <span class="badge ${item.type}">
+          ${item.type === "clase" ? "Clase" : "Documento"}
+        </span>
+      </div>
+
+      <h3 class="item-title">${escapeHtml(item.title)}</h3>
+      <p class="item-desc">${escapeHtml(item.description)}</p>
+
+      <div class="item-meta">
+        <span class="meta-pill">
+          <i data-lucide="calendar-days" style="width:14px;height:14px;"></i>
+          ${formatDate(item.updatedAt)}
+        </span>
+
+        <span class="meta-pill">
+          <i data-lucide="${item.type === "clase" ? "monitor-play" : "files"}" style="width:14px;height:14px;"></i>
+          ${item.type === "clase" ? "Aula" : "Documento"}
+        </span>
+      </div>
+
+      <div class="item-footer">
+        <a class="open-link" href="${item.openUrl}">
+          ${item.type === "clase" ? "Abrir aula" : "Abrir documento"}
+        </a>
+
+        <div class="item-menu">
+          <button class="mini-btn" type="button" onclick="window.location.href='${item.openUrl}'">
+            Abrir
+          </button>
+        </div>
+      </div>
+    </article>
+  `).join("");
+
+  cardsGrid.innerHTML = createCardHtml + itemsHtml;
+  cardsGrid.classList.remove("hidden");
+  emptyState.classList.add("hidden");
+
+  totalCount.textContent = `${items.length} elemento${items.length === 1 ? "" : "s"}`;
+
+  const createCard = cardsGrid.querySelector('[data-create-empty="documento"]');
+  const createBtn = createCard?.querySelector(".mini-btn");
+
+  createCard?.addEventListener("click", () => {
+    createEmptyDocument();
+  });
+
+  createBtn?.addEventListener("click", (e) => {
+    e.stopPropagation();
+    createEmptyDocument();
+  });
+
+  lucide.createIcons();
+}
 
     function escapeHtml(text = "") {
       return String(text)
@@ -1181,20 +1278,27 @@ async function getCollectionItems(uid, name, fallbackType) {
         .replaceAll("'", "&#039;");
     }
 
-    function applyFilters() {
-      const filtered = allItems
-        .filter(item => currentFilter === "todos" ? true : item.type === currentFilter)
-        .filter(item => {
-          const q = currentSearch.trim().toLowerCase();
-          if (!q) return true;
-          return (
-            item.title.toLowerCase().includes(q) ||
-            item.description.toLowerCase().includes(q)
-          );
-        });
+function applyFilters() {
+  const filtered = allItems
+    .filter(item => currentFilter === "todos" ? true : item.type === currentFilter)
+    .filter(item => {
+      const q = currentSearch.trim().toLowerCase();
+      if (!q) return true;
+      return (
+        item.title.toLowerCase().includes(q) ||
+        item.description.toLowerCase().includes(q)
+      );
+    });
 
-      renderCards(filtered);
-    }
+  renderCards(filtered);
+
+  if (!filtered.length) {
+    emptyState.classList.remove("hidden");
+    emptyState.textContent = "Todavía no tenés documentos o clases creados.";
+  } else {
+    emptyState.classList.add("hidden");
+  }
+}
 
     async function loadUserContent(user) {
       loadingState.classList.remove("hidden");
