@@ -26,15 +26,21 @@
       --brand:#1fb8c9;
       --brand-dark:#1498a8;
       --brand-soft:#e9fbfd;
+      --brand-soft-2:#f3fdff;
 
       --active-bg:#eff0fa;
       --active-text:#167f9c;
 
-      --featured-bg:#fff5c9;
-      --featured-border:#f0d65f;
-      --featured-star:#ffd84d;
+      --featured-bg:#f7fdff;
+      --featured-border:#cfeef3;
+      --featured-shadow:0 12px 28px rgba(31, 184, 201, .10);
+
+      --star:#cfd6e6;
+      --star-active:#45bfd0;
 
       --shadow:0 10px 30px rgba(31, 42, 68, .07);
+      --shadow-soft:0 8px 22px rgba(25,35,68,.04);
+
       --radius-xl:26px;
       --radius-lg:20px;
       --radius-md:16px;
@@ -65,6 +71,12 @@
       font:inherit;
     }
 
+    button{
+      border:none;
+      background:none;
+      cursor:pointer;
+    }
+
     .app{
       min-height:100vh;
       display:grid;
@@ -82,7 +94,7 @@
       position:sticky;
       top:0;
       height:100vh;
-      z-index:20;
+      z-index:30;
     }
 
     .brand{
@@ -162,17 +174,6 @@
       flex-shrink:0;
     }
 
-    .nav-badge{
-      margin-left:auto;
-      font-size:.72rem;
-      font-weight:800;
-      color:white;
-      background:linear-gradient(90deg, #1fb8c9, #1876ff);
-      padding:5px 10px;
-      border-radius:999px;
-      line-height:1;
-    }
-
     .sidebar-footer{
       margin-top:auto;
       display:flex;
@@ -184,7 +185,6 @@
 
     .logout-btn{
       width:100%;
-      border:none;
       background:#f5f7fb;
       color:#48516b;
       padding:13px 14px;
@@ -194,7 +194,6 @@
       justify-content:center;
       gap:10px;
       font-weight:800;
-      cursor:pointer;
       transition:.2s ease;
     }
 
@@ -212,15 +211,15 @@
     .topbar{
       position:sticky;
       top:0;
-      z-index:15;
+      z-index:20;
       display:flex;
       align-items:center;
       justify-content:space-between;
       gap:16px;
       padding:18px 26px;
-      background:rgba(246,247,251,.85);
+      background:rgba(246,247,251,.88);
       backdrop-filter:blur(10px);
-      border-bottom:1px solid rgba(236,236,243,.7);
+      border-bottom:1px solid rgba(236,236,243,.75);
     }
 
     .topbar-left{
@@ -234,32 +233,64 @@
     .menu-btn{
       width:48px;
       height:48px;
-      border:none;
       background:white;
       border:1px solid var(--line);
       border-radius:16px;
       display:grid;
       place-items:center;
-      cursor:pointer;
       color:#667089;
+      box-shadow:var(--shadow);
+      flex-shrink:0;
+      transition:.2s ease;
+    }
+
+    .menu-btn:hover{
+      transform:translateY(-1px);
+      background:#fcfdff;
+    }
+
+    .search-wrap{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex:1;
+      max-width:820px;
+      min-width:0;
+    }
+
+    .search-icon-box{
+      width:50px;
+      height:50px;
+      border-radius:16px;
+      background:white;
+      border:1px solid var(--line);
+      display:grid;
+      place-items:center;
+      color:#69738d;
       box-shadow:var(--shadow);
       flex-shrink:0;
     }
 
-    .search-wrap{
-      position:relative;
-      flex:1;
-      max-width:760px;
+    .search-icon-box i{
+      width:20px;
+      height:20px;
     }
 
-    .search-wrap i{
+    .search-field{
+      position:relative;
+      flex:1;
+      min-width:0;
+    }
+
+    .search-field i{
       position:absolute;
       left:18px;
       top:50%;
       transform:translateY(-50%);
       width:18px;
       height:18px;
-      color:#9199ad;
+      color:#9aa2b5;
+      pointer-events:none;
     }
 
     .search-input{
@@ -273,6 +304,7 @@
       outline:none;
       font-weight:700;
       box-shadow:var(--shadow);
+      transition:border-color .2s ease, box-shadow .2s ease;
     }
 
     .search-input::placeholder{
@@ -280,42 +312,26 @@
       font-weight:700;
     }
 
+    .search-input:focus{
+      border-color:#c9eaf0;
+      box-shadow:0 10px 30px rgba(31,184,201,.10);
+    }
+
     .topbar-right{
       display:flex;
       align-items:center;
       gap:12px;
       flex-shrink:0;
-    }
-
-    .icon-btn{
-      width:48px;
-      height:48px;
-      border:none;
-      background:white;
-      border:1px solid var(--line);
-      border-radius:16px;
-      display:grid;
-      place-items:center;
-      cursor:pointer;
-      color:#6d7690;
-      box-shadow:var(--shadow);
       position:relative;
     }
 
-    .icon-btn .dot{
-      position:absolute;
-      top:11px;
-      right:11px;
-      width:8px;
-      height:8px;
-      border-radius:999px;
-      background:#ffbf47;
-      border:2px solid white;
+    .profile-wrap{
+      position:relative;
     }
 
-    .avatar{
-      width:48px;
-      height:48px;
+    .profile-trigger{
+      width:50px;
+      height:50px;
       border-radius:50%;
       border:3px solid #7ed5de;
       background:linear-gradient(180deg, #ffffff 0%, #eef5ff 100%);
@@ -325,6 +341,116 @@
       font-size:1rem;
       font-weight:900;
       box-shadow:var(--shadow);
+      transition:transform .2s ease, box-shadow .2s ease;
+    }
+
+    .profile-trigger:hover{
+      transform:translateY(-1px);
+      box-shadow:0 14px 32px rgba(31,42,68,.10);
+    }
+
+    .profile-menu{
+      position:absolute;
+      top:62px;
+      right:0;
+      width:260px;
+      background:white;
+      border:1px solid var(--line);
+      border-radius:20px;
+      box-shadow:0 20px 45px rgba(16, 28, 52, .12);
+      padding:12px;
+      display:none;
+      z-index:50;
+    }
+
+    .profile-menu.open{
+      display:block;
+      animation:fadeMenu .18s ease;
+    }
+
+    @keyframes fadeMenu{
+      from{
+        opacity:0;
+        transform:translateY(-6px);
+      }
+      to{
+        opacity:1;
+        transform:translateY(0);
+      }
+    }
+
+    .profile-head{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      padding:10px 10px 14px;
+      border-bottom:1px solid var(--line-soft);
+      margin-bottom:8px;
+    }
+
+    .profile-avatar{
+      width:44px;
+      height:44px;
+      border-radius:50%;
+      display:grid;
+      place-items:center;
+      background:linear-gradient(180deg, #dff9fc 0%, #eef5ff 100%);
+      color:#35405a;
+      font-weight:900;
+      border:2px solid #9fe2e8;
+      flex-shrink:0;
+    }
+
+    .profile-name{
+      font-weight:900;
+      color:#26304b;
+      line-height:1.1;
+    }
+
+    .profile-mail{
+      margin-top:3px;
+      font-size:.88rem;
+      color:#8a92a8;
+      font-weight:700;
+    }
+
+    .profile-links{
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+    }
+
+    .profile-link{
+      width:100%;
+      display:flex;
+      align-items:center;
+      gap:12px;
+      padding:12px 12px;
+      border-radius:14px;
+      color:#556079;
+      font-weight:800;
+      transition:.2s ease;
+      text-align:left;
+    }
+
+    .profile-link:hover{
+      background:#f7f9fc;
+      color:#24314b;
+    }
+
+    .profile-link.logout{
+      color:#b04f4f;
+    }
+
+    .profile-link.logout:hover{
+      background:#fff5f5;
+      color:#9c3f3f;
+    }
+
+    .profile-link i{
+      width:18px;
+      height:18px;
+      flex-shrink:0;
     }
 
     .content{
@@ -378,11 +504,11 @@
       border-radius:24px;
       padding:22px 22px 20px;
       min-height:245px;
-      box-shadow:0 8px 22px rgba(25,35,68,.04);
+      box-shadow:var(--shadow-soft);
       transition:transform .2s ease, box-shadow .2s ease, border-color .2s ease;
-      cursor:pointer;
       display:flex;
       flex-direction:column;
+      cursor:pointer;
     }
 
     .tool-card:hover{
@@ -393,8 +519,8 @@
 
     .tool-card.featured{
       background:var(--featured-bg);
-      border:2px solid var(--featured-border);
-      box-shadow:0 12px 28px rgba(227, 197, 63, .12);
+      border:1px solid var(--featured-border);
+      box-shadow:var(--featured-shadow);
     }
 
     .tool-top{
@@ -423,14 +549,15 @@
     }
 
     .star-btn{
-      border:none;
-      background:transparent;
-      color:#eadf97;
-      cursor:pointer;
-      padding:2px;
+      color:var(--star);
+      padding:4px;
       border-radius:12px;
       transition:.2s ease;
       flex-shrink:0;
+    }
+
+    .star-btn:hover{
+      transform:scale(1.06);
     }
 
     .star-btn i{
@@ -438,12 +565,8 @@
       height:18px;
     }
 
-    .tool-card.featured .star-btn{
-      color:var(--featured-star);
-    }
-
     .star-btn.active{
-      color:#ffd84d !important;
+      color:var(--star-active);
     }
 
     .tool-title{
@@ -475,8 +598,8 @@
       display:inline-flex;
       align-items:center;
       gap:8px;
-      background:rgba(255,255,255,.7);
-      border:1px solid rgba(255,255,255,.7);
+      background:rgba(255,255,255,.85);
+      border:1px solid #edf2f8;
       color:#677089;
       font-weight:800;
       padding:9px 12px;
@@ -507,14 +630,13 @@
       box-shadow:var(--shadow);
     }
 
-    /* responsive */
-    @media (max-width: 1280px){
+    @media (max-width:1280px){
       .tools-grid{
         grid-template-columns:repeat(3, minmax(0, 1fr));
       }
     }
 
-    @media (max-width: 980px){
+    @media (max-width:980px){
       .app{
         grid-template-columns:1fr;
       }
@@ -543,7 +665,7 @@
       }
     }
 
-    @media (max-width: 640px){
+    @media (max-width:640px){
       .topbar{
         padding:16px;
       }
@@ -569,11 +691,20 @@
         height:48px;
       }
 
-      .icon-btn,
+      .search-icon-box,
       .menu-btn,
-      .avatar{
+      .profile-trigger{
         width:44px;
         height:44px;
+      }
+
+      .search-wrap{
+        gap:8px;
+      }
+
+      .profile-menu{
+        right:-4px;
+        width:240px;
       }
     }
   </style>
@@ -613,7 +744,6 @@
         <a href="aula.html" class="nav-link">
           <i class="nav-icon" data-lucide="monitor-play"></i>
           <span>Aula</span>
-          <span class="nav-badge">Beta</span>
         </a>
 
         <a href="historial.html" class="nav-link">
@@ -639,23 +769,66 @@
           </button>
 
           <div class="search-wrap">
-            <i data-lucide="search"></i>
-            <input
-              id="searchInput"
-              class="search-input"
-              type="text"
-              placeholder="Buscar herramientas"
-            />
+            <div class="search-icon-box" aria-hidden="true">
+              <i data-lucide="search"></i>
+            </div>
+
+            <div class="search-field">
+              <i data-lucide="search"></i>
+              <input
+                id="searchInput"
+                class="search-input"
+                type="text"
+                placeholder="Buscar herramientas"
+              />
+            </div>
           </div>
         </div>
 
         <div class="topbar-right">
-          <button class="icon-btn" aria-label="Notificaciones">
-            <i data-lucide="bell"></i>
-            <span class="dot"></span>
-          </button>
+          <div class="profile-wrap">
+            <button
+              class="profile-trigger"
+              id="profileTrigger"
+              type="button"
+              aria-label="Abrir menú de cuenta"
+              aria-expanded="false"
+            >
+              S
+            </button>
 
-          <div class="avatar" title="Perfil">S</div>
+            <div class="profile-menu" id="profileMenu">
+              <div class="profile-head">
+                <div class="profile-avatar">S</div>
+                <div>
+                  <div class="profile-name">Simón</div>
+                  <div class="profile-mail">simon@eduvia.app</div>
+                </div>
+              </div>
+
+              <div class="profile-links">
+                <a href="cuenta.html" class="profile-link">
+                  <i data-lucide="user-round"></i>
+                  <span>Mi cuenta</span>
+                </a>
+
+                <a href="plan.html" class="profile-link">
+                  <i data-lucide="badge-check"></i>
+                  <span>Mi plan</span>
+                </a>
+
+                <a href="configuracion.html" class="profile-link">
+                  <i data-lucide="settings-2"></i>
+                  <span>Configuración</span>
+                </a>
+
+                <button class="profile-link logout" id="profileLogoutBtn" type="button">
+                  <i data-lucide="log-out"></i>
+                  <span>Cerrar sesión</span>
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </header>
 
@@ -855,11 +1028,13 @@
     const sidebar = document.getElementById("sidebar");
     const menuBtn = document.getElementById("menuBtn");
     const searchInput = document.getElementById("searchInput");
-    const toolsGrid = document.getElementById("toolsGrid");
     const cards = [...document.querySelectorAll(".tool-card")];
     const emptyState = document.getElementById("emptyState");
     const toolCount = document.getElementById("toolCount");
     const logoutBtn = document.getElementById("logoutBtn");
+    const profileLogoutBtn = document.getElementById("profileLogoutBtn");
+    const profileTrigger = document.getElementById("profileTrigger");
+    const profileMenu = document.getElementById("profileMenu");
 
     menuBtn.addEventListener("click", () => {
       sidebar.classList.toggle("open");
@@ -868,10 +1043,22 @@
     document.addEventListener("click", (e) => {
       const clickedInsideSidebar = sidebar.contains(e.target);
       const clickedMenu = menuBtn.contains(e.target);
+      const clickedProfile = profileTrigger.contains(e.target) || profileMenu.contains(e.target);
 
       if (window.innerWidth <= 980 && !clickedInsideSidebar && !clickedMenu) {
         sidebar.classList.remove("open");
       }
+
+      if (!clickedProfile) {
+        profileMenu.classList.remove("open");
+        profileTrigger.setAttribute("aria-expanded", "false");
+      }
+    });
+
+    profileTrigger.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const isOpen = profileMenu.classList.toggle("open");
+      profileTrigger.setAttribute("aria-expanded", String(isOpen));
     });
 
     searchInput.addEventListener("input", () => {
@@ -905,9 +1092,12 @@
       });
     });
 
-    logoutBtn.addEventListener("click", () => {
+    function cerrarSesion() {
       window.location.href = "login.html";
-    });
+    }
+
+    logoutBtn.addEventListener("click", cerrarSesion);
+    profileLogoutBtn.addEventListener("click", cerrarSesion);
   </script>
 </body>
 </html>
