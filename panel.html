@@ -31,20 +31,11 @@
       --active-bg:#eff0fa;
       --active-text:#167f9c;
 
-      --featured-bg:#f7fdff;
-      --featured-border:#cfeef3;
-      --featured-shadow:0 12px 28px rgba(31, 184, 201, .10);
-
       --danger:#b04f4f;
       --danger-soft:#fff5f5;
 
       --shadow:0 10px 30px rgba(31, 42, 68, .07);
       --shadow-soft:0 8px 22px rgba(25,35,68,.04);
-
-      --radius-xl:26px;
-      --radius-lg:20px;
-      --radius-md:16px;
-      --radius-sm:12px;
     }
 
     *{
@@ -219,7 +210,7 @@
       z-index:20;
       display:flex;
       align-items:center;
-      justify-content:space-between;
+      justify-content:flex-end;
       gap:16px;
       padding:18px 26px;
       background:rgba(246,247,251,.88);
@@ -800,18 +791,22 @@
       }
 
       .sidebar{
-        position:fixed;
-        left:0;
-        top:0;
-        bottom:0;
-        width:280px;
-        transform:translateX(-100%);
-        transition:transform .25s ease;
-        box-shadow:0 20px 50px rgba(18,27,52,.18);
+        position:relative;
+        top:auto;
+        height:auto;
+        border-right:none;
+        border-bottom:1px solid var(--line);
+        box-shadow:none;
       }
 
-      .sidebar.open{
-        transform:translateX(0);
+      .nav{
+        display:grid;
+        grid-template-columns:1fr 1fr;
+        gap:10px;
+      }
+
+      .nav-link.active::before{
+        display:none;
       }
 
       .section-title{
@@ -843,9 +838,9 @@
       }
 
       .profile-trigger{
-  width:44px;
-  height:44px;
-}
+        width:44px;
+        height:44px;
+      }
 
       .profile-menu{
         right:-4px;
@@ -855,6 +850,10 @@
       .recent-item{
         flex-direction:column;
         align-items:flex-start;
+      }
+
+      .nav{
+        grid-template-columns:1fr;
       }
     }
   </style>
@@ -910,55 +909,54 @@
     </aside>
 
     <main class="main">
-<header class="topbar">
-  <div></div>
+      <header class="topbar">
+        <div class="topbar-right">
+          <div class="profile-wrap">
+            <button
+              class="profile-trigger"
+              id="profileTrigger"
+              type="button"
+              aria-label="Abrir menú de cuenta"
+              aria-expanded="false"
+            >
+              <span id="topbarInitial">U</span>
+            </button>
 
-  <div class="topbar-right">
-    <div class="profile-wrap">
-      <button
-        class="profile-trigger"
-        id="profileTrigger"
-        type="button"
-        aria-label="Abrir menú de cuenta"
-        aria-expanded="false"
-      >
-        <span id="topbarInitial">U</span>
-      </button>
+            <div class="profile-menu" id="profileMenu">
+              <div class="profile-head">
+                <div class="profile-avatar" id="menuAvatar">U</div>
+                <div>
+                  <div class="profile-name" id="menuUserName">Usuario</div>
+                  <div class="profile-mail" id="menuUserEmail">Cargando...</div>
+                </div>
+              </div>
 
-      <div class="profile-menu" id="profileMenu">
-        <div class="profile-head">
-          <div class="profile-avatar" id="menuAvatar">U</div>
-          <div>
-            <div class="profile-name" id="menuUserName">Usuario</div>
-            <div class="profile-mail" id="menuUserEmail">Cargando...</div>
+              <div class="profile-links">
+                <a href="cuenta.html" class="profile-link">
+                  <i data-lucide="user-round"></i>
+                  <span>Mi cuenta</span>
+                </a>
+
+                <a href="plan.html" class="profile-link">
+                  <i data-lucide="badge-check"></i>
+                  <span>Mi plan</span>
+                </a>
+
+                <a href="configuracion.html" class="profile-link">
+                  <i data-lucide="settings-2"></i>
+                  <span>Configuración</span>
+                </a>
+
+                <button class="profile-link logout" id="profileLogoutBtn" type="button">
+                  <i data-lucide="log-out"></i>
+                  <span>Cerrar sesión</span>
+                </button>
+              </div>
+            </div>
           </div>
         </div>
+      </header>
 
-        <div class="profile-links">
-          <a href="cuenta.html" class="profile-link">
-            <i data-lucide="user-round"></i>
-            <span>Mi cuenta</span>
-          </a>
-
-          <a href="plan.html" class="profile-link">
-            <i data-lucide="badge-check"></i>
-            <span>Mi plan</span>
-          </a>
-
-          <a href="configuracion.html" class="profile-link">
-            <i data-lucide="settings-2"></i>
-            <span>Configuración</span>
-          </a>
-
-          <button class="profile-link logout" id="profileLogoutBtn" type="button">
-            <i data-lucide="log-out"></i>
-            <span>Cerrar sesión</span>
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-</header>
       <section class="content">
         <div class="section-head">
           <div>
@@ -1132,7 +1130,6 @@
 
     const $ = (id) => document.getElementById(id);
 
-    const sidebar = $("sidebar");
     const profileTrigger = $("profileTrigger");
     const profileMenu = $("profileMenu");
     const logoutBtn = $("logoutBtn");
@@ -1279,10 +1276,6 @@
       return "Clase sin título";
     }
 
-    function getItemTitle(item, type) {
-      return type === "doc" ? getDocumentTitle(item) : getClassTitle(item);
-    }
-
     function getItemDate(item = {}) {
       return (
         item.actualizadoEn ||
@@ -1300,27 +1293,12 @@
         : `mis-clases.html?id=${encodeURIComponent(item.id)}`;
     }
 
-    function filterItems(items = [], type = "doc", query = "") {
-      const q = String(query || "").trim().toLowerCase();
-      if (!q) return items;
-
-      return items.filter((item) => {
-        const title = getItemTitle(item, type).toLowerCase();
-        const text =
-          type === "doc"
-            ? String(item.contenido || "").toLowerCase()
-            : `${String(item.contenido || "").toLowerCase()} ${String(stripHtml(item.contenidoHtml || "")).toLowerCase()}`;
-
-        return title.includes(q) || text.includes(q);
-      });
-    }
-
-    function renderRecentItems({ items, listEl, emptyEl, type, query = "" }) {
+    function renderRecentItems({ items, listEl, emptyEl, type }) {
       if (!listEl || !emptyEl) return;
 
-      const filtered = filterItems(items, type, query).slice(0, 4);
+      const visibleItems = items.slice(0, 4);
 
-      if (!filtered.length) {
+      if (!visibleItems.length) {
         listEl.innerHTML = "";
         listEl.classList.add("hidden");
         emptyEl.classList.remove("hidden");
@@ -1330,8 +1308,8 @@
       emptyEl.classList.add("hidden");
       listEl.classList.remove("hidden");
 
-      listEl.innerHTML = filtered.map((item) => {
-        const title = getItemTitle(item, type);
+      listEl.innerHTML = visibleItems.map((item) => {
+        const title = type === "doc" ? getDocumentTitle(item) : getClassTitle(item);
         const date = formatDate(getItemDate(item));
         const href = getItemHref(item, type);
 
@@ -1369,43 +1347,30 @@
       setText("menuUserEmail", email || "Sin email");
     }
 
-    function updatePanelMeta(query = "") {
-      const docsFiltered = filterItems(state.docs, "doc", query).length;
-      const classesFiltered = filterItems(state.classes, "class", query).length;
+    function updatePanelMeta() {
       const total = state.docs.length + state.classes.length;
-      const visible = docsFiltered + classesFiltered;
-
-      if (query.trim()) {
-        setText(
-          "panelMeta",
-          `${visible} resultado${visible === 1 ? "" : "s"} encontrado${visible === 1 ? "" : "s"}`
-        );
-      } else {
-        setText(
-          "panelMeta",
-          `${total} elemento${total === 1 ? "" : "s"} guardado${total === 1 ? "" : "s"}`
-        );
-      }
+      setText(
+        "panelMeta",
+        `${total} elemento${total === 1 ? "" : "s"} guardado${total === 1 ? "" : "s"}`
+      );
     }
 
-    function renderAll(query = "") {
+    function renderAll() {
       renderRecentItems({
         items: state.docs,
         listEl: $("docsRecentList"),
         emptyEl: $("docsEmptyState"),
-        type: "doc",
-        query
+        type: "doc"
       });
 
       renderRecentItems({
         items: state.classes,
         listEl: $("classesRecentList"),
         emptyEl: $("classesEmptyState"),
-        type: "class",
-        query
+        type: "class"
       });
 
-      updatePanelMeta(query);
+      updatePanelMeta();
     }
 
     async function loadPanel(user) {
@@ -1474,7 +1439,7 @@
         $("lastClassLink").innerHTML = `<span>Ver clases</span><i data-lucide="arrow-right"></i>`;
       }
 
-      renderAll("");
+      renderAll();
       createIcons();
     }
 
@@ -1489,7 +1454,6 @@
       }
     }
 
-
     if (profileTrigger && profileMenu) {
       profileTrigger.addEventListener("click", (e) => {
         e.stopPropagation();
@@ -1499,18 +1463,13 @@
     }
 
     document.addEventListener("click", (e) => {
-  const clickedProfile =
-    profileTrigger?.contains(e.target) || profileMenu?.contains(e.target);
+      const clickedProfile =
+        profileTrigger?.contains(e.target) || profileMenu?.contains(e.target);
 
-  if (!clickedProfile) {
-    profileMenu?.classList.remove("open");
-    profileTrigger?.setAttribute("aria-expanded", "false");
-  }
-});
-
-
-    searchInput?.addEventListener("input", () => {
-      renderAll(searchInput.value || "");
+      if (!clickedProfile) {
+        profileMenu?.classList.remove("open");
+        profileTrigger?.setAttribute("aria-expanded", "false");
+      }
     });
 
     logoutBtn?.addEventListener("click", () => handleLogout(logoutBtn));
