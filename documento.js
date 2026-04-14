@@ -49,6 +49,9 @@ const normalizeEmail = (email = "") => txt(email).toLowerCase();
 const normalizeRole = (role = "") => (role === "editor" ? "editor" : "viewer");
 const emailToKey = (email = "") => normalizeEmail(email).replace(/[^a-z0-9]/gi, "_");
 
+const DOCUMENTOS_COLLECTION = "documentos";
+const sourceParam = params.get("source") || "clases";
+
 const toArray = (value) => (Array.isArray(value) ? value : []);
 
 const localDocKey = (ownerUid, claseId) =>
@@ -462,29 +465,19 @@ function replaceNodeToClearListeners(node) {
 function readClaseFromLocalStorage(ownerUid, claseId) {
   try {
     const specific = localStorage.getItem(localDocKey(ownerUid, claseId));
-    if (specific) {
-      const parsed = safeJsonParse(specific, null);
-      if (parsed && typeof parsed === "object") return parsed;
-    }
+    if (!specific) return null;
 
-    const legacy = localStorage.getItem("claseActual");
-    if (legacy) {
-      const parsed = safeJsonParse(legacy, null);
-      if (parsed && typeof parsed === "object") return parsed;
-    }
+    const parsed = safeJsonParse(specific, null);
+    return parsed && typeof parsed === "object" ? parsed : null;
   } catch {
-    // no-op
+    return null;
   }
-
-  return null;
 }
 
 function writeClaseToLocalStorage(clase, ownerUid, claseId) {
   try {
     if (!clase || !ownerUid || !claseId) return;
-    const value = JSON.stringify(clase);
-    localStorage.setItem(localDocKey(ownerUid, claseId), value);
-    localStorage.setItem("claseActual", value);
+    localStorage.setItem(localDocKey(ownerUid, claseId), JSON.stringify(clase));
   } catch {
     // no-op
   }
@@ -1651,7 +1644,6 @@ async function generarDocumentoSiFalta(clase = {}) {
 /* =========================
    LOAD DOC
 ========================= */
-
 async function resolveClaseFromFirestoreOrLocal(user) {
   const fallbackOwner = state.currentOwnerUid || user.uid;
   const localClase = readClaseFromLocalStorage(fallbackOwner, state.currentClaseId);
@@ -1663,62 +1655,45 @@ async function resolveClaseFromFirestoreOrLocal(user) {
     if (localClase) {
       state.currentClaseData = localClase;
       state.currentRole = state.currentOwnerUid === user.uid ? "owner" : "viewer";
-      state.currentClaseRef = doc(db, "usuarios", state.currentOwnerUid, "clases", localClase.id);
-
-      if (state.currentRole === "owner") clearSharedDocSession();
-      else setSharedDocSession(state.currentRole, user, state.currentOwnerUid, localClase.id);
-
       return { clase: localClase, origin: "local" };
     }
-
-    throw new Error("No se encontró el identificador de la clase.");
+    throw new Error("No se encontró el identificador del documento.");
   }
 
-  const claseRef = doc(db, "usuarios", state.currentOwnerUid, "clases", state.currentClaseId);
+  const refs = sourceParam === "documentos"
+    ? [
+        doc(db, "usuarios", state.currentOwnerUid, DOCUMENTOS_COLLECTION, state.currentClaseId),
+        doc(db, "usuarios", state.currentOwnerUid, "clases", state.currentClaseId),
+      ]
+    : [
+        doc(db, "usuarios", state.currentOwnerUid, "clases", state.currentClaseId),
+        doc(db, "usuarios", state.currentOwnerUid, DOCUMENTOS_COLLECTION, state.currentClaseId),
+      ];
 
-  try {
-    const snap = await getDoc(claseRef);
+  for (const ref of refs) {
+    const snap = await getDoc(ref);
+    if (!snap.exists()) continue;
 
-    if (!snap.exists()) {
-      if (!localClase) throw new Error("La clase no existe o no se pudo encontrar en Firestore.");
-
-      state.currentClaseRef = claseRef;
-      state.currentClaseData = localClase;
-      state.currentRole = state.currentOwnerUid === user.uid ? "owner" : "viewer";
-
-      if (state.currentRole === "owner") clearSharedDocSession();
-      else setSharedDocSession(state.currentRole, user, state.currentOwnerUid, state.currentClaseId);
-
-      return { clase: localClase, origin: "local" };
-    }
-
-    const claseData = {
+    const data = {
       id: snap.id,
       ownerUid: state.currentOwnerUid,
       ...snap.data(),
     };
 
-    const role = resolveUserRole(claseData, user, state.currentOwnerUid);
-    if (!role) return { denied: true };
-
-    state.currentClaseRef = claseRef;
-    state.currentClaseData = claseData;
-    state.currentRole = role;
-    setSharedDocSession(role, user, state.currentOwnerUid, state.currentClaseId);
-
-    return { clase: claseData, origin: "firestore" };
-  } catch (error) {
-    if (!localClase) throw error;
-
-    state.currentClaseRef = claseRef;
-    state.currentClaseData = localClase;
+    state.currentClaseRef = ref;
+    state.currentClaseData = data;
     state.currentRole = state.currentOwnerUid === user.uid ? "owner" : "viewer";
 
-    if (state.currentRole === "owner") clearSharedDocSession();
-    else setSharedDocSession(state.currentRole, user, state.currentOwnerUid, state.currentClaseId);
+    return { clase: data, origin: "firestore" };
+  }
 
+  if (localClase) {
+    state.currentClaseData = localClase;
+    state.currentRole = state.currentOwnerUid === user.uid ? "owner" : "viewer";
     return { clase: localClase, origin: "local" };
   }
+
+  throw new Error("No se encontró el documento en Firestore.");
 }
 
 async function loadClase(user) {
