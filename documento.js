@@ -1307,9 +1307,17 @@ function bindAutosave() {
 
 function getShareUrl() {
   if (!state.currentClaseId || !state.currentOwnerUid) return window.location.href;
+
   const url = new URL(window.location.href);
   url.searchParams.set("id", state.currentClaseId);
   url.searchParams.set("owner", state.currentOwnerUid);
+
+  if (state.currentClaseRef?.path?.includes("/documentos/")) {
+    url.searchParams.set("source", "documentos");
+  } else {
+    url.searchParams.delete("source");
+  }
+
   return url.toString();
 }
 
@@ -1655,8 +1663,13 @@ async function resolveClaseFromFirestoreOrLocal(user) {
     if (localClase) {
       state.currentClaseData = localClase;
       state.currentRole = state.currentOwnerUid === user.uid ? "owner" : "viewer";
-      state.currentClaseRef = doc(db, "usuarios", state.currentOwnerUid, "clases", localClase.id);
-
+state.currentClaseRef = doc(
+  db,
+  "usuarios",
+  state.currentOwnerUid,
+  sourceParam === "documentos" ? DOCUMENTOS_COLLECTION : "clases",
+  localClase.id
+);
       if (state.currentRole === "owner") clearSharedDocSession();
       else setSharedDocSession(state.currentRole, user, state.currentOwnerUid, localClase.id);
 
@@ -1707,8 +1720,6 @@ async function resolveClaseFromFirestoreOrLocal(user) {
   if (localClase) {
     state.currentClaseData = localClase;
     state.currentRole = state.currentOwnerUid === user.uid ? "owner" : "viewer";
-    state.currentClaseRef = doc(db, "usuarios", state.currentOwnerUid, "clases", localClase.id);
-
     if (state.currentRole === "owner") clearSharedDocSession();
     else setSharedDocSession(state.currentRole, user, state.currentOwnerUid, localClase.id);
 
