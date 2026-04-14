@@ -1660,21 +1660,22 @@ async function resolveClaseFromFirestoreOrLocal(user) {
   if (!state.currentOwnerUid) state.currentOwnerUid = localClase?.ownerUid || user.uid;
 
   if (!state.currentClaseId) {
-    if (localClase) {
-      state.currentClaseData = localClase;
-      state.currentRole = state.currentOwnerUid === user.uid ? "owner" : "viewer";
-state.currentClaseRef = doc(
-  db,
-  "usuarios",
-  state.currentOwnerUid,
-  sourceParam === "documentos" ? DOCUMENTOS_COLLECTION : "clases",
-  localClase.id
-);
-      if (state.currentRole === "owner") clearSharedDocSession();
-      else setSharedDocSession(state.currentRole, user, state.currentOwnerUid, localClase.id);
+  if (localClase) {
+  state.currentClaseData = localClase;
+  state.currentRole = state.currentOwnerUid === user.uid ? "owner" : "viewer";
+  state.currentClaseRef = doc(
+    db,
+    "usuarios",
+    state.currentOwnerUid,
+    sourceParam === "documentos" ? DOCUMENTOS_COLLECTION : "clases",
+    localClase.id
+  );
 
-      return { clase: localClase, origin: "local" };
-    }
+  if (state.currentRole === "owner") clearSharedDocSession();
+  else setSharedDocSession(state.currentRole, user, state.currentOwnerUid, localClase.id);
+
+  return { clase: localClase, origin: "local" };
+}
 
     throw new Error("No se encontró el identificador del documento.");
   }
