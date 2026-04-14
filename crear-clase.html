@@ -8,43 +8,38 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&display=swap"
     rel="stylesheet"
   />
 
   <style>
     :root{
-      --bg:#f4f7f8;
-      --bg-2:#edf3f5;
+      --bg:#f6f7fb;
+      --sidebar:#ffffff;
       --surface:#ffffff;
-      --surface-soft:#f8fbfc;
-      --surface-tint:#f5fafb;
-      --line:#dbe5e8;
-      --line-strong:#c9d8dd;
+      --surface-soft:#fbfcff;
+      --line:#ececf3;
+      --line-soft:#f2f3f8;
+      --text:#20243a;
+      --muted:#7a8198;
+      --muted-2:#98a1b5;
 
-      --text:#17212b;
-      --muted:#637381;
-      --muted-2:#8c9aa7;
+      --brand:#1fb8c9;
+      --brand-dark:#1498a8;
+      --brand-soft:#e9fbfd;
 
-      --teal:#11a9c4;
-      --teal-strong:#0f95ae;
-      --teal-soft:#dff7fb;
-      --teal-active:#c9f1f7;
+      --active-bg:#eff0fa;
+      --active-text:#167f9c;
 
-      --sidebar:#eef3f4;
-      --sidebar-deep:#e7eef0;
-      --sidebar-border:#d6e1e5;
+      --shadow:0 10px 30px rgba(31, 42, 68, .07);
+      --shadow-soft:0 8px 22px rgba(25,35,68,.04);
+      --shadow-lg:0 18px 42px rgba(23, 31, 52, .08);
 
-      --shadow:0 28px 70px rgba(20, 31, 41, 0.10);
-      --shadow-soft:0 16px 34px rgba(20, 31, 41, 0.07);
-      --shadow-card:0 14px 34px rgba(20, 31, 41, 0.06);
-      --shadow-premium:0 18px 46px rgba(17,169,196,.12);
+      --radius-xl:28px;
+      --radius-lg:22px;
+      --radius-md:16px;
 
-      --radius-xl:32px;
-      --radius-lg:24px;
-      --radius-md:18px;
-
-      --sidebar-width:252px;
+      --sidebar-width:280px;
     }
 
     *{
@@ -53,19 +48,34 @@
       padding:0;
     }
 
-    html{
-      scroll-behavior:smooth;
+    html, body{
+      width:100%;
+      min-height:100%;
+      font-family:"Nunito", system-ui, sans-serif;
+      background:var(--bg);
+      color:var(--text);
     }
 
     body{
-      font-family:"Inter",sans-serif;
-      color:var(--text);
-      background:
-        radial-gradient(circle at top left, rgba(17,169,196,.10), transparent 20%),
-        radial-gradient(circle at bottom right, rgba(17,169,196,.07), transparent 22%),
-        linear-gradient(180deg, #f5f8f9 0%, #edf3f5 100%);
-      min-height:100vh;
       overflow:hidden;
+    }
+
+    a{
+      color:inherit;
+      text-decoration:none;
+    }
+
+    button,
+    input,
+    select,
+    textarea{
+      font:inherit;
+    }
+
+    button{
+      border:none;
+      background:none;
+      cursor:pointer;
     }
 
     .app{
@@ -74,293 +84,489 @@
       grid-template-columns:var(--sidebar-width) 1fr;
     }
 
+    /* SIDEBAR */
     .sidebar{
+      background:var(--sidebar);
+      border-right:1px solid var(--line);
+      padding:26px 18px 18px;
+      display:flex;
+      flex-direction:column;
+      gap:22px;
       position:sticky;
       top:0;
       height:100vh;
-      background:
-        linear-gradient(180deg, rgba(255,255,255,.4), rgba(255,255,255,0)),
-        linear-gradient(180deg, var(--sidebar) 0%, var(--sidebar-deep) 100%);
-      border-right:1px solid var(--sidebar-border);
-      padding:22px 16px 18px;
-      display:flex;
-      flex-direction:column;
-      gap:18px;
-      box-shadow:inset -1px 0 0 rgba(255,255,255,.55);
+      z-index:30;
     }
 
     .brand{
       display:flex;
       align-items:center;
       gap:12px;
-      padding:2px 10px 18px;
-      border-bottom:1px solid rgba(214,225,229,.9);
+      padding:4px 8px 8px;
     }
 
-    .brand-mark{
-      width:44px;
-      height:44px;
-      border-radius:15px;
+    .brand-badge{
+      width:42px;
+      height:42px;
+      border-radius:14px;
       display:grid;
       place-items:center;
-      background:linear-gradient(135deg, var(--teal), var(--teal-strong));
-      color:#fff;
-      font-family:"Sora",sans-serif;
-      font-size:1rem;
-      font-weight:800;
-      letter-spacing:-.04em;
-      box-shadow:0 10px 20px rgba(17,169,196,.24);
-      flex:none;
+      background:linear-gradient(180deg, #87e8ef 0%, #1fb8c9 100%);
+      color:white;
+      box-shadow:0 10px 20px rgba(31,184,201,.18);
+      flex-shrink:0;
+    }
+
+    .brand-text{
+      display:flex;
+      flex-direction:column;
+      line-height:1;
     }
 
     .brand-text strong{
-      display:block;
-      font-family:"Sora",sans-serif;
-      font-size:1rem;
-      line-height:1.05;
-      letter-spacing:-.03em;
-      color:var(--text);
+      font-size:2rem;
+      font-weight:800;
+      letter-spacing:-0.03em;
+      background:linear-gradient(90deg, #31d2d8 0%, #5f8cff 100%);
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+      background-clip:text;
     }
 
     .brand-text span{
-      display:block;
-      margin-top:3px;
+      margin-top:4px;
       font-size:.82rem;
-      color:var(--muted);
+      font-weight:800;
+      color:#8c93a8;
+      letter-spacing:.02em;
     }
 
-    .menu{
+    .nav{
       display:flex;
       flex-direction:column;
-      gap:7px;
-      padding-top:2px;
+      gap:8px;
+      margin-top:8px;
     }
 
-    .menu a,
-    .menu button{
+    .nav-link,
+    .nav button{
       width:100%;
-      border:none;
-      background:transparent;
-      text-decoration:none;
-      text-align:left;
-      color:#4e606d;
-      font-family:inherit;
-      font-size:.95rem;
-      font-weight:700;
-      padding:12px 14px 12px 16px;
+      display:flex;
+      align-items:center;
+      gap:14px;
+      padding:14px 16px;
       border-radius:16px;
-      cursor:pointer;
-      transition:.18s ease;
+      color:#6f778e;
+      font-weight:700;
+      transition:.2s ease;
       position:relative;
+      text-align:left;
     }
 
-    .menu a:hover,
-    .menu button:hover{
-      background:rgba(255,255,255,.58);
-      color:var(--text);
-      transform:translateX(2px);
+    .nav-link:hover,
+    .nav button:hover{
+      background:#f7f8fc;
+      color:#374056;
     }
 
-    .menu a.active{
-      background:linear-gradient(180deg, rgba(255,255,255,.76), rgba(255,255,255,.54)), var(--teal-soft);
-      color:#0e778c;
-      box-shadow:0 10px 20px rgba(17,169,196,.10);
+    .nav-link.active{
+      background:var(--active-bg);
+      color:var(--active-text);
     }
 
-    .menu a.active::before{
+    .nav-link.active::before{
       content:"";
       position:absolute;
-      left:0;
+      left:-18px;
       top:10px;
       bottom:10px;
-      width:4px;
+      width:6px;
       border-radius:999px;
-      background:linear-gradient(180deg, var(--teal), #62d2e6);
-      box-shadow:0 0 14px rgba(17,169,196,.28);
+      background:var(--brand);
     }
 
-    .sidebar-note{
+    .nav-icon{
+      width:18px;
+      height:18px;
+      opacity:.9;
+      flex-shrink:0;
+    }
+
+    .sidebar-tip{
       margin-top:auto;
+      background:#f9fbff;
+      border:1px solid var(--line);
+      border-radius:20px;
       padding:16px;
-      border-radius:22px;
-      background:linear-gradient(180deg, rgba(255,255,255,.94), rgba(255,255,255,.78));
-      border:1px solid rgba(214,225,229,.92);
       box-shadow:var(--shadow-soft);
     }
 
-    .sidebar-note strong{
+    .sidebar-tip strong{
       display:block;
-      font-size:.9rem;
+      color:#26304b;
+      font-size:.95rem;
       margin-bottom:6px;
-      color:var(--text);
     }
 
-    .sidebar-note p{
-      font-size:.84rem;
-      line-height:1.58;
+    .sidebar-tip p{
       color:var(--muted);
+      font-size:.9rem;
+      line-height:1.55;
+      font-weight:700;
     }
 
+    .sidebar-footer{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      padding-top:14px;
+      border-top:1px solid var(--line-soft);
+    }
+
+    .logout-btn{
+      width:100%;
+      background:#f5f7fb;
+      color:#48516b;
+      padding:13px 14px;
+      border-radius:14px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      font-weight:800;
+      transition:.2s ease;
+    }
+
+    .logout-btn:hover{
+      background:#eef2f8;
+    }
+
+    /* MAIN */
     .main{
-      padding:18px 22px 18px 18px;
       min-width:0;
+      display:flex;
+      flex-direction:column;
       height:100vh;
     }
 
-    .page{
-      max-width:1380px;
-      margin:0 auto;
-      display:grid;
-      gap:0;
-      height:calc(100dvh - 36px);
+    .topbar{
+      position:sticky;
+      top:0;
+      z-index:20;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:18px;
+      padding:18px 26px;
+      background:rgba(246,247,251,.88);
+      backdrop-filter:blur(10px);
+      border-bottom:1px solid rgba(236,236,243,.75);
     }
 
-    .editor-shell{
-      width:100%;
-      max-width:none;
-      background:linear-gradient(180deg, rgba(255,255,255,.99) 0%, #ffffff 100%);
-      border:1px solid rgba(219,229,232,.98);
-      border-radius:var(--radius-xl);
+    .topbar-left{
+      display:flex;
+      align-items:center;
+      gap:14px;
+      min-width:0;
+    }
+
+    .menu-btn{
+      display:none;
+      width:48px;
+      height:48px;
+      background:white;
+      border:1px solid var(--line);
+      border-radius:16px;
+      place-items:center;
+      color:#667089;
       box-shadow:var(--shadow);
-      overflow:hidden;
+      flex-shrink:0;
+      transition:.2s ease;
+    }
+
+    .menu-btn:hover{
+      transform:translateY(-1px);
+      background:#fcfdff;
+    }
+
+    .topbar-copy h1{
+      font-size:1.55rem;
+      font-weight:900;
+      letter-spacing:-.03em;
+      color:#232843;
+      line-height:1;
+    }
+
+    .topbar-copy p{
+      margin-top:4px;
+      color:var(--muted);
+      font-weight:700;
+      font-size:.95rem;
+    }
+
+    .topbar-right{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      flex-shrink:0;
+    }
+
+    .profile-wrap{
+      position:relative;
+    }
+
+    .profile-trigger{
+      width:56px;
+      height:56px;
+      border-radius:50%;
+      border:3px solid #7ed5de;
+      background:linear-gradient(180deg, #ffffff 0%, #eef5ff 100%);
+      display:grid;
+      place-items:center;
+      color:#4b5671;
+      font-size:1rem;
+      font-weight:900;
+      box-shadow:var(--shadow);
+      transition:transform .2s ease, box-shadow .2s ease;
+    }
+
+    .profile-trigger:hover{
+      transform:translateY(-1px);
+      box-shadow:0 14px 32px rgba(31,42,68,.10);
+    }
+
+    .profile-menu{
+      position:absolute;
+      top:66px;
+      right:0;
+      width:260px;
+      background:white;
+      border:1px solid var(--line);
+      border-radius:20px;
+      box-shadow:0 20px 45px rgba(16, 28, 52, .12);
+      padding:12px;
+      display:none;
+      z-index:50;
+    }
+
+    .profile-menu.open{
+      display:block;
+      animation:fadeMenu .18s ease;
+    }
+
+    @keyframes fadeMenu{
+      from{
+        opacity:0;
+        transform:translateY(-6px);
+      }
+      to{
+        opacity:1;
+        transform:translateY(0);
+      }
+    }
+
+    .profile-head{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      padding:10px 10px 14px;
+      border-bottom:1px solid var(--line-soft);
+      margin-bottom:8px;
+    }
+
+    .profile-avatar{
+      width:44px;
+      height:44px;
+      border-radius:50%;
+      display:grid;
+      place-items:center;
+      background:linear-gradient(180deg, #dff9fc 0%, #eef5ff 100%);
+      color:#35405a;
+      font-weight:900;
+      border:2px solid #9fe2e8;
+      flex-shrink:0;
+    }
+
+    .profile-name{
+      font-weight:900;
+      color:#26304b;
+      line-height:1.1;
+    }
+
+    .profile-mail{
+      margin-top:3px;
+      font-size:.88rem;
+      color:#8a92a8;
+      font-weight:700;
+      word-break:break-word;
+    }
+
+    .profile-links{
       display:flex;
       flex-direction:column;
+      gap:4px;
+    }
+
+    .profile-link{
+      width:100%;
+      display:flex;
+      align-items:center;
+      gap:12px;
+      padding:12px 12px;
+      border-radius:14px;
+      color:#556079;
+      font-weight:800;
+      transition:.2s ease;
+      text-align:left;
+    }
+
+    .profile-link:hover{
+      background:#f7f9fc;
+      color:#24314b;
+    }
+
+    .profile-link.logout{
+      color:#b04f4f;
+    }
+
+    .profile-link.logout:hover{
+      background:#fff5f5;
+      color:#9c3f3f;
+    }
+
+    .profile-link i{
+      width:18px;
+      height:18px;
+      flex-shrink:0;
+    }
+
+    .content{
+      flex:1;
+      min-height:0;
+      padding:24px 26px 28px;
+      overflow:hidden;
+    }
+
+    .page{
       height:100%;
       min-height:0;
-      position:relative;
-      isolation:isolate;
     }
 
-    .editor-shell::before{
-      content:"";
-      position:absolute;
-      inset:0 0 auto 0;
-      height:150px;
-      background:linear-gradient(180deg, rgba(17,169,196,.07), transparent);
-      pointer-events:none;
-      z-index:0;
-    }
-
-    .editor-shell::after{
-      content:"";
-      position:absolute;
-      top:0;
-      left:24px;
-      right:24px;
-      height:1px;
-      background:linear-gradient(90deg, transparent, rgba(255,255,255,.95), transparent);
-      z-index:1;
-      pointer-events:none;
-    }
-
-    .editor-shell > *{
-      position:relative;
-      z-index:2;
+    /* SHELL */
+    .editor-shell{
+      width:100%;
+      height:100%;
+      min-height:0;
+      display:flex;
+      flex-direction:column;
+      overflow:hidden;
+      background:var(--surface);
+      border:1px solid var(--line);
+      border-radius:30px;
+      box-shadow:var(--shadow-lg);
     }
 
     .card-header{
-      display:grid;
-      gap:5px;
-      padding:20px 26px 14px;
-      border-bottom:1px solid rgba(219,229,232,.72);
-      background:
-        linear-gradient(180deg, rgba(255,255,255,.72), rgba(255,255,255,0)),
-        linear-gradient(180deg, #fbfeff 0%, #f6fbfc 100%);
+      padding:24px 26px 18px;
+      border-bottom:1px solid var(--line);
+      background:linear-gradient(180deg, #ffffff 0%, #fbfdff 100%);
     }
 
     .eyebrow{
       display:inline-flex;
       align-items:center;
-      width:max-content;
-      padding:6px 11px;
+      gap:8px;
+      padding:7px 12px;
       border-radius:999px;
-      background:linear-gradient(180deg, rgba(255,255,255,.8), rgba(255,255,255,.45)), var(--teal-soft);
-      color:#0f7f96;
-      font-size:.7rem;
-      font-weight:800;
-      letter-spacing:.08em;
+      background:var(--brand-soft);
+      color:#138398;
+      font-size:.76rem;
+      font-weight:900;
       text-transform:uppercase;
-      border:1px solid rgba(17,169,196,.10);
-      box-shadow:0 6px 16px rgba(17,169,196,.08);
+      letter-spacing:.08em;
+      margin-bottom:12px;
     }
 
-    .card-header h1{
-      font-family:"Sora",sans-serif;
-      font-size:clamp(1.8rem, 2.3vw, 2.35rem);
-      line-height:1;
-      letter-spacing:-.045em;
-      color:#111b24;
-      margin:0;
+    .card-header h2{
+      font-size:2rem;
+      line-height:1.02;
+      font-weight:900;
+      letter-spacing:-.03em;
+      color:#20243a;
     }
 
     .card-header p{
+      margin-top:8px;
       color:var(--muted);
-      line-height:1.45;
-      font-size:.94rem;
-      max-width:760px;
-      margin:0;
+      font-size:1rem;
+      line-height:1.6;
+      font-weight:700;
+      max-width:780px;
+    }
+
+    /* FORM */
+    #clase-form{
+      display:flex;
+      flex-direction:column;
+      height:100%;
+      min-height:0;
     }
 
     .stepper-wrap{
       padding:20px 26px 18px;
-      border-bottom:1px solid rgba(219,229,232,.95);
-      background:
-        linear-gradient(180deg, rgba(255,255,255,.7), rgba(255,255,255,0)),
-        linear-gradient(180deg, #fbfeff 0%, #f2f9fb 100%);
-      flex:none;
-      box-shadow:inset 0 1px 0 rgba(255,255,255,.7);
+      border-bottom:1px solid var(--line);
+      background:#fcfdff;
+      flex-shrink:0;
     }
 
     .stepper{
       display:grid;
-      grid-template-columns:repeat(4, 1fr);
-      gap:14px;
-      align-items:start;
+      grid-template-columns:repeat(4, minmax(0, 1fr));
+      gap:12px;
     }
 
     .stepper-item{
       display:flex;
       align-items:flex-start;
       gap:12px;
-      min-width:0;
-      cursor:pointer;
-      user-select:none;
       position:relative;
+      cursor:pointer;
+      min-width:0;
       padding:4px 0;
     }
 
     .stepper-item:not(:last-child)::after{
       content:"";
       position:absolute;
-      top:26px;
-      left:54px;
-      right:-10px;
+      left:52px;
+      right:-8px;
+      top:22px;
       height:2px;
-      background:linear-gradient(90deg, rgba(201,216,221,.95), rgba(201,216,221,.55));
-      z-index:0;
+      background:#e5e8f2;
       border-radius:999px;
+      z-index:0;
     }
 
     .stepper-item.done:not(:last-child)::after{
-      background:linear-gradient(90deg, rgba(17,169,196,.55), rgba(17,169,196,.18));
+      background:linear-gradient(90deg, rgba(31,184,201,.65), rgba(31,184,201,.18));
     }
 
     .stepper-dot{
-      position:relative;
-      z-index:1;
       width:40px;
       height:40px;
-      border-radius:999px;
-      border:1.5px solid var(--line-strong);
+      border-radius:50%;
       background:#fff;
+      border:1px solid #dde2ee;
+      color:#7f88a3;
       display:grid;
       place-items:center;
-      font-size:.86rem;
-      font-weight:800;
-      color:#728191;
-      flex:none;
-      transition:.18s ease;
-      box-shadow:0 8px 18px rgba(23,33,43,.06);
+      font-size:.9rem;
+      font-weight:900;
+      flex-shrink:0;
+      position:relative;
+      z-index:1;
+      box-shadow:var(--shadow-soft);
+      transition:.2s ease;
     }
 
     .stepper-copy{
@@ -370,49 +576,49 @@
 
     .stepper-copy strong{
       display:block;
-      font-size:.94rem;
-      color:#73808c;
-      font-weight:800;
-      line-height:1.06;
-      transition:.18s ease;
+      color:#76809b;
+      font-size:.95rem;
+      font-weight:900;
+      line-height:1.1;
+      transition:.2s ease;
     }
 
     .stepper-copy span{
       display:block;
       margin-top:4px;
-      font-size:.79rem;
-      color:#99a5b2;
-      line-height:1.22;
+      color:#99a2b7;
+      font-size:.8rem;
+      font-weight:700;
+      line-height:1.25;
     }
 
     .stepper-item.active .stepper-dot{
-      background:linear-gradient(180deg, #1bc1de, var(--teal));
+      background:linear-gradient(180deg, #44d3df 0%, #1fb8c9 100%);
       border-color:transparent;
       color:#fff;
-      box-shadow:0 0 0 7px rgba(17,169,196,.12), 0 14px 28px rgba(17,169,196,.24);
+      box-shadow:0 12px 24px rgba(31,184,201,.22);
     }
 
     .stepper-item.active .stepper-copy strong{
-      color:#16212b;
+      color:#20243a;
     }
 
     .stepper-item.done .stepper-dot{
-      background:linear-gradient(180deg, #f5feff, var(--teal-soft));
-      border-color:rgba(17,169,196,.26);
-      color:#0f8195;
-      box-shadow:0 10px 22px rgba(17,169,196,.11);
+      background:#eafcff;
+      border-color:#bde8ee;
+      color:#167f9c;
     }
 
     .stepper-item.done .stepper-copy strong{
-      color:#304052;
+      color:#3a4561;
     }
 
     .form-stage{
-      padding:20px 26px;
       flex:1;
-      overflow-y:auto;
       min-height:0;
-      background:linear-gradient(180deg, #ffffff 0%, #fcfefe 100%);
+      overflow-y:auto;
+      padding:22px 26px;
+      background:#ffffff;
     }
 
     .form-stage::-webkit-scrollbar{
@@ -420,7 +626,7 @@
     }
 
     .form-stage::-webkit-scrollbar-thumb{
-      background:#d3dfe3;
+      background:#d8dcea;
       border-radius:999px;
       border:2px solid #fff;
     }
@@ -447,30 +653,29 @@
     }
 
     .section-head{
-      display:grid;
-      gap:6px;
-      margin-bottom:16px;
+      margin-bottom:18px;
     }
 
-    .section-head h2{
-      font-family:"Sora",sans-serif;
-      font-size:1.1rem;
-      line-height:1.05;
-      letter-spacing:-.03em;
-      color:#111b24;
+    .section-head h3{
+      font-size:1.4rem;
+      font-weight:900;
+      letter-spacing:-.02em;
+      color:#232843;
     }
 
     .section-head p{
+      margin-top:6px;
       color:var(--muted);
-      line-height:1.52;
-      font-size:.91rem;
-      max-width:640px;
+      font-size:1rem;
+      line-height:1.6;
+      font-weight:700;
+      max-width:700px;
     }
 
     .type-grid{
       display:grid;
       grid-template-columns:repeat(3, minmax(0, 1fr));
-      gap:14px;
+      gap:18px;
       align-items:stretch;
     }
 
@@ -483,36 +688,33 @@
       inset:0;
       opacity:0;
       cursor:pointer;
-      z-index:3;
+      z-index:2;
     }
 
     .type-card{
+      position:relative;
       height:100%;
-      min-height:112px;
-      padding:16px;
-      border-radius:22px;
-      border:1px solid rgba(219,229,232,.98);
-      background:
-        linear-gradient(180deg, rgba(255,255,255,.96), rgba(255,255,255,.84)),
-        linear-gradient(180deg, #ffffff 0%, #fbfdfe 100%);
-      display:grid;
-      gap:10px;
-      transition:.18s ease;
-      box-shadow:0 12px 28px rgba(23,33,43,.04);
+      min-height:170px;
+      padding:20px;
+      border-radius:24px;
+      border:1px solid var(--line);
+      background:var(--surface);
+      box-shadow:var(--shadow-soft);
+      display:flex;
+      flex-direction:column;
+      transition:.2s ease;
     }
 
     .type-card:hover{
-      border-color:#c8d8dd;
-      transform:translateY(-2px);
-      box-shadow:var(--shadow-card);
+      transform:translateY(-3px);
+      box-shadow:0 14px 30px rgba(31,42,68,.09);
+      border-color:#dfe3ef;
     }
 
     .type-option input:checked + .type-card{
-      border-color:rgba(17,169,196,.34);
-      background:
-        linear-gradient(180deg, rgba(255,255,255,.96), rgba(255,255,255,.76)),
-        linear-gradient(180deg, rgba(223,247,251,.78), rgba(255,255,255,.96));
-      box-shadow:0 0 0 4px rgba(17,169,196,.08), var(--shadow-premium);
+      background:var(--brand-soft);
+      border-color:#cdeff4;
+      box-shadow:0 14px 30px rgba(31,184,201,.12);
     }
 
     .type-top{
@@ -520,72 +722,73 @@
       align-items:flex-start;
       justify-content:space-between;
       gap:12px;
+      margin-bottom:18px;
     }
 
     .type-icon{
-      width:38px;
-      height:38px;
-      border-radius:13px;
+      width:58px;
+      height:58px;
+      border-radius:50%;
       display:grid;
       place-items:center;
-      background:linear-gradient(180deg, #f7fbfc, #eef6f8);
-      color:#0f7f96;
-      font-size:.76rem;
-      font-weight:800;
-      letter-spacing:-.03em;
-      border:1px solid #e2edf0;
-      flex:none;
-      box-shadow:0 8px 18px rgba(20,31,41,.04);
+      background:linear-gradient(180deg, #149fb0 0%, #107b8f 100%);
+      color:white;
+      box-shadow:0 8px 16px rgba(17,125,143,.18);
+      font-size:.92rem;
+      font-weight:900;
+      flex-shrink:0;
     }
 
     .type-badge{
       display:inline-flex;
       align-items:center;
-      padding:5px 9px;
+      padding:7px 10px;
       border-radius:999px;
-      background:#f6fbfc;
-      border:1px solid #e2edf0;
-      font-size:.68rem;
-      font-weight:800;
-      color:#7b8895;
-      letter-spacing:.03em;
+      background:#f8f9fd;
+      border:1px solid #eef1f8;
+      color:#677089;
+      font-size:.74rem;
+      font-weight:900;
       text-transform:uppercase;
+      letter-spacing:.04em;
     }
 
     .type-option input:checked + .type-card .type-badge{
-      background:rgba(255,255,255,.86);
-      border-color:rgba(17,169,196,.20);
-      color:#0f7f96;
+      background:#ffffffcc;
+      border-color:#d5eef2;
+      color:#167f9c;
     }
 
     .type-card strong{
       display:block;
-      font-size:1rem;
-      color:#17212b;
+      font-size:1.24rem;
+      line-height:1.15;
+      font-weight:900;
       letter-spacing:-.02em;
-      line-height:1.14;
-      margin-bottom:4px;
+      color:#20243a;
+      margin-bottom:10px;
     }
 
     .type-card p{
-      color:var(--muted);
-      font-size:.87rem;
-      line-height:1.45;
-      max-width:30ch;
+      color:#5f667d;
+      font-size:.98rem;
+      line-height:1.65;
+      font-weight:700;
+      margin-top:auto;
     }
 
     .dynamic-shell{
-      border:1px solid rgba(219,229,232,.95);
+      border:1px solid var(--line);
       border-radius:24px;
-      background:linear-gradient(180deg, var(--surface-tint) 0%, #fbfdfd 100%);
+      background:#fcfdff;
       padding:18px;
-      box-shadow:inset 0 1px 0 rgba(255,255,255,.7);
+      box-shadow:var(--shadow-soft);
     }
 
     .form-grid{
       display:grid;
       grid-template-columns:1fr 1fr;
-      gap:15px;
+      gap:16px;
     }
 
     .field{
@@ -598,59 +801,60 @@
     }
 
     .field label{
-      font-size:.9rem;
-      font-weight:800;
-      color:#1a2430;
+      font-size:.95rem;
+      font-weight:900;
+      color:#26304b;
     }
 
     .field input,
     .field select,
     .field textarea{
       width:100%;
-      border:1px solid rgba(219,229,232,.95);
-      border-radius:16px;
+      border:1px solid var(--line);
       background:#fff;
+      border-radius:18px;
+      padding:14px 16px;
       color:var(--text);
-      font-family:inherit;
-      font-size:.96rem;
-      padding:14px 15px;
       outline:none;
-      transition:.18s ease;
+      font-weight:800;
+      box-shadow:var(--shadow-soft);
+      transition:border-color .2s ease, box-shadow .2s ease, transform .2s ease;
       resize:none;
-      box-shadow:0 2px 8px rgba(23,33,43,.02);
     }
 
     .field input,
     .field select{
-      min-height:52px;
+      min-height:54px;
     }
 
     .field textarea{
-      min-height:118px;
+      min-height:128px;
     }
 
     .field input::placeholder,
     .field textarea::placeholder{
-      color:#a1aeb9;
+      color:#9aa2b5;
+      font-weight:700;
     }
 
     .field input:focus,
     .field select:focus,
     .field textarea:focus{
-      border-color:rgba(17,169,196,.48);
-      box-shadow:0 0 0 4px rgba(17,169,196,.08);
+      border-color:#c9eaf0;
+      box-shadow:0 10px 30px rgba(31,184,201,.10);
     }
 
     .helper{
       color:var(--muted-2);
-      font-size:.82rem;
-      line-height:1.48;
+      font-size:.85rem;
+      line-height:1.45;
+      font-weight:700;
     }
 
     .format-switcher{
       display:grid;
       grid-template-columns:1fr 1fr;
-      gap:14px;
+      gap:18px;
     }
 
     .format-option{
@@ -666,92 +870,96 @@
     }
 
     .format-card{
-      min-height:92px;
-      padding:16px;
-      border-radius:22px;
-      border:1px solid rgba(219,229,232,.95);
-      background:linear-gradient(180deg, #ffffff 0%, #fbfdfe 100%);
+      min-height:110px;
+      padding:18px;
+      border-radius:24px;
+      border:1px solid var(--line);
+      background:#fff;
       display:flex;
       align-items:center;
       gap:14px;
-      transition:.18s ease;
-      box-shadow:0 8px 22px rgba(23,33,43,.03);
+      transition:.2s ease;
+      box-shadow:var(--shadow-soft);
     }
 
     .format-card:hover{
-      border-color:#cddadf;
-      box-shadow:var(--shadow-card);
+      transform:translateY(-2px);
+      box-shadow:0 14px 30px rgba(31,42,68,.09);
     }
 
     .format-option input:checked + .format-card{
-      border-color:rgba(17,169,196,.38);
-      background:linear-gradient(180deg, rgba(255,255,255,.96), rgba(223,247,251,.72));
-      box-shadow:0 0 0 4px rgba(17,169,196,.08), 0 14px 28px rgba(17,169,196,.10);
+      background:var(--brand-soft);
+      border-color:#cdeff4;
+      box-shadow:0 14px 30px rgba(31,184,201,.12);
     }
 
     .format-icon{
-      width:42px;
-      height:42px;
-      border-radius:14px;
+      width:54px;
+      height:54px;
+      border-radius:50%;
       display:grid;
       place-items:center;
-      background:#f3f8fa;
-      color:#0f7f96;
-      font-size:.8rem;
-      font-weight:800;
-      border:1px solid #e2edf0;
-      flex:none;
+      background:linear-gradient(180deg, #149fb0 0%, #107b8f 100%);
+      color:white;
+      font-size:.9rem;
+      font-weight:900;
+      flex-shrink:0;
+      box-shadow:0 8px 16px rgba(17,125,143,.18);
     }
 
     .format-copy strong{
       display:block;
-      margin-bottom:4px;
-      font-size:.96rem;
-      color:#17212b;
+      font-size:1.08rem;
+      color:#20243a;
+      font-weight:900;
+      margin-bottom:5px;
     }
 
     .format-copy p{
-      color:var(--muted);
-      font-size:.89rem;
-      line-height:1.5;
+      color:#5f667d;
+      font-size:.94rem;
+      line-height:1.55;
+      font-weight:700;
     }
 
     .format-preview{
-      margin-top:14px;
+      margin-top:16px;
+      background:#f9fbff;
+      border:1px solid var(--line);
+      border-radius:20px;
       padding:16px 18px;
-      border-radius:18px;
-      background:linear-gradient(180deg, #f8fbfc 0%, #f3f9fb 100%);
-      border:1px solid rgba(219,229,232,.95);
-      box-shadow:inset 0 1px 0 rgba(255,255,255,.75);
+      box-shadow:var(--shadow-soft);
     }
 
     .format-preview strong{
       display:block;
+      color:#26304b;
+      font-size:.96rem;
+      font-weight:900;
       margin-bottom:6px;
-      font-size:.92rem;
-      color:#17202c;
     }
 
     .format-preview p{
       color:var(--muted);
-      font-size:.89rem;
-      line-height:1.58;
+      font-size:.93rem;
+      line-height:1.6;
+      font-weight:700;
     }
 
     .upload-box{
       position:relative;
-      border:1.5px dashed #c7d8dd;
-      border-radius:22px;
-      background:linear-gradient(180deg, #fbfdfe 0%, #f7fbfc 100%);
-      padding:18px;
-      transition:.18s ease;
+      border:2px dashed #d7dceb;
+      border-radius:24px;
+      background:#fbfcff;
+      padding:20px;
+      transition:.2s ease;
+      box-shadow:var(--shadow-soft);
       overflow:hidden;
-      box-shadow:0 8px 24px rgba(23,33,43,.03);
     }
 
     .upload-box:hover{
-      border-color:rgba(17,169,196,.45);
-      background:#f8fcfd;
+      border-color:#bfe8ee;
+      background:#f9fdfe;
     }
 
     .upload-box input[type="file"]{
@@ -771,31 +979,32 @@
     }
 
     .upload-icon{
-      width:44px;
-      height:44px;
-      border-radius:15px;
+      width:56px;
+      height:56px;
+      border-radius:50%;
       display:grid;
       place-items:center;
-      background:#fff;
-      border:1px solid var(--line);
-      color:#0f7f96;
-      font-size:.82rem;
-      font-weight:800;
-      flex:none;
-      box-shadow:0 6px 18px rgba(23,33,43,.04);
+      background:linear-gradient(180deg, #149fb0 0%, #107b8f 100%);
+      color:white;
+      font-size:.9rem;
+      font-weight:900;
+      flex-shrink:0;
+      box-shadow:0 8px 16px rgba(17,125,143,.18);
     }
 
     .upload-inner strong{
       display:block;
-      font-size:.95rem;
-      color:#17212b;
-      margin-bottom:4px;
+      font-size:1rem;
+      color:#20243a;
+      font-weight:900;
+      margin-bottom:5px;
     }
 
     .upload-inner p{
-      color:var(--muted);
-      line-height:1.55;
-      font-size:.89rem;
+      color:#5f667d;
+      font-size:.95rem;
+      line-height:1.6;
+      font-weight:700;
     }
 
     .file-list{
@@ -808,14 +1017,14 @@
       display:flex;
       align-items:center;
       gap:10px;
-      padding:12px 14px;
-      border-radius:15px;
+      padding:13px 14px;
+      border-radius:16px;
       border:1px solid var(--line);
       background:#fff;
       color:#435063;
-      font-size:.89rem;
-      font-weight:600;
-      box-shadow:0 8px 20px rgba(23,33,43,.03);
+      font-size:.92rem;
+      font-weight:800;
+      box-shadow:var(--shadow-soft);
     }
 
     .wizard-footer{
@@ -823,32 +1032,28 @@
       align-items:center;
       justify-content:space-between;
       gap:12px;
-      padding:15px 26px 19px;
-      border-top:1px solid rgba(219,229,232,.95);
-      background:linear-gradient(180deg, #ffffff 0%, #fbfdfe 100%);
-      margin-top:auto;
-      flex:none;
+      padding:18px 26px 20px;
+      border-top:1px solid var(--line);
+      background:#ffffff;
+      flex-shrink:0;
     }
 
-    .wizard-footer-left{
+    .wizard-footer-left,
+    .wizard-footer-right{
       display:flex;
-      gap:10px;
       align-items:center;
+      gap:10px;
       flex-wrap:wrap;
     }
 
     .wizard-footer-right{
-      display:flex;
-      gap:10px;
-      align-items:center;
-      flex-wrap:wrap;
       margin-left:auto;
     }
 
     .step-counter{
-      font-size:.88rem;
-      font-weight:800;
-      color:var(--muted);
+      color:#68718b;
+      font-size:.92rem;
+      font-weight:900;
     }
 
     .btn{
@@ -859,13 +1064,12 @@
       display:inline-flex;
       align-items:center;
       justify-content:center;
-      min-height:48px;
+      min-height:50px;
       padding:13px 20px;
-      border-radius:15px;
-      font-family:inherit;
-      font-size:.94rem;
-      font-weight:800;
-      transition:.18s ease;
+      border-radius:16px;
+      font-size:.95rem;
+      font-weight:900;
+      transition:.2s ease;
     }
 
     .btn:hover{
@@ -873,50 +1077,38 @@
     }
 
     .btn-primary{
-      background:linear-gradient(135deg, var(--teal), var(--teal-strong));
+      background:linear-gradient(180deg, #33cad8 0%, #1fb8c9 100%);
       color:#fff;
-      box-shadow:0 14px 26px rgba(17,169,196,.22);
+      box-shadow:0 12px 24px rgba(31,184,201,.22);
     }
 
     .btn-soft{
-      background:#fff;
-      color:#223042;
-      border:1px solid rgba(219,229,232,.95);
-      box-shadow:0 8px 20px rgba(23,33,43,.04);
+      background:#f5f7fb;
+      color:#48516b;
+      box-shadow:var(--shadow-soft);
+    }
+
+    .btn-soft:hover{
+      background:#eef2f8;
     }
 
     .hidden-legacy{
       display:none !important;
     }
 
-    @media (max-width: 1180px){
+    @media (max-width:1280px){
       .type-grid{
         grid-template-columns:repeat(2, minmax(0, 1fr));
       }
     }
 
-    @media (max-width: 1100px){
-      .page{
-        max-width:100%;
-      }
-
+    @media (max-width:1100px){
       .form-grid{
         grid-template-columns:1fr;
       }
     }
 
-    @media (max-width: 940px){
-      .stepper{
-        grid-template-columns:1fr 1fr;
-        gap:16px 12px;
-      }
-
-      .stepper-item:not(:last-child)::after{
-        display:none;
-      }
-    }
-
-    @media (max-width: 820px){
+    @media (max-width:980px){
       body{
         overflow:auto;
       }
@@ -926,15 +1118,26 @@
       }
 
       .sidebar{
-        position:relative;
-        height:auto;
-        border-right:none;
-        border-bottom:1px solid var(--sidebar-border);
+        position:fixed;
+        left:0;
+        top:0;
+        bottom:0;
+        width:280px;
+        transform:translateX(-100%);
+        transition:transform .25s ease;
+        box-shadow:0 20px 50px rgba(18,27,52,.18);
       }
 
-      .main{
-        padding:18px;
-        height:auto;
+      .sidebar.open{
+        transform:translateX(0);
+      }
+
+      .menu-btn{
+        display:grid;
+      }
+
+      .content{
+        overflow:visible;
       }
 
       .page{
@@ -942,70 +1145,55 @@
       }
 
       .editor-shell{
-        border-radius:24px;
         height:auto;
         min-height:unset;
       }
 
-      .card-header{
-        padding:17px 18px 11px;
+      .stepper{
+        grid-template-columns:1fr 1fr;
       }
 
+      .stepper-item:not(:last-child)::after{
+        display:none;
+      }
+    }
+
+    @media (max-width:720px){
+      .topbar{
+        padding:16px;
+      }
+
+      .content{
+        padding:18px 16px 22px;
+      }
+
+      .card-header,
       .stepper-wrap,
-      .form-stage{
+      .form-stage,
+      .wizard-footer{
         padding-left:18px;
         padding-right:18px;
       }
 
-      .card-header h1{
-        white-space:normal;
+      .card-header h2{
+        font-size:1.7rem;
       }
 
-      .form-stage{
-        overflow:visible;
-      }
-    }
-
-    @media (max-width: 620px){
-      .main{
-        padding:14px;
+      .topbar-copy h1{
+        font-size:1.28rem;
       }
 
-      .card-header{
-        gap:5px;
-        padding:15px 18px 10px;
-      }
-
-      .card-header h1{
-        font-size:1.65rem;
-      }
-
-      .card-header p{
+      .topbar-copy p{
         font-size:.9rem;
       }
 
+      .type-grid,
+      .format-switcher,
       .stepper{
         grid-template-columns:1fr;
-        gap:12px;
-      }
-
-      .stepper-dot{
-        width:36px;
-        height:36px;
-        font-size:.82rem;
-      }
-
-      .type-grid{
-        grid-template-columns:1fr;
-      }
-
-      .type-card{
-        min-height:98px;
-        padding:15px;
       }
 
       .wizard-footer{
-        padding:15px 18px 18px;
         flex-direction:column;
         align-items:stretch;
       }
@@ -1020,268 +1208,364 @@
         width:100%;
       }
 
-      .format-switcher{
-        grid-template-columns:1fr;
+      .profile-trigger{
+        width:48px;
+        height:48px;
+      }
+
+      .menu-btn{
+        width:44px;
+        height:44px;
+        border-radius:14px;
       }
     }
   </style>
 </head>
 <body style="visibility:hidden; opacity:0;">
   <div class="app">
-    <aside class="sidebar">
+    <aside class="sidebar" id="sidebar">
       <div class="brand">
-        <div class="brand-mark">E</div>
+        <div class="brand-badge">
+          <i data-lucide="graduation-cap"></i>
+        </div>
         <div class="brand-text">
           <strong>Eduvia</strong>
           <span>Tu aula con IA</span>
         </div>
       </div>
 
-      <nav class="menu">
-        <a href="panel.html">Inicio</a>
-        <a href="crear-clase.html" class="active">Crear contenido</a>
-        <a href="panel.html#guia">Cómo funciona</a>
-        <a href="mis-clases.html">Mis clases</a>
-        <a href="#">Historial</a>
-        <a href="#">Ajustes</a>
-        <button id="logout" type="button">Cerrar sesión</button>
+      <nav class="nav">
+        <a href="panel.html" class="nav-link">
+          <i class="nav-icon" data-lucide="house"></i>
+          <span>Inicio</span>
+        </a>
+
+        <a href="crear-clase.html" class="nav-link active">
+          <i class="nav-icon" data-lucide="plus-square"></i>
+          <span>Crear contenido</span>
+        </a>
+
+        <a href="panel.html#guia" class="nav-link">
+          <i class="nav-icon" data-lucide="sparkles"></i>
+          <span>Cómo funciona</span>
+        </a>
+
+        <a href="mis-clases.html" class="nav-link">
+          <i class="nav-icon" data-lucide="folder-open"></i>
+          <span>Mis clases</span>
+        </a>
+
+        <a href="historial.html" class="nav-link">
+          <i class="nav-icon" data-lucide="history"></i>
+          <span>Historial</span>
+        </a>
+
+        <a href="configuracion.html" class="nav-link">
+          <i class="nav-icon" data-lucide="settings-2"></i>
+          <span>Ajustes</span>
+        </a>
       </nav>
 
-      <div class="sidebar-note">
+      <div class="sidebar-tip">
         <strong>Consejo</strong>
-        <p>
-          Cuanto más claro sea el pedido, mejor queda el contenido final.
-        </p>
+        <p>Cuanto más claro sea el pedido, mejor va a quedar el contenido final.</p>
+      </div>
+
+      <div class="sidebar-footer">
+        <button class="logout-btn" id="logout">
+          <i data-lucide="log-out"></i>
+          <span>Cerrar sesión</span>
+        </button>
       </div>
     </aside>
 
     <main class="main">
-      <div class="page">
-        <section class="editor-shell">
-          <div class="card-header">
-            <span class="eyebrow">Crear con Eduvia</span>
-            <h1>Armá tu contenido paso a paso.</h1>
-            <p>
-              Elegí el tipo, completá lo importante y definí cómo querés verlo al final.
-            </p>
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="menu-btn" id="menuBtn" aria-label="Abrir menú">
+            <i data-lucide="menu"></i>
+          </button>
+
+          <div class="topbar-copy">
+            <h1>Crear contenido</h1>
+            <p>Armá clases, resúmenes o documentos con una experiencia más ordenada.</p>
           </div>
+        </div>
 
-          <form id="clase-form" style="display:flex; flex-direction:column; height:100%; min-height:0;">
-            <div class="stepper-wrap">
-              <div class="stepper" id="stepper">
-                <div class="stepper-item active" data-step="1">
-                  <div class="stepper-dot">1</div>
-                  <div class="stepper-copy">
-                    <strong>Tipo</strong>
-                    <span>Qué querés crear</span>
-                  </div>
-                </div>
+        <div class="topbar-right">
+          <div class="profile-wrap">
+            <button
+              class="profile-trigger"
+              id="profileTrigger"
+              type="button"
+              aria-label="Abrir menú de cuenta"
+              aria-expanded="false"
+            >
+              <span id="topbarInitial">U</span>
+            </button>
 
-                <div class="stepper-item" data-step="2">
-                  <div class="stepper-dot">2</div>
-                  <div class="stepper-copy">
-                    <strong>Detalles</strong>
-                    <span>Información principal</span>
-                  </div>
+            <div class="profile-menu" id="profileMenu">
+              <div class="profile-head">
+                <div class="profile-avatar" id="menuAvatar">U</div>
+                <div>
+                  <div class="profile-name" id="menuUserName">Usuario</div>
+                  <div class="profile-mail" id="menuUserEmail">sin-email@eduvia.app</div>
                 </div>
+              </div>
 
-                <div class="stepper-item" data-step="3">
-                  <div class="stepper-dot">3</div>
-                  <div class="stepper-copy">
-                    <strong>Vista</strong>
-                    <span>Cómo querés verlo</span>
-                  </div>
-                </div>
+              <div class="profile-links">
+                <a href="cuenta.html" class="profile-link">
+                  <i data-lucide="user-round"></i>
+                  <span>Mi cuenta</span>
+                </a>
 
-                <div class="stepper-item" data-step="4">
-                  <div class="stepper-dot">4</div>
-                  <div class="stepper-copy">
-                    <strong>Archivos</strong>
-                    <span>Material de apoyo</span>
-                  </div>
-                </div>
+                <a href="plan.html" class="profile-link">
+                  <i data-lucide="badge-check"></i>
+                  <span>Mi plan</span>
+                </a>
+
+                <a href="configuracion.html" class="profile-link">
+                  <i data-lucide="settings-2"></i>
+                  <span>Configuración</span>
+                </a>
+
+                <button class="profile-link logout" id="profileLogoutBtn" type="button">
+                  <i data-lucide="log-out"></i>
+                  <span>Cerrar sesión</span>
+                </button>
               </div>
             </div>
+          </div>
+        </div>
+      </header>
 
-            <div class="form-stage">
-              <section class="step-panel active" data-panel="1">
-                <div class="section-head">
-                  <h2>Elegí el tipo de contenido</h2>
-                  <p>Seleccioná la opción que mejor se adapte a lo que necesitás.</p>
-                </div>
+      <section class="content">
+        <div class="page">
+          <section class="editor-shell">
+            <div class="card-header">
+              <span class="eyebrow">
+                <i data-lucide="sparkles" style="width:14px;height:14px;"></i>
+                Crear con Eduvia
+              </span>
+              <h2>Armá tu contenido paso a paso.</h2>
+              <p>
+                Elegí el tipo, completá la información importante y definí cómo querés ver el resultado final.
+              </p>
+            </div>
 
-                <div class="type-grid" id="content-type-selector">
-                  <label class="type-option">
-                    <input type="radio" name="tipo_contenido" value="clase" checked />
-                    <div class="type-card">
-                      <div class="type-top">
-                        <div class="type-icon">CL</div>
-                        <span class="type-badge">Base</span>
-                      </div>
-                      <div>
-                        <strong>Clase escolar</strong>
-                        <p>Para materias, temas y objetivos.</p>
-                      </div>
-                    </div>
-                  </label>
-
-                  <label class="type-option">
-                    <input type="radio" name="tipo_contenido" value="resumen" />
-                    <div class="type-card">
-                      <div class="type-top">
-                        <div class="type-icon">RS</div>
-                        <span class="type-badge">Claro</span>
-                      </div>
-                      <div>
-                        <strong>Resumen / explicación</strong>
-                        <p>Para entender un tema de forma clara.</p>
-                      </div>
-                    </div>
-                  </label>
-
-                  <label class="type-option">
-                    <input type="radio" name="tipo_contenido" value="analisis" />
-                    <div class="type-card">
-                      <div class="type-top">
-                        <div class="type-icon">AN</div>
-                        <span class="type-badge">Profundo</span>
-                      </div>
-                      <div>
-                        <strong>Análisis de tema</strong>
-                        <p>Para comparar, interpretar o profundizar.</p>
-                      </div>
-                    </div>
-                  </label>
-
-                  <label class="type-option">
-                    <input type="radio" name="tipo_contenido" value="documento" />
-                    <div class="type-card">
-                      <div class="type-top">
-                        <div class="type-icon">DC</div>
-                        <span class="type-badge">Ordenado</span>
-                      </div>
-                      <div>
-                        <strong>Documento de estudio</strong>
-                        <p>Para apuntes y desarrollos más largos.</p>
-                      </div>
-                    </div>
-                  </label>
-
-                  <label class="type-option">
-                    <input type="radio" name="tipo_contenido" value="investigacion" />
-                    <div class="type-card">
-                      <div class="type-top">
-                        <div class="type-icon">IN</div>
-                        <span class="type-badge">Rápido</span>
-                      </div>
-                      <div>
-                        <strong>Investigación rápida</strong>
-                        <p>Para preguntas, hallazgos e ideas clave.</p>
-                      </div>
-                    </div>
-                  </label>
-                </div>
-              </section>
-
-              <section class="step-panel" data-panel="2">
-                <div class="section-head">
-                  <h2>Completá la información principal</h2>
-                  <p>Los campos cambian automáticamente según el tipo que elegiste.</p>
-                </div>
-
-                <div class="dynamic-shell">
-                  <div id="dynamic-fields" class="form-grid"></div>
-                </div>
-              </section>
-
-              <section class="step-panel" data-panel="3">
-                <div class="section-head">
-                  <h2>Elegí la visualización final</h2>
-                  <p>Esto cambia la forma de ver el resultado, no el contenido.</p>
-                </div>
-
-                <div class="format-switcher">
-                  <label class="format-option">
-                    <input type="radio" name="formato" value="pizarron" checked />
-                    <div class="format-card">
-                      <div class="format-icon">PZ</div>
-                      <div class="format-copy">
-                        <strong>Modo Pizarrón</strong>
-                        <p>Más visual y guiado.</p>
-                      </div>
-                    </div>
-                  </label>
-
-                  <label class="format-option">
-                    <input type="radio" name="formato" value="documento" />
-                    <div class="format-card">
-                      <div class="format-icon">DC</div>
-                      <div class="format-copy">
-                        <strong>Modo Documento</strong>
-                        <p>Más lineal y ordenado.</p>
-                      </div>
-                    </div>
-                  </label>
-                </div>
-
-                <div id="format-preview" class="format-preview">
-                  <strong>Vista elegida: Pizarrón</strong>
-                  <p>
-                    El contenido se mostrará en una experiencia más visual, tipo aula interactiva.
-                  </p>
-                </div>
-              </section>
-
-              <section class="step-panel" data-panel="4">
-                <div class="section-head">
-                  <h2>Agregá material de apoyo</h2>
-                  <p>Podés subir archivos para darle más contexto a la IA.</p>
-                </div>
-
-                <div class="field full">
-                  <label for="archivo">Archivos</label>
-
-                  <div class="upload-box">
-                    <input id="archivo" type="file" multiple accept=".pdf,.doc,.docx,.txt,.png,.jpg,.jpeg" />
-                    <div class="upload-inner">
-                      <div class="upload-icon">AR</div>
-                      <div>
-                        <strong>Subí apuntes, PDFs, guías o imágenes</strong>
-                        <p>
-                          Sumá solo material que realmente ayude a construir mejor el contenido.
-                        </p>
-                      </div>
+            <form id="clase-form">
+              <div class="stepper-wrap">
+                <div class="stepper" id="stepper">
+                  <div class="stepper-item active" data-step="1">
+                    <div class="stepper-dot">1</div>
+                    <div class="stepper-copy">
+                      <strong>Tipo</strong>
+                      <span>Qué querés crear</span>
                     </div>
                   </div>
 
-                  <div id="file-list" class="file-list"></div>
+                  <div class="stepper-item" data-step="2">
+                    <div class="stepper-dot">2</div>
+                    <div class="stepper-copy">
+                      <strong>Detalles</strong>
+                      <span>Información principal</span>
+                    </div>
+                  </div>
+
+                  <div class="stepper-item" data-step="3">
+                    <div class="stepper-dot">3</div>
+                    <div class="stepper-copy">
+                      <strong>Vista</strong>
+                      <span>Cómo querés verlo</span>
+                    </div>
+                  </div>
+
+                  <div class="stepper-item" data-step="4">
+                    <div class="stepper-dot">4</div>
+                    <div class="stepper-copy">
+                      <strong>Archivos</strong>
+                      <span>Material de apoyo</span>
+                    </div>
+                  </div>
                 </div>
-              </section>
-
-              <div class="hidden-legacy" aria-hidden="true">
-                <input type="hidden" id="tipo_contenido_hidden" name="tipo_contenido_hidden" value="clase" />
-                <input type="hidden" id="materia" name="materia" />
-                <input type="hidden" id="tema" name="tema" />
-                <input type="hidden" id="nivel" name="nivel" />
-                <input type="hidden" id="duracion" name="duracion" />
-                <textarea id="objetivo" name="objetivo"></textarea>
-              </div>
-            </div>
-
-            <div class="wizard-footer">
-              <div class="wizard-footer-left">
-                <span class="step-counter" id="step-counter">Paso 1 de 4</span>
               </div>
 
-              <div class="wizard-footer-right">
-                <button type="button" class="btn btn-soft" id="prev-step-btn">Atrás</button>
-                <button type="button" class="btn btn-primary" id="next-step-btn">Siguiente</button>
-                <button type="submit" class="btn btn-primary" id="submit-step-btn" style="display:none;">Crear contenido</button>
+              <div class="form-stage">
+                <section class="step-panel active" data-panel="1">
+                  <div class="section-head">
+                    <h3>Elegí el tipo de contenido</h3>
+                    <p>Seleccioná la opción que mejor se adapte a lo que necesitás.</p>
+                  </div>
+
+                  <div class="type-grid" id="content-type-selector">
+                    <label class="type-option">
+                      <input type="radio" name="tipo_contenido" value="clase" checked />
+                      <div class="type-card">
+                        <div class="type-top">
+                          <div class="type-icon">CL</div>
+                          <span class="type-badge">Base</span>
+                        </div>
+                        <div>
+                          <strong>Clase escolar</strong>
+                          <p>Para materias, temas y objetivos.</p>
+                        </div>
+                      </div>
+                    </label>
+
+                    <label class="type-option">
+                      <input type="radio" name="tipo_contenido" value="resumen" />
+                      <div class="type-card">
+                        <div class="type-top">
+                          <div class="type-icon">RS</div>
+                          <span class="type-badge">Claro</span>
+                        </div>
+                        <div>
+                          <strong>Resumen / explicación</strong>
+                          <p>Para entender un tema de forma clara.</p>
+                        </div>
+                      </div>
+                    </label>
+
+                    <label class="type-option">
+                      <input type="radio" name="tipo_contenido" value="analisis" />
+                      <div class="type-card">
+                        <div class="type-top">
+                          <div class="type-icon">AN</div>
+                          <span class="type-badge">Profundo</span>
+                        </div>
+                        <div>
+                          <strong>Análisis de tema</strong>
+                          <p>Para comparar, interpretar o profundizar.</p>
+                        </div>
+                      </div>
+                    </label>
+
+                    <label class="type-option">
+                      <input type="radio" name="tipo_contenido" value="documento" />
+                      <div class="type-card">
+                        <div class="type-top">
+                          <div class="type-icon">DC</div>
+                          <span class="type-badge">Ordenado</span>
+                        </div>
+                        <div>
+                          <strong>Documento de estudio</strong>
+                          <p>Para apuntes y desarrollos más largos.</p>
+                        </div>
+                      </div>
+                    </label>
+
+                    <label class="type-option">
+                      <input type="radio" name="tipo_contenido" value="investigacion" />
+                      <div class="type-card">
+                        <div class="type-top">
+                          <div class="type-icon">IN</div>
+                          <span class="type-badge">Rápido</span>
+                        </div>
+                        <div>
+                          <strong>Investigación rápida</strong>
+                          <p>Para preguntas, hallazgos e ideas clave.</p>
+                        </div>
+                      </div>
+                    </label>
+                  </div>
+                </section>
+
+                <section class="step-panel" data-panel="2">
+                  <div class="section-head">
+                    <h3>Completá la información principal</h3>
+                    <p>Los campos cambian automáticamente según el tipo que elegiste.</p>
+                  </div>
+
+                  <div class="dynamic-shell">
+                    <div id="dynamic-fields" class="form-grid"></div>
+                  </div>
+                </section>
+
+                <section class="step-panel" data-panel="3">
+                  <div class="section-head">
+                    <h3>Elegí la visualización final</h3>
+                    <p>Esto cambia la forma de ver el resultado, no el contenido.</p>
+                  </div>
+
+                  <div class="format-switcher">
+                    <label class="format-option">
+                      <input type="radio" name="formato" value="pizarron" checked />
+                      <div class="format-card">
+                        <div class="format-icon">PZ</div>
+                        <div class="format-copy">
+                          <strong>Modo Pizarrón</strong>
+                          <p>Más visual y guiado.</p>
+                        </div>
+                      </div>
+                    </label>
+
+                    <label class="format-option">
+                      <input type="radio" name="formato" value="documento" />
+                      <div class="format-card">
+                        <div class="format-icon">DC</div>
+                        <div class="format-copy">
+                          <strong>Modo Documento</strong>
+                          <p>Más lineal y ordenado.</p>
+                        </div>
+                      </div>
+                    </label>
+                  </div>
+
+                  <div id="format-preview" class="format-preview">
+                    <strong>Vista elegida: Pizarrón</strong>
+                    <p>El contenido se mostrará en una experiencia más visual, tipo aula interactiva.</p>
+                  </div>
+                </section>
+
+                <section class="step-panel" data-panel="4">
+                  <div class="section-head">
+                    <h3>Agregá material de apoyo</h3>
+                    <p>Podés subir archivos para darle más contexto a la IA.</p>
+                  </div>
+
+                  <div class="field full">
+                    <label for="archivo">Archivos</label>
+
+                    <div class="upload-box">
+                      <input id="archivo" type="file" multiple accept=".pdf,.doc,.docx,.txt,.png,.jpg,.jpeg" />
+                      <div class="upload-inner">
+                        <div class="upload-icon">AR</div>
+                        <div>
+                          <strong>Subí apuntes, PDFs, guías o imágenes</strong>
+                          <p>Sumá solo material que realmente ayude a construir mejor el contenido.</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div id="file-list" class="file-list"></div>
+                  </div>
+                </section>
+
+                <div class="hidden-legacy" aria-hidden="true">
+                  <input type="hidden" id="tipo_contenido_hidden" name="tipo_contenido_hidden" value="clase" />
+                  <input type="hidden" id="materia" name="materia" />
+                  <input type="hidden" id="tema" name="tema" />
+                  <input type="hidden" id="nivel" name="nivel" />
+                  <input type="hidden" id="duracion" name="duracion" />
+                  <textarea id="objetivo" name="objetivo"></textarea>
+                </div>
               </div>
-            </div>
-          </form>
-        </section>
-      </div>
+
+              <div class="wizard-footer">
+                <div class="wizard-footer-left">
+                  <span class="step-counter" id="step-counter">Paso 1 de 4</span>
+                </div>
+
+                <div class="wizard-footer-right">
+                  <button type="button" class="btn btn-soft" id="prev-step-btn">Atrás</button>
+                  <button type="button" class="btn btn-primary" id="next-step-btn">Siguiente</button>
+                  <button type="submit" class="btn btn-primary" id="submit-step-btn" style="display:none;">Crear contenido</button>
+                </div>
+              </div>
+            </form>
+          </section>
+        </div>
+      </section>
     </main>
   </div>
 
@@ -1289,19 +1573,86 @@
   <script type="module" src="crear-clase.js"></script>
   <script type="module" src="panel-auth.js?v=1"></script>
 
+  <script src="https://unpkg.com/lucide@latest"></script>
+
   <script type="module">
     import { auth } from "./firebase.js?v=7";
-    import { signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
     const logoutBtn = document.getElementById("logout");
+    const profileLogoutBtn = document.getElementById("profileLogoutBtn");
 
-    logoutBtn?.addEventListener("click", async () => {
+    const topbarInitial = document.getElementById("topbarInitial");
+    const menuAvatar = document.getElementById("menuAvatar");
+    const menuUserName = document.getElementById("menuUserName");
+    const menuUserEmail = document.getElementById("menuUserEmail");
+
+    function getInitial(name = "", email = "") {
+      const text = (name || "").trim() || (email || "").trim() || "U";
+      return text.charAt(0).toUpperCase();
+    }
+
+    function setProfileData(user) {
+      const email = user?.email || "sin-email@eduvia.app";
+      const rawName = user?.displayName || email.split("@")[0] || "Usuario";
+      const prettyName = rawName.charAt(0).toUpperCase() + rawName.slice(1);
+      const initial = getInitial(prettyName, email);
+
+      topbarInitial.textContent = initial;
+      menuAvatar.textContent = initial;
+      menuUserName.textContent = prettyName;
+      menuUserEmail.textContent = email;
+    }
+
+    onAuthStateChanged(auth, (user) => {
+      setProfileData(user);
+    });
+
+    async function cerrarSesion() {
       try {
         await signOut(auth);
         window.location.href = "login.html";
       } catch (error) {
         console.error("Error al cerrar sesión:", error);
         alert("No se pudo cerrar sesión. Intentá de nuevo.");
+      }
+    }
+
+    logoutBtn?.addEventListener("click", cerrarSesion);
+    profileLogoutBtn?.addEventListener("click", cerrarSesion);
+  </script>
+
+  <script>
+    lucide.createIcons();
+
+    const sidebar = document.getElementById("sidebar");
+    const menuBtn = document.getElementById("menuBtn");
+    const profileTrigger = document.getElementById("profileTrigger");
+    const profileMenu = document.getElementById("profileMenu");
+
+    menuBtn?.addEventListener("click", () => {
+      sidebar.classList.toggle("open");
+    });
+
+    profileTrigger?.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const isOpen = profileMenu.classList.toggle("open");
+      profileTrigger.setAttribute("aria-expanded", String(isOpen));
+    });
+
+    document.addEventListener("click", (e) => {
+      const clickedInsideSidebar = sidebar?.contains(e.target);
+      const clickedMenu = menuBtn?.contains(e.target);
+      const clickedProfile =
+        profileTrigger?.contains(e.target) || profileMenu?.contains(e.target);
+
+      if (window.innerWidth <= 980 && !clickedInsideSidebar && !clickedMenu) {
+        sidebar?.classList.remove("open");
+      }
+
+      if (!clickedProfile) {
+        profileMenu?.classList.remove("open");
+        profileTrigger?.setAttribute("aria-expanded", "false");
       }
     });
   </script>
