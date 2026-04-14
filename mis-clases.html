@@ -1046,41 +1046,73 @@
       );
     }
 
-    function resolveOpenUrl(item) {
-      if (item.type === "clase") {
-        return `aula.html?id=${encodeURIComponent(item.id)}`;
-      }
-      return `documento.html?id=${encodeURIComponent(item.id)}`;
-    }
+function resolveRealType(data = {}, fallbackType = "clase") {
+  const formato = safeText(
+    data.formato || data.tipoVista || data.tipo || ""
+  ).toLowerCase();
 
-    function normalizeItem(docSnap, type) {
-      const data = docSnap.data() || {};
-      const updatedDate =
-        extractDate(data.updatedAt) ||
-        extractDate(data.fechaActualizacion) ||
-        extractDate(data.createdAt) ||
-        extractDate(data.fecha) ||
-        null;
+  if (fallbackType === "documento") return "documento";
+  if (formato === "documento") return "documento";
 
-      return {
-        id: docSnap.id,
-        type,
-        title: resolveTitle(data, type === "clase" ? "Clase sin título" : "Documento sin título"),
-        description: resolveDescription(data, type),
-        updatedAt: updatedDate,
-        openUrl: resolveOpenUrl({ id: docSnap.id, type })
-      };
-    }
+  return "clase";
+}
 
-    async function getCollectionItems(uid, name, type) {
-      try {
-        const snap = await getDocs(collection(db, "usuarios", uid, name));
-        return snap.docs.map(docSnap => normalizeItem(docSnap, type));
-      } catch (error) {
-        console.warn(`No se pudo leer ${name}:`, error);
-        return [];
-      }
-    }
+function resolveOpenUrl(item) {
+  const owner = item.ownerUid
+    ? `&owner=${encodeURIComponent(item.ownerUid)}`
+    : "";
+
+  if (item.type === "documento") {
+    const source =
+      item.sourceCollection === "documentos" ? "&source=documentos" : "";
+    return `documento.html?id=${encodeURIComponent(item.id)}${owner}${source}`;
+  }
+
+  return `aula.html?id=${encodeURIComponent(item.id)}${owner}`;
+}
+
+function normalizeItem(docSnap, fallbackType, ownerUid, sourceCollection) {
+  const data = docSnap.data() || {};
+  const realType = resolveRealType(data, fallbackType);
+
+  const updatedDate =
+    extractDate(data.updatedAt) ||
+    extractDate(data.fechaActualizacion) ||
+    extractDate(data.createdAt) ||
+    extractDate(data.fecha) ||
+    null;
+
+  return {
+    id: docSnap.id,
+    ownerUid,
+    sourceCollection,
+    type: realType,
+    title: resolveTitle(
+      data,
+      realType === "clase" ? "Clase sin título" : "Documento sin título"
+    ),
+    description: resolveDescription(data, realType),
+    updatedAt: updatedDate,
+    openUrl: resolveOpenUrl({
+      id: docSnap.id,
+      type: realType,
+      ownerUid,
+      sourceCollection
+    })
+  };
+}
+
+async function getCollectionItems(uid, name, fallbackType) {
+  try {
+    const snap = await getDocs(collection(db, "usuarios", uid, name));
+    return snap.docs.map(docSnap =>
+      normalizeItem(docSnap, fallbackType, uid, name)
+    );
+  } catch (error) {
+    console.warn(`No se pudo leer ${name}:`, error);
+    return [];
+  }
+}
 
     function renderCards(items) {
       cardsGrid.innerHTML = "";
