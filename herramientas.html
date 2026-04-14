@@ -17,7 +17,6 @@
       --bg:#f6f7fb;
       --sidebar:#ffffff;
       --surface:#ffffff;
-      --surface-2:#fbfbfe;
       --line:#ececf3;
       --line-soft:#f2f3f8;
       --text:#20243a;
@@ -26,7 +25,6 @@
       --brand:#1fb8c9;
       --brand-dark:#1498a8;
       --brand-soft:#e9fbfd;
-      --brand-soft-2:#f3fdff;
 
       --active-bg:#eff0fa;
       --active-text:#167f9c;
@@ -40,11 +38,6 @@
 
       --shadow:0 10px 30px rgba(31, 42, 68, .07);
       --shadow-soft:0 8px 22px rgba(25,35,68,.04);
-
-      --radius-xl:26px;
-      --radius-lg:20px;
-      --radius-md:16px;
-      --radius-sm:12px;
     }
 
     *{
@@ -53,7 +46,7 @@
       padding:0;
     }
 
-    html,body{
+    html, body{
       width:100%;
       min-height:100%;
       font-family:"Nunito", system-ui, sans-serif;
@@ -215,7 +208,7 @@
       display:flex;
       align-items:center;
       justify-content:space-between;
-      gap:16px;
+      gap:18px;
       padding:18px 26px;
       background:rgba(246,247,251,.88);
       backdrop-filter:blur(10px);
@@ -225,18 +218,17 @@
     .topbar-left{
       display:flex;
       align-items:center;
-      gap:14px;
-      min-width:0;
       flex:1;
+      min-width:0;
     }
 
     .menu-btn{
+      display:none;
       width:48px;
       height:48px;
       background:white;
       border:1px solid var(--line);
       border-radius:16px;
-      display:grid;
       place-items:center;
       color:#667089;
       box-shadow:var(--shadow);
@@ -251,19 +243,19 @@
 
     .search-wrap{
       position:relative;
-      flex:1;
-      max-width:820px;
+      width:100%;
+      max-width:920px;
       min-width:0;
     }
 
-    .search-wrap i{
+    .search-icon{
       position:absolute;
       left:18px;
       top:50%;
       transform:translateY(-50%);
-      width:18px;
-      height:18px;
-      color:#98a1b5;
+      width:20px;
+      height:20px;
+      color:#97a0b4;
       pointer-events:none;
     }
 
@@ -273,7 +265,7 @@
       border:1px solid var(--line);
       background:white;
       border-radius:20px;
-      padding:0 20px 0 52px;
+      padding:0 20px 0 54px;
       color:var(--text);
       outline:none;
       font-weight:700;
@@ -294,9 +286,8 @@
     .topbar-right{
       display:flex;
       align-items:center;
-      gap:12px;
+      justify-content:center;
       flex-shrink:0;
-      position:relative;
     }
 
     .profile-wrap{
@@ -304,8 +295,8 @@
     }
 
     .profile-trigger{
-      width:50px;
-      height:50px;
+      width:56px;
+      height:56px;
       border-radius:50%;
       border:3px solid #7ed5de;
       background:linear-gradient(180deg, #ffffff 0%, #eef5ff 100%);
@@ -325,7 +316,7 @@
 
     .profile-menu{
       position:absolute;
-      top:62px;
+      top:66px;
       right:0;
       width:260px;
       background:white;
@@ -631,6 +622,11 @@
         transform:translateX(0);
       }
 
+      .menu-btn{
+        display:grid;
+        margin-right:12px;
+      }
+
       .tools-grid{
         grid-template-columns:repeat(2, minmax(0, 1fr));
       }
@@ -643,6 +639,7 @@
     @media (max-width:640px){
       .topbar{
         padding:16px;
+        gap:12px;
       }
 
       .content{
@@ -664,12 +661,19 @@
 
       .search-input{
         height:50px;
+        border-radius:18px;
       }
 
-      .menu-btn,
       .profile-trigger{
+        width:48px;
+        height:48px;
+      }
+
+      .menu-btn{
         width:44px;
         height:44px;
+        border-radius:14px;
+        margin-right:10px;
       }
 
       .profile-menu{
@@ -737,7 +741,7 @@
           </button>
 
           <div class="search-wrap">
-            <i data-lucide="search"></i>
+            <i class="search-icon" data-lucide="search"></i>
             <input
               id="searchInput"
               class="search-input"
