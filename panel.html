@@ -204,82 +204,6 @@
       flex-direction:column;
     }
 
-    .topbar{
-      position:sticky;
-      top:0;
-      z-index:20;
-      display:flex;
-      align-items:center;
-      justify-content:flex-end;
-      gap:16px;
-      padding:18px 26px;
-      background:rgba(246,247,251,.88);
-      backdrop-filter:blur(10px);
-      border-bottom:1px solid rgba(236,236,243,.75);
-    }
-
-    .topbar-right{
-      display:flex;
-      align-items:center;
-      gap:12px;
-      flex-shrink:0;
-      position:relative;
-    }
-
-    .profile-wrap{
-      position:relative;
-    }
-
-    .profile-trigger{
-      width:50px;
-      height:50px;
-      border-radius:50%;
-      border:3px solid #7ed5de;
-      background:linear-gradient(180deg, #ffffff 0%, #eef5ff 100%);
-      display:grid;
-      place-items:center;
-      color:#4b5671;
-      font-size:1rem;
-      font-weight:900;
-      box-shadow:var(--shadow);
-      transition:transform .2s ease, box-shadow .2s ease;
-    }
-
-    .profile-trigger:hover{
-      transform:translateY(-1px);
-      box-shadow:0 14px 32px rgba(31,42,68,.10);
-    }
-
-    .profile-menu{
-      position:absolute;
-      top:62px;
-      right:0;
-      width:260px;
-      background:white;
-      border:1px solid var(--line);
-      border-radius:20px;
-      box-shadow:0 20px 45px rgba(16, 28, 52, .12);
-      padding:12px;
-      display:none;
-      z-index:50;
-    }
-
-    .profile-menu.open{
-      display:block;
-      animation:fadeMenu .18s ease;
-    }
-
-    @keyframes fadeMenu{
-      from{
-        opacity:0;
-        transform:translateY(-6px);
-      }
-      to{
-        opacity:1;
-        transform:translateY(0);
-      }
-    }
-
     .profile-head{
       display:flex;
       align-items:center;
@@ -836,17 +760,7 @@
       .hero-card h2{
         font-size:1.8rem;
       }
-
-      .profile-trigger{
-        width:44px;
-        height:44px;
-      }
-
-      .profile-menu{
-        right:-4px;
-        width:240px;
-      }
-
+      
       .recent-item{
         flex-direction:column;
         align-items:flex-start;
@@ -909,54 +823,6 @@
     </aside>
 
     <main class="main">
-      <header class="topbar">
-        <div class="topbar-right">
-          <div class="profile-wrap">
-            <button
-              class="profile-trigger"
-              id="profileTrigger"
-              type="button"
-              aria-label="Abrir menú de cuenta"
-              aria-expanded="false"
-            >
-              <span id="topbarInitial">U</span>
-            </button>
-
-            <div class="profile-menu" id="profileMenu">
-              <div class="profile-head">
-                <div class="profile-avatar" id="menuAvatar">U</div>
-                <div>
-                  <div class="profile-name" id="menuUserName">Usuario</div>
-                  <div class="profile-mail" id="menuUserEmail">Cargando...</div>
-                </div>
-              </div>
-
-              <div class="profile-links">
-                <a href="cuenta.html" class="profile-link">
-                  <i data-lucide="user-round"></i>
-                  <span>Mi cuenta</span>
-                </a>
-
-                <a href="plan.html" class="profile-link">
-                  <i data-lucide="badge-check"></i>
-                  <span>Mi plan</span>
-                </a>
-
-                <a href="configuracion.html" class="profile-link">
-                  <i data-lucide="settings-2"></i>
-                  <span>Configuración</span>
-                </a>
-
-                <button class="profile-link logout" id="profileLogoutBtn" type="button">
-                  <i data-lucide="log-out"></i>
-                  <span>Cerrar sesión</span>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </header>
-
       <section class="content">
         <div class="section-head">
           <div>
@@ -1129,11 +995,7 @@
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
     const $ = (id) => document.getElementById(id);
-
-    const profileTrigger = $("profileTrigger");
-    const profileMenu = $("profileMenu");
     const logoutBtn = $("logoutBtn");
-    const profileLogoutBtn = $("profileLogoutBtn");
 
     const state = {
       docs: [],
@@ -1454,26 +1316,7 @@
       }
     }
 
-    if (profileTrigger && profileMenu) {
-      profileTrigger.addEventListener("click", (e) => {
-        e.stopPropagation();
-        const isOpen = profileMenu.classList.toggle("open");
-        profileTrigger.setAttribute("aria-expanded", String(isOpen));
-      });
-    }
-
-    document.addEventListener("click", (e) => {
-      const clickedProfile =
-        profileTrigger?.contains(e.target) || profileMenu?.contains(e.target);
-
-      if (!clickedProfile) {
-        profileMenu?.classList.remove("open");
-        profileTrigger?.setAttribute("aria-expanded", "false");
-      }
-    });
-
     logoutBtn?.addEventListener("click", () => handleLogout(logoutBtn));
-    profileLogoutBtn?.addEventListener("click", () => handleLogout(profileLogoutBtn));
 
     onAuthStateChanged(auth, async (user) => {
       if (!user) {
