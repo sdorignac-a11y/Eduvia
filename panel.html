@@ -79,7 +79,6 @@
       grid-template-columns:280px 1fr;
     }
 
-    /* SIDEBAR */
     .sidebar{
       background:var(--sidebar);
       border-right:1px solid var(--line);
@@ -197,86 +196,10 @@
       background:#eef2f8;
     }
 
-    /* MAIN */
     .main{
       min-width:0;
       display:flex;
       flex-direction:column;
-    }
-
-    .profile-head{
-      display:flex;
-      align-items:center;
-      gap:12px;
-      padding:10px 10px 14px;
-      border-bottom:1px solid var(--line-soft);
-      margin-bottom:8px;
-    }
-
-    .profile-avatar{
-      width:44px;
-      height:44px;
-      border-radius:50%;
-      display:grid;
-      place-items:center;
-      background:linear-gradient(180deg, #dff9fc 0%, #eef5ff 100%);
-      color:#35405a;
-      font-weight:900;
-      border:2px solid #9fe2e8;
-      flex-shrink:0;
-    }
-
-    .profile-name{
-      font-weight:900;
-      color:#26304b;
-      line-height:1.1;
-    }
-
-    .profile-mail{
-      margin-top:3px;
-      font-size:.88rem;
-      color:#8a92a8;
-      font-weight:700;
-      word-break:break-word;
-    }
-
-    .profile-links{
-      display:flex;
-      flex-direction:column;
-      gap:4px;
-    }
-
-    .profile-link{
-      width:100%;
-      display:flex;
-      align-items:center;
-      gap:12px;
-      padding:12px 12px;
-      border-radius:14px;
-      color:#556079;
-      font-weight:800;
-      transition:.2s ease;
-      text-align:left;
-    }
-
-    .profile-link:hover{
-      background:#f7f9fc;
-      color:#24314b;
-    }
-
-    .profile-link.logout{
-      color:#b04f4f;
-    }
-
-    .profile-link.logout:hover{
-      background:#fff5f5;
-      color:#9c3f3f;
-    }
-
-    .profile-link i{
-      width:18px;
-      height:18px;
-      flex-shrink:0;
     }
 
     .content{
@@ -309,14 +232,25 @@
       font-size:1rem;
     }
 
-    .section-meta{
-      background:white;
-      border:1px solid var(--line);
-      padding:12px 16px;
-      border-radius:16px;
-      color:#68718b;
-      font-weight:800;
+    .account-circle{
+      width:58px;
+      height:58px;
+      border-radius:50%;
+      display:grid;
+      place-items:center;
+      background:linear-gradient(180deg, #ffffff 0%, #eef5ff 100%);
+      border:3px solid #7ed5de;
+      color:#4b5671;
+      font-size:1.08rem;
+      font-weight:900;
       box-shadow:var(--shadow);
+      flex-shrink:0;
+      transition:.2s ease;
+    }
+
+    .account-circle:hover{
+      transform:translateY(-1px);
+      box-shadow:0 14px 32px rgba(31,42,68,.10);
     }
 
     .hero-grid{
@@ -739,10 +673,6 @@
     }
 
     @media (max-width: 720px){
-      .topbar{
-        padding:16px;
-      }
-
       .content{
         padding:20px 16px 26px;
       }
@@ -760,7 +690,12 @@
       .hero-card h2{
         font-size:1.8rem;
       }
-      
+
+      .account-circle{
+        width:50px;
+        height:50px;
+      }
+
       .recent-item{
         flex-direction:column;
         align-items:flex-start;
@@ -832,9 +767,9 @@
             </p>
           </div>
 
-          <div class="section-meta" id="panelMeta">
-            Cargando contenido...
-          </div>
+          <a href="cuenta.html" class="account-circle" id="accountCircle" aria-label="Ir a mi cuenta">
+            <span id="accountInitial">U</span>
+          </a>
         </div>
 
         <section class="hero-grid">
@@ -996,6 +931,7 @@
 
     const $ = (id) => document.getElementById(id);
     const logoutBtn = $("logoutBtn");
+    const accountInitial = $("accountInitial");
 
     const state = {
       docs: [],
@@ -1200,23 +1136,6 @@
       return items;
     }
 
-    function updateProfileUI(fullName, email) {
-      const initial = getInitial(fullName, email);
-
-      setText("topbarInitial", initial);
-      setText("menuAvatar", initial);
-      setText("menuUserName", fullName || "Usuario");
-      setText("menuUserEmail", email || "Sin email");
-    }
-
-    function updatePanelMeta() {
-      const total = state.docs.length + state.classes.length;
-      setText(
-        "panelMeta",
-        `${total} elemento${total === 1 ? "" : "s"} guardado${total === 1 ? "" : "s"}`
-      );
-    }
-
     function renderAll() {
       renderRecentItems({
         items: state.docs,
@@ -1231,8 +1150,6 @@
         emptyEl: $("classesEmptyState"),
         type: "class"
       });
-
-      updatePanelMeta();
     }
 
     async function loadPanel(user) {
@@ -1244,8 +1161,7 @@
       const email = userData?.email || user.email || "Sin email";
 
       state.user = user;
-
-      updateProfileUI(fullName, email);
+      setText("accountInitial", getInitial(fullName, email));
 
       setText("welcomeBadge", "Cuenta activa");
       setText("heroTitle", `Bienvenido, ${fullName}`);
@@ -1334,7 +1250,6 @@
           "heroText",
           "Hubo un problema trayendo la información desde Firebase. Revisá la consola y la estructura exacta de tus colecciones."
         );
-        setText("panelMeta", "Error al cargar");
       }
     });
   </script>
