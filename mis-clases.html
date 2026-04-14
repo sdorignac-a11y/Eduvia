@@ -667,6 +667,92 @@
 
     .create-empty-card{
   cursor:pointer;
+  border:2px dashed #cfc7ff;
+  background:linear-gradient(180deg, #fcfbff 0%, #f7f4ff 100%);
+  box-shadow:0 12px 28px rgba(124,108,255,.08);
+  position:relative;
+}
+
+.create-empty-card:hover{
+  transform:translateY(-4px);
+  border-color:#a99cff;
+  box-shadow:0 18px 34px rgba(124,108,255,.14);
+}
+
+.create-empty-card::before{
+  content:"";
+  position:absolute;
+  top:14px;
+  right:14px;
+  width:90px;
+  height:90px;
+  border-radius:50%;
+  background:radial-gradient(circle, rgba(124,108,255,.14) 0%, rgba(124,108,255,0) 72%);
+  pointer-events:none;
+}
+
+.create-icon{
+  box-shadow:0 10px 22px rgba(124,108,255,.18);
+}
+
+.create-badge{
+  background:#ede9ff;
+  color:#6d5ef6;
+  font-weight:900;
+}
+
+.create-mini-label{
+  font-size:.82rem;
+  font-weight:900;
+  letter-spacing:.03em;
+  text-transform:uppercase;
+  color:#7a6df2;
+  margin-top:-2px;
+}
+
+.create-pill{
+  background:#f3f0ff;
+  border-color:#e4ddff;
+  color:#6f63e8;
+}
+
+.create-note{
+  margin-top:4px;
+  font-size:.92rem;
+  line-height:1.5;
+  color:#776fa3;
+  font-weight:800;
+}
+
+.create-footer{
+  margin-top:auto;
+  justify-content:flex-start;
+}
+
+.create-main-btn{
+  width:100%;
+  min-height:52px;
+  border:none;
+  border-radius:16px;
+  background:linear-gradient(180deg, #8b7cff 0%, #7464f5 100%);
+  color:#fff;
+  font-weight:900;
+  font-size:.98rem;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  box-shadow:0 14px 26px rgba(116,100,245,.24);
+  transition:transform .2s ease, box-shadow .2s ease;
+}
+
+.create-main-btn:hover{
+  transform:translateY(-1px);
+  box-shadow:0 18px 30px rgba(116,100,245,.28);
+}
+
+    .create-empty-card{
+  cursor:pointer;
   border:1.5px dashed #d8d6ff;
   background:linear-gradient(180deg, #ffffff 0%, #faf8ff 100%);
 }
@@ -1170,43 +1256,46 @@ async function getCollectionItems(uid, name, fallbackType) {
 function renderCards(items) {
   cardsGrid.innerHTML = "";
 
-  const createCardHtml = `
-    <article class="item-card create-empty-card" data-create-empty="documento">
-      <div class="item-top">
-        <div class="item-icon documento">
-          <i data-lucide="file-plus-2"></i>
-        </div>
-        <span class="badge documento">Nuevo</span>
+const createCardHtml = `
+  <article class="item-card create-empty-card" data-create-empty="documento">
+    <div class="item-top">
+      <div class="item-icon documento create-icon">
+        <i data-lucide="file-plus-2"></i>
       </div>
+      <span class="badge create-badge">Crear</span>
+    </div>
 
-      <h3 class="item-title">Generar documento vacío</h3>
-      <p class="item-desc">
-        Creá un documento limpio, sin contenido inicial, para empezar a escribir desde cero.
-      </p>
+    <div class="create-mini-label">Acción rápida</div>
 
-      <div class="item-meta">
-        <span class="meta-pill">
-          <i data-lucide="sparkles" style="width:14px;height:14px;"></i>
-          Sin IA
-        </span>
+    <h3 class="item-title">Nuevo documento vacío</h3>
+    <p class="item-desc">
+      Empezá desde cero. Tocá esta card y se crea un documento limpio automáticamente.
+    </p>
 
-        <span class="meta-pill">
-          <i data-lucide="files" style="width:14px;height:14px;"></i>
-          Documento
-        </span>
-      </div>
+    <div class="item-meta">
+      <span class="meta-pill create-pill">
+        <i data-lucide="sparkles" style="width:14px;height:14px;"></i>
+        Sin IA
+      </span>
 
-      <div class="item-footer">
-        <span class="open-link">Crear documento</span>
+      <span class="meta-pill create-pill">
+        <i data-lucide="plus-circle" style="width:14px;height:14px;"></i>
+        Se crea al instante
+      </span>
+    </div>
 
-        <div class="item-menu">
-          <button class="mini-btn" type="button">
-            Crear
-          </button>
-        </div>
-      </div>
-    </article>
-  `;
+    <div class="create-note">
+      Esta card no es un archivo guardado. Sirve para crear uno nuevo.
+    </div>
+
+    <div class="item-footer create-footer">
+      <button class="create-main-btn" type="button">
+        <i data-lucide="file-plus-2" style="width:18px;height:18px;"></i>
+        Crear documento vacío
+      </button>
+    </div>
+  </article>
+`;
 
   const itemsHtml = items.map(item => `
     <article class="item-card" data-type="${item.type}" data-title="${escapeHtml(item.title)}" data-description="${escapeHtml(item.description)}">
@@ -1254,12 +1343,17 @@ function renderCards(items) {
 
   totalCount.textContent = `${items.length} elemento${items.length === 1 ? "" : "s"}`;
 
-  const createCard = cardsGrid.querySelector('[data-create-empty="documento"]');
-  const createBtn = createCard?.querySelector(".mini-btn");
+const createCard = cardsGrid.querySelector('[data-create-empty="documento"]');
+const createBtn = createCard?.querySelector(".create-main-btn");
 
-  createCard?.addEventListener("click", () => {
-    createEmptyDocument();
-  });
+createCard?.addEventListener("click", () => {
+  createEmptyDocument();
+});
+
+createBtn?.addEventListener("click", (e) => {
+  e.stopPropagation();
+  createEmptyDocument();
+});
 
   createBtn?.addEventListener("click", (e) => {
     e.stopPropagation();
