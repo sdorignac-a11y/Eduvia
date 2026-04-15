@@ -17,6 +17,31 @@ function getValue(id) {
   return document.getElementById(id)?.value?.trim() || "";
 }
 
+function limpiarNumeroPalabras(value = "") {
+  const raw = String(value || "").trim();
+  if (!raw) return "";
+  const num = Number(raw);
+  if (!Number.isFinite(num) || num < 0) return "";
+  return String(Math.floor(num));
+}
+
+function construirExtensionDeseada({
+  palabrasMin = "",
+  palabrasMax = "",
+  duracion = "",
+}) {
+  const min = String(palabrasMin || "").trim();
+  const max = String(palabrasMax || "").trim();
+  const dur = String(duracion || "").trim();
+
+  if (min && max) return `Entre ${min} y ${max} palabras`;
+  if (min) return `Mínimo ${min} palabras`;
+  if (max) return `Máximo ${max} palabras`;
+  if (dur) return dur;
+
+  return "";
+}
+
 function renderFiles(files = []) {
   if (!fileList) return;
 
@@ -55,10 +80,14 @@ function setSubmitState(disabled) {
   const submitBtn = form?.querySelector('button[type="submit"]');
   if (!submitBtn) return;
 
+  const formato = getSelectedFormato();
+  const idleText = formato === "documento" ? "Crear contenido" : "Crear clase";
+  const loadingText = formato === "documento" ? "Creando contenido..." : "Creando clase...";
+
   submitBtn.disabled = disabled;
   submitBtn.style.opacity = disabled ? "0.7" : "1";
   submitBtn.style.pointerEvents = disabled ? "none" : "auto";
-  submitBtn.textContent = disabled ? "Creando clase..." : "Crear clase";
+  submitBtn.textContent = disabled ? loadingText : idleText;
 }
 
 onAuthStateChanged(auth, (user) => {
@@ -68,6 +97,7 @@ onAuthStateChanged(auth, (user) => {
   }
 
   currentUser = user;
+  setSubmitState(false);
 });
 
 form?.addEventListener("submit", async (e) => {
@@ -87,8 +117,21 @@ form?.addEventListener("submit", async (e) => {
   const objetivo = getValue("objetivo");
   const formato = getSelectedFormato();
 
+  const palabrasMin = limpiarNumeroPalabras(getValue("clase_palabras_min"));
+  const palabrasMax = limpiarNumeroPalabras(getValue("clase_palabras_max"));
+  const extensionDeseada = construirExtensionDeseada({
+    palabrasMin,
+    palabrasMax,
+    duracion,
+  });
+
   if (!materia || !tema || !nivel) {
     alert("Completá materia, tema y nivel.");
+    return;
+  }
+
+  if (palabrasMin && palabrasMax && Number(palabrasMin) > Number(palabrasMax)) {
+    alert("El mínimo de palabras no puede ser mayor que el máximo.");
     return;
   }
 
@@ -100,7 +143,10 @@ form?.addEventListener("submit", async (e) => {
       materia,
       tema,
       nivel,
-      duracion,
+      duracion: extensionDeseada || duracion || "",
+      palabrasMin,
+      palabrasMax,
+      extensionDeseada,
       objetivo,
       formato,
       ownerUid: currentUser.uid,
@@ -123,7 +169,10 @@ form?.addEventListener("submit", async (e) => {
       materia,
       tema,
       nivel,
-      duracion,
+      duracion: extensionDeseada || duracion || "",
+      palabrasMin,
+      palabrasMax,
+      extensionDeseada,
       objetivo,
       formato,
       ownerUid: currentUser.uid,
