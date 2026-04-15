@@ -18,6 +18,18 @@ const classesGrid = document.getElementById("classes-grid");
 const totalClases = document.getElementById("total-clases");
 const logoutBtn = document.getElementById("logout");
 
+const pageParams = new URLSearchParams(window.location.search);
+const pickerMode = pageParams.get("picker") === "1";
+const requestedTool = (pageParams.get("tool") || "").trim();
+
+const TOOL_LABELS = {
+  summary: "Resumen inteligente",
+  quiz: "Quiz interactivo",
+  complete: "Completar",
+  keywords: "Palabras clave",
+  presentation: "Presentación rápida"
+};
+
 let currentUser = null;
 
 logoutBtn?.addEventListener("click", async () => {
@@ -37,6 +49,7 @@ onAuthStateChanged(auth, async (user) => {
   }
 
   currentUser = user;
+  injectPickerBanner();
   await cargarClases(user.uid);
 });
 
@@ -73,7 +86,7 @@ async function cargarClases(uid) {
       const fechaTexto = formatearFecha(clase.creadoEn);
 
       const destino = buildClaseUrl(formato, claseId, uid);
-      const textoBoton = formato === "documento" ? "Abrir documento" : "Abrir clase";
+      const textoBoton = getTextoBoton(formato);
       const emoji = formato === "documento" ? "📄" : "📘";
 
       const article = document.createElement("article");
@@ -105,7 +118,7 @@ async function cargarClases(uid) {
 
           <div class="meta-box">
             <span>Formato</span>
-            <strong>${escapeHTML(capitalizar(formato))}</strong>
+            <strong>${escapeHTML(capitalizar(formato === "documento" ? "documento" : "clase"))}</strong>
           </div>
         </div>
 
@@ -116,14 +129,20 @@ async function cargarClases(uid) {
 
         <div class="card-actions">
           <a href="${destino}" class="btn btn-primary">${textoBoton}</a>
-          <button
-            type="button"
-            class="btn btn-danger delete-class-btn"
-            data-id="${claseId}"
-            data-title="${escapeHTML(tema)}"
-          >
-            Eliminar
-          </button>
+          ${
+            pickerMode
+              ? ""
+              : `
+                <button
+                  type="button"
+                  class="btn btn-danger delete-class-btn"
+                  data-id="${claseId}"
+                  data-title="${escapeHTML(tema)}"
+                >
+                  Eliminar
+                </button>
+              `
+          }
         </div>
       `;
 
@@ -136,6 +155,8 @@ async function cargarClases(uid) {
 }
 
 classesGrid?.addEventListener("click", async (e) => {
+  if (pickerMode) return;
+
   const deleteBtn = e.target.closest(".delete-class-btn");
   if (!deleteBtn || !currentUser) return;
 
@@ -187,7 +208,19 @@ function mostrarCargando() {
 
 function mostrarVacio() {
   if (loadingState) loadingState.style.display = "none";
-  if (emptyState) emptyState.style.display = "block";
+  if (emptyState) {
+    emptyState.style.display = "block";
+
+    if (pickerMode) {
+      emptyState.innerHTML = `
+        <strong>No tenés documentos o clases guardadas</strong>
+        <p style="margin-top:8px;">
+          Primero necesitás crear una clase o documento para usar esta herramienta.
+        </p>
+      `;
+    }
+  }
+
   if (classesGrid) classesGrid.style.display = "none";
 }
 
@@ -212,7 +245,43 @@ function normalizarFormato(formato = "") {
 
 function buildClaseUrl(formato, claseId, ownerUid) {
   const base = formato === "documento" ? "documento.html" : "clase.html";
+
+  if (pickerMode && requestedTool) {
+    return `${base}?id=${encodeURIComponent(claseId)}&owner=${encodeURIComponent(ownerUid)}&tool=${encodeURIComponent(requestedTool)}&from=picker`;
+  }
+
   return `${base}?id=${encodeURIComponent(claseId)}&owner=${encodeURIComponent(ownerUid)}`;
+}
+
+function getTextoBoton(formato) {
+  if (pickerMode) {
+    return formato === "documento" ? "Elegir documento" : "Elegir clase";
+  }
+
+  return formato === "documento" ? "Abrir documento" : "Abrir clase";
+}
+
+function injectPickerBanner() {
+  if (!pickerMode || !requestedTool) return;
+
+  const title = TOOL_LABELS[requestedTool] || "herramienta";
+  const banner = document.createElement("div");
+  banner.className = "picker-banner";
+  banner.innerHTML = `
+    <strong>Elegí un documento o clase</strong>
+    <span>Seleccioná uno para usar la herramienta: ${escapeHTML(title)}.</span>
+  `;
+
+  const container =
+    document.querySelector(".content") ||
+    document.querySelector(".page") ||
+    document.querySelector("main");
+
+  if (!container) return;
+
+  if (!document.querySelector(".picker-banner")) {
+    container.prepend(banner);
+  }
 }
 
 function capitalizar(texto = "") {
