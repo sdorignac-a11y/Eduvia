@@ -2265,8 +2265,84 @@ function renderDynamicFields() {
 applyToolPreset();
     
 
-    const form = document.getElementById("clase-form");
-    form?.addEventListener("submit", syncLegacyFields);
+    const resultTextarea = document.getElementById("resultado_texto");
+const copyResultBtn = document.getElementById("copy-result-btn");
+const backToEditBtn = document.getElementById("back-to-edit-btn");
+const form = document.getElementById("clase-form");
+
+function buildConclusionResult() {
+  const textoBase = valueOf("conclusion_texto_base");
+  const enfoque = valueOf("conclusion_enfoque");
+  const tono = document.getElementById("conclusion_tono")?.value || "Académico";
+  const extension = document.getElementById("conclusion_extension")?.value || "Media";
+  const cierre = valueOf("conclusion_cierre");
+
+  const textoPlano = textoBase.replace(/\s+/g, " ").trim();
+  const resumenBase =
+    textoPlano.length > 280
+      ? `${textoPlano.slice(0, 280).trim()}...`
+      : (textoPlano || "el contenido presentado");
+
+  let apertura = "En conclusión,";
+  if (tono === "Formal") apertura = "En definitiva,";
+  if (tono === "Claro") apertura = "Para cerrar,";
+  if (tono === "Persuasivo") apertura = "En síntesis,";
+
+  let cuerpo = `${apertura} ${resumenBase}`;
+
+  if (enfoque) {
+    cuerpo += ` Esto permite reforzar especialmente ${enfoque.toLowerCase()}.`;
+  } else {
+    cuerpo += ` Esto permite reforzar las ideas centrales del texto.`;
+  }
+
+  if (extension === "Media" || extension === "Larga") {
+    cuerpo += ` De este modo, la conclusión reúne los puntos más importantes y les da un cierre coherente y ordenado.`;
+  }
+
+  if (extension === "Larga") {
+    cuerpo += ` Además, ayuda a que el lector termine con una visión más clara del sentido general del contenido trabajado.`;
+  }
+
+  if (cierre) {
+    cuerpo += ` ${cierre}`;
+  }
+
+  return cuerpo.trim();
+}
+
+function showConclusionResult() {
+  const result = buildConclusionResult();
+
+  if (resultTextarea) {
+    resultTextarea.value = result;
+  }
+
+  goToStep(5);
+}
+
+form?.addEventListener("submit", (event) => {
+  if (selectedTool !== "conclusion") {
+    syncLegacyFields();
+    return;
+  }
+
+  event.preventDefault();
+  syncLegacyFields();
+  showConclusionResult();
+}, true);
+
+copyResultBtn?.addEventListener("click", async () => {
+  try {
+    await navigator.clipboard.writeText(resultTextarea?.value || "");
+  } catch (error) {
+    console.error("No se pudo copiar el resultado:", error);
+  }
+});
+
+backToEditBtn?.addEventListener("click", () => {
+  goToStep(2);
+});
   </script>
 </body>
 </html>
