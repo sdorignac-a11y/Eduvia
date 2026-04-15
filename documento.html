@@ -3638,17 +3638,20 @@
         }
       };
 
-      const toolFromUrl = new URLSearchParams(window.location.search).get("tool");
+const params = new URLSearchParams(window.location.search);
+const toolFromUrl = (params.get("tool") || "").trim().toLowerCase();
 
 const toolToPanelMap = {
+  flashcards: "flashcards-panel",
   quiz: "quiz-panel",
+  truefalse: "truefalse-panel",
   complete: "complete-panel",
   summary: "summary-panel",
   keywords: "keywords-panel",
   presentation: "presentation-panel"
 };
 
-function openToolFromQuery() {
+function runToolFromQuery() {
   if (!toolFromUrl) return;
 
   const panelId = toolToPanelMap[toolFromUrl];
@@ -3658,9 +3661,30 @@ function openToolFromQuery() {
   if (!meta) return;
 
   openToolPanel(panelId, meta);
+
+  setTimeout(() => {
+    if (toolFromUrl === "presentation") {
+      generatePresentationBtn?.click();
+      return;
+    }
+
+    const validStudyTools = [
+      "flashcards",
+      "quiz",
+      "truefalse",
+      "complete",
+      "summary",
+      "keywords"
+    ];
+
+    if (validStudyTools.includes(toolFromUrl)) {
+      closeToolPanel();
+      runStudyTool(toolFromUrl);
+    }
+  }, 250);
 }
 
-setTimeout(openToolFromQuery, 300);
+setTimeout(runToolFromQuery, 300);
       
       toolDockButtons.forEach((btn) => {
         btn.addEventListener("click", () => {
