@@ -922,23 +922,29 @@
             </div>
           </article>
 
-          <article class="tool-card" data-title="Generador de conclusión" data-desc="Crea un cierre final para clases, trabajos o actividades." data-href="crear-clase.html">
-            <div class="tool-top">
-              <div class="tool-icon"><i data-lucide="notebook-pen"></i></div>
-              <button class="star-btn" type="button" aria-label="Favorito">
-                <i data-lucide="star"></i>
-              </button>
-            </div>
-            <h3 class="tool-title">Generador de conclusión</h3>
-            <p class="tool-desc">Cierra una clase o contenido con un párrafo sólido, simple y bien armado.</p>
-            <div class="tool-foot">
-              <span class="tool-tag">
-                <i data-lucide="sparkles" style="width:14px;height:14px;"></i>
-                IA rápida
-              </span>
-              <span class="tool-open">Abrir</span>
-            </div>
-          </article>
+<article
+  class="tool-card"
+  data-title="Generador de conclusión"
+  data-desc="Crea un cierre final para clases, trabajos o actividades."
+  data-href="crear-clase.html"
+  data-tool="conclusion"
+>
+  <div class="tool-top">
+    <div class="tool-icon"><i data-lucide="notebook-pen"></i></div>
+    <button class="star-btn" type="button" aria-label="Favorito">
+      <i data-lucide="star"></i>
+    </button>
+  </div>
+  <h3 class="tool-title">Generador de conclusión</h3>
+  <p class="tool-desc">Cierra una clase o contenido con un párrafo sólido, simple y bien armado.</p>
+  <div class="tool-foot">
+    <span class="tool-tag">
+      <i data-lucide="sparkles" style="width:14px;height:14px;"></i>
+      IA rápida
+    </span>
+    <span class="tool-open">Abrir</span>
+  </div>
+</article>
 
           <article class="tool-card" data-title="Mejorador de contenido" data-desc="Reformula tus textos para que suenen más claros y ordenados." data-href="crear-clase.html">
             <div class="tool-top">
@@ -1198,22 +1204,28 @@
       });
     });
 
-    cards.forEach((card) => {
-      card.addEventListener("click", () => {
-        const href = card.dataset.href;
-        const mode = card.dataset.mode || "normal";
-        const tool = card.dataset.tool || "";
+cards.forEach((card) => {
+  card.addEventListener("click", () => {
+    const href = card.dataset.href;
+    const mode = card.dataset.mode || "normal";
+    const tool = card.dataset.tool || "";
 
-        if (mode === "requires-doc" && tool) {
-          window.location.href = `mis-clases.html?picker=1&tool=${encodeURIComponent(tool)}`;
-          return;
-        }
+    if (mode === "requires-doc" && tool) {
+      window.location.href = `mis-clases.html?picker=1&tool=${encodeURIComponent(tool)}`;
+      return;
+    }
 
-        if (href) {
-          window.location.href = href;
-        }
-      });
-    });
+    if (href) {
+      const url = new URL(href, window.location.origin);
+
+      if (tool) {
+        url.searchParams.set("tool", tool);
+      }
+
+      window.location.href = `${url.pathname}${url.search}`;
+    }
+  });
+});
 
     function cerrarSesion() {
       window.location.href = "login.html";
