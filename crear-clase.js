@@ -59,9 +59,24 @@ function getSelectedFormato() {
   return document.querySelector('input[name="formato"]:checked')?.value || "pizarron";
 }
 
-function buildDestino(formato, claseId, ownerUid) {
+const pageParams = new URLSearchParams(window.location.search);
+const pendingTool =
+  (pageParams.get("tool") || localStorage.getItem("eduvia_pending_tool") || "")
+    .trim()
+    .toLowerCase();
+
+function buildDestino(formato, claseId, ownerUid, tool = "") {
   const base = formato === "documento" ? "documento.html" : "clase.html";
-  return `${base}?id=${encodeURIComponent(claseId)}&owner=${encodeURIComponent(ownerUid)}`;
+  const params = new URLSearchParams();
+
+  params.set("id", claseId);
+  params.set("owner", ownerUid);
+
+  if (tool && formato === "documento") {
+    params.set("tool", tool);
+  }
+
+  return `${base}?${params.toString()}`;
 }
 
 function saveClaseInLocalStorage(clase) {
@@ -185,8 +200,9 @@ form?.addEventListener("submit", async (e) => {
 
     saveClaseInLocalStorage(claseGuardada);
 
-    const destino = buildDestino(formato, docRef.id, currentUser.uid);
-    window.location.href = destino;
+const destino = buildDestino(formato, docRef.id, currentUser.uid, pendingTool);
+localStorage.removeItem("eduvia_pending_tool");
+window.location.href = destino;
   } catch (error) {
     console.error("Error al crear la clase:", error);
     alert("Error al crear la clase: " + (error.message || "No se pudo guardar."));
