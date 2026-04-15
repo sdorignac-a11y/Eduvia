@@ -2328,8 +2328,13 @@ form?.addEventListener("submit", (event) => {
   }
 
   event.preventDefault();
+  event.stopPropagation();
+  event.stopImmediatePropagation();
+
   syncLegacyFields();
   showConclusionResult();
+
+  return false;
 }, true);
 
 copyResultBtn?.addEventListener("click", async () => {
