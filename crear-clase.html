@@ -1552,6 +1552,7 @@
                   <input type="hidden" id="nivel" name="nivel" />
                   <input type="hidden" id="duracion" name="duracion" />
                   <textarea id="objetivo" name="objetivo"></textarea>
+                  <input type="hidden" id="tool_mode" name="tool_mode" value="" />
                 </div>
               </div>
 
@@ -1783,6 +1784,13 @@
     const legacyNivel = document.getElementById("nivel");
     const legacyDuracion = document.getElementById("duracion");
     const legacyObjetivo = document.getElementById("objetivo");
+    const legacyToolMode = document.getElementById("tool_mode");
+
+const urlParams = new URLSearchParams(window.location.search);
+const selectedTool = (urlParams.get("tool") || "").trim().toLowerCase();
+
+const stepTwoTitle = document.querySelector('.step-panel[data-panel="2"] .section-head h3');
+const stepTwoText = document.querySelector('.step-panel[data-panel="2"] .section-head p');
 
     const fieldTemplates = {
       clase: `
@@ -1968,6 +1976,57 @@
         </div>
       `
     };
+    const toolTemplates = {
+  conclusion: `
+    <div class="field full">
+      <label for="conclusion_texto_base">Texto base</label>
+      <textarea
+        id="conclusion_texto_base"
+        placeholder="Pegá acá el texto completo o la parte principal para generar una conclusión coherente."
+      ></textarea>
+      <span class="helper">Este texto es la base principal del cierre.</span>
+    </div>
+
+    <div class="field">
+      <label for="conclusion_enfoque">Idea a cerrar</label>
+      <input
+        id="conclusion_enfoque"
+        placeholder="Ejemplo: cerrar destacando las consecuencias principales"
+      />
+      <span class="helper">Qué querés que deje claro la conclusión.</span>
+    </div>
+
+    <div class="field">
+      <label for="conclusion_tono">Tono</label>
+      <select id="conclusion_tono">
+        <option value="Académico">Académico</option>
+        <option value="Claro">Claro</option>
+        <option value="Formal">Formal</option>
+        <option value="Persuasivo">Persuasivo</option>
+      </select>
+      <span class="helper">Cómo querés que suene el cierre.</span>
+    </div>
+
+    <div class="field">
+      <label for="conclusion_extension">Extensión</label>
+      <select id="conclusion_extension">
+        <option value="Corta">Corta</option>
+        <option value="Media" selected>Media</option>
+        <option value="Larga">Larga</option>
+      </select>
+      <span class="helper">Largo aproximado de la conclusión.</span>
+    </div>
+
+    <div class="field full">
+      <label for="conclusion_cierre">Indicaciones extra</label>
+      <textarea
+        id="conclusion_cierre"
+        placeholder="Ejemplo: que termine con una reflexión final y sin repetir literalmente el texto."
+      ></textarea>
+      <span class="helper">Opcional.</span>
+    </div>
+  `
+};
 
     function valueOf(id) {
       return document.getElementById(id)?.value?.trim() || "";
@@ -1977,6 +2036,32 @@
       const selected = document.querySelector('input[name="tipo_contenido"]:checked')?.value || "clase";
 
       legacyTipo.value = selected;
+      if (legacyToolMode) {
+  legacyToolMode.value = selectedTool;
+}
+
+if (selectedTool === "conclusion") {
+  const textoBase = valueOf("conclusion_texto_base");
+  const enfoque = valueOf("conclusion_enfoque");
+  const tono = document.getElementById("conclusion_tono")?.value || "Académico";
+  const extension = document.getElementById("conclusion_extension")?.value || "Media";
+  const cierre = valueOf("conclusion_cierre");
+
+  legacyTipo.value = "documento";
+  legacyMateria.value = "Generador de conclusión";
+  legacyTema.value = enfoque || "Conclusión";
+  legacyNivel.value = tono;
+  legacyDuracion.value = extension;
+  legacyObjetivo.value =
+    `Herramienta: Generador de conclusión.\n` +
+    `Texto base:\n${textoBase || "No especificado"}\n\n` +
+    `Idea a cerrar: ${enfoque || "No especificado"}.\n` +
+    `Tono: ${tono}.\n` +
+    `Extensión: ${extension}.\n` +
+    `Indicaciones extra: ${cierre || "No especificado"}.`;
+
+  return;
+}
 
 if (selected === "clase") {
   const minPalabras = valueOf("clase_palabras_min");
@@ -2075,19 +2160,45 @@ if (selected === "clase") {
         input.addEventListener("change", syncLegacyFields);
       });
     }
+    function applyToolPreset() {
+  if (selectedTool !== "conclusion") return;
 
-    function renderDynamicFields() {
-      const selected = document.querySelector('input[name="tipo_contenido"]:checked')?.value || "clase";
-      dynamicFields.innerHTML = fieldTemplates[selected] || fieldTemplates.clase;
-      bindDynamicInputs();
-      syncLegacyFields();
-    }
+  const documentoInput = document.querySelector('input[name="tipo_contenido"][value="documento"]');
+  if (documentoInput) {
+    documentoInput.checked = true;
+  }
+
+  if (stepTwoTitle) {
+    stepTwoTitle.textContent = "Pegá el texto para generar la conclusión";
+  }
+
+  if (stepTwoText) {
+    stepTwoText.textContent = "Usá tu texto base para crear un cierre coherente, con el tono y la extensión que elijas.";
+  }
+
+  renderDynamicFields();
+  goToStep(2);
+}
+
+function renderDynamicFields() {
+  const selected = document.querySelector('input[name="tipo_contenido"]:checked')?.value || "clase";
+
+  if (selectedTool === "conclusion") {
+    dynamicFields.innerHTML = toolTemplates.conclusion;
+  } else {
+    dynamicFields.innerHTML = fieldTemplates[selected] || fieldTemplates.clase;
+  }
+
+  bindDynamicInputs();
+  syncLegacyFields();
+}
 
     tipoInputs.forEach((input) => {
       input.addEventListener("change", renderDynamicFields);
     });
 
     renderDynamicFields();
+applyToolPreset();
 
     const form = document.getElementById("clase-form");
     form?.addEventListener("submit", syncLegacyFields);
