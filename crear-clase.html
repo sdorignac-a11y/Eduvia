@@ -2271,44 +2271,40 @@ const backToEditBtn = document.getElementById("back-to-edit-btn");
 const form = document.getElementById("clase-form");
 
 function buildConclusionResult() {
-  const textoBase = valueOf("conclusion_texto_base");
   const enfoque = valueOf("conclusion_enfoque");
   const tono = document.getElementById("conclusion_tono")?.value || "Académico";
   const extension = document.getElementById("conclusion_extension")?.value || "Media";
   const cierre = valueOf("conclusion_cierre");
 
-  const textoPlano = textoBase.replace(/\s+/g, " ").trim();
-  const resumenBase =
-    textoPlano.length > 280
-      ? `${textoPlano.slice(0, 280).trim()}...`
-      : (textoPlano || "el contenido presentado");
+  let conclusion = "";
 
-  let apertura = "En conclusión,";
-  if (tono === "Formal") apertura = "En definitiva,";
-  if (tono === "Claro") apertura = "Para cerrar,";
-  if (tono === "Persuasivo") apertura = "En síntesis,";
-
-  let cuerpo = `${apertura} ${resumenBase}`;
+  if (tono === "Claro") {
+    conclusion = "En conclusión, este tema demuestra una idea central muy importante.";
+  } else if (tono === "Formal") {
+    conclusion = "En definitiva, este análisis permite comprender con mayor claridad la importancia del tema desarrollado.";
+  } else if (tono === "Persuasivo") {
+    conclusion = "En síntesis, todo lo expuesto confirma la relevancia de este tema y su impacto.";
+  } else {
+    conclusion = "En conclusión, este tema permite comprender una idea central de gran importancia.";
+  }
 
   if (enfoque) {
-    cuerpo += ` Esto permite reforzar especialmente ${enfoque.toLowerCase()}.`;
-  } else {
-    cuerpo += ` Esto permite reforzar las ideas centrales del texto.`;
+    conclusion += ` Además, refuerza especialmente ${enfoque.toLowerCase()}.`;
   }
 
   if (extension === "Media" || extension === "Larga") {
-    cuerpo += ` De este modo, la conclusión reúne los puntos más importantes y les da un cierre coherente y ordenado.`;
+    conclusion += " De este modo, las ideas principales quedan unidas en un cierre claro y coherente.";
   }
 
   if (extension === "Larga") {
-    cuerpo += ` Además, ayuda a que el lector termine con una visión más clara del sentido general del contenido trabajado.`;
+    conclusion += " Esto ayuda a valorar mejor el significado general del contenido y su importancia dentro del contexto tratado.";
   }
 
   if (cierre) {
-    cuerpo += ` ${cierre}`;
+    conclusion += ` ${cierre}`;
   }
 
-  return cuerpo.trim();
+  return conclusion.trim();
 }
 
 function showConclusionResult() {
