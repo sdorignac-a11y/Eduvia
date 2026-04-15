@@ -118,28 +118,15 @@
     }
 
     .brand-text{
-      display:flex;
-      flex-direction:column;
-      line-height:1;
-    }
-
-    .brand-text strong{
-      font-size:2rem;
-      font-weight:800;
-      letter-spacing:-0.03em;
-      background:linear-gradient(90deg, #31d2d8 0%, #5f8cff 100%);
-      -webkit-background-clip:text;
-      -webkit-text-fill-color:transparent;
-      background-clip:text;
-    }
-
-    .brand-text span{
-      margin-top:4px;
-      font-size:.82rem;
-      font-weight:800;
-      color:#8c93a8;
-      letter-spacing:.02em;
-    }
+  font-size:2rem;
+  font-weight:800;
+  line-height:1;
+  letter-spacing:-0.03em;
+  background:linear-gradient(90deg, #31d2d8 0%, #5f8cff 100%);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+}
 
     .nav{
       display:flex;
@@ -192,36 +179,14 @@
       flex-shrink:0;
     }
 
-    .sidebar-tip{
-      margin-top:auto;
-      background:#f9fbff;
-      border:1px solid var(--line);
-      border-radius:20px;
-      padding:16px;
-      box-shadow:var(--shadow-soft);
-    }
-
-    .sidebar-tip strong{
-      display:block;
-      color:#26304b;
-      font-size:.95rem;
-      margin-bottom:6px;
-    }
-
-    .sidebar-tip p{
-      color:var(--muted);
-      font-size:.9rem;
-      line-height:1.55;
-      font-weight:700;
-    }
-
-    .sidebar-footer{
-      display:flex;
-      flex-direction:column;
-      gap:10px;
-      padding-top:14px;
-      border-top:1px solid var(--line-soft);
-    }
+  .sidebar-footer{
+  margin-top:auto;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  padding-top:14px;
+  border-top:1px solid var(--line-soft);
+}
 
     .logout-btn{
       width:100%;
@@ -1255,61 +1220,53 @@
 </head>
 <body style="visibility:hidden; opacity:0;">
   <div class="app">
-    <aside class="sidebar" id="sidebar">
-      <div class="brand">
-        <div class="brand-badge">
-          <i data-lucide="graduation-cap"></i>
-        </div>
-        <div class="brand-text">
-          <strong>Eduvia</strong>
-          <span>Tu aula con IA</span>
-        </div>
-      </div>
+<aside class="sidebar" id="sidebar">
+  <div class="brand">
+    <div class="brand-badge">
+      <i data-lucide="graduation-cap"></i>
+    </div>
+    <div class="brand-text">Eduvia</div>
+  </div>
 
-      <nav class="nav">
-        <a href="panel.html" class="nav-link">
-          <i class="nav-icon" data-lucide="house"></i>
-          <span>Inicio</span>
-        </a>
+  <nav class="nav">
+    <a href="panel.html" class="nav-link">
+      <i class="nav-icon" data-lucide="house"></i>
+      <span>Inicio</span>
+    </a>
 
-        <a href="crear-clase.html" class="nav-link active">
-          <i class="nav-icon" data-lucide="plus-square"></i>
-          <span>Crear contenido</span>
-        </a>
+    <a href="herramientas.html" class="nav-link">
+      <i class="nav-icon" data-lucide="briefcase"></i>
+      <span>Herramientas</span>
+    </a>
 
-        <a href="panel.html#guia" class="nav-link">
-          <i class="nav-icon" data-lucide="sparkles"></i>
-          <span>Cómo funciona</span>
-        </a>
+    <a href="mis-clases.html" class="nav-link">
+      <i class="nav-icon" data-lucide="folder-open"></i>
+      <span>Mis clases</span>
+    </a>
 
-        <a href="mis-clases.html" class="nav-link">
-          <i class="nav-icon" data-lucide="folder-open"></i>
-          <span>Mis clases</span>
-        </a>
+    <a href="crear-clase.html" class="nav-link active">
+      <i class="nav-icon" data-lucide="plus-square"></i>
+      <span>Crear clase</span>
+    </a>
 
-        <a href="historial.html" class="nav-link">
-          <i class="nav-icon" data-lucide="history"></i>
-          <span>Historial</span>
-        </a>
+    <a href="aula.html" class="nav-link">
+      <i class="nav-icon" data-lucide="monitor-play"></i>
+      <span>Aula</span>
+    </a>
 
-        <a href="configuracion.html" class="nav-link">
-          <i class="nav-icon" data-lucide="settings-2"></i>
-          <span>Ajustes</span>
-        </a>
-      </nav>
+    <a href="historial.html" class="nav-link">
+      <i class="nav-icon" data-lucide="history"></i>
+      <span>Historial</span>
+    </a>
+  </nav>
 
-      <div class="sidebar-tip">
-        <strong>Consejo</strong>
-        <p>Cuanto más claro sea el pedido, mejor va a quedar el contenido final.</p>
-      </div>
-
-      <div class="sidebar-footer">
-        <button class="logout-btn" id="logout">
-          <i data-lucide="log-out"></i>
-          <span>Cerrar sesión</span>
-        </button>
-      </div>
-    </aside>
+  <div class="sidebar-footer">
+    <button class="logout-btn" id="logout">
+      <i data-lucide="log-out"></i>
+      <span>Cerrar sesión</span>
+    </button>
+  </div>
+</aside>
 
     <main class="main">
       <header class="topbar">
