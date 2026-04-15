@@ -35,7 +35,7 @@
       --radius-pill:999px;
 
       --chat-width:360px;
-      --left-rail-width:280px;
+      --left-rail-width:92px;
     }
 
     *{ box-sizing:border-box; margin:0; padding:0; }
@@ -63,7 +63,6 @@
       border:0 !important;
     }
 
-    /* ===== access ===== */
     .access-guard{
       display:none;
       min-height:100vh;
@@ -95,7 +94,6 @@
       line-height:1.7;
     }
 
-    /* ===== loading ===== */
     .doc-loading-screen{
       position:fixed;
       inset:0;
@@ -299,22 +297,24 @@
       to{ transform:translateX(10%); }
     }
 
-    /* ===== header ===== */
     .editor-chrome{
       position:sticky;
       top:0;
-      z-index:60;
-      background:#fff;
-      border-bottom:1px solid var(--line);
+      z-index:80;
+      background:rgba(255,255,255,.96);
+      backdrop-filter:blur(14px);
+      border-bottom:1px solid #e8edf3;
+      box-shadow:0 10px 24px rgba(15,23,42,.06);
     }
 
     .topbar{
-      min-height:68px;
+      min-height:70px;
       display:flex;
       align-items:center;
       justify-content:space-between;
       gap:16px;
       padding:12px 18px;
+      border-bottom:1px solid #eef2f6;
     }
 
     .topbar-left{
@@ -429,74 +429,28 @@
       transform:none;
     }
 
-    /* ===== layout ===== */
-    .page-shell{
-      position:relative;
-      min-height:calc(100vh - 69px);
-    }
-
-    #document-app.document-with-chat .workspace{
-      padding-left:calc(var(--left-rail-width) + 34px);
-      padding-right:calc(var(--chat-width) + 42px);
-    }
-
-    #document-app.document-with-chat .tool-panel{
-      left:calc(var(--left-rail-width) + 34px);
-      right:auto;
-    }
-
-    .left-rail{
-      position:fixed;
-      top:92px;
-      left:18px;
-      bottom:24px;
-      width:var(--left-rail-width);
-      z-index:58;
-      display:flex;
-      flex-direction:column;
-      gap:14px;
-    }
-
-    .left-card{
-      background:rgba(255,255,255,.94);
-      border:1px solid #e4e8ee;
-      border-radius:24px;
-      box-shadow:var(--shadow-panel);
-      backdrop-filter:blur(12px);
-      overflow:hidden;
-    }
-
-    .left-card-header{
-      padding:16px 18px 12px;
-      border-bottom:1px solid #edf1f5;
+    .format-topbar{
+      padding:10px 16px 12px;
       background:linear-gradient(180deg,#ffffff 0%,#fbfcfe 100%);
     }
 
-    .left-card-header strong{
-      display:block;
-      font-size:.96rem;
-      font-weight:800;
-      color:#111827;
-      margin-bottom:4px;
+    .format-scroll{
+      overflow-x:auto;
+      overflow-y:hidden;
+      padding-bottom:2px;
     }
 
-    .left-card-header span{
-      display:block;
-      font-size:.84rem;
-      color:var(--muted);
-      line-height:1.55;
+    .format-scroll::-webkit-scrollbar{
+      height:8px;
     }
 
-    .toolbar-shell{
-      flex:1;
-      padding:14px;
-      overflow:auto;
+    .format-scroll::-webkit-scrollbar-thumb{
+      background:#d7dce2;
+      border-radius:999px;
     }
 
     .toolbar{
       display:flex;
-      flex-direction:column;
-      gap:12px;
       border:none;
       background:transparent;
       padding:0;
@@ -504,15 +458,30 @@
       overflow:visible;
     }
 
+    .format-toolbar{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      min-width:max-content;
+      flex-wrap:nowrap;
+    }
+
     .toolbar-group{
       display:flex;
-      flex-wrap:wrap;
+      align-items:center;
       gap:8px;
       padding:0;
       flex:none;
+      flex-wrap:nowrap;
     }
 
-    .toolbar-group + .toolbar-group::before{ display:none; }
+    .format-divider{
+      width:1px;
+      height:30px;
+      background:#e3e8ef;
+      border-radius:999px;
+      flex:none;
+    }
 
     .tool-btn{
       min-width:42px;
@@ -529,7 +498,7 @@
       gap:6px;
       flex:none;
       border:1px solid #e5eaf1;
-      transition:background .15s ease,color .15s ease,box-shadow .15s ease,border-color .15s ease;
+      transition:background .15s ease,color .15s ease,box-shadow .15s ease,border-color .15s ease, transform .15s ease;
     }
 
     .tool-btn:hover{
@@ -561,9 +530,9 @@
     }
 
     .tool-select{
-      width:100%;
-      min-width:0;
-      height:42px;
+      width:auto;
+      min-width:130px;
+      height:40px;
       border:1px solid #e5eaf1;
       border-radius:12px;
       background:#f8fafc;
@@ -587,15 +556,8 @@
       box-shadow:0 0 0 4px rgba(26,115,232,.10);
     }
 
-    .tool-select.style-select,
-    .tool-select.font-select,
-    .tool-select.size-select{
-      width:100%;
-    }
-
-    .toolbar-group.select-stack{
-      display:grid;
-      grid-template-columns:1fr;
+    #font-size-select{
+      min-width:84px;
     }
 
     .tool-label{
@@ -603,7 +565,7 @@
       align-items:center;
       justify-content:space-between;
       gap:10px;
-      height:42px;
+      height:40px;
       padding:0 12px;
       border-radius:12px;
       background:#f8fafc;
@@ -613,7 +575,8 @@
       font-weight:700;
       white-space:nowrap;
       transition:background .15s ease, border-color .15s ease;
-      flex:1 1 100%;
+      flex:none;
+      min-width:112px;
       border:1px solid #e5eaf1;
     }
 
@@ -644,9 +607,60 @@
       padding:0;
     }
 
-    /* ===== study dock left ===== */
-    .dock-shell{
-      padding:14px;
+    .page-shell{
+      position:relative;
+      min-height:calc(100vh - 124px);
+    }
+
+    #document-app.document-with-chat .workspace{
+      padding-left:calc(var(--left-rail-width) + 42px);
+      padding-right:calc(var(--chat-width) + 42px);
+      padding-top:26px;
+    }
+
+    #document-app.document-with-chat .tool-panel{
+      left:calc(var(--left-rail-width) + 28px);
+      right:auto;
+    }
+
+    .left-rail{
+      position:fixed;
+      top:140px;
+      left:16px;
+      bottom:24px;
+      width:var(--left-rail-width);
+      z-index:58;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:12px;
+      padding:14px 10px;
+      background:rgba(255,255,255,.95);
+      border:1px solid #e4e8ee;
+      border-radius:28px;
+      box-shadow:var(--shadow-panel);
+      backdrop-filter:blur(14px);
+      overflow:auto;
+    }
+
+    .left-rail-head{
+      width:100%;
+      display:flex;
+      justify-content:center;
+      padding-bottom:4px;
+    }
+
+    .left-rail-badge{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:7px 10px;
+      border-radius:999px;
+      background:#eef4ff;
+      color:var(--blue-strong);
+      font-size:.72rem;
+      font-weight:800;
+      letter-spacing:.02em;
     }
 
     .tool-dock{
@@ -656,7 +670,9 @@
       z-index:auto;
       display:flex;
       flex-direction:column;
-      gap:12px;
+      align-items:center;
+      gap:10px;
+      width:100%;
       padding:0;
       border-radius:0;
       background:transparent;
@@ -669,23 +685,24 @@
 
     .tool-dock-group{
       display:grid;
-      grid-template-columns:repeat(2,minmax(0,1fr));
+      grid-template-columns:1fr;
       gap:10px;
+      width:100%;
       position:static;
       z-index:auto;
     }
 
     .tool-dock-divider{
-      width:100%;
+      width:44px;
       height:1px;
       background:linear-gradient(90deg, transparent, #d7dee7, transparent);
-      margin:2px 0;
+      margin:4px auto;
     }
 
     .tool-dock-btn{
       position:relative;
       width:100%;
-      height:54px;
+      height:50px;
       border:none;
       border-radius:16px;
       background:linear-gradient(180deg, #fff 0%, #f7f9fc 100%);
@@ -761,7 +778,6 @@
 
     .tool-dock-btn.pdf-btn svg{ width:20px; height:20px; }
 
-    /* ===== document ===== */
     .workspace{
       padding:26px 14px 56px;
     }
@@ -773,17 +789,17 @@
 
     .paper{
       width:100%;
-      max-width:816px;
+      max-width:860px;
       min-height:1120px;
       margin:0 auto;
       background:var(--paper);
-      border:1px solid #e0e0e0;
-      box-shadow:var(--shadow);
-      border-radius:8px;
+      border:1px solid #e4e8ee;
+      box-shadow:0 18px 38px rgba(15,23,42,.08);
+      border-radius:16px;
       overflow:hidden;
     }
 
-    .paper-inner{ padding:72px 78px 84px; }
+    .paper-inner{ padding:62px 68px 74px; }
 
     .doc-header{
       margin-bottom:34px;
@@ -866,7 +882,6 @@
       color:#9aa0a6;
     }
 
-    /* ===== references ===== */
     .references-panel{
       margin-top:42px;
       padding-top:28px;
@@ -981,7 +996,6 @@
       white-space:nowrap;
     }
 
-    /* ===== tool panel ===== */
     .tool-panel-backdrop{
       position:fixed;
       inset:0;
@@ -999,7 +1013,7 @@
 
     .tool-panel{
       position:fixed;
-      top:118px;
+      top:132px;
       bottom:24px;
       width:340px;
       overflow:auto;
@@ -1135,7 +1149,6 @@
       box-shadow:0 16px 28px rgba(26,115,232,.22);
     }
 
-    /* ===== modals ===== */
     .share-modal-backdrop,
     .study-modal-backdrop{
       position:fixed;
@@ -1591,10 +1604,9 @@
       line-height:1.65;
     }
 
-    /* ===== right chat ===== */
     .doc-chat-panel{
       position:fixed;
-      top:92px;
+      top:140px;
       right:20px;
       bottom:24px;
       width:var(--chat-width);
@@ -1832,25 +1844,22 @@
       stroke-linejoin:round;
     }
 
-    /* ===== scrollbars ===== */
-    .toolbar-shell::-webkit-scrollbar,
     .tool-panel::-webkit-scrollbar,
-    .doc-chat-body::-webkit-scrollbar{
+    .doc-chat-body::-webkit-scrollbar,
+    .left-rail::-webkit-scrollbar{
       width:8px;
       height:8px;
     }
 
-    .toolbar-shell::-webkit-scrollbar-thumb,
     .tool-panel::-webkit-scrollbar-thumb,
-    .doc-chat-body::-webkit-scrollbar-thumb{
+    .doc-chat-body::-webkit-scrollbar-thumb,
+    .left-rail::-webkit-scrollbar-thumb{
       background:#d7dce2;
       border-radius:999px;
     }
 
-    /* ===== responsive ===== */
     @media (max-width:1350px){
       :root{
-        --left-rail-width:260px;
         --chat-width:340px;
       }
     }
@@ -1875,13 +1884,35 @@
       .left-rail{
         position:static;
         width:auto;
+        height:auto;
         top:auto;
         left:auto;
         bottom:auto;
+        margin:14px;
         padding:14px;
+        border-radius:24px;
+        flex-direction:row;
+        justify-content:flex-start;
+        align-items:flex-start;
       }
 
-      .toolbar-shell{ flex:none; }
+      .left-rail-head{
+        width:auto;
+        padding:0;
+      }
+
+      .tool-dock{
+        width:100%;
+      }
+
+      .tool-dock-group{
+        grid-template-columns:repeat(4,minmax(0,1fr));
+      }
+
+      .tool-dock-divider{
+        width:100%;
+      }
+
       .tool-dock-btn::after{ display:none; }
 
       .doc-chat-panel{ display:none; }
@@ -1900,9 +1931,17 @@
     }
 
     @media (max-width:900px){
-      .paper-inner{ padding:42px 28px 50px; }
-      .doc-title{ font-size:1.8rem; }
-      .tool-dock-group{ grid-template-columns:repeat(3,minmax(0,1fr)); }
+      .format-topbar{
+        padding:10px 12px 12px;
+      }
+
+      .paper-inner{
+        padding:42px 28px 50px;
+      }
+
+      .doc-title{
+        font-size:1.8rem;
+      }
     }
 
     @media (max-width:760px){
@@ -1954,7 +1993,7 @@
       }
 
       .topbar{
-        padding:10px 12px 6px;
+        padding:10px 12px 8px;
         align-items:flex-start;
         flex-direction:column;
       }
@@ -1964,14 +2003,34 @@
         justify-content:flex-start;
       }
 
-      .left-rail{ padding:10px; }
-      .paper{ min-height:auto; }
-      .paper-inner{ padding:28px 18px 36px; }
-      .doc-title{ font-size:1.55rem; }
-      .doc-meta{ flex-direction:column; gap:8px; }
-      .share-row{ grid-template-columns:1fr; }
+      .left-rail{
+        margin:10px;
+      }
 
-      .tool-dock-group{ grid-template-columns:repeat(2,minmax(0,1fr)); }
+      .tool-dock-group{
+        grid-template-columns:repeat(3,minmax(0,1fr));
+      }
+
+      .paper{
+        min-height:auto;
+      }
+
+      .paper-inner{
+        padding:28px 18px 36px;
+      }
+
+      .doc-title{
+        font-size:1.55rem;
+      }
+
+      .doc-meta{
+        flex-direction:column;
+        gap:8px;
+      }
+
+      .share-row{
+        grid-template-columns:1fr;
+      }
     }
 
     @media print{
@@ -2003,308 +2062,6 @@
 
       .paper-inner{ padding:0; }
     }
-    /* ===== NUEVA ESTÉTICA DOCUMENTO ===== */
-
-:root{
-  --left-rail-width:92px;
-}
-
-.editor-chrome{
-  position:sticky;
-  top:0;
-  z-index:80;
-  background:rgba(255,255,255,.96);
-  backdrop-filter:blur(14px);
-  border-bottom:1px solid #e8edf3;
-  box-shadow:0 10px 24px rgba(15,23,42,.06);
-}
-
-.topbar{
-  min-height:70px;
-  padding:12px 18px;
-  border-bottom:1px solid #eef2f6;
-}
-
-.format-topbar{
-  padding:10px 16px 12px;
-  background:linear-gradient(180deg,#ffffff 0%,#fbfcfe 100%);
-}
-
-.format-scroll{
-  overflow-x:auto;
-  overflow-y:hidden;
-  padding-bottom:2px;
-}
-
-.format-scroll::-webkit-scrollbar{
-  height:8px;
-}
-
-.format-scroll::-webkit-scrollbar-thumb{
-  background:#d7dce2;
-  border-radius:999px;
-}
-
-.format-toolbar{
-  display:flex;
-  align-items:center;
-  gap:12px;
-  min-width:max-content;
-  flex-wrap:nowrap;
-}
-
-.format-toolbar .toolbar-group{
-  display:flex;
-  flex-direction:row;
-  align-items:center;
-  gap:8px;
-  flex-wrap:nowrap;
-  padding:0;
-}
-
-.format-divider{
-  width:1px;
-  height:30px;
-  background:#e3e8ef;
-  border-radius:999px;
-  flex:none;
-}
-
-.format-toolbar .tool-btn{
-  min-width:40px;
-  height:40px;
-  border-radius:12px;
-  background:#f8fafc;
-  border:1px solid #e5eaf1;
-}
-
-.format-toolbar .tool-btn:hover{
-  background:#eef3f8;
-  border-color:#dce4ee;
-}
-
-.format-toolbar .tool-select{
-  width:auto;
-  min-width:130px;
-  height:40px;
-  border-radius:12px;
-  background:#f8fafc;
-}
-
-.format-toolbar #font-size-select{
-  min-width:84px;
-}
-
-.format-toolbar .tool-label{
-  flex:none;
-  min-width:112px;
-  height:40px;
-  border-radius:12px;
-  background:#f8fafc;
-}
-
-.page-shell{
-  position:relative;
-  min-height:calc(100vh - 124px);
-}
-
-#document-app.document-with-chat .workspace{
-  padding-left:calc(var(--left-rail-width) + 42px);
-  padding-right:calc(var(--chat-width) + 42px);
-  padding-top:26px;
-}
-
-#document-app.document-with-chat .tool-panel{
-  left:calc(var(--left-rail-width) + 28px);
-  right:auto;
-}
-
-.left-rail{
-  position:fixed;
-  top:140px;
-  left:16px;
-  bottom:24px;
-  width:var(--left-rail-width);
-  z-index:58;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:12px;
-  padding:14px 10px;
-  background:rgba(255,255,255,.95);
-  border:1px solid #e4e8ee;
-  border-radius:28px;
-  box-shadow:var(--shadow-panel);
-  backdrop-filter:blur(14px);
-  overflow:auto;
-}
-
-.left-rail-head{
-  width:100%;
-  display:flex;
-  justify-content:center;
-  padding-bottom:4px;
-}
-
-.left-rail-badge{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  padding:7px 10px;
-  border-radius:999px;
-  background:#eef4ff;
-  color:var(--blue-strong);
-  font-size:.72rem;
-  font-weight:800;
-  letter-spacing:.02em;
-}
-
-.left-rail .tool-dock{
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:10px;
-  width:100%;
-  padding:0;
-  background:transparent;
-  border:none;
-  box-shadow:none;
-}
-
-.left-rail .tool-dock-group{
-  display:grid;
-  grid-template-columns:1fr;
-  gap:10px;
-  width:100%;
-}
-
-.left-rail .tool-dock-divider{
-  width:44px;
-  height:1px;
-  background:linear-gradient(90deg, transparent, #d7dee7, transparent);
-  margin:4px auto;
-}
-
-.left-rail .tool-dock-btn{
-  width:100%;
-  height:50px;
-  border-radius:16px;
-  background:linear-gradient(180deg,#fff 0%,#f7f9fc 100%);
-  border:1px solid #e3e8ef;
-  box-shadow:0 10px 24px rgba(15,23,42,.10), inset 0 1px 0 rgba(255,255,255,.95);
-}
-
-.left-rail .tool-dock-btn:hover{
-  transform:translateY(-2px);
-}
-
-.paper-wrap{
-  max-width:980px;
-  margin:0 auto;
-}
-
-.paper{
-  max-width:860px;
-  border:1px solid #e4e8ee;
-  border-radius:16px;
-  box-shadow:0 18px 38px rgba(15,23,42,.08);
-}
-
-.paper-inner{
-  padding:62px 68px 74px;
-}
-
-.doc-chat-panel{
-  top:140px;
-}
-
-@media (max-width:1180px){
-  #document-app.document-with-chat .workspace{
-    padding-left:14px;
-    padding-right:14px;
-  }
-
-  #document-app.document-with-chat .tool-panel{
-    left:12px;
-    right:12px;
-    width:auto;
-  }
-
-  .left-rail{
-    position:static;
-    width:auto;
-    height:auto;
-    top:auto;
-    left:auto;
-    bottom:auto;
-    margin:14px;
-    padding:14px;
-    border-radius:24px;
-    flex-direction:row;
-    justify-content:flex-start;
-    align-items:flex-start;
-  }
-
-  .left-rail-head{
-    width:auto;
-    padding:0;
-  }
-
-  .left-rail .tool-dock{
-    width:100%;
-  }
-
-  .left-rail .tool-dock-group{
-    grid-template-columns:repeat(4,minmax(0,1fr));
-  }
-
-  .left-rail .tool-dock-divider{
-    width:100%;
-  }
-
-  .doc-chat-panel{
-    top:auto;
-  }
-}
-
-@media (max-width:900px){
-  .format-topbar{
-    padding:10px 12px 12px;
-  }
-
-  .paper-inner{
-    padding:42px 28px 50px;
-  }
-}
-
-@media (max-width:720px){
-  .topbar{
-    padding:10px 12px 8px;
-    align-items:flex-start;
-    flex-direction:column;
-  }
-
-  .topbar-actions{
-    width:100%;
-    justify-content:flex-start;
-  }
-
-  .left-rail{
-    margin:10px;
-  }
-
-  .left-rail .tool-dock-group{
-    grid-template-columns:repeat(3,minmax(0,1fr));
-  }
-
-  .paper-inner{
-    padding:28px 18px 36px;
-  }
-
-  .doc-title{
-    font-size:1.55rem;
-  }
-}
   </style>
 </head>
 <body>
@@ -2379,243 +2136,243 @@
   </div>
 
   <div id="document-app" class="hidden document-with-chat">
-<div class="editor-chrome">
-  <header class="topbar">
-    <div class="topbar-left">
-      <div class="doc-icon">📄</div>
+    <div class="editor-chrome">
+      <header class="topbar">
+        <div class="topbar-left">
+          <div class="doc-icon">📄</div>
 
-      <div class="topbar-text">
-        <div class="topbar-title-row">
-          <strong id="topbar-title">Documento sin título</strong>
+          <div class="topbar-text">
+            <div class="topbar-title-row">
+              <strong id="topbar-title">Documento sin título</strong>
+            </div>
+
+            <div class="topbar-sub">
+              <span>Eduvia · modo documento</span>
+              <span id="topbar-last-save">Guardado automático</span>
+            </div>
+          </div>
         </div>
 
-        <div class="topbar-sub">
-          <span>Eduvia · modo documento</span>
-          <span id="topbar-last-save">Guardado automático</span>
+        <div class="topbar-actions">
+          <a href="crear-clase.html" class="btn btn-outline">← Volver</a>
+          <button type="button" class="btn btn-soft" id="toggle-reference-view-btn">APA</button>
+          <button type="button" class="btn btn-primary" id="open-share-btn">Compartir</button>
+        </div>
+      </header>
+
+      <div class="format-topbar">
+        <div class="format-scroll">
+          <div class="toolbar format-toolbar">
+            <div class="toolbar-group">
+              <button type="button" class="tool-btn" id="undo-btn" title="Deshacer" aria-label="Deshacer">
+                <svg viewBox="0 0 24 24"><path d="M9 14 4 9l5-5"/><path d="M20 20a8 8 0 0 0-8-8H4"/></svg>
+              </button>
+
+              <button type="button" class="tool-btn" id="redo-btn" title="Rehacer" aria-label="Rehacer">
+                <svg viewBox="0 0 24 24"><path d="m15 14 5-5-5-5"/><path d="M4 20a8 8 0 0 1 8-8h8"/></svg>
+              </button>
+
+              <button type="button" class="tool-btn" id="print-btn" title="Imprimir" aria-label="Imprimir">
+                <svg viewBox="0 0 24 24"><path d="M6 9V3h12v6"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v7H6z"/></svg>
+              </button>
+            </div>
+
+            <div class="format-divider"></div>
+
+            <div class="toolbar-group">
+              <select class="tool-select style-select" id="format-block" title="Estilo">
+                <option value="p">Texto normal</option>
+                <option value="h2">Título grande</option>
+                <option value="h3">Subtítulo</option>
+                <option value="blockquote">Cita</option>
+              </select>
+
+              <select class="tool-select font-select" id="font-family-select" title="Fuente">
+                <option value="Arial">Arial</option>
+                <option value="Inter">Inter</option>
+                <option value="Georgia">Georgia</option>
+                <option value="Times New Roman">Times New Roman</option>
+                <option value="Verdana">Verdana</option>
+              </select>
+
+              <select class="tool-select size-select" id="font-size-select" title="Tamaño">
+                <option value="2">10</option>
+                <option value="3" selected>12</option>
+                <option value="4">14</option>
+                <option value="5">18</option>
+                <option value="6">24</option>
+                <option value="7">32</option>
+              </select>
+            </div>
+
+            <div class="format-divider"></div>
+
+            <div class="toolbar-group">
+              <button type="button" class="tool-btn text-btn" data-command="bold" title="Negrita"><strong>B</strong></button>
+              <button type="button" class="tool-btn text-btn" data-command="italic" title="Cursiva"><em>I</em></button>
+              <button type="button" class="tool-btn text-btn" data-command="underline" title="Subrayado"><u>U</u></button>
+              <button type="button" class="tool-btn text-btn" data-command="strikeThrough" title="Tachado"><s>S</s></button>
+            </div>
+
+            <div class="format-divider"></div>
+
+            <div class="toolbar-group">
+              <label class="tool-label" title="Color de texto">
+                Texto
+                <span class="color-wrap">
+                  <input type="color" id="text-color" value="#202124">
+                </span>
+              </label>
+
+              <label class="tool-label" title="Resaltado">
+                Fondo
+                <span class="color-wrap">
+                  <input type="color" id="highlight-color" value="#fff59d">
+                </span>
+              </label>
+            </div>
+
+            <div class="format-divider"></div>
+
+            <div class="toolbar-group">
+              <button type="button" class="tool-btn" id="link-btn" title="Insertar link">
+                <svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.07 0l2.83-2.83a5 5 0 0 0-7.07-7.07L11 5"/><path d="M14 11a5 5 0 0 0-7.07 0L4.1 13.83a5 5 0 1 0 7.07 7.07L13 19"/></svg>
+              </button>
+
+              <button type="button" class="tool-btn" id="image-btn" title="Insertar imagen">
+                <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="1.5"/><path d="m21 16-5-5L5 19"/></svg>
+              </button>
+
+              <button type="button" class="tool-btn text-btn" data-command="removeFormat" title="Quitar formato">Tx</button>
+            </div>
+
+            <div class="format-divider"></div>
+
+            <div class="toolbar-group">
+              <button type="button" class="tool-btn" data-command="insertUnorderedList" title="Lista con viñetas">
+                <svg viewBox="0 0 24 24"><path d="M9 6h11"/><path d="M9 12h11"/><path d="M9 18h11"/><circle cx="4" cy="6" r="1"/><circle cx="4" cy="12" r="1"/><circle cx="4" cy="18" r="1"/></svg>
+              </button>
+
+              <button type="button" class="tool-btn" data-command="insertOrderedList" title="Lista numerada">
+                <svg viewBox="0 0 24 24"><path d="M10 6h10"/><path d="M10 12h10"/><path d="M10 18h10"/><path d="M4 7V5l-1 1"/><path d="M3 12h2l-2 3h2"/><path d="M3 17c0-.6.4-1 1-1h1c.6 0 1 .4 1 1s-.4 1-1 1H4c-.6 0-1 .4-1 1s.4 1 1 1h1c.6 0 1-.4 1-1"/></svg>
+              </button>
+
+              <button type="button" class="tool-btn" data-command="outdent" title="Reducir sangría">
+                <svg viewBox="0 0 24 24"><path d="M21 6H11"/><path d="M21 12H11"/><path d="M21 18H11"/><path d="m7 8-4 4 4 4"/></svg>
+              </button>
+
+              <button type="button" class="tool-btn" data-command="indent" title="Aumentar sangría">
+                <svg viewBox="0 0 24 24"><path d="M21 6H11"/><path d="M21 12H11"/><path d="M21 18H11"/><path d="m3 8 4 4-4 4"/></svg>
+              </button>
+            </div>
+
+            <div class="format-divider"></div>
+
+            <div class="toolbar-group">
+              <button type="button" class="tool-btn" data-command="justifyLeft" title="Alinear izquierda">
+                <svg viewBox="0 0 24 24"><path d="M4 6h16"/><path d="M4 10h10"/><path d="M4 14h16"/><path d="M4 18h10"/></svg>
+              </button>
+
+              <button type="button" class="tool-btn" data-command="justifyCenter" title="Centrar">
+                <svg viewBox="0 0 24 24"><path d="M4 6h16"/><path d="M7 10h10"/><path d="M4 14h16"/><path d="M7 18h10"/></svg>
+              </button>
+
+              <button type="button" class="tool-btn" data-command="justifyRight" title="Alinear derecha">
+                <svg viewBox="0 0 24 24"><path d="M4 6h16"/><path d="M10 10h10"/><path d="M4 14h16"/><path d="M10 18h10"/></svg>
+              </button>
+
+              <button type="button" class="tool-btn" data-command="justifyFull" title="Justificar">
+                <svg viewBox="0 0 24 24"><path d="M4 6h16"/><path d="M4 10h16"/><path d="M4 14h16"/><path d="M4 18h16"/></svg>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
-
-    <div class="topbar-actions">
-      <a href="crear-clase.html" class="btn btn-outline">← Volver</a>
-      <button type="button" class="btn btn-soft" id="toggle-reference-view-btn">APA</button>
-      <button type="button" class="btn btn-primary" id="open-share-btn">Compartir</button>
-    </div>
-  </header>
-
-  <div class="format-topbar">
-    <div class="format-scroll">
-      <div class="toolbar format-toolbar">
-        <div class="toolbar-group">
-          <button type="button" class="tool-btn" id="undo-btn" title="Deshacer" aria-label="Deshacer">
-            <svg viewBox="0 0 24 24"><path d="M9 14 4 9l5-5"/><path d="M20 20a8 8 0 0 0-8-8H4"/></svg>
-          </button>
-
-          <button type="button" class="tool-btn" id="redo-btn" title="Rehacer" aria-label="Rehacer">
-            <svg viewBox="0 0 24 24"><path d="m15 14 5-5-5-5"/><path d="M4 20a8 8 0 0 1 8-8h8"/></svg>
-          </button>
-
-          <button type="button" class="tool-btn" id="print-btn" title="Imprimir" aria-label="Imprimir">
-            <svg viewBox="0 0 24 24"><path d="M6 9V3h12v6"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v7H6z"/></svg>
-          </button>
-        </div>
-
-        <div class="format-divider"></div>
-
-        <div class="toolbar-group">
-          <select class="tool-select style-select" id="format-block" title="Estilo">
-            <option value="p">Texto normal</option>
-            <option value="h2">Título grande</option>
-            <option value="h3">Subtítulo</option>
-            <option value="blockquote">Cita</option>
-          </select>
-
-          <select class="tool-select font-select" id="font-family-select" title="Fuente">
-            <option value="Arial">Arial</option>
-            <option value="Inter">Inter</option>
-            <option value="Georgia">Georgia</option>
-            <option value="Times New Roman">Times New Roman</option>
-            <option value="Verdana">Verdana</option>
-          </select>
-
-          <select class="tool-select size-select" id="font-size-select" title="Tamaño">
-            <option value="2">10</option>
-            <option value="3" selected>12</option>
-            <option value="4">14</option>
-            <option value="5">18</option>
-            <option value="6">24</option>
-            <option value="7">32</option>
-          </select>
-        </div>
-
-        <div class="format-divider"></div>
-
-        <div class="toolbar-group">
-          <button type="button" class="tool-btn text-btn" data-command="bold" title="Negrita"><strong>B</strong></button>
-          <button type="button" class="tool-btn text-btn" data-command="italic" title="Cursiva"><em>I</em></button>
-          <button type="button" class="tool-btn text-btn" data-command="underline" title="Subrayado"><u>U</u></button>
-          <button type="button" class="tool-btn text-btn" data-command="strikeThrough" title="Tachado"><s>S</s></button>
-        </div>
-
-        <div class="format-divider"></div>
-
-        <div class="toolbar-group">
-          <label class="tool-label" title="Color de texto">
-            Texto
-            <span class="color-wrap">
-              <input type="color" id="text-color" value="#202124">
-            </span>
-          </label>
-
-          <label class="tool-label" title="Resaltado">
-            Fondo
-            <span class="color-wrap">
-              <input type="color" id="highlight-color" value="#fff59d">
-            </span>
-          </label>
-        </div>
-
-        <div class="format-divider"></div>
-
-        <div class="toolbar-group">
-          <button type="button" class="tool-btn" id="link-btn" title="Insertar link">
-            <svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.07 0l2.83-2.83a5 5 0 0 0-7.07-7.07L11 5"/><path d="M14 11a5 5 0 0 0-7.07 0L4.1 13.83a5 5 0 1 0 7.07 7.07L13 19"/></svg>
-          </button>
-
-          <button type="button" class="tool-btn" id="image-btn" title="Insertar imagen">
-            <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="1.5"/><path d="m21 16-5-5L5 19"/></svg>
-          </button>
-
-          <button type="button" class="tool-btn text-btn" data-command="removeFormat" title="Quitar formato">Tx</button>
-        </div>
-
-        <div class="format-divider"></div>
-
-        <div class="toolbar-group">
-          <button type="button" class="tool-btn" data-command="insertUnorderedList" title="Lista con viñetas">
-            <svg viewBox="0 0 24 24"><path d="M9 6h11"/><path d="M9 12h11"/><path d="M9 18h11"/><circle cx="4" cy="6" r="1"/><circle cx="4" cy="12" r="1"/><circle cx="4" cy="18" r="1"/></svg>
-          </button>
-
-          <button type="button" class="tool-btn" data-command="insertOrderedList" title="Lista numerada">
-            <svg viewBox="0 0 24 24"><path d="M10 6h10"/><path d="M10 12h10"/><path d="M10 18h10"/><path d="M4 7V5l-1 1"/><path d="M3 12h2l-2 3h2"/><path d="M3 17c0-.6.4-1 1-1h1c.6 0 1 .4 1 1s-.4 1-1 1H4c-.6 0-1 .4-1 1s.4 1 1 1h1c.6 0 1-.4 1-1"/></svg>
-          </button>
-
-          <button type="button" class="tool-btn" data-command="outdent" title="Reducir sangría">
-            <svg viewBox="0 0 24 24"><path d="M21 6H11"/><path d="M21 12H11"/><path d="M21 18H11"/><path d="m7 8-4 4 4 4"/></svg>
-          </button>
-
-          <button type="button" class="tool-btn" data-command="indent" title="Aumentar sangría">
-            <svg viewBox="0 0 24 24"><path d="M21 6H11"/><path d="M21 12H11"/><path d="M21 18H11"/><path d="m3 8 4 4-4 4"/></svg>
-          </button>
-        </div>
-
-        <div class="format-divider"></div>
-
-        <div class="toolbar-group">
-          <button type="button" class="tool-btn" data-command="justifyLeft" title="Alinear izquierda">
-            <svg viewBox="0 0 24 24"><path d="M4 6h16"/><path d="M4 10h10"/><path d="M4 14h16"/><path d="M4 18h10"/></svg>
-          </button>
-
-          <button type="button" class="tool-btn" data-command="justifyCenter" title="Centrar">
-            <svg viewBox="0 0 24 24"><path d="M4 6h16"/><path d="M7 10h10"/><path d="M4 14h16"/><path d="M7 18h10"/></svg>
-          </button>
-
-          <button type="button" class="tool-btn" data-command="justifyRight" title="Alinear derecha">
-            <svg viewBox="0 0 24 24"><path d="M4 6h16"/><path d="M10 10h10"/><path d="M4 14h16"/><path d="M10 18h10"/></svg>
-          </button>
-
-          <button type="button" class="tool-btn" data-command="justifyFull" title="Justificar">
-            <svg viewBox="0 0 24 24"><path d="M4 6h16"/><path d="M4 10h16"/><path d="M4 14h16"/><path d="M4 18h16"/></svg>
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
 
     <div class="page-shell">
-<aside class="left-rail">
-  <div class="left-rail-head">
-    <span class="left-rail-badge">Tools</span>
-  </div>
+      <aside class="left-rail">
+        <div class="left-rail-head">
+          <span class="left-rail-badge">Tools</span>
+        </div>
 
-  <div class="tool-dock" id="tool-dock">
-    <div class="tool-dock-group">
-      <button type="button" class="tool-dock-btn" data-panel="flashcards-panel" data-tip="Tarjetas" title="Tarjetas">
-        <svg viewBox="0 0 24 24">
-          <path d="M9 3h11v14H9z"/>
-          <path d="M5 7H4a1 1 0 0 0-1 1v11a2 2 0 0 0 2 2h11a1 1 0 0 0 1-1v-1"/>
-          <path d="M12 7h5"/>
-          <path d="M12 11h5"/>
-        </svg>
-      </button>
+        <div class="tool-dock" id="tool-dock">
+          <div class="tool-dock-group">
+            <button type="button" class="tool-dock-btn" data-panel="flashcards-panel" data-tip="Tarjetas" title="Tarjetas">
+              <svg viewBox="0 0 24 24">
+                <path d="M9 3h11v14H9z"/>
+                <path d="M5 7H4a1 1 0 0 0-1 1v11a2 2 0 0 0 2 2h11a1 1 0 0 0 1-1v-1"/>
+                <path d="M12 7h5"/>
+                <path d="M12 11h5"/>
+              </svg>
+            </button>
 
-      <button type="button" class="tool-dock-btn" data-panel="quiz-panel" data-tip="Quiz" title="Quiz">
-        <svg viewBox="0 0 24 24">
-          <path d="M9.09 9a3 3 0 1 1 5.82 1c0 2-3 2-3 4"/>
-          <path d="M12 17h.01"/>
-          <circle cx="12" cy="12" r="9"/>
-        </svg>
-      </button>
+            <button type="button" class="tool-dock-btn" data-panel="quiz-panel" data-tip="Quiz" title="Quiz">
+              <svg viewBox="0 0 24 24">
+                <path d="M9.09 9a3 3 0 1 1 5.82 1c0 2-3 2-3 4"/>
+                <path d="M12 17h.01"/>
+                <circle cx="12" cy="12" r="9"/>
+              </svg>
+            </button>
 
-      <button type="button" class="tool-dock-btn" data-panel="truefalse-panel" data-tip="Verdadero o falso" title="Verdadero o falso">
-        <svg viewBox="0 0 24 24">
-          <path d="m20 6-11 11-5-5"/>
-        </svg>
-      </button>
+            <button type="button" class="tool-dock-btn" data-panel="truefalse-panel" data-tip="Verdadero o falso" title="Verdadero o falso">
+              <svg viewBox="0 0 24 24">
+                <path d="m20 6-11 11-5-5"/>
+              </svg>
+            </button>
 
-      <button type="button" class="tool-dock-btn" data-panel="complete-panel" data-tip="Completar" title="Completar">
-        <svg viewBox="0 0 24 24">
-          <path d="M4 20h16"/>
-          <path d="M8 4h8"/>
-          <path d="M9 4v6"/>
-          <path d="M15 4v6"/>
-          <path d="M7 14h10"/>
-        </svg>
-      </button>
+            <button type="button" class="tool-dock-btn" data-panel="complete-panel" data-tip="Completar" title="Completar">
+              <svg viewBox="0 0 24 24">
+                <path d="M4 20h16"/>
+                <path d="M8 4h8"/>
+                <path d="M9 4v6"/>
+                <path d="M15 4v6"/>
+                <path d="M7 14h10"/>
+              </svg>
+            </button>
 
-      <button type="button" class="tool-dock-btn" data-panel="summary-panel" data-tip="Resumen" title="Resumen">
-        <svg viewBox="0 0 24 24">
-          <path d="M7 4h10"/>
-          <path d="M5 8h14"/>
-          <path d="M5 12h14"/>
-          <path d="M5 16h10"/>
-          <path d="M5 20h6"/>
-        </svg>
-      </button>
+            <button type="button" class="tool-dock-btn" data-panel="summary-panel" data-tip="Resumen" title="Resumen">
+              <svg viewBox="0 0 24 24">
+                <path d="M7 4h10"/>
+                <path d="M5 8h14"/>
+                <path d="M5 12h14"/>
+                <path d="M5 16h10"/>
+                <path d="M5 20h6"/>
+              </svg>
+            </button>
 
-      <button type="button" class="tool-dock-btn" data-panel="keywords-panel" data-tip="Palabras clave" title="Palabras clave">
-        <svg viewBox="0 0 24 24">
-          <circle cx="11" cy="11" r="6"/>
-          <path d="m20 20-4.2-4.2"/>
-        </svg>
-      </button>
+            <button type="button" class="tool-dock-btn" data-panel="keywords-panel" data-tip="Palabras clave" title="Palabras clave">
+              <svg viewBox="0 0 24 24">
+                <circle cx="11" cy="11" r="6"/>
+                <path d="m20 20-4.2-4.2"/>
+              </svg>
+            </button>
 
-      <button type="button" class="tool-dock-btn" data-panel="presentation-panel" data-tip="Presentación" title="Presentación">
-        <svg viewBox="0 0 24 24">
-          <rect x="3" y="4" width="18" height="12" rx="2"/>
-          <path d="M8 20h8"/>
-          <path d="M12 16v4"/>
-          <path d="M7 8h10"/>
-          <path d="M7 11h6"/>
-        </svg>
-      </button>
-    </div>
+            <button type="button" class="tool-dock-btn" data-panel="presentation-panel" data-tip="Presentación" title="Presentación">
+              <svg viewBox="0 0 24 24">
+                <rect x="3" y="4" width="18" height="12" rx="2"/>
+                <path d="M8 20h8"/>
+                <path d="M12 16v4"/>
+                <path d="M7 8h10"/>
+                <path d="M7 11h6"/>
+              </svg>
+            </button>
+          </div>
 
-    <div class="tool-dock-divider"></div>
+          <div class="tool-dock-divider"></div>
 
-    <div class="tool-dock-group">
-      <button type="button" class="tool-dock-btn pdf-btn" id="dock-pdf-btn" data-tip="Exportar PDF" title="PDF">
-        <svg viewBox="0 0 24 24">
-          <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/>
-          <path d="M14 3v5h5"/>
-          <path d="M8 13h2.5a1.5 1.5 0 0 0 0-3H8v7"/>
-          <path d="M14 17h1.5a2.5 2.5 0 0 0 0-5H14z"/>
-        </svg>
-      </button>
-    </div>
-  </div>
-</aside>
+          <div class="tool-dock-group">
+            <button type="button" class="tool-dock-btn pdf-btn" id="dock-pdf-btn" data-tip="Exportar PDF" title="PDF">
+              <svg viewBox="0 0 24 24">
+                <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/>
+                <path d="M14 3v5h5"/>
+                <path d="M8 13h2.5a1.5 1.5 0 0 0 0-3H8v7"/>
+                <path d="M14 17h1.5a2.5 2.5 0 0 0 0-5H14z"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </aside>
 
       <main class="workspace">
         <div class="paper-wrap">
@@ -3952,54 +3709,54 @@
         }
       };
 
-const params = new URLSearchParams(window.location.search);
-const toolFromUrl = (params.get("tool") || "").trim().toLowerCase();
+      const params = new URLSearchParams(window.location.search);
+      const toolFromUrl = (params.get("tool") || "").trim().toLowerCase();
 
-const toolToPanelMap = {
-  flashcards: "flashcards-panel",
-  quiz: "quiz-panel",
-  truefalse: "truefalse-panel",
-  complete: "complete-panel",
-  summary: "summary-panel",
-  keywords: "keywords-panel",
-  presentation: "presentation-panel"
-};
+      const toolToPanelMap = {
+        flashcards: "flashcards-panel",
+        quiz: "quiz-panel",
+        truefalse: "truefalse-panel",
+        complete: "complete-panel",
+        summary: "summary-panel",
+        keywords: "keywords-panel",
+        presentation: "presentation-panel"
+      };
 
-function runToolFromQuery() {
-  if (!toolFromUrl) return;
+      function runToolFromQuery() {
+        if (!toolFromUrl) return;
 
-  const panelId = toolToPanelMap[toolFromUrl];
-  if (!panelId) return;
+        const panelId = toolToPanelMap[toolFromUrl];
+        if (!panelId) return;
 
-  const meta = panelMeta[panelId];
-  if (!meta) return;
+        const meta = panelMeta[panelId];
+        if (!meta) return;
 
-  openToolPanel(panelId, meta);
+        openToolPanel(panelId, meta);
 
-  setTimeout(() => {
-    if (toolFromUrl === "presentation") {
-      generatePresentationBtn?.click();
-      return;
-    }
+        setTimeout(() => {
+          if (toolFromUrl === "presentation") {
+            generatePresentationBtn?.click();
+            return;
+          }
 
-    const validStudyTools = [
-      "flashcards",
-      "quiz",
-      "truefalse",
-      "complete",
-      "summary",
-      "keywords"
-    ];
+          const validStudyTools = [
+            "flashcards",
+            "quiz",
+            "truefalse",
+            "complete",
+            "summary",
+            "keywords"
+          ];
 
-    if (validStudyTools.includes(toolFromUrl)) {
-      closeToolPanel();
-      runStudyTool(toolFromUrl);
-    }
-  }, 250);
-}
+          if (validStudyTools.includes(toolFromUrl)) {
+            closeToolPanel();
+            runStudyTool(toolFromUrl);
+          }
+        }, 250);
+      }
 
-setTimeout(runToolFromQuery, 300);
-      
+      setTimeout(runToolFromQuery, 300);
+
       toolDockButtons.forEach((btn) => {
         btn.addEventListener("click", () => {
           const panelId = btn.dataset.panel;
