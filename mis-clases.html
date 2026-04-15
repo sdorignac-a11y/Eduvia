@@ -13,30 +13,37 @@
   />
 
   <style>
-:root{
-  --bg:#f6f7fb;
-  --sidebar:#ffffff;
-  --surface:#ffffff;
-  --line:#ececf3;
-  --line-soft:#f2f3f8;
-  --text:#20243a;
-  --muted:#7a8198;
+    :root{
+      --bg:#f6f7fb;
+      --sidebar:#ffffff;
+      --surface:#ffffff;
+      --line:#ececf3;
+      --line-soft:#f2f3f8;
+      --text:#20243a;
+      --muted:#7a8198;
 
-  --brand:#1fb8c9;
-  --brand-dark:#1498a8;
-  --brand-soft:#e9fbfd;
+      --brand:#1fb8c9;
+      --brand-dark:#1498a8;
+      --brand-soft:#e9fbfd;
 
-  --active-bg:#edf9fb;
-  --active-text:#167f9c;
+      --active-bg:#eff0fa;
+      --active-text:#167f9c;
 
-  --purple:#1fb8c9;
-  --purple-soft:#e9fbfd;
-  --green:#18b57c;
-  --green-soft:#ebfbf4;
+      --featured-bg:#f7fdff;
+      --featured-border:#cfeef3;
+      --featured-shadow:0 12px 28px rgba(31, 184, 201, .10);
 
-  --shadow:0 10px 30px rgba(31, 42, 68, .07);
-  --shadow-soft:0 8px 22px rgba(25,35,68,.04);
-}
+      --document:#1498a8;
+      --document-soft:#e9fbfd;
+      --document-gradient:linear-gradient(180deg, #1fb8c9 0%, #1498a8 100%);
+
+      --class:#18b57c;
+      --class-soft:#ebfbf4;
+      --class-gradient:linear-gradient(180deg, #29d194 0%, #18b57c 100%);
+
+      --shadow:0 10px 30px rgba(31, 42, 68, .07);
+      --shadow-soft:0 8px 22px rgba(25,35,68,.04);
+    }
 
     *{
       box-sizing:border-box;
@@ -65,6 +72,10 @@
       border:none;
       background:none;
       cursor:pointer;
+    }
+
+    .hidden{
+      display:none !important;
     }
 
     .app{
@@ -100,7 +111,7 @@
       display:grid;
       place-items:center;
       background:linear-gradient(180deg, #87e8ef 0%, #1fb8c9 100%);
-      color:white;
+      color:#fff;
       box-shadow:0 10px 20px rgba(31,184,201,.18);
       flex-shrink:0;
     }
@@ -165,9 +176,6 @@
 
     .sidebar-footer{
       margin-top:auto;
-      display:flex;
-      flex-direction:column;
-      gap:10px;
       padding-top:14px;
       border-top:1px solid var(--line-soft);
     }
@@ -221,7 +229,7 @@
       display:none;
       width:48px;
       height:48px;
-      background:white;
+      background:#fff;
       border:1px solid var(--line);
       border-radius:16px;
       place-items:center;
@@ -258,7 +266,7 @@
       width:100%;
       height:56px;
       border:1px solid var(--line);
-      background:white;
+      background:#fff;
       border-radius:20px;
       padding:0 20px 0 54px;
       color:var(--text);
@@ -314,7 +322,7 @@
       top:66px;
       right:0;
       width:260px;
-      background:white;
+      background:#fff;
       border:1px solid var(--line);
       border-radius:20px;
       box-shadow:0 20px 45px rgba(16, 28, 52, .12);
@@ -386,7 +394,7 @@
       display:flex;
       align-items:center;
       gap:12px;
-      padding:12px 12px;
+      padding:12px;
       border-radius:14px;
       color:#556079;
       font-weight:800;
@@ -443,7 +451,7 @@
     }
 
     .section-meta{
-      background:white;
+      background:#fff;
       border:1px solid var(--line);
       padding:12px 16px;
       border-radius:16px;
@@ -460,20 +468,29 @@
       flex-wrap:wrap;
     }
 
-    .filter-chips{
+    .filter-chips,
+    .quick-actions,
+    .item-meta,
+    .item-menu{
       display:flex;
       flex-wrap:wrap;
       gap:10px;
     }
 
-    .chip{
-      padding:11px 16px;
-      border-radius:999px;
-      background:white;
-      border:1px solid var(--line);
-      color:#5c6681;
+    .chip,
+    .quick-btn,
+    .mini-btn{
+      border-radius:14px;
       font-weight:800;
       transition:.2s ease;
+    }
+
+    .chip{
+      padding:11px 16px;
+      background:#fff;
+      border:1px solid var(--line);
+      color:#5c6681;
+      border-radius:999px;
     }
 
     .chip:hover{
@@ -482,35 +499,27 @@
 
     .chip.active{
       background:var(--brand-soft);
-      border-color:#cdeef3;
+      border-color:var(--featured-border);
       color:var(--active-text);
-    }
-
-    .quick-actions{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
     }
 
     .quick-btn{
       padding:12px 16px;
-      border-radius:15px;
-      background:white;
+      background:#fff;
       border:1px solid var(--line);
-      font-weight:800;
       color:#566078;
       box-shadow:var(--shadow-soft);
-      transition:.2s ease;
     }
 
     .quick-btn.primary{
       background:linear-gradient(180deg, #34cddb 0%, #1fb8c9 100%);
-      color:white;
+      color:#fff;
       border:none;
       box-shadow:0 12px 26px rgba(31,184,201,.18);
     }
 
-    .quick-btn:hover{
+    .quick-btn:hover,
+    .mini-btn:hover{
       transform:translateY(-1px);
     }
 
@@ -553,19 +562,19 @@
       border-radius:50%;
       display:grid;
       place-items:center;
-      color:white;
+      color:#fff;
       flex-shrink:0;
-      box-shadow:0 8px 16px rgba(17,125,143,.12);
     }
 
     .item-icon.clase{
-      background:linear-gradient(180deg, #29d194 0%, #18b57c 100%);
+      background:var(--class-gradient);
+      box-shadow:0 8px 16px rgba(24,181,124,.14);
     }
 
-.item-icon.documento{
-  background:linear-gradient(180deg, #34cddb 0%, #1fb8c9 100%);
-}
-
+    .item-icon.documento{
+      background:var(--document-gradient);
+      box-shadow:0 8px 16px rgba(31,184,201,.18);
+    }
 
     .item-icon i{
       width:28px;
@@ -581,14 +590,14 @@
     }
 
     .badge.clase{
-      background:var(--green-soft);
-      color:var(--green);
+      background:var(--class-soft);
+      color:var(--class);
     }
 
-.badge.documento{
-  background:var(--purple-soft);
-  color:var(--purple);
-}
+    .badge.documento{
+      background:var(--document-soft);
+      color:var(--document);
+    }
 
     .item-title{
       font-size:1.55rem;
@@ -608,12 +617,6 @@
       -webkit-line-clamp:3;
       -webkit-box-orient:vertical;
       overflow:hidden;
-    }
-
-    .item-meta{
-      display:flex;
-      flex-wrap:wrap;
-      gap:8px;
     }
 
     .meta-pill{
@@ -643,54 +646,45 @@
       font-size:.95rem;
     }
 
-    .item-menu{
-      display:flex;
-      gap:8px;
-    }
-
     .mini-btn{
       padding:10px 12px;
-      border-radius:12px;
       background:#f7f9fc;
       border:1px solid var(--line);
       color:#59637b;
-      font-weight:800;
-      transition:.2s ease;
+      border-radius:12px;
     }
 
     .mini-btn:hover{
       background:#eef4f8;
     }
 
-.create-empty-card{
-  cursor:pointer;
-  position:relative;
-  grid-column:span 2;
-  min-height:320px;
-  padding:28px 28px 24px;
-  border:2px dashed #bfeaf0;
-  border-radius:28px;
-  background:linear-gradient(180deg, #fcfeff 0%, #eefbfd 100%);
-  box-shadow:0 16px 34px rgba(31,184,201,.10);
-}
+    .create-empty-card{
+      cursor:pointer;
+      grid-column:span 2;
+      min-height:320px;
+      padding:28px 28px 24px;
+      border:2px dashed var(--featured-border);
+      border-radius:28px;
+      background:var(--featured-bg);
+      box-shadow:var(--featured-shadow);
+    }
 
-.create-empty-card:hover{
-  transform:translateY(-4px);
-  border-color:#7ed5de;
-  box-shadow:0 20px 40px rgba(31,184,201,.16);
-}
+    .create-empty-card:hover{
+      border-color:var(--brand);
+      box-shadow:0 18px 34px rgba(31,184,201,.14);
+    }
 
-.create-empty-card::before{
-  content:"";
-  position:absolute;
-  top:18px;
-  right:18px;
-  width:120px;
-  height:120px;
-  border-radius:50%;
-  background:radial-gradient(circle, rgba(31,184,201,.16) 0%, rgba(31,184,201,0) 72%);
-  pointer-events:none;
-}
+    .create-empty-card::before{
+      content:"";
+      position:absolute;
+      top:18px;
+      right:18px;
+      width:120px;
+      height:120px;
+      border-radius:50%;
+      background:radial-gradient(circle, rgba(31,184,201,.14) 0%, rgba(31,184,201,0) 72%);
+      pointer-events:none;
+    }
 
     .create-empty-card .item-title{
       font-size:2rem;
@@ -709,7 +703,8 @@
     .create-icon{
       width:72px;
       height:72px;
-      box-shadow:0 10px 24px rgba(124,108,255,.20);
+      background:var(--document-gradient);
+      box-shadow:0 10px 24px rgba(31,184,201,.20);
     }
 
     .create-icon i{
@@ -717,68 +712,65 @@
       height:32px;
     }
 
-.create-badge{
-  background:#dff7fa;
-  color:#1498a8;
-  font-weight:900;
-  font-size:.88rem;
-  padding:9px 14px;
-}
+    .create-badge{
+      background:var(--brand-soft);
+      color:var(--brand-dark);
+      font-size:.88rem;
+      padding:9px 14px;
+    }
 
-.create-mini-label{
-  font-size:.82rem;
-  font-weight:900;
-  letter-spacing:.05em;
-  text-transform:uppercase;
-  color:#1498a8;
-  margin-top:-2px;
-}
+    .create-mini-label{
+      font-size:.82rem;
+      font-weight:900;
+      letter-spacing:.05em;
+      text-transform:uppercase;
+      color:var(--brand-dark);
+      margin-top:-2px;
+    }
 
-.create-pill{
-  background:#eefbfd;
-  border-color:#d7f2f6;
-  color:#1498a8;
-}
+    .create-pill{
+      background:var(--brand-soft);
+      border-color:var(--featured-border);
+      color:var(--brand-dark);
+    }
 
-.create-note{
-  margin-top:2px;
-  font-size:.96rem;
-  line-height:1.55;
-  color:#4f8b95;
-  font-weight:800;
-}
-
+    .create-note{
+      margin-top:2px;
+      font-size:.96rem;
+      line-height:1.55;
+      color:#5f667d;
+      font-weight:800;
+    }
 
     .create-footer{
-      margin-top:auto;
       justify-content:flex-start;
     }
 
-.create-main-btn{
-  width:100%;
-  min-height:56px;
-  border:none;
-  border-radius:18px;
-  background:linear-gradient(180deg, #34cddb 0%, #1fb8c9 100%);
-  color:#fff;
-  font-weight:900;
-  font-size:1rem;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:10px;
-  box-shadow:0 14px 26px rgba(31,184,201,.24);
-  transition:transform .2s ease, box-shadow .2s ease;
-}
+    .create-main-btn{
+      width:100%;
+      min-height:56px;
+      border:none;
+      border-radius:18px;
+      background:var(--document-gradient);
+      color:#fff;
+      font-weight:900;
+      font-size:1rem;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      box-shadow:0 14px 26px rgba(31,184,201,.24);
+      transition:transform .2s ease, box-shadow .2s ease;
+    }
 
-.create-main-btn:hover{
-  transform:translateY(-1px);
-  box-shadow:0 18px 30px rgba(31,184,201,.28);
-}
+    .create-main-btn:hover{
+      transform:translateY(-1px);
+      box-shadow:0 18px 30px rgba(31,184,201,.28);
+    }
 
     .loading-state,
     .empty-state{
-      background:white;
+      background:#fff;
       border:1px dashed #d7dceb;
       color:#6c7590;
       border-radius:22px;
@@ -806,10 +798,6 @@
 
     @keyframes spin{
       to{ transform:rotate(360deg); }
-    }
-
-    .hidden{
-      display:none !important;
     }
 
     @media (max-width:1280px){
@@ -856,7 +844,6 @@
       }
 
       .create-empty-card{
-        grid-column:span 2;
         min-height:300px;
       }
     }
@@ -880,6 +867,10 @@
         min-height:220px;
       }
 
+      .item-title{
+        font-size:1.35rem;
+      }
+
       .search-input{
         height:50px;
         border-radius:18px;
@@ -900,10 +891,6 @@
       .profile-menu{
         right:-4px;
         width:240px;
-      }
-
-      .item-title{
-        font-size:1.35rem;
       }
 
       .create-empty-card{
@@ -965,7 +952,7 @@
       </nav>
 
       <div class="sidebar-footer">
-        <button class="logout-btn" id="logoutBtn">
+        <button class="logout-btn" id="logoutBtn" type="button">
           <i data-lucide="log-out"></i>
           <span>Cerrar sesión</span>
         </button>
@@ -975,7 +962,7 @@
     <main class="main">
       <header class="topbar">
         <div class="topbar-left">
-          <button class="menu-btn" id="menuBtn" aria-label="Abrir menú">
+          <button class="menu-btn" id="menuBtn" type="button" aria-label="Abrir menú">
             <i data-lucide="menu"></i>
           </button>
 
@@ -986,6 +973,7 @@
               class="search-input"
               type="text"
               placeholder="Buscar clases o documentos"
+              autocomplete="off"
             />
           </div>
         </div>
@@ -1051,14 +1039,18 @@
 
         <div class="filters">
           <div class="filter-chips">
-            <button class="chip active" data-filter="todos">Todos</button>
-            <button class="chip" data-filter="clase">Clases</button>
-            <button class="chip" data-filter="documento">Documentos</button>
+            <button class="chip active" data-filter="todos" type="button">Todos</button>
+            <button class="chip" data-filter="clase" type="button">Clases</button>
+            <button class="chip" data-filter="documento" type="button">Documentos</button>
           </div>
 
           <div class="quick-actions">
-            <button class="quick-btn primary" id="createDocTopBtn" type="button">+ Documento vacío</button>
-            <button class="quick-btn" id="reloadBtn" type="button">Actualizar</button>
+            <button class="quick-btn primary" id="createDocTopBtn" type="button">
+              + Documento vacío
+            </button>
+            <button class="quick-btn" id="reloadBtn" type="button">
+              Actualizar
+            </button>
           </div>
         </div>
 
@@ -1080,7 +1072,10 @@
 
   <script type="module">
     import { auth, db } from "./firebase.js?v=1";
-    import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import {
+      onAuthStateChanged,
+      signOut
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
     import {
       collection,
       getDocs,
@@ -1088,36 +1083,57 @@
       serverTimestamp
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-    lucide.createIcons();
+    const $ = (selector) => document.querySelector(selector);
 
-    const sidebar = document.getElementById("sidebar");
-    const menuBtn = document.getElementById("menuBtn");
-    const searchInput = document.getElementById("searchInput");
-    const profileTrigger = document.getElementById("profileTrigger");
-    const profileMenu = document.getElementById("profileMenu");
-    const logoutBtn = document.getElementById("logoutBtn");
-    const profileLogoutBtn = document.getElementById("profileLogoutBtn");
-    const reloadBtn = document.getElementById("reloadBtn");
-    const createDocTopBtn = document.getElementById("createDocTopBtn");
+    const sidebar = $("#sidebar");
+    const menuBtn = $("#menuBtn");
+    const searchInput = $("#searchInput");
+    const profileTrigger = $("#profileTrigger");
+    const profileMenu = $("#profileMenu");
+    const logoutBtn = $("#logoutBtn");
+    const profileLogoutBtn = $("#profileLogoutBtn");
+    const reloadBtn = $("#reloadBtn");
+    const createDocTopBtn = $("#createDocTopBtn");
 
-    const topbarInitial = document.getElementById("topbarInitial");
-    const menuAvatar = document.getElementById("menuAvatar");
-    const menuUserName = document.getElementById("menuUserName");
-    const menuUserEmail = document.getElementById("menuUserEmail");
+    const topbarInitial = $("#topbarInitial");
+    const menuAvatar = $("#menuAvatar");
+    const menuUserName = $("#menuUserName");
+    const menuUserEmail = $("#menuUserEmail");
 
-    const cardsGrid = document.getElementById("cardsGrid");
-    const emptyState = document.getElementById("emptyState");
-    const loadingState = document.getElementById("loadingState");
-    const totalCount = document.getElementById("totalCount");
+    const cardsGrid = $("#cardsGrid");
+    const emptyState = $("#emptyState");
+    const loadingState = $("#loadingState");
+    const totalCount = $("#totalCount");
     const chips = [...document.querySelectorAll(".chip")];
 
     let allItems = [];
     let currentFilter = "todos";
     let currentSearch = "";
 
+    function refreshIcons() {
+      if (window.lucide) {
+        window.lucide.createIcons();
+      }
+    }
+
+    function safeText(value, fallback = "") {
+      if (value === null || value === undefined) return fallback;
+      const text = String(value).trim();
+      return text || fallback;
+    }
+
+    function escapeHtml(text = "") {
+      return String(text)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
     function getInitial(name = "", email = "") {
-      const text = String(name || email || "U").trim();
-      return text.charAt(0).toUpperCase() || "U";
+      const text = safeText(name) || safeText(email) || "U";
+      return text.charAt(0).toUpperCase();
     }
 
     function setProfileData(user) {
@@ -1129,12 +1145,6 @@
       menuAvatar.textContent = initial;
       menuUserName.textContent = name;
       menuUserEmail.textContent = email;
-    }
-
-    function safeText(value, fallback = "") {
-      if (value === null || value === undefined) return fallback;
-      const text = String(value).trim();
-      return text || fallback;
     }
 
     function extractDate(value) {
@@ -1149,11 +1159,12 @@
       }
 
       const parsed = new Date(value);
-      return isNaN(parsed.getTime()) ? null : parsed;
+      return Number.isNaN(parsed.getTime()) ? null : parsed;
     }
 
     function formatDate(date) {
       if (!date) return "Sin fecha";
+
       return new Intl.DateTimeFormat("es-AR", {
         day: "2-digit",
         month: "short",
@@ -1185,14 +1196,12 @@
     }
 
     function resolveRealType(data = {}, fallbackType = "clase") {
-      const formato = safeText(
-        data.formato || data.tipoVista || data.tipo || ""
+      const typeText = safeText(
+        data.formato || data.tipoVista || data.tipo || fallbackType
       ).toLowerCase();
 
       if (fallbackType === "documento") return "documento";
-      if (formato === "documento") return "documento";
-
-      return "clase";
+      return typeText === "documento" ? "documento" : "clase";
     }
 
     function resolveOpenUrl(item) {
@@ -1202,7 +1211,9 @@
 
       if (item.type === "documento") {
         const source =
-          item.sourceCollection === "documentos" ? "&source=documentos" : "";
+          item.sourceCollection === "documentos"
+            ? "&source=documentos"
+            : "";
         return `documento.html?id=${encodeURIComponent(item.id)}${owner}${source}`;
       }
 
@@ -1240,14 +1251,14 @@
       };
     }
 
-    async function getCollectionItems(uid, name, fallbackType) {
+    async function getCollectionItems(uid, collectionName, fallbackType) {
       try {
-        const snap = await getDocs(collection(db, "usuarios", uid, name));
-        return snap.docs.map(docSnap =>
-          normalizeItem(docSnap, fallbackType, uid, name)
+        const snap = await getDocs(collection(db, "usuarios", uid, collectionName));
+        return snap.docs.map((docSnap) =>
+          normalizeItem(docSnap, fallbackType, uid, collectionName)
         );
       } catch (error) {
-        console.warn(`No se pudo leer ${name}:`, error);
+        console.warn(`No se pudo leer ${collectionName}:`, error);
         return [];
       }
     }
@@ -1272,27 +1283,25 @@
           updatedAt: serverTimestamp()
         });
 
-        window.location.href = `documento.html?id=${encodeURIComponent(ref.id)}&owner=${encodeURIComponent(user.uid)}&source=documentos`;
+        window.location.href =
+          `documento.html?id=${encodeURIComponent(ref.id)}` +
+          `&owner=${encodeURIComponent(user.uid)}` +
+          `&source=documentos`;
       } catch (error) {
         console.error("Error creando documento vacío:", error);
         alert("No se pudo crear el documento vacío.");
       }
     }
 
-    function escapeHtml(text = "") {
-      return String(text)
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
+    function updateCount(amount) {
+      totalCount.textContent = `${amount} elemento${amount === 1 ? "" : "s"}`;
     }
 
     function renderCards(items) {
       const createCardHtml = `
         <article class="item-card create-empty-card" data-create-empty="documento">
           <div class="item-top">
-            <div class="item-icon documento create-icon">
+            <div class="item-icon create-icon">
               <i data-lucide="file-plus-2"></i>
             </div>
             <span class="badge create-badge">Crear</span>
@@ -1330,13 +1339,14 @@
         </article>
       `;
 
-      const itemsHtml = items.map(item => `
-        <article class="item-card" data-type="${item.type}">
+      const itemsHtml = items.map((item) => `
+        <article class="item-card" data-type="${escapeHtml(item.type)}">
           <div class="item-top">
-            <div class="item-icon ${item.type}">
+            <div class="item-icon ${escapeHtml(item.type)}">
               <i data-lucide="${item.type === "clase" ? "graduation-cap" : "file-text"}"></i>
             </div>
-            <span class="badge ${item.type}">
+
+            <span class="badge ${escapeHtml(item.type)}">
               ${item.type === "clase" ? "Clase" : "Documento"}
             </span>
           </div>
@@ -1347,7 +1357,7 @@
           <div class="item-meta">
             <span class="meta-pill">
               <i data-lucide="calendar-days" style="width:14px;height:14px;"></i>
-              ${formatDate(item.updatedAt)}
+              ${escapeHtml(formatDate(item.updatedAt))}
             </span>
 
             <span class="meta-pill">
@@ -1357,12 +1367,16 @@
           </div>
 
           <div class="item-footer">
-            <a class="open-link" href="${item.openUrl}">
+            <a class="open-link" href="${escapeHtml(item.openUrl)}">
               ${item.type === "clase" ? "Abrir aula" : "Abrir documento"}
             </a>
 
             <div class="item-menu">
-              <button class="mini-btn open-item-btn" type="button" data-open-url="${escapeHtml(item.openUrl)}">
+              <button
+                class="mini-btn open-item-btn"
+                type="button"
+                data-open-url="${escapeHtml(item.openUrl)}"
+              >
                 Abrir
               </button>
             </div>
@@ -1374,34 +1388,34 @@
       cardsGrid.classList.remove("hidden");
 
       const createCard = cardsGrid.querySelector('[data-create-empty="documento"]');
-      const createBtn = cardsGrid.querySelector(".create-main-btn");
+      const createButton = cardsGrid.querySelector(".create-main-btn");
       const openButtons = [...cardsGrid.querySelectorAll(".open-item-btn")];
 
-      createCard?.addEventListener("click", () => {
+      createCard?.addEventListener("click", createEmptyDocument);
+
+      createButton?.addEventListener("click", (event) => {
+        event.stopPropagation();
         createEmptyDocument();
       });
 
-      createBtn?.addEventListener("click", (e) => {
-        e.stopPropagation();
-        createEmptyDocument();
-      });
-
-      openButtons.forEach(btn => {
-        btn.addEventListener("click", () => {
-          const url = btn.dataset.openUrl;
-          if (url) window.location.href = url;
+      openButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+          const url = button.dataset.openUrl;
+          if (url) {
+            window.location.href = url;
+          }
         });
       });
 
-      lucide.createIcons();
+      refreshIcons();
     }
 
     function applyFilters() {
       const query = currentSearch.trim().toLowerCase();
 
       const filtered = allItems
-        .filter(item => currentFilter === "todos" ? true : item.type === currentFilter)
-        .filter(item => {
+        .filter((item) => currentFilter === "todos" || item.type === currentFilter)
+        .filter((item) => {
           if (!query) return true;
           return (
             item.title.toLowerCase().includes(query) ||
@@ -1410,7 +1424,7 @@
         });
 
       renderCards(filtered);
-      totalCount.textContent = `${filtered.length} elemento${filtered.length === 1 ? "" : "s"}`;
+      updateCount(filtered.length);
 
       if (!filtered.length) {
         emptyState.classList.remove("hidden");
@@ -1449,18 +1463,20 @@
       }
     }
 
-    function closeSidebarOnOutsideClick(e) {
-      const clickedInsideSidebar = sidebar.contains(e.target);
-      const clickedMenu = menuBtn.contains(e.target);
-      const clickedProfile = profileTrigger.contains(e.target) || profileMenu.contains(e.target);
+    function closeSidebarAndMenus(event) {
+      const target = event.target;
+      const clickedInsideSidebar = sidebar?.contains(target);
+      const clickedMenu = menuBtn?.contains(target);
+      const clickedProfile =
+        profileTrigger?.contains(target) || profileMenu?.contains(target);
 
       if (window.innerWidth <= 980 && !clickedInsideSidebar && !clickedMenu) {
-        sidebar.classList.remove("open");
+        sidebar?.classList.remove("open");
       }
 
       if (!clickedProfile) {
-        profileMenu.classList.remove("open");
-        profileTrigger.setAttribute("aria-expanded", "false");
+        profileMenu?.classList.remove("open");
+        profileTrigger?.setAttribute("aria-expanded", "false");
       }
     }
 
@@ -1475,40 +1491,40 @@
         });
     }
 
-    menuBtn.addEventListener("click", () => {
-      sidebar.classList.toggle("open");
+    menuBtn?.addEventListener("click", () => {
+      sidebar?.classList.toggle("open");
     });
 
-    document.addEventListener("click", closeSidebarOnOutsideClick);
+    document.addEventListener("click", closeSidebarAndMenus);
 
-    profileTrigger.addEventListener("click", (e) => {
-      e.stopPropagation();
-      const isOpen = profileMenu.classList.toggle("open");
-      profileTrigger.setAttribute("aria-expanded", String(isOpen));
+    profileTrigger?.addEventListener("click", (event) => {
+      event.stopPropagation();
+      const isOpen = profileMenu?.classList.toggle("open");
+      profileTrigger.setAttribute("aria-expanded", String(Boolean(isOpen)));
     });
 
-    logoutBtn.addEventListener("click", handleLogout);
-    profileLogoutBtn.addEventListener("click", handleLogout);
+    logoutBtn?.addEventListener("click", handleLogout);
+    profileLogoutBtn?.addEventListener("click", handleLogout);
 
-    createDocTopBtn.addEventListener("click", () => {
-      createEmptyDocument();
-    });
+    createDocTopBtn?.addEventListener("click", createEmptyDocument);
 
-    reloadBtn.addEventListener("click", () => {
+    reloadBtn?.addEventListener("click", () => {
       const user = auth.currentUser;
-      if (user) loadUserContent(user);
+      if (user) {
+        loadUserContent(user);
+      }
     });
 
-    searchInput.addEventListener("input", () => {
+    searchInput?.addEventListener("input", () => {
       currentSearch = searchInput.value || "";
       applyFilters();
     });
 
-    chips.forEach(chip => {
+    chips.forEach((chip) => {
       chip.addEventListener("click", () => {
-        chips.forEach(c => c.classList.remove("active"));
+        chips.forEach((item) => item.classList.remove("active"));
         chip.classList.add("active");
-        currentFilter = chip.dataset.filter;
+        currentFilter = chip.dataset.filter || "todos";
         applyFilters();
       });
     });
@@ -1522,6 +1538,8 @@
       setProfileData(user);
       await loadUserContent(user);
     });
+
+    refreshIcons();
   </script>
 </body>
 </html>
