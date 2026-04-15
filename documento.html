@@ -3638,32 +3638,6 @@
         }
       };
 
-      <script>
-  const toolFromUrl = new URLSearchParams(window.location.search).get("tool");
-
-  const toolToPanelMap = {
-    quiz: "quiz-panel",
-    complete: "complete-panel",
-    summary: "summary-panel",
-    keywords: "keywords-panel",
-    presentation: "presentation-panel"
-  };
-
-  function openToolFromQuery() {
-    if (!toolFromUrl) return;
-
-    const panelId = toolToPanelMap[toolFromUrl];
-    if (!panelId) return;
-
-    const meta = panelMeta[panelId];
-    if (!meta) return;
-
-    openToolPanel(panelId, meta);
-  }
-
-  setTimeout(openToolFromQuery, 300);
-</script>
-
       toolDockButtons.forEach((btn) => {
         btn.addEventListener("click", () => {
           const panelId = btn.dataset.panel;
