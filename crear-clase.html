@@ -1851,16 +1851,17 @@
           <span class="helper">Ajusta dificultad y lenguaje.</span>
         </div>
 
-        <div class="field">
-          <label for="clase_duracion">Duración estimada</label>
-          <select id="clase_duracion">
-            <option value="20 min">20 minutos</option>
-            <option value="30 min">30 minutos</option>
-            <option value="45 min">45 minutos</option>
-            <option value="60 min">60 minutos</option>
-          </select>
-          <span class="helper">Ordena mejor la estructura.</span>
-        </div>
+<div class="field">
+  <label for="clase_palabras_min">Mínimo de palabras</label>
+  <input id="clase_palabras_min" type="number" min="0" placeholder="Ejemplo: 300" />
+  <span class="helper">Cantidad mínima de palabras deseada.</span>
+</div>
+
+<div class="field">
+  <label for="clase_palabras_max">Máximo de palabras</label>
+  <input id="clase_palabras_max" type="number" min="0" placeholder="Ejemplo: 600" />
+  <span class="helper">Cantidad máxima de palabras deseada.</span>
+</div>
 
         <div class="field full">
           <label for="clase_objetivo">Objetivo</label>
@@ -2020,13 +2021,25 @@
 
       legacyTipo.value = selected;
 
-      if (selected === "clase") {
-        legacyMateria.value = valueOf("clase_materia");
-        legacyTema.value = valueOf("clase_tema");
-        legacyNivel.value = document.getElementById("clase_nivel")?.value || "Secundaria";
-        legacyDuracion.value = document.getElementById("clase_duracion")?.value || "30 min";
-        legacyObjetivo.value = valueOf("clase_objetivo");
-      }
+if (selected === "clase") {
+  const minPalabras = valueOf("clase_palabras_min");
+  const maxPalabras = valueOf("clase_palabras_max");
+  const objetivoBase = valueOf("clase_objetivo");
+
+  legacyMateria.value = valueOf("clase_materia");
+  legacyTema.value = valueOf("clase_tema");
+  legacyNivel.value = document.getElementById("clase_nivel")?.value || "Secundaria";
+  legacyDuracion.value =
+    minPalabras || maxPalabras
+      ? `${minPalabras || "0"}-${maxPalabras || "0"} palabras`
+      : "Sin límite definido";
+
+  legacyObjetivo.value =
+    `${objetivoBase}` +
+    ((minPalabras || maxPalabras)
+      ? `\nExtensión deseada: entre ${minPalabras || "0"} y ${maxPalabras || "0"} palabras.`
+      : "");
+}
 
       if (selected === "resumen") {
         const tema = valueOf("resumen_tema");
