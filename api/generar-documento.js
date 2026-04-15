@@ -271,11 +271,32 @@ function combinarContextoBase({ investigacion = "", contenidoBase = "" }) {
   return partes.join("\n\n").trim();
 }
 
+function construirExtensionDeseada({
+  palabrasMin = "",
+  palabrasMax = "",
+  duracion = "",
+}) {
+  const min = limpiarTexto(palabrasMin);
+  const max = limpiarTexto(palabrasMax);
+  const rangoDesdeDuracion = limpiarTexto(duracion);
+
+  if (min && max) return `Entre ${min} y ${max} palabras`;
+  if (min) return `Mínimo ${min} palabras`;
+  if (max) return `Máximo ${max} palabras`;
+
+  if (rangoDesdeDuracion) {
+    if (/palabra/i.test(rangoDesdeDuracion)) return rangoDesdeDuracion;
+    return rangoDesdeDuracion;
+  }
+
+  return "No especificada";
+}
+
 function buildResearchPrompt({
   materia,
   tema,
   nivel,
-  duracion,
+  extensionDeseada,
   objetivo,
   contenidoBase,
 }) {
@@ -286,7 +307,7 @@ Datos:
 - Materia: ${materia}
 - Tema: ${tema}
 - Nivel: ${nivel}
-- Duración: ${duracion || "No especificada"}
+- Extensión deseada: ${extensionDeseada || "No especificada"}
 - Objetivo: ${objetivo || "No especificado"}
 
 ${contenidoBase ? `Contenido base ya disponible:\n${contenidoBase}\n` : ""}
@@ -301,6 +322,7 @@ Instrucciones:
 - Explicá el contenido como base de estudio para un alumno.
 - Si ya hay contenido base, usalo para orientar la investigación y completarlo.
 - Incluí datos concretos solo cuando aporten valor real.
+- Ajustá la cantidad de desarrollo según la extensión deseada.
 
 Necesito:
 1. idea central del tema
@@ -336,7 +358,7 @@ function buildDocumentoPrompt({
   materia,
   tema,
   nivel,
-  duracion,
+  extensionDeseada,
   objetivo,
   investigacionFinal,
   contenidoBase,
@@ -349,7 +371,7 @@ Datos:
 - Materia: ${materia}
 - Tema: ${tema}
 - Nivel: ${nivel}
-- Duración: ${duracion || "No especificada"}
+- Extensión deseada: ${extensionDeseada || "No especificada"}
 - Objetivo: ${objetivo || "No especificado"}
 
 Base de investigación:
@@ -369,6 +391,7 @@ Requisitos:
 - Incluí ejemplos o aplicaciones si corresponde.
 - Cerrá con un repaso final.
 - Adaptá la profundidad al nivel indicado.
+- Respetá la extensión deseada.
 - No pongas relleno.
 - No repitas demasiado las mismas ideas.
 - No agregues las fuentes dentro del HTML.
@@ -677,7 +700,7 @@ async function investigarTemaConWeb({
   materia,
   tema,
   nivel,
-  duracion,
+  extensionDeseada,
   objetivo,
   contenidoBase,
 }) {
@@ -700,7 +723,7 @@ Devolvé SOLO JSON válido.
         materia,
         tema,
         nivel,
-        duracion,
+        extensionDeseada,
         objetivo,
         contenidoBase,
       }),
@@ -781,7 +804,7 @@ async function generarDocumentoConIA({
   materia,
   tema,
   nivel,
-  duracion,
+  extensionDeseada,
   objetivo,
   investigacionFinal,
   contenidoBase,
@@ -825,7 +848,7 @@ ${refuerzo ? `- ${refuerzo.replace(/\n/g, "\n- ")}` : ""}
         materia,
         tema,
         nivel,
-        duracion,
+        extensionDeseada,
         objetivo,
         investigacionFinal,
         contenidoBase,
@@ -909,6 +932,8 @@ export default async function handler(req, res) {
       tema = "",
       nivel = "",
       duracion = "",
+      palabrasMin = "",
+      palabrasMax = "",
       objetivo = "",
       investigacion = "",
       fuentes = [],
@@ -919,8 +944,16 @@ export default async function handler(req, res) {
     const temaLimpio = limitarTexto(tema, 220);
     const nivelLimpio = limitarTexto(nivel, 120);
     const duracionLimpia = limitarTexto(duracion, 120);
+    const palabrasMinLimpias = limitarTexto(palabrasMin, 20);
+    const palabrasMaxLimpias = limitarTexto(palabrasMax, 20);
     const objetivoLimpio = limitarTexto(objetivo, 400);
     const contenidoBaseLimpio = limpiarContenidoBase(contenidoBase);
+
+    const extensionDeseada = construirExtensionDeseada({
+      palabrasMin: palabrasMinLimpias,
+      palabrasMax: palabrasMaxLimpias,
+      duracion: duracionLimpia,
+    });
 
     if (!materiaLimpia || !temaLimpio || !nivelLimpio) {
       return res.status(400).json({
@@ -945,7 +978,7 @@ export default async function handler(req, res) {
         materia: materiaLimpia,
         tema: temaLimpio,
         nivel: nivelLimpio,
-        duracion: duracionLimpia,
+        extensionDeseada,
         objetivo: objetivoLimpio,
         contenidoBase: contenidoBaseLimpio,
       });
@@ -983,6 +1016,7 @@ export default async function handler(req, res) {
       materia: materiaLimpia,
       tema: temaLimpio,
       nivel: nivelLimpio,
+      extensionDeseada,
       tieneObjetivo: Boolean(objetivoLimpio),
       investigacionLen: investigacionFinal.length,
       contenidoBaseLen: contenidoBaseLimpio.length,
@@ -1001,7 +1035,7 @@ export default async function handler(req, res) {
           materia: materiaLimpia,
           tema: temaLimpio,
           nivel: nivelLimpio,
-          duracion: duracionLimpia,
+          extensionDeseada,
           objetivo: objetivoLimpio,
           investigacionFinal: contextoDocumento || investigacionFinal,
           contenidoBase: contenidoBaseLimpio,
