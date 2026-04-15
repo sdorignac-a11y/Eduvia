@@ -1376,6 +1376,14 @@
                       <span>Material de apoyo</span>
                     </div>
                   </div>
+
+                  <div class="stepper-item" data-step="5" id="result-step-item" style="display:none;">
+  <div class="stepper-dot">5</div>
+  <div class="stepper-copy">
+    <strong>Resultado</strong>
+    <span>Texto generado</span>
+  </div>
+</div>
                 </div>
               </div>
 
@@ -1545,6 +1553,26 @@
                   </div>
                 </section>
 
+                <section class="step-panel" data-panel="5" id="result-step-panel" style="display:none;">
+  <div class="section-head">
+    <h3>Resultado generado</h3>
+    <p>Acá vas a ver la conclusión antes de guardarla como documento.</p>
+  </div>
+
+  <div class="dynamic-shell">
+    <div class="field full">
+      <label for="resultado_texto">Conclusión</label>
+      <textarea id="resultado_texto" readonly></textarea>
+      <span class="helper">Podés copiarla, volver a editar o después guardarla como documento.</span>
+    </div>
+
+    <div class="wizard-footer-right" style="margin-top:16px;">
+      <button type="button" class="btn btn-soft" id="copy-result-btn">Copiar</button>
+      <button type="button" class="btn btn-soft" id="back-to-edit-btn">Volver a editar</button>
+    </div>
+  </div>
+</section>
+
                 <div class="hidden-legacy" aria-hidden="true">
                   <input type="hidden" id="tipo_contenido_hidden" name="tipo_contenido_hidden" value="clase" />
                   <input type="hidden" id="materia" name="materia" />
@@ -1663,8 +1691,38 @@
   </script>
 
   <script>
-    const TOTAL_STEPS = 4;
-    let currentStep = 1;
+    let TOTAL_STEPS = 4;
+let currentStep = 1;
+
+const resultStepItem = document.getElementById("result-step-item");
+const resultStepPanel = document.getElementById("result-step-panel");
+
+function isQuickResultMode() {
+  const params = new URLSearchParams(window.location.search);
+  return (params.get("tool") || "").trim().toLowerCase() === "conclusion";
+}
+
+function updateWizardMode() {
+  const quickMode = isQuickResultMode();
+
+  TOTAL_STEPS = quickMode ? 5 : 4;
+
+  if (resultStepItem) {
+    resultStepItem.style.display = quickMode ? "flex" : "none";
+  }
+
+  if (resultStepPanel) {
+    resultStepPanel.style.display = quickMode ? "" : "none";
+  }
+
+  if (stepCounter) {
+    stepCounter.textContent = `Paso ${currentStep} de ${TOTAL_STEPS}`;
+  }
+
+  if (submitStepBtn) {
+    submitStepBtn.textContent = quickMode ? "Generar resultado" : "Crear contenido";
+  }
+}
 
     const stepperItems = Array.from(document.querySelectorAll(".stepper-item"));
     const stepPanels = Array.from(document.querySelectorAll(".step-panel"));
@@ -1673,35 +1731,40 @@
     const submitStepBtn = document.getElementById("submit-step-btn");
     const stepCounter = document.getElementById("step-counter");
 
-    function goToStep(step) {
-      currentStep = Math.min(Math.max(step, 1), TOTAL_STEPS);
+function goToStep(step) {
+  currentStep = Math.min(Math.max(step, 1), TOTAL_STEPS);
 
-      stepPanels.forEach((panel) => {
-        panel.classList.toggle("active", Number(panel.dataset.panel) === currentStep);
-      });
+  stepPanels.forEach((panel) => {
+    panel.classList.toggle("active", Number(panel.dataset.panel) === currentStep);
+  });
 
-      stepperItems.forEach((item) => {
-        const itemStep = Number(item.dataset.step);
-        item.classList.toggle("active", itemStep === currentStep);
-        item.classList.toggle("done", itemStep < currentStep);
-      });
-
-      if (stepCounter) {
-        stepCounter.textContent = `Paso ${currentStep} de ${TOTAL_STEPS}`;
-      }
-
-      if (prevStepBtn) {
-        prevStepBtn.style.display = currentStep === 1 ? "none" : "inline-flex";
-      }
-
-      if (nextStepBtn) {
-        nextStepBtn.style.display = currentStep === TOTAL_STEPS ? "none" : "inline-flex";
-      }
-
-      if (submitStepBtn) {
-        submitStepBtn.style.display = currentStep === TOTAL_STEPS ? "inline-flex" : "none";
-      }
+  stepperItems.forEach((item) => {
+    const itemStep = Number(item.dataset.step);
+    if (itemStep > TOTAL_STEPS) {
+      item.classList.remove("active", "done");
+      return;
     }
+
+    item.classList.toggle("active", itemStep === currentStep);
+    item.classList.toggle("done", itemStep < currentStep);
+  });
+
+  if (stepCounter) {
+    stepCounter.textContent = `Paso ${currentStep} de ${TOTAL_STEPS}`;
+  }
+
+  if (prevStepBtn) {
+    prevStepBtn.style.display = currentStep === 1 ? "none" : "inline-flex";
+  }
+
+  if (nextStepBtn) {
+    nextStepBtn.style.display = currentStep === TOTAL_STEPS ? "none" : "inline-flex";
+  }
+
+  if (submitStepBtn) {
+    submitStepBtn.style.display = currentStep === TOTAL_STEPS ? "inline-flex" : "none";
+  }
+}
 
     prevStepBtn?.addEventListener("click", () => {
       goToStep(currentStep - 1);
@@ -1718,7 +1781,8 @@
       });
     });
 
-    goToStep(1);
+    updateWizardMode();
+goToStep(1);
   </script>
 
   <script>
@@ -2199,6 +2263,7 @@ function renderDynamicFields() {
 
     renderDynamicFields();
 applyToolPreset();
+    
 
     const form = document.getElementById("clase-form");
     form?.addEventListener("submit", syncLegacyFields);
