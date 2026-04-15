@@ -1241,6 +1241,16 @@
         border-radius:14px;
       }
     }
+    .type-option{
+  position:relative;
+  display:block;
+  min-width:0;
+}
+
+.type-option-link{
+  display:block;
+  min-width:0;
+}
   </style>
 </head>
 <body style="visibility:hidden; opacity:0;">
@@ -1413,95 +1423,99 @@
               </div>
 
               <div class="form-stage">
-                <section class="step-panel active" data-panel="1">
-                  <div class="section-head">
-                    <h3>Elegí el tipo de contenido</h3>
-                    <p>Seleccioná la opción que mejor se adapte a lo que necesitás.</p>
-                  </div>
+<section class="step-panel active" data-panel="1">
+  <div class="section-head">
+    <h3>Elegí el tipo de contenido</h3>
+    <p>Seleccioná la opción que mejor se adapte a lo que necesitás.</p>
+  </div>
 
-<label class="type-option">
-  <input type="radio" name="tipo_contenido" value="clase" checked />
-  <div class="type-card">
-    <div class="type-top">
-      <div class="type-icon">CL</div>
-      <span class="type-badge">Base</span>
-    </div>
-    <div>
-      <strong>Clase escolar</strong>
-      <p>Para materias, temas y objetivos.</p>
-    </div>
-  </div>
-</label>
+  <div class="type-grid" id="content-type-selector">
+    <label class="type-option">
+      <input type="radio" name="tipo_contenido" value="clase" checked />
+      <div class="type-card">
+        <div class="type-top">
+          <div class="type-icon">CL</div>
+          <span class="type-badge">Base</span>
+        </div>
+        <div>
+          <strong>Clase escolar</strong>
+          <p>Para materias, temas y objetivos.</p>
+        </div>
+      </div>
+    </label>
 
-<label class="type-option">
-  <input type="radio" name="tipo_contenido" value="resumen" />
-  <div class="type-card">
-    <div class="type-top">
-      <div class="type-icon">RS</div>
-      <span class="type-badge">Claro</span>
-    </div>
-    <div>
-      <strong>Resumen / explicación</strong>
-      <p>Para entender un tema de forma clara.</p>
-    </div>
-  </div>
-</label>
+    <label class="type-option">
+      <input type="radio" name="tipo_contenido" value="resumen" />
+      <div class="type-card">
+        <div class="type-top">
+          <div class="type-icon">RS</div>
+          <span class="type-badge">Claro</span>
+        </div>
+        <div>
+          <strong>Resumen / explicación</strong>
+          <p>Para entender un tema de forma clara.</p>
+        </div>
+      </div>
+    </label>
 
-<label class="type-option">
-  <input type="radio" name="tipo_contenido" value="analisis" />
-  <div class="type-card">
-    <div class="type-top">
-      <div class="type-icon">AN</div>
-      <span class="type-badge">Profundo</span>
-    </div>
-    <div>
-      <strong>Análisis de tema</strong>
-      <p>Para comparar, interpretar o profundizar.</p>
-    </div>
-  </div>
-</label>
+    <label class="type-option">
+      <input type="radio" name="tipo_contenido" value="analisis" />
+      <div class="type-card">
+        <div class="type-top">
+          <div class="type-icon">AN</div>
+          <span class="type-badge">Profundo</span>
+        </div>
+        <div>
+          <strong>Análisis de tema</strong>
+          <p>Para comparar, interpretar o profundizar.</p>
+        </div>
+      </div>
+    </label>
 
-<label class="type-option">
-  <input type="radio" name="tipo_contenido" value="documento" />
-  <div class="type-card">
-    <div class="type-top">
-      <div class="type-icon">DC</div>
-      <span class="type-badge">Ordenado</span>
-    </div>
-    <div>
-      <strong>Documento de estudio</strong>
-      <p>Para apuntes y desarrollos más largos.</p>
-    </div>
-  </div>
-</label>
+    <label class="type-option">
+      <input type="radio" name="tipo_contenido" value="documento" />
+      <div class="type-card">
+        <div class="type-top">
+          <div class="type-icon">DC</div>
+          <span class="type-badge">Ordenado</span>
+        </div>
+        <div>
+          <strong>Documento de estudio</strong>
+          <p>Para apuntes y desarrollos más largos.</p>
+        </div>
+      </div>
+    </label>
 
-<a href="herramientas.html" class="type-card type-link-card">
-  <div class="type-top">
-    <div class="type-icon">
-      <i data-lucide="sparkles"></i>
-    </div>
-    <span class="type-badge">Explorar</span>
-  </div>
-  <div>
-    <strong>Conocer más funciones</strong>
-    <p>Descubrí todas las herramientas de Eduvia y elegí nuevas formas de estudiar.</p>
-  </div>
-</a>
+    <a href="herramientas.html" class="type-option-link">
+      <div class="type-card type-link-card">
+        <div class="type-top">
+          <div class="type-icon">
+            <i data-lucide="sparkles"></i>
+          </div>
+          <span class="type-badge">Explorar</span>
+        </div>
+        <div>
+          <strong>Conocer más funciones</strong>
+          <p>Descubrí todas las herramientas de Eduvia y elegí nuevas formas de estudiar.</p>
+        </div>
+      </div>
+    </a>
 
-<label class="type-option">
-  <input type="radio" name="tipo_contenido" value="investigacion" />
-  <div class="type-card">
-    <div class="type-top">
-      <div class="type-icon">IN</div>
-      <span class="type-badge">Rápido</span>
-    </div>
-    <div>
-      <strong>Investigación rápida</strong>
-      <p>Para preguntas, hallazgos e ideas clave.</p>
-    </div>
+    <label class="type-option">
+      <input type="radio" name="tipo_contenido" value="investigacion" />
+      <div class="type-card">
+        <div class="type-top">
+          <div class="type-icon">IN</div>
+          <span class="type-badge">Rápido</span>
+        </div>
+        <div>
+          <strong>Investigación rápida</strong>
+          <p>Para preguntas, hallazgos e ideas clave.</p>
+        </div>
+      </div>
+    </label>
   </div>
-</label>
-                </section>
+</section>
 
                 <section class="step-panel" data-panel="2">
                   <div class="section-head">
