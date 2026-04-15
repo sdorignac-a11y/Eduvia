@@ -99,7 +99,38 @@ function limpiarTexto(value = "") {
   return String(value || "").trim();
 }
 
-function buildSearchPrompt({ materia, tema, nivel, duracion, objetivo }) {
+function limitarTexto(value = "", max = 1000) {
+  return limpiarTexto(value).slice(0, max);
+}
+
+function construirExtensionDeseada({
+  palabrasMin = "",
+  palabrasMax = "",
+  duracion = "",
+}) {
+  const min = limpiarTexto(palabrasMin);
+  const max = limpiarTexto(palabrasMax);
+  const rangoDesdeDuracion = limpiarTexto(duracion);
+
+  if (min && max) return `Entre ${min} y ${max} palabras`;
+  if (min) return `Mínimo ${min} palabras`;
+  if (max) return `Máximo ${max} palabras`;
+
+  if (rangoDesdeDuracion) {
+    if (/palabra/i.test(rangoDesdeDuracion)) return rangoDesdeDuracion;
+    return rangoDesdeDuracion;
+  }
+
+  return "No especificada";
+}
+
+function buildSearchPrompt({
+  materia,
+  tema,
+  nivel,
+  extensionDeseada,
+  objetivo,
+}) {
   return `
 Investigá este tema para preparar una clase de estudio de alta calidad.
 
@@ -107,7 +138,7 @@ Datos:
 - Materia: ${materia}
 - Tema: ${tema}
 - Nivel: ${nivel}
-- Duración: ${duracion || "No especificada"}
+- Extensión deseada: ${extensionDeseada || "No especificada"}
 - Objetivo: ${objetivo || "No especificado"}
 
 Instrucciones:
@@ -118,6 +149,7 @@ Instrucciones:
 - Entregá una investigación breve y útil en español.
 - No fuerces una plantilla fija.
 - Incluí solo lo que realmente aplique al tema.
+- Ajustá la cantidad de desarrollo a la extensión deseada.
 
 Quiero una investigación breve que pueda incluir, según corresponda:
 - definición o idea central
@@ -137,7 +169,7 @@ function buildLessonInput({
   materia,
   tema,
   nivel,
-  duracion,
+  extensionDeseada,
   objetivo,
   investigacion,
   fuentes,
@@ -154,7 +186,7 @@ Generá el resumen de estudio con estos datos:
 - Materia: ${materia}
 - Tema: ${tema}
 - Nivel: ${nivel}
-- Duración: ${duracion || "No especificada"}
+- Extensión deseada: ${extensionDeseada || "No especificada"}
 - Objetivo: ${objetivo || "No especificado"}
 
 Investigación previa validada:
@@ -166,6 +198,7 @@ ${fuentesTexto}
 Quiero que quede completo, claro, útil y bien explicado.
 Basate en la investigación previa.
 No inventes datos que contradigan o se alejen de esa base.
+Respetá la extensión deseada.
 `.trim();
 }
 
@@ -250,10 +283,26 @@ export default async function handler(req, res) {
       tema = "",
       nivel = "",
       duracion = "",
+      palabrasMin = "",
+      palabrasMax = "",
       objetivo = "",
     } = req.body || {};
 
-    if (!materia || !tema || !nivel) {
+    const materiaLimpia = limitarTexto(materia, 180);
+    const temaLimpio = limitarTexto(tema, 220);
+    const nivelLimpio = limitarTexto(nivel, 120);
+    const duracionLimpia = limitarTexto(duracion, 120);
+    const palabrasMinLimpias = limitarTexto(palabrasMin, 20);
+    const palabrasMaxLimpias = limitarTexto(palabrasMax, 20);
+    const objetivoLimpio = limitarTexto(objetivo, 400);
+
+    const extensionDeseada = construirExtensionDeseada({
+      palabrasMin: palabrasMinLimpias,
+      palabrasMax: palabrasMaxLimpias,
+      duracion: duracionLimpia,
+    });
+
+    if (!materiaLimpia || !temaLimpio || !nivelLimpio) {
       return res.status(400).json({
         ok: false,
         error: "Faltan materia, tema o nivel.",
@@ -275,11 +324,11 @@ No fuerces estructuras fijas.
 Incluí solo la información que realmente sirva para este tema.
 `.trim(),
       input: buildSearchPrompt({
-        materia,
-        tema,
-        nivel,
-        duracion,
-        objetivo,
+        materia: materiaLimpia,
+        tema: temaLimpio,
+        nivel: nivelLimpio,
+        extensionDeseada,
+        objetivo: objetivoLimpio,
       }),
     });
 
@@ -324,6 +373,7 @@ MUY IMPORTANTE:
 - Si el tema es más práctico, priorizá reglas, procedimiento, aplicación y errores comunes.
 - Si el tema es histórico o social, priorizá contexto, causas, consecuencias, relaciones y debates importantes.
 - Las secciones deben surgir del contenido, no de una plantilla.
+- Respetá la extensión deseada.
 
 QUÉ TENÉS QUE DEVOLVER:
 
@@ -364,11 +414,11 @@ ESTILO:
 - Útil para preparar una prueba
       `.trim(),
       input: buildLessonInput({
-        materia,
-        tema,
-        nivel,
-        duracion,
-        objetivo,
+        materia: materiaLimpia,
+        tema: temaLimpio,
+        nivel: nivelLimpio,
+        extensionDeseada,
+        objetivo: objetivoLimpio,
         investigacion,
         fuentes,
       }),
