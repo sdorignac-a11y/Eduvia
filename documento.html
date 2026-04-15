@@ -14,23 +14,18 @@
       --bg:#f1f3f4;
       --paper:#ffffff;
       --line:#dadce0;
-      --line-soft:#eceff1;
       --text:#202124;
       --muted:#5f6368;
       --blue:#1a73e8;
       --blue-strong:#0b57d0;
       --blue-soft:#e8f0fe;
       --success:#1e8e3e;
-      --danger:#d93025;
 
       --shadow:0 1px 2px rgba(60,64,67,.16),0 4px 12px rgba(60,64,67,.10);
-      --shadow-soft:0 18px 44px rgba(15,23,42,.16);
       --shadow-panel:0 18px 40px rgba(15,23,42,.12);
       --shadow-chat:0 22px 46px rgba(15,23,42,.16);
 
-      --radius-sm:12px;
       --radius-md:16px;
-      --radius-lg:20px;
       --radius-xl:24px;
       --radius-pill:999px;
 
@@ -298,23 +293,25 @@
     }
 
     .editor-chrome{
-      position:sticky;
-      top:0;
-      z-index:80;
-      background:rgba(255,255,255,.96);
-      backdrop-filter:blur(14px);
-      border-bottom:1px solid #e8edf3;
-      box-shadow:0 10px 24px rgba(15,23,42,.06);
+      position:static;
+      background:transparent;
+      border-bottom:none;
+      box-shadow:none;
+      padding:20px 16px 0;
     }
 
     .topbar{
-      min-height:70px;
+      min-height:74px;
       display:flex;
       align-items:center;
       justify-content:space-between;
       gap:16px;
-      padding:12px 18px;
-      border-bottom:1px solid #eef2f6;
+      padding:14px 18px;
+      border:1px solid #e7ecf2;
+      border-radius:22px;
+      background:rgba(255,255,255,.92);
+      backdrop-filter:blur(14px);
+      box-shadow:0 14px 34px rgba(15,23,42,.08);
     }
 
     .topbar-left{
@@ -326,16 +323,25 @@
     }
 
     .doc-icon{
-      width:34px;
-      height:42px;
-      border-radius:9px;
+      width:38px;
+      height:46px;
+      border-radius:12px;
       display:grid;
       place-items:center;
-      background:var(--blue);
+      background:linear-gradient(180deg,#3b82f6 0%, #2563eb 100%);
       color:#fff;
-      font-size:.95rem;
       flex:none;
-      box-shadow:0 8px 16px rgba(26,115,232,.16);
+      box-shadow:0 10px 20px rgba(37,99,235,.20);
+    }
+
+    .doc-icon svg{
+      width:20px;
+      height:20px;
+      stroke:currentColor;
+      fill:none;
+      stroke-width:2;
+      stroke-linecap:round;
+      stroke-linejoin:round;
     }
 
     .topbar-text{
@@ -409,12 +415,12 @@
     .btn-outline{
       background:#fff;
       color:var(--text);
-      border:1px solid #d7dde3;
+      border:1px solid #d8e0e8;
     }
 
     .btn-outline:hover{
-      background:#f8f9fa;
-      border-color:#cfd4da;
+      background:#f8fafc;
+      border-color:#cdd7e1;
       transform:none;
     }
 
@@ -429,9 +435,30 @@
       transform:none;
     }
 
+    .btn-icon{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+    }
+
+    .btn-icon svg{
+      width:16px;
+      height:16px;
+      stroke:currentColor;
+      fill:none;
+      stroke-width:2.2;
+      stroke-linecap:round;
+      stroke-linejoin:round;
+    }
+
     .format-topbar{
-      padding:10px 16px 12px;
-      background:linear-gradient(180deg,#ffffff 0%,#fbfcfe 100%);
+      margin-top:12px;
+      padding:12px 14px;
+      border:1px solid #e7ecf2;
+      border-radius:22px;
+      background:rgba(255,255,255,.92);
+      backdrop-filter:blur(14px);
+      box-shadow:0 14px 34px rgba(15,23,42,.07);
     }
 
     .format-scroll{
@@ -487,9 +514,9 @@
       min-width:42px;
       height:42px;
       border:none;
-      border-radius:12px;
-      background:#f8fafc;
-      color:var(--text);
+      border-radius:14px;
+      background:linear-gradient(180deg,#ffffff 0%, #f7f9fc 100%);
+      color:#334155;
       cursor:pointer;
       padding:0 10px;
       display:inline-flex;
@@ -497,25 +524,28 @@
       justify-content:center;
       gap:6px;
       flex:none;
-      border:1px solid #e5eaf1;
-      transition:background .15s ease,color .15s ease,box-shadow .15s ease,border-color .15s ease, transform .15s ease;
+      border:1px solid #e3e8ef;
+      box-shadow:0 4px 14px rgba(15,23,42,.04);
+      transition:background .16s ease,color .16s ease,box-shadow .16s ease,border-color .16s ease, transform .16s ease;
     }
 
     .tool-btn:hover{
-      background:#eef3f8;
-      border-color:#dce4ee;
+      background:#f3f7fb;
+      border-color:#d7e0ea;
+      color:#0f172a;
+      transform:translateY(-1px);
     }
 
     .tool-btn.is-active{
-      background:var(--blue-soft);
-      color:var(--blue);
-      box-shadow:inset 0 0 0 1px rgba(26,115,232,.10);
+      background:linear-gradient(180deg,#eef5ff 0%, #e4efff 100%);
+      color:var(--blue-strong);
       border-color:#cfe0ff;
+      box-shadow:0 10px 22px rgba(26,115,232,.12);
     }
 
     .tool-btn svg{
-      width:16px;
-      height:16px;
+      width:17px;
+      height:17px;
       stroke:currentColor;
       fill:none;
       stroke-width:2;
@@ -524,9 +554,17 @@
     }
 
     .tool-btn.text-btn{
-      font-size:.9rem;
-      font-weight:700;
+      font-size:.92rem;
+      font-weight:800;
       letter-spacing:-.01em;
+    }
+
+    .text-btn strong,
+    .text-btn em,
+    .text-btn u,
+    .text-btn s{
+      font-size:1rem;
+      line-height:1;
     }
 
     .tool-select{
@@ -609,7 +647,7 @@
 
     .page-shell{
       position:relative;
-      min-height:calc(100vh - 124px);
+      min-height:calc(100vh - 160px);
     }
 
     #document-app.document-with-chat .workspace{
@@ -618,14 +656,25 @@
       padding-top:26px;
     }
 
-    #document-app.document-with-chat .tool-panel{
+    #document-app.document-centered .workspace{
+      padding-left:calc(var(--left-rail-width) + 42px);
+      padding-right:28px;
+      padding-top:26px;
+    }
+
+    #document-app.document-with-chat .tool-panel,
+    #document-app.document-centered .tool-panel{
       left:calc(var(--left-rail-width) + 28px);
       right:auto;
     }
 
+    #document-app.document-centered .paper-wrap{
+      max-width:1040px;
+    }
+
     .left-rail{
       position:fixed;
-      top:140px;
+      top:172px;
       left:16px;
       bottom:24px;
       width:var(--left-rail-width);
@@ -665,31 +714,22 @@
 
     .tool-dock{
       position:static;
-      right:auto;
-      top:auto;
-      z-index:auto;
       display:flex;
       flex-direction:column;
       align-items:center;
       gap:10px;
       width:100%;
       padding:0;
-      border-radius:0;
-      background:transparent;
       border:none;
+      background:transparent;
       box-shadow:none;
-      backdrop-filter:none;
     }
-
-    .tool-dock::before{ display:none; }
 
     .tool-dock-group{
       display:grid;
       grid-template-columns:1fr;
       gap:10px;
       width:100%;
-      position:static;
-      z-index:auto;
     }
 
     .tool-dock-divider{
@@ -702,18 +742,17 @@
     .tool-dock-btn{
       position:relative;
       width:100%;
-      height:50px;
+      height:52px;
       border:none;
-      border-radius:16px;
-      background:linear-gradient(180deg, #fff 0%, #f7f9fc 100%);
+      border-radius:18px;
+      background:linear-gradient(180deg,#ffffff 0%, #f7f9fc 100%);
       border:1px solid #e3e8ef;
-      box-shadow:0 10px 24px rgba(15,23,42,.10), inset 0 1px 0 rgba(255,255,255,.95);
+      box-shadow:0 12px 26px rgba(15,23,42,.08), inset 0 1px 0 rgba(255,255,255,.95);
       display:grid;
       place-items:center;
       cursor:pointer;
       color:#475569;
       transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease, background .18s ease, color .18s ease;
-      backdrop-filter:blur(10px);
     }
 
     .tool-dock-btn::after{
@@ -741,20 +780,18 @@
     }
 
     .tool-dock-btn:hover{
-      transform:translateY(-2px) scale(1.02);
+      transform:translateY(-2px);
       color:#1f2937;
-      border-color:#d8e1ec;
-      background:linear-gradient(180deg, #fff 0%, #f2f6fb 100%);
-      box-shadow:0 16px 30px rgba(15,23,42,.14), inset 0 1px 0 rgba(255,255,255,1);
+      border-color:#d6dee8;
+      background:linear-gradient(180deg,#fff 0%, #f2f6fb 100%);
+      box-shadow:0 16px 30px rgba(15,23,42,.12), inset 0 1px 0 rgba(255,255,255,1);
     }
-
-    .tool-dock-btn:active{ transform:scale(.98); }
 
     .tool-dock-btn.is-active{
       color:var(--blue-strong);
       border-color:#c8dbff;
-      background:linear-gradient(180deg, #eef5ff 0%, #e4efff 100%);
-      box-shadow:0 18px 34px rgba(26,115,232,.18), inset 0 0 0 1px rgba(26,115,232,.08);
+      background:linear-gradient(180deg,#eef5ff 0%, #e4efff 100%);
+      box-shadow:0 18px 34px rgba(26,115,232,.16), inset 0 0 0 1px rgba(26,115,232,.06);
     }
 
     .tool-dock-btn.is-active::before{
@@ -1013,7 +1050,7 @@
 
     .tool-panel{
       position:fixed;
-      top:132px;
+      top:186px;
       bottom:24px;
       width:340px;
       overflow:auto;
@@ -1606,7 +1643,7 @@
 
     .doc-chat-panel{
       position:fixed;
-      top:140px;
+      top:172px;
       right:20px;
       bottom:24px;
       width:var(--chat-width);
@@ -1790,15 +1827,18 @@
     .doc-chat-send{
       height:52px;
       min-width:52px;
-      padding:0 16px;
+      padding:0;
       border:none;
       border-radius:18px;
-      background:linear-gradient(180deg, var(--blue) 0%, #1565d8 100%);
+      background:linear-gradient(180deg,var(--blue) 0%, #1565d8 100%);
       color:#fff;
       font-weight:800;
       cursor:pointer;
       transition:.18s ease;
       box-shadow:0 12px 24px rgba(26,115,232,.18);
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
     }
 
     .doc-chat-send:hover{
@@ -1811,6 +1851,16 @@
       cursor:not-allowed;
       transform:none;
       box-shadow:none;
+    }
+
+    .doc-chat-send svg{
+      width:20px;
+      height:20px;
+      stroke:currentColor;
+      fill:none;
+      stroke-width:2.2;
+      stroke-linecap:round;
+      stroke-linejoin:round;
     }
 
     .doc-chat-toggle{
@@ -1865,12 +1915,14 @@
     }
 
     @media (max-width:1180px){
-      #document-app.document-with-chat .workspace{
+      #document-app.document-with-chat .workspace,
+      #document-app.document-centered .workspace{
         padding-left:14px;
         padding-right:14px;
       }
 
-      #document-app.document-with-chat .tool-panel{
+      #document-app.document-with-chat .tool-panel,
+      #document-app.document-centered .tool-panel{
         left:12px;
         right:12px;
         width:auto;
@@ -1927,6 +1979,12 @@
         width:auto;
         max-height:70vh;
         z-index:98;
+      }
+
+      .tool-panel{
+        top:auto;
+        bottom:92px;
+        max-height:60vh;
       }
     }
 
@@ -1990,6 +2048,10 @@
         top:24px;
         width:36px;
         height:36px;
+      }
+
+      .editor-chrome{
+        padding:14px 10px 0;
       }
 
       .topbar{
@@ -2139,7 +2201,14 @@
     <div class="editor-chrome">
       <header class="topbar">
         <div class="topbar-left">
-          <div class="doc-icon">📄</div>
+          <div class="doc-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/>
+              <path d="M14 3v5h5"/>
+              <path d="M9 13h6"/>
+              <path d="M9 17h4"/>
+            </svg>
+          </div>
 
           <div class="topbar-text">
             <div class="topbar-title-row">
@@ -2154,7 +2223,13 @@
         </div>
 
         <div class="topbar-actions">
-          <a href="crear-clase.html" class="btn btn-outline">← Volver</a>
+          <a href="crear-clase.html" class="btn btn-outline btn-icon">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="m15 18-6-6 6-6"/>
+            </svg>
+            <span>Volver</span>
+          </a>
+
           <button type="button" class="btn btn-soft" id="toggle-reference-view-btn">APA</button>
           <button type="button" class="btn btn-primary" id="open-share-btn">Compartir</button>
         </div>
@@ -2434,53 +2509,59 @@
         </div>
       </main>
     </div>
-  </div>
 
-  <aside class="doc-chat-panel" id="doc-chat-panel" aria-label="Chat del documento">
-    <div class="doc-chat-head">
-      <div class="doc-chat-head-left">
-        <div class="doc-chat-badge">Asistente IA</div>
-        <div class="doc-chat-title">Completar o corregir contexto</div>
-        <div class="doc-chat-subtitle">
-          Pedí agregar, resumir, alargar o ajustar partes sin rehacer el documento.
+    <aside class="doc-chat-panel" id="doc-chat-panel" aria-label="Chat del documento">
+      <div class="doc-chat-head">
+        <div class="doc-chat-head-left">
+          <div class="doc-chat-badge">Asistente IA</div>
+          <div class="doc-chat-title">Completar o corregir contexto</div>
+          <div class="doc-chat-subtitle">
+            Pedí agregar, resumir, alargar o ajustar partes sin rehacer el documento.
+          </div>
+        </div>
+        <button type="button" class="doc-chat-close" id="doc-chat-close" aria-label="Cerrar chat">×</button>
+      </div>
+
+      <div class="doc-chat-body" id="doc-chat-body">
+        <div class="doc-chat-empty" id="doc-chat-empty">
+          Probá con algo como:
+          <br>• “Agregá una conclusión”
+          <br>• “Resumí esta parte”
+          <br>• “Explicalo más simple”
         </div>
       </div>
-      <button type="button" class="doc-chat-close" id="doc-chat-close" aria-label="Cerrar chat">×</button>
-    </div>
 
-    <div class="doc-chat-body" id="doc-chat-body">
-      <div class="doc-chat-empty" id="doc-chat-empty">
-        Probá con algo como:
-        <br>• “Agregá una conclusión”
-        <br>• “Resumí esta parte”
-        <br>• “Explicalo más simple”
+      <div class="doc-chat-suggestions">
+        <button type="button" class="doc-chat-chip" data-chat-chip="Resumí el contenido actual">Resumir</button>
+        <button type="button" class="doc-chat-chip" data-chat-chip="Agregá ejemplos al documento">Agregar ejemplos</button>
+        <button type="button" class="doc-chat-chip" data-chat-chip="Escribí una conclusión para este texto">Conclusión</button>
       </div>
-    </div>
 
-    <div class="doc-chat-suggestions">
-      <button type="button" class="doc-chat-chip" data-chat-chip="Resumí el contenido actual">Resumir</button>
-      <button type="button" class="doc-chat-chip" data-chat-chip="Agregá ejemplos al documento">Agregar ejemplos</button>
-      <button type="button" class="doc-chat-chip" data-chat-chip="Escribí una conclusión para este texto">Conclusión</button>
-    </div>
+      <form class="doc-chat-form" id="doc-chat-form">
+        <div class="doc-chat-input-wrap">
+          <textarea
+            id="doc-chat-input"
+            class="doc-chat-input"
+            placeholder="Escribí qué querés cambiar o agregar..."
+            rows="1"
+          ></textarea>
+        </div>
 
-    <form class="doc-chat-form" id="doc-chat-form">
-      <div class="doc-chat-input-wrap">
-        <textarea
-          id="doc-chat-input"
-          class="doc-chat-input"
-          placeholder="Escribí qué querés cambiar o agregar..."
-          rows="1"
-        ></textarea>
-      </div>
-      <button type="submit" class="doc-chat-send" id="doc-chat-send">→</button>
-    </form>
-  </aside>
+        <button type="submit" class="doc-chat-send" id="doc-chat-send" aria-label="Enviar">
+          <svg viewBox="0 0 24 24">
+            <path d="M5 12h14"/>
+            <path d="m13 5 7 7-7 7"/>
+          </svg>
+        </button>
+      </form>
+    </aside>
 
-  <button type="button" class="doc-chat-toggle" id="doc-chat-toggle" aria-label="Abrir chat">
-    <svg viewBox="0 0 24 24">
-      <path d="M21 15a4 4 0 0 1-4 4H7l-4 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"/>
-    </svg>
-  </button>
+    <button type="button" class="doc-chat-toggle" id="doc-chat-toggle" aria-label="Abrir chat">
+      <svg viewBox="0 0 24 24">
+        <path d="M21 15a4 4 0 0 1-4 4H7l-4 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"/>
+      </svg>
+    </button>
+  </div>
 
   <div class="share-modal-backdrop" id="share-modal">
     <div class="share-modal">
@@ -2757,6 +2838,7 @@
       const $ = (id) => document.getElementById(id);
       const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
 
+      const documentApp = $("document-app");
       const editableAreas = $$(".doc-editable");
       const editor = $("doc-content");
 
@@ -3473,23 +3555,42 @@
         chatInput.style.height = `${Math.min(chatInput.scrollHeight, 140)}px`;
       }
 
+      function syncDocumentLayout() {
+        if (!documentApp || !chatPanel) return;
+
+        const desktop = window.innerWidth > 1180;
+        const chatVisible = desktop
+          ? !chatPanel.classList.contains("hidden")
+          : chatPanel.classList.contains("is-open");
+
+        documentApp.classList.toggle("document-with-chat", chatVisible);
+        documentApp.classList.toggle("document-centered", !chatVisible);
+      }
+
       function openChat() {
         if (!chatPanel) return;
+
         chatPanel.classList.remove("hidden");
+
         if (window.innerWidth <= 1180) {
           chatPanel.classList.add("is-open");
         } else {
           chatPanel.classList.remove("is-open");
         }
+
+        syncDocumentLayout();
       }
 
       function closeChat() {
         if (!chatPanel) return;
+
         if (window.innerWidth <= 1180) {
           chatPanel.classList.remove("is-open");
         } else {
           chatPanel.classList.add("hidden");
         }
+
+        syncDocumentLayout();
       }
 
       function localChatReply(message) {
@@ -3623,6 +3724,7 @@
 
       openShareBtn?.addEventListener("click", openShareModal);
       closeShareBtn?.addEventListener("click", closeShareModal);
+
       shareModal?.addEventListener("click", (event) => {
         if (event.target === shareModal) closeShareModal();
       });
@@ -3666,6 +3768,7 @@
 
       simpleViewBtn?.addEventListener("click", () => setReferenceView("simple"));
       apaViewBtn?.addEventListener("click", () => setReferenceView("apa"));
+
       toggleReferenceViewBtn?.addEventListener("click", () => {
         const next = document.body.dataset.referenceView === "apa" ? "simple" : "apa";
         setReferenceView(next);
@@ -3827,6 +3930,7 @@
       });
 
       closeStudyBtn?.addEventListener("click", closeStudyModal);
+
       studyModal?.addEventListener("click", (event) => {
         if (event.target === studyModal) closeStudyModal();
       });
@@ -3988,8 +4092,10 @@
         if (window.innerWidth > 1180 && chatPanel?.classList.contains("is-open")) {
           chatPanel.classList.remove("is-open");
         }
+        syncDocumentLayout();
       });
 
+      syncDocumentLayout();
       setReferenceView("simple");
       refreshToolbarState();
     })();
