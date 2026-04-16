@@ -71,6 +71,13 @@ function getAttachedSources(files = []) {
   }));
 }
 
+function normalizarLinks(raw = "") {
+  return String(raw || "")
+    .split("\n")
+    .map((link) => link.trim())
+    .filter(Boolean);
+}
+
 const pageParams = new URLSearchParams(window.location.search);
 const pendingTool =
   (pageParams.get("tool") || localStorage.getItem("eduvia_pending_tool") || "")
@@ -107,9 +114,8 @@ function setSubmitState(disabled) {
   const submitBtn = form?.querySelector('button[type="submit"]');
   if (!submitBtn) return;
 
-  const formato = getSelectedFormato();
-  const idleText = formato === "documento" ? "Crear contenido" : "Crear clase";
-  const loadingText = formato === "documento" ? "Creando contenido..." : "Creando clase...";
+  const idleText = "Crear contenido";
+  const loadingText = "Creando contenido...";
 
   submitBtn.disabled = disabled;
   submitBtn.style.opacity = disabled ? "0.7" : "1";
@@ -152,26 +158,23 @@ form?.addEventListener("submit", async (e) => {
     duracion,
   });
 
-const files = Array.from(archivoInput?.files || []);
-const rawLinks = sourceLinksInput?.value?.trim() || "";
-const sourceLinks = rawLinks
-  .split("\n")
-  .map((link) => link.trim())
-  .filter(Boolean);
+  const files = Array.from(archivoInput?.files || []);
+  const rawLinks = sourceLinksInput?.value?.trim() || "";
+  const sourceLinks = normalizarLinks(rawLinks);
 
-const hasFileSources = files.length > 0;
-const hasLinkSources = sourceLinks.length > 0;
-const hasAttachedSources = hasFileSources || hasLinkSources;
-const sourceMode = hasAttachedSources ? "exclusive" : "general";
-const attachedSources = getAttachedSources(files);
+  const hasFileSources = files.length > 0;
+  const hasLinkSources = sourceLinks.length > 0;
+  const hasAttachedSources = hasFileSources || hasLinkSources;
+  const sourceMode = hasAttachedSources ? "exclusive" : "general";
+  const attachedSources = getAttachedSources(files);
 
-if (sourceModeInput) {
-  sourceModeInput.value = sourceMode;
-}
+  if (sourceModeInput) {
+    sourceModeInput.value = sourceMode;
+  }
 
-if (sourceLinksHidden) {
-  sourceLinksHidden.value = rawLinks;
-}
+  if (sourceLinksHidden) {
+    sourceLinksHidden.value = rawLinks;
+  }
 
   if (!materia || !tema || !nivel) {
     alert("Completá materia, tema y nivel.");
@@ -187,29 +190,29 @@ if (sourceLinksHidden) {
   setSubmitState(true);
 
   try {
-const payload = {
-  materia,
-  tema,
-  nivel,
-  duracion: extensionDeseada || duracion || "",
-  palabrasMin,
-  palabrasMax,
-  extensionDeseada,
-  objetivo,
-  formato,
-  sourceMode,
-  hasAttachedSources,
-  attachedSources,
-  sourceLinks,
-  ownerUid: currentUser.uid,
-  ownerEmail: currentUser.email || "",
-  creadoEn: serverTimestamp(),
-  updatedAt: serverTimestamp(),
-  sharedWithEmails: [],
-  sharedViewerEmails: [],
-  sharedEditorEmails: [],
-  sharedUsers: {}
-};
+    const payload = {
+      materia,
+      tema,
+      nivel,
+      duracion: extensionDeseada || duracion || "",
+      palabrasMin,
+      palabrasMax,
+      extensionDeseada,
+      objetivo,
+      formato,
+      sourceMode,
+      hasAttachedSources,
+      attachedSources,
+      sourceLinks,
+      ownerUid: currentUser.uid,
+      ownerEmail: currentUser.email || "",
+      creadoEn: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+      sharedWithEmails: [],
+      sharedViewerEmails: [],
+      sharedEditorEmails: [],
+      sharedUsers: {}
+    };
 
     const docRef = await addDoc(
       collection(db, "usuarios", currentUser.uid, "clases"),
@@ -258,8 +261,10 @@ if (archivoInput) {
     const files = Array.from(archivoInput.files || []);
     renderFiles(files);
 
+    const rawLinks = sourceLinksInput?.value?.trim() || "";
+
     if (sourceModeInput) {
-      sourceModeInput.value = files.length ? "exclusive" : "general";
+      sourceModeInput.value = (files.length || rawLinks) ? "exclusive" : "general";
     }
   });
 }
