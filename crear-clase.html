@@ -2243,241 +2243,176 @@ const toolTemplates = {
       return document.getElementById(id)?.value?.trim() || "";
     }
 
-    function syncLegacyFields() {
-      const selected = document.querySelector('input[name="tipo_contenido"]:checked')?.value || "clase";
+function syncLegacyFields() {
+  const selected = document.querySelector('input[name="tipo_contenido"]:checked')?.value || "clase";
 
-      legacyTipo.value = selected;
-      if (legacyToolMode) {
-  legacyToolMode.value = selectedTool;
+  if (legacyTipo) legacyTipo.value = selected;
+  if (legacyToolMode) legacyToolMode.value = selectedTool || "";
+
+  if (legacyMateria) legacyMateria.value = "";
+  if (legacyTema) legacyTema.value = "";
+  if (legacyNivel) legacyNivel.value = "";
+  if (legacyDuracion) legacyDuracion.value = "";
+  if (legacyObjetivo) legacyObjetivo.value = "";
+
+  if (selectedTool === "introduction") {
+    const tema = valueOf("intro_tema");
+    const enfoque = valueOf("intro_enfoque");
+    const tono = document.getElementById("intro_tono")?.value || "Académico";
+    const extension = document.getElementById("intro_extension")?.value || "Media";
+    const indicaciones = valueOf("intro_indicaciones");
+
+    legacyMateria.value = "Generador de introducción";
+    legacyTema.value = tema || "Introducción";
+    legacyNivel.value = "General";
+    legacyDuracion.value = extension;
+    legacyObjetivo.value =
+      `Tipo de contenido: Introducción.\n` +
+      `Enfoque: ${enfoque || "No especificado"}.\n` +
+      `Tono: ${tono}.\n` +
+      `Extensión: ${extension}.\n` +
+      `Indicaciones extra: ${indicaciones || "No especificadas"}.`;
+    return;
+  }
+
+  if (selectedTool === "conclusion") {
+    const enfoque = valueOf("conclusion_enfoque");
+    const tono = document.getElementById("conclusion_tono")?.value || "Académico";
+    const extension = document.getElementById("conclusion_extension")?.value || "Media";
+    const cierre = valueOf("conclusion_cierre");
+
+    legacyMateria.value = "Generador de conclusión";
+    legacyTema.value = enfoque || "Conclusión";
+    legacyNivel.value = "General";
+    legacyDuracion.value = extension;
+    legacyObjetivo.value =
+      `Tipo de contenido: Conclusión.\n` +
+      `Idea central: ${enfoque || "No especificada"}.\n` +
+      `Tono: ${tono}.\n` +
+      `Extensión: ${extension}.\n` +
+      `Cierre extra: ${cierre || "No especificado"}.`;
+    return;
+  }
+
+  if (selectedTool === "research") {
+    const pregunta = valueOf("research_pregunta");
+    const enfoque = valueOf("research_enfoque");
+    const profundidad = document.getElementById("research_profundidad")?.value || "Intermedia";
+    const formato = document.getElementById("research_formato")?.value || "Ideas clave";
+    const indicaciones = valueOf("research_indicaciones");
+
+    legacyMateria.value = "Investigación rápida";
+    legacyTema.value = pregunta || "Investigación";
+    legacyNivel.value = "General";
+    legacyDuracion.value = profundidad;
+    legacyObjetivo.value =
+      `Tipo de contenido: Investigación rápida.\n` +
+      `Enfoque: ${enfoque || "No especificado"}.\n` +
+      `Profundidad: ${profundidad}.\n` +
+      `Formato: ${formato}.\n` +
+      `Indicaciones extra: ${indicaciones || "No especificadas"}.`;
+    return;
+  }
+
+  if (selectedTool === "simple-explanation") {
+    const tema = valueOf("simple_tema");
+    const publico = document.getElementById("simple_publico")?.value || "Secundaria";
+    const tono = document.getElementById("simple_tono")?.value || "Claro";
+    const extension = document.getElementById("simple_extension")?.value || "Media";
+    const indicaciones = valueOf("simple_indicaciones");
+
+    legacyMateria.value = "Explicación simple";
+    legacyTema.value = tema || "Explicación";
+    legacyNivel.value = publico;
+    legacyDuracion.value = extension;
+    legacyObjetivo.value =
+      `Tipo de contenido: Explicación simple.\n` +
+      `Público: ${publico}.\n` +
+      `Tono: ${tono}.\n` +
+      `Extensión: ${extension}.\n` +
+      `Indicaciones extra: ${indicaciones || "No especificadas"}.`;
+    return;
+  }
+
+  if (selected === "clase") {
+    const materia = valueOf("clase_materia");
+    const tema = valueOf("clase_tema");
+    const nivel = document.getElementById("clase_nivel")?.value || "Secundaria";
+    const objetivo = valueOf("clase_objetivo");
+
+    legacyMateria.value = materia;
+    legacyTema.value = tema;
+    legacyNivel.value = nivel;
+    legacyDuracion.value = "";
+    legacyObjetivo.value = objetivo;
+    return;
+  }
+
+  if (selected === "resumen") {
+    const tema = valueOf("resumen_tema");
+    const nivel = document.getElementById("resumen_nivel")?.value || "Secundaria";
+    const objetivo = valueOf("resumen_objetivo");
+
+    legacyMateria.value = "Resumen / explicación";
+    legacyTema.value = tema;
+    legacyNivel.value = nivel;
+    legacyDuracion.value = "";
+    legacyObjetivo.value = objetivo;
+    return;
+  }
+
+  if (selected === "analisis") {
+    const tema = valueOf("analisis_tema");
+    const perspectiva = valueOf("analisis_perspectiva");
+    const nivel = document.getElementById("analisis_nivel")?.value || "Secundaria";
+    const consigna = valueOf("analisis_objetivo");
+
+    legacyMateria.value = "Análisis de tema";
+    legacyTema.value = tema;
+    legacyNivel.value = nivel;
+    legacyDuracion.value = "";
+    legacyObjetivo.value =
+      `Perspectiva: ${perspectiva || "No especificada"}.\n` +
+      `Objetivo: ${consigna || "No especificado"}.`;
+    return;
+  }
+
+  if (selected === "documento") {
+    const titulo = valueOf("documento_titulo");
+    const tema = valueOf("documento_tema");
+    const publico = document.getElementById("documento_publico")?.value || "General";
+    const estructura = document.getElementById("documento_estructura")?.value || "Apunte";
+    const incluir = valueOf("documento_incluir");
+
+    legacyMateria.value = "Documento de estudio";
+    legacyTema.value = tema || titulo;
+    legacyNivel.value = publico;
+    legacyDuracion.value = estructura;
+    legacyObjetivo.value =
+      `Tipo de contenido: Documento de estudio.\n` +
+      `Título sugerido: ${titulo || "Sin título"}.\n` +
+      `Estructura deseada: ${estructura}.\n` +
+      `Qué incluir: ${incluir || "No especificado"}.`;
+    return;
+  }
+
+  if (selected === "investigacion") {
+    const pregunta = valueOf("investigacion_pregunta");
+    const objetivo = valueOf("investigacion_objetivo");
+    const profundidad = document.getElementById("investigacion_profundidad")?.value || "Intermedio";
+    const resultado = valueOf("investigacion_resultado");
+
+    legacyMateria.value = "Investigación rápida";
+    legacyTema.value = pregunta;
+    legacyNivel.value = "General";
+    legacyDuracion.value = profundidad;
+    legacyObjetivo.value =
+      `Tipo de contenido: Investigación rápida.\n` +
+      `Objetivo: ${objetivo || "No especificado"}.\n` +
+      `Nivel de profundidad: ${profundidad}.\n` +
+      `Resultado esperado: ${resultado || "No especificado"}.`;
+  }
 }
-
-if (selectedTool === "conclusion") {
-  const textoBase = valueOf("conclusion_texto_base");
-  const enfoque = valueOf("conclusion_enfoque");
-  const tono = document.getElementById("conclusion_tono")?.value || "Académico";
-  const extension = document.getElementById("conclusion_extension")?.value || "Media";
-  const cierre = valueOf("conclusion_cierre");
-
-  legacyTipo.value = "documento";
-  legacyMateria.value = "Generador de conclusión";
-  legacyTema.value = enfoque || "Conclusión";
-  legacyNivel.value = tono;
-  legacyDuracion.value = extension;
-  legacyObjetivo.value =
-    `Herramienta: Generador de conclusión.\n` +
-    `Texto base:\n${textoBase || "No especificado"}\n\n` +
-    `Idea a cerrar: ${enfoque || "No especificado"}.\n` +
-    `Tono: ${tono}.\n` +
-    `Extensión: ${extension}.\n` +
-    `Indicaciones extra: ${cierre || "No especificado"}.`;
-
-  return;
-}
-if (selectedTool === "introduction") {
-  const tema = valueOf("intro_tema");
-  const enfoque = valueOf("intro_enfoque");
-  const tono = document.getElementById("intro_tono")?.value || "Académico";
-  const extension = document.getElementById("intro_extension")?.value || "Media";
-  const indicaciones = valueOf("intro_indicaciones");
-
-  legacyTipo.value = "introduccion";
-  legacyMateria.value = "Generador de introducción";
-  legacyTema.value = tema || "Introducción";
-  legacyNivel.value = tono;
-  legacyDuracion.value = extension;
-  legacyObjetivo.value =
-    `Herramienta: Generador de introducción.\n` +
-    `Tema: ${tema || "No especificado"}.\n` +
-    `Enfoque: ${enfoque || "No especificado"}.\n` +
-    `Tono: ${tono}.\n` +
-    `Extensión: ${extension}.\n` +
-    `Indicaciones extra: ${indicaciones || "No especificado"}.`;
-
-  return;
-}
-
-if (selectedTool === "research") {
-  const pregunta = valueOf("research_pregunta");
-  const enfoque = valueOf("research_enfoque");
-  const profundidad = document.getElementById("research_profundidad")?.value || "Media";
-  const formato = document.getElementById("research_formato")?.value || "Ideas clave";
-  const indicaciones = valueOf("research_indicaciones");
-
-  legacyTipo.value = "investigacion";
-  legacyMateria.value = "Investigación rápida";
-  legacyTema.value = pregunta || "Investigación";
-  legacyNivel.value = "General";
-  legacyDuracion.value = profundidad;
-  legacyObjetivo.value =
-    `Herramienta: Investigación rápida.\n` +
-    `Pregunta o tema: ${pregunta || "No especificado"}.\n` +
-    `Enfoque: ${enfoque || "No especificado"}.\n` +
-    `Profundidad: ${profundidad}.\n` +
-    `Formato: ${formato}.\n` +
-    `Indicaciones extra: ${indicaciones || "No especificado"}.`;
-
-  return;
-}
-
-if (selectedTool === "simple-explanation") {
-  const tema = valueOf("simple_tema");
-  const publico = document.getElementById("simple_publico")?.value || "Secundaria";
-  const tono = document.getElementById("simple_tono")?.value || "Claro";
-  const extension = document.getElementById("simple_extension")?.value || "Media";
-  const indicaciones = valueOf("simple_indicaciones");
-
-  legacyTipo.value = "explicacion_simple";
-  legacyMateria.value = "Explicación simple";
-  legacyTema.value = tema || "Explicación";
-  legacyNivel.value = publico;
-  legacyDuracion.value = extension;
-  legacyObjetivo.value =
-    `Herramienta: Explicación simple.\n` +
-    `Tema: ${tema || "No especificado"}.\n` +
-    `Dirigido a: ${publico}.\n` +
-    `Tono: ${tono}.\n` +
-    `Extensión: ${extension}.\n` +
-    `Indicaciones extra: ${indicaciones || "No especificado"}.`;
-
-  return;
-}
-
-  if (selectedTool === "improve") {
-  const textoBase = valueOf("improve_texto_base");
-  const objetivo = document.getElementById("improve_objetivo")?.value || "Claridad";
-  const tono = document.getElementById("improve_tono")?.value || "Académico";
-  const extension = document.getElementById("improve_extension")?.value || "Similar";
-  const indicaciones = valueOf("improve_indicaciones");
-
-  legacyTipo.value = "documento";
-  legacyMateria.value = "Mejorador de contenido";
-  legacyTema.value = objetivo;
-  legacyNivel.value = tono;
-  legacyDuracion.value = extension;
-  legacyObjetivo.value =
-    `Herramienta: Mejorador de contenido.\n` +
-    `Texto base:\n${textoBase || "No especificado"}\n\n` +
-    `Objetivo de mejora: ${objetivo}.\n` +
-    `Tono final: ${tono}.\n` +
-    `Extensión: ${extension}.\n` +
-    `Indicaciones extra: ${indicaciones || "No especificado"}.`;
-
-  return;
-}
-
-if (selectedTool === "paragraphs") {
-  const tema = valueOf("paragraphs_tema");
-  const cantidad = document.getElementById("paragraphs_cantidad")?.value || "2";
-  const tono = document.getElementById("paragraphs_tono")?.value || "Académico";
-  const longitud = document.getElementById("paragraphs_longitud")?.value || "Media";
-  const incluir = valueOf("paragraphs_incluir");
-
-  legacyTipo.value = "documento";
-  legacyMateria.value = "Generador de párrafos";
-  legacyTema.value = tema || "Párrafos";
-  legacyNivel.value = tono;
-  legacyDuracion.value = `${cantidad} párrafo(s) - ${longitud}`;
-  legacyObjetivo.value =
-    `Herramienta: Generador de párrafos.\n` +
-    `Tema: ${tema || "No especificado"}.\n` +
-    `Cantidad de párrafos: ${cantidad}.\n` +
-    `Tono: ${tono}.\n` +
-    `Longitud: ${longitud}.\n` +
-    `Qué incluir: ${incluir || "No especificado"}.`;
-
-  return;
-}
-
-if (selected === "clase") {
-  const minPalabras = valueOf("clase_palabras_min");
-  const maxPalabras = valueOf("clase_palabras_max");
-  const objetivoBase = valueOf("clase_objetivo");
-
-  legacyMateria.value = valueOf("clase_materia");
-  legacyTema.value = valueOf("clase_tema");
-  legacyNivel.value = document.getElementById("clase_nivel")?.value || "Secundaria";
-  legacyDuracion.value =
-    minPalabras || maxPalabras
-      ? `${minPalabras || "0"}-${maxPalabras || "0"} palabras`
-      : "Sin límite definido";
-
-  legacyObjetivo.value =
-    `${objetivoBase}` +
-    ((minPalabras || maxPalabras)
-      ? `\nExtensión deseada: entre ${minPalabras || "0"} y ${maxPalabras || "0"} palabras.`
-      : "");
-}
-
-      if (selected === "resumen") {
-        const tema = valueOf("resumen_tema");
-        const enfoque = valueOf("resumen_enfoque");
-        const publico = document.getElementById("resumen_publico")?.value || "General";
-        const profundidad = document.getElementById("resumen_profundidad")?.value || "Media";
-        const pedido = valueOf("resumen_pedido");
-
-        legacyMateria.value = "Resumen / explicación";
-        legacyTema.value = tema;
-        legacyNivel.value = publico;
-        legacyDuracion.value = profundidad;
-        legacyObjetivo.value =
-          `Tipo de contenido: Resumen / explicación.\n` +
-          `Enfoque: ${enfoque || "No especificado"}.\n` +
-          `Nivel de profundidad: ${profundidad}.\n` +
-          `Pedido del usuario: ${pedido || "No especificado"}.`;
-      }
-
-      if (selected === "analisis") {
-        const tema = valueOf("analisis_tema");
-        const tipo = valueOf("analisis_tipo");
-        const publico = document.getElementById("analisis_publico")?.value || "General";
-        const eje = valueOf("analisis_eje");
-
-        legacyMateria.value = "Análisis de tema";
-        legacyTema.value = tema;
-        legacyNivel.value = publico;
-        legacyDuracion.value = "Profundo";
-        legacyObjetivo.value =
-          `Tipo de contenido: Análisis de tema.\n` +
-          `Tipo de análisis: ${tipo || "No especificado"}.\n` +
-          `Eje principal: ${eje || "No especificado"}.`;
-      }
-
-      if (selected === "documento") {
-        const titulo = valueOf("documento_titulo");
-        const tema = valueOf("documento_tema");
-        const publico = document.getElementById("documento_publico")?.value || "General";
-        const estructura = document.getElementById("documento_estructura")?.value || "Apunte";
-        const incluir = valueOf("documento_incluir");
-
-        legacyMateria.value = "Documento de estudio";
-        legacyTema.value = tema || titulo;
-        legacyNivel.value = publico;
-        legacyDuracion.value = estructura;
-        legacyObjetivo.value =
-          `Tipo de contenido: Documento de estudio.\n` +
-          `Título sugerido: ${titulo || "Sin título"}.\n` +
-          `Estructura deseada: ${estructura}.\n` +
-          `Qué incluir: ${incluir || "No especificado"}.`;
-      }
-
-      if (selected === "investigacion") {
-        const pregunta = valueOf("investigacion_pregunta");
-        const objetivo = valueOf("investigacion_objetivo");
-        const profundidad = document.getElementById("investigacion_profundidad")?.value || "Intermedio";
-        const resultado = valueOf("investigacion_resultado");
-
-        legacyMateria.value = "Investigación rápida";
-        legacyTema.value = pregunta;
-        legacyNivel.value = "General";
-        legacyDuracion.value = profundidad;
-        legacyObjetivo.value =
-          `Tipo de contenido: Investigación rápida.\n` +
-          `Objetivo: ${objetivo || "No especificado"}.\n` +
-          `Nivel de profundidad: ${profundidad}.\n` +
-          `Resultado esperado: ${resultado || "No especificado"}.`;
-      }
-    }
-
     function bindDynamicInputs() {
       const inputs = dynamicFields.querySelectorAll("input, select, textarea");
       inputs.forEach((input) => {
