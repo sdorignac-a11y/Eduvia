@@ -523,6 +523,18 @@
       transform:translateY(-1px);
     }
 
+    .delete-doc-btn{
+  background:#fff5f5;
+  border:1px solid #f2d7d7;
+  color:#b04f4f;
+}
+
+.delete-doc-btn:hover{
+  background:#feecec;
+  border-color:#eabcbc;
+  color:#983c3c;
+}
+
     .cards-grid{
       display:grid;
       grid-template-columns:repeat(3, minmax(0, 1fr));
@@ -1077,11 +1089,13 @@
       signOut
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
     import {
-      collection,
-      getDocs,
-      addDoc,
-      serverTimestamp
-    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+  collection,
+  getDocs,
+  addDoc,
+  deleteDoc,
+  doc,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
     const $ = (selector) => document.querySelector(selector);
 
@@ -1293,6 +1307,34 @@
       }
     }
 
+    async function deleteDocumentById(documentId) {
+  const user = auth.currentUser;
+
+  if (!user) {
+    window.location.href = "login.html";
+    return;
+  }
+
+  const confirmed = window.confirm(
+    "¿Seguro que querés borrar este documento? Esta acción no se puede deshacer."
+  );
+
+  if (!confirmed) return;
+
+  try {
+    await deleteDoc(doc(db, "usuarios", user.uid, "documentos", documentId));
+
+    allItems = allItems.filter(
+      (item) => !(item.id === documentId && item.type === "documento")
+    );
+
+    applyFilters();
+  } catch (error) {
+    console.error("Error borrando documento:", error);
+    alert("No se pudo borrar el documento.");
+  }
+}
+
     function updateCount(amount) {
       totalCount.textContent = `${amount} elemento${amount === 1 ? "" : "s"}`;
     }
@@ -1366,37 +1408,75 @@
             </span>
           </div>
 
-          <div class="item-footer">
-            <a class="open-link" href="${escapeHtml(item.openUrl)}">
-              ${item.type === "clase" ? "Abrir aula" : "Abrir documento"}
-            </a>
+<div class="item-footer">
+  <a class="open-link" href="${escapeHtml(item.openUrl)}">
+    ${item.type === "clase" ? "Abrir aula" : "Abrir documento"}
+  </a>
 
-            <div class="item-menu">
-              <button
-                class="mini-btn open-item-btn"
-                type="button"
-                data-open-url="${escapeHtml(item.openUrl)}"
-              >
-                Abrir
-              </button>
-            </div>
-          </div>
+  <div class="item-menu">
+    <button
+      class="mini-btn open-item-btn"
+      type="button"
+      data-open-url="${escapeHtml(item.openUrl)}"
+    >
+      Abrir
+    </button>
+
+    ${
+      item.type === "documento"
+        ? `
+          <button
+            class="mini-btn delete-doc-btn"
+            type="button"
+            data-delete-doc-id="${escapeHtml(item.id)}"
+          >
+            Borrar
+          </button>
+        `
+        : ""
+    }
+  </div>
+</div>
         </article>
       `).join("");
 
       cardsGrid.innerHTML = createCardHtml + itemsHtml;
       cardsGrid.classList.remove("hidden");
 
-      const createCard = cardsGrid.querySelector('[data-create-empty="documento"]');
-      const createButton = cardsGrid.querySelector(".create-main-btn");
-      const openButtons = [...cardsGrid.querySelectorAll(".open-item-btn")];
+const createCard = cardsGrid.querySelector('[data-create-empty="documento"]');
+const createButton = cardsGrid.querySelector(".create-main-btn");
+const openButtons = [...cardsGrid.querySelectorAll(".open-item-btn")];
+const deleteButtons = [...cardsGrid.querySelectorAll(".delete-doc-btn")];
 
-      createCard?.addEventListener("click", createEmptyDocument);
+createCard?.addEventListener("click", createEmptyDocument);
 
-      createButton?.addEventListener("click", (event) => {
-        event.stopPropagation();
-        createEmptyDocument();
-      });
+createButton?.addEventListener("click", (event) => {
+  event.stopPropagation();
+  createEmptyDocument();
+});
+
+openButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    const url = button.dataset.openUrl;
+    if (url) {
+      window.location.href = url;
+    }
+  });
+});
+
+deleteButtons.forEach((button) => {
+  button.addEventListener("click", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const documentId = button.dataset.deleteDocId;
+    if (documentId) {
+      deleteDocumentById(documentId);
+    }
+  });
+});
+
+refreshIcons();
 
       openButtons.forEach((button) => {
         button.addEventListener("click", () => {
