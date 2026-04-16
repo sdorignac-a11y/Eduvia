@@ -1555,13 +1555,13 @@
 
                 <section class="step-panel" data-panel="5" id="result-step-panel" style="display:none;">
   <div class="section-head">
-    <h3>Resultado generado</h3>
-    <p>Acá vas a ver la conclusión antes de guardarla como documento.</p>
+    <h3 id="result-title">Resultado generado</h3>
+    <p id="result-text">Acá vas a ver el resultado antes de guardarlo como documento.</p>
   </div>
 
   <div class="dynamic-shell">
     <div class="field full">
-      <label for="resultado_texto">Conclusión</label>
+      <label for="resultado_texto" id="result-label">Resultado</label>
       <textarea id="resultado_texto" readonly></textarea>
       <span class="helper">Podés copiarla, volver a editar o después guardarla como documento.</span>
     </div>
@@ -1699,7 +1699,8 @@ const resultStepPanel = document.getElementById("result-step-panel");
 
 function isQuickResultMode() {
   const params = new URLSearchParams(window.location.search);
-  return (params.get("tool") || "").trim().toLowerCase() === "conclusion";
+  const tool = (params.get("tool") || "").trim().toLowerCase();
+  return ["conclusion", "introduction", "research", "simple-explanation"].includes(tool);
 }
 
 function updateWizardMode() {
@@ -2044,19 +2045,13 @@ const toolTemplates = {
   conclusion: `
     <div class="field full">
       <label for="conclusion_texto_base">Texto base</label>
-      <textarea
-        id="conclusion_texto_base"
-        placeholder="Pegá acá el texto completo o la parte principal para generar una conclusión coherente."
-      ></textarea>
+      <textarea id="conclusion_texto_base" placeholder="Pegá acá el texto completo o la parte principal para generar una conclusión coherente."></textarea>
       <span class="helper">Este texto es la base principal del cierre.</span>
     </div>
 
     <div class="field">
       <label for="conclusion_enfoque">Idea a cerrar</label>
-      <input
-        id="conclusion_enfoque"
-        placeholder="Ejemplo: cerrar destacando las consecuencias principales"
-      />
+      <input id="conclusion_enfoque" placeholder="Ejemplo: cerrar destacando las consecuencias principales" />
       <span class="helper">Qué querés que deje claro la conclusión.</span>
     </div>
 
@@ -2083,115 +2078,133 @@ const toolTemplates = {
 
     <div class="field full">
       <label for="conclusion_cierre">Indicaciones extra</label>
-      <textarea
-        id="conclusion_cierre"
-        placeholder="Ejemplo: que termine con una reflexión final y sin repetir literalmente el texto."
-      ></textarea>
+      <textarea id="conclusion_cierre" placeholder="Ejemplo: que termine con una reflexión final y sin repetir literalmente el texto."></textarea>
       <span class="helper">Opcional.</span>
     </div>
   `,
 
-  improve: `
+  introduction: `
     <div class="field full">
-      <label for="improve_texto_base">Texto a mejorar</label>
-      <textarea
-        id="improve_texto_base"
-        placeholder="Pegá el texto que querés mejorar."
-      ></textarea>
-      <span class="helper">Podés pegar un texto corto o largo.</span>
+      <label for="intro_tema">Tema principal</label>
+      <input id="intro_tema" placeholder="Ejemplo: Lionel Messi y su impacto en el fútbol" />
+      <span class="helper">Tema central de la introducción.</span>
     </div>
 
     <div class="field">
-      <label for="improve_objetivo">Qué querés mejorar</label>
-      <select id="improve_objetivo">
-        <option value="Claridad">Claridad</option>
-        <option value="Orden">Orden</option>
-        <option value="Redacción">Redacción</option>
-        <option value="Formalidad">Formalidad</option>
-      </select>
-      <span class="helper">Elegí el foco principal de la mejora.</span>
+      <label for="intro_enfoque">Enfoque</label>
+      <input id="intro_enfoque" placeholder="Ejemplo: su legado, su carrera o su estilo de juego" />
+      <span class="helper">Qué querés destacar desde el inicio.</span>
     </div>
 
     <div class="field">
-      <label for="improve_tono">Tono final</label>
-      <select id="improve_tono">
+      <label for="intro_tono">Tono</label>
+      <select id="intro_tono">
         <option value="Académico">Académico</option>
         <option value="Claro">Claro</option>
         <option value="Formal">Formal</option>
-        <option value="Natural">Natural</option>
+        <option value="Atractivo">Atractivo</option>
       </select>
-      <span class="helper">Cómo querés que suene el texto final.</span>
+      <span class="helper">Cómo querés que suene la introducción.</span>
     </div>
 
     <div class="field">
-      <label for="improve_extension">Mantener extensión</label>
-      <select id="improve_extension">
-        <option value="Similar" selected>Similar</option>
-        <option value="Más corto">Más corto</option>
-        <option value="Más largo">Más largo</option>
-      </select>
-      <span class="helper">Define si el texto debe quedar parecido en largo o no.</span>
-    </div>
-
-    <div class="field full">
-      <label for="improve_indicaciones">Indicaciones extra</label>
-      <textarea
-        id="improve_indicaciones"
-        placeholder="Ejemplo: que suene más profesional y que no repita ideas."
-      ></textarea>
-      <span class="helper">Opcional.</span>
-    </div>
-  `,
-
-  paragraphs: `
-    <div class="field full">
-      <label for="paragraphs_tema">Tema o idea principal</label>
-      <input
-        id="paragraphs_tema"
-        placeholder="Ejemplo: Lionel Messi y su impacto en el fútbol"
-      />
-      <span class="helper">Tema base sobre el que se van a generar los párrafos.</span>
-    </div>
-
-    <div class="field">
-      <label for="paragraphs_cantidad">Cantidad de párrafos</label>
-      <select id="paragraphs_cantidad">
-        <option value="1">1</option>
-        <option value="2" selected>2</option>
-        <option value="3">3</option>
-        <option value="4">4</option>
-      </select>
-      <span class="helper">Cuántos párrafos querés generar.</span>
-    </div>
-
-    <div class="field">
-      <label for="paragraphs_tono">Tono</label>
-      <select id="paragraphs_tono">
-        <option value="Académico">Académico</option>
-        <option value="Claro">Claro</option>
-        <option value="Formal">Formal</option>
-        <option value="Narrativo">Narrativo</option>
-      </select>
-      <span class="helper">Cómo querés que suenen los párrafos.</span>
-    </div>
-
-    <div class="field">
-      <label for="paragraphs_longitud">Longitud</label>
-      <select id="paragraphs_longitud">
+      <label for="intro_extension">Extensión</label>
+      <select id="intro_extension">
         <option value="Corta">Corta</option>
         <option value="Media" selected>Media</option>
         <option value="Larga">Larga</option>
       </select>
-      <span class="helper">Largo aproximado de cada párrafo.</span>
+      <span class="helper">Largo aproximado del texto.</span>
     </div>
 
     <div class="field full">
-      <label for="paragraphs_incluir">Qué querés que incluyan</label>
-      <textarea
-        id="paragraphs_incluir"
-        placeholder="Ejemplo: contexto, idea principal, ejemplo y cierre."
-      ></textarea>
-      <span class="helper">Indicá los puntos que no querés que falten.</span>
+      <label for="intro_indicaciones">Indicaciones extra</label>
+      <textarea id="intro_indicaciones" placeholder="Ejemplo: que empiece con una idea general y cierre presentando la importancia del tema."></textarea>
+      <span class="helper">Opcional.</span>
+    </div>
+  `,
+
+  research: `
+    <div class="field full">
+      <label for="research_pregunta">Pregunta o tema</label>
+      <input id="research_pregunta" placeholder="Ejemplo: ¿Por qué Messi es considerado uno de los mejores futbolistas de la historia?" />
+      <span class="helper">La pregunta o eje principal de la investigación.</span>
+    </div>
+
+    <div class="field">
+      <label for="research_enfoque">Enfoque</label>
+      <input id="research_enfoque" placeholder="Ejemplo: logros, estilo de juego y legado" />
+      <span class="helper">Qué aspecto querés investigar.</span>
+    </div>
+
+    <div class="field">
+      <label for="research_profundidad">Profundidad</label>
+      <select id="research_profundidad">
+        <option value="Rápida">Rápida</option>
+        <option value="Media" selected>Media</option>
+        <option value="Profunda">Profunda</option>
+      </select>
+      <span class="helper">Cuánto detalle querés.</span>
+    </div>
+
+    <div class="field">
+      <label for="research_formato">Formato</label>
+      <select id="research_formato">
+        <option value="Ideas clave">Ideas clave</option>
+        <option value="Texto breve">Texto breve</option>
+        <option value="Mini resumen">Mini resumen</option>
+      </select>
+      <span class="helper">Cómo querés ver el resultado.</span>
+    </div>
+
+    <div class="field full">
+      <label for="research_indicaciones">Indicaciones extra</label>
+      <textarea id="research_indicaciones" placeholder="Ejemplo: incluir datos concretos y cerrar con una idea general."></textarea>
+      <span class="helper">Opcional.</span>
+    </div>
+  `,
+
+  "simple-explanation": `
+    <div class="field full">
+      <label for="simple_tema">Tema o concepto</label>
+      <input id="simple_tema" placeholder="Ejemplo: por qué Lionel Messi es importante en la historia del fútbol" />
+      <span class="helper">Qué querés que la IA explique de forma sencilla.</span>
+    </div>
+
+    <div class="field">
+      <label for="simple_publico">Dirigido a</label>
+      <select id="simple_publico">
+        <option value="Niño">Niño</option>
+        <option value="Secundaria" selected>Secundaria</option>
+        <option value="General">General</option>
+      </select>
+      <span class="helper">A quién va dirigida la explicación.</span>
+    </div>
+
+    <div class="field">
+      <label for="simple_tono">Tono</label>
+      <select id="simple_tono">
+        <option value="Claro">Claro</option>
+        <option value="Amigable">Amigable</option>
+        <option value="Académico">Académico</option>
+      </select>
+      <span class="helper">Cómo querés que suene.</span>
+    </div>
+
+    <div class="field">
+      <label for="simple_extension">Extensión</label>
+      <select id="simple_extension">
+        <option value="Corta">Corta</option>
+        <option value="Media" selected>Media</option>
+        <option value="Larga">Larga</option>
+      </select>
+      <span class="helper">Largo aproximado.</span>
+    </div>
+
+    <div class="field full">
+      <label for="simple_indicaciones">Indicaciones extra</label>
+      <textarea id="simple_indicaciones" placeholder="Ejemplo: usar palabras fáciles y un ejemplo concreto."></textarea>
+      <span class="helper">Opcional.</span>
     </div>
   `
 };
@@ -2227,6 +2240,74 @@ if (selectedTool === "conclusion") {
     `Tono: ${tono}.\n` +
     `Extensión: ${extension}.\n` +
     `Indicaciones extra: ${cierre || "No especificado"}.`;
+
+  return;
+}
+if (selectedTool === "introduction") {
+  const tema = valueOf("intro_tema");
+  const enfoque = valueOf("intro_enfoque");
+  const tono = document.getElementById("intro_tono")?.value || "Académico";
+  const extension = document.getElementById("intro_extension")?.value || "Media";
+  const indicaciones = valueOf("intro_indicaciones");
+
+  legacyTipo.value = "introduccion";
+  legacyMateria.value = "Generador de introducción";
+  legacyTema.value = tema || "Introducción";
+  legacyNivel.value = tono;
+  legacyDuracion.value = extension;
+  legacyObjetivo.value =
+    `Herramienta: Generador de introducción.\n` +
+    `Tema: ${tema || "No especificado"}.\n` +
+    `Enfoque: ${enfoque || "No especificado"}.\n` +
+    `Tono: ${tono}.\n` +
+    `Extensión: ${extension}.\n` +
+    `Indicaciones extra: ${indicaciones || "No especificado"}.`;
+
+  return;
+}
+
+if (selectedTool === "research") {
+  const pregunta = valueOf("research_pregunta");
+  const enfoque = valueOf("research_enfoque");
+  const profundidad = document.getElementById("research_profundidad")?.value || "Media";
+  const formato = document.getElementById("research_formato")?.value || "Ideas clave";
+  const indicaciones = valueOf("research_indicaciones");
+
+  legacyTipo.value = "investigacion";
+  legacyMateria.value = "Investigación rápida";
+  legacyTema.value = pregunta || "Investigación";
+  legacyNivel.value = "General";
+  legacyDuracion.value = profundidad;
+  legacyObjetivo.value =
+    `Herramienta: Investigación rápida.\n` +
+    `Pregunta o tema: ${pregunta || "No especificado"}.\n` +
+    `Enfoque: ${enfoque || "No especificado"}.\n` +
+    `Profundidad: ${profundidad}.\n` +
+    `Formato: ${formato}.\n` +
+    `Indicaciones extra: ${indicaciones || "No especificado"}.`;
+
+  return;
+}
+
+if (selectedTool === "simple-explanation") {
+  const tema = valueOf("simple_tema");
+  const publico = document.getElementById("simple_publico")?.value || "Secundaria";
+  const tono = document.getElementById("simple_tono")?.value || "Claro";
+  const extension = document.getElementById("simple_extension")?.value || "Media";
+  const indicaciones = valueOf("simple_indicaciones");
+
+  legacyTipo.value = "explicacion_simple";
+  legacyMateria.value = "Explicación simple";
+  legacyTema.value = tema || "Explicación";
+  legacyNivel.value = publico;
+  legacyDuracion.value = extension;
+  legacyObjetivo.value =
+    `Herramienta: Explicación simple.\n` +
+    `Tema: ${tema || "No especificado"}.\n` +
+    `Dirigido a: ${publico}.\n` +
+    `Tono: ${tono}.\n` +
+    `Extensión: ${extension}.\n` +
+    `Indicaciones extra: ${indicaciones || "No especificado"}.`;
 
   return;
 }
@@ -2379,37 +2460,34 @@ function applyToolPreset() {
     conclusion: {
       tipo: "documento",
       title: "Pegá el texto para generar la conclusión",
-      text: "Usá tu texto base para crear un cierre coherente, con el tono y la extensión que elijas."
+      text: "Usá tu texto base para crear un cierre coherente, con el tono y la extensión que elijas.",
+      resultTitle: "Conclusión generada",
+      resultText: "Acá vas a ver la conclusión antes de guardarla como documento.",
+      resultLabel: "Conclusión"
     },
-    improve: {
+    introduction: {
       tipo: "documento",
-      title: "Pegá el texto que querés mejorar",
-      text: "Esta herramienta ya viene configurada para mejorar redacción, claridad, orden o tono sobre un texto existente."
+      title: "Completá los datos de la introducción",
+      text: "Definí el tema, el enfoque y el tono para generar una introducción rápida.",
+      resultTitle: "Introducción generada",
+      resultText: "Acá vas a ver la introducción antes de guardarla como documento.",
+      resultLabel: "Introducción"
     },
-    paragraphs: {
-      tipo: "documento",
-      title: "Completá la idea para generar párrafos",
-      text: "Esta herramienta ya viene configurada para crear párrafos completos a partir de un tema, tono y cantidad definida."
+    research: {
+      tipo: "investigacion",
+      title: "Completá los datos de la investigación rápida",
+      text: "Definí la pregunta, el enfoque y el formato para obtener un resultado rápido.",
+      resultTitle: "Investigación generada",
+      resultText: "Acá vas a ver el resultado de la investigación antes de guardarlo como documento.",
+      resultLabel: "Investigación"
     },
-    "clase-doc": {
-      tipo: "clase",
-      title: "Completá los datos de la clase",
-      text: "Esta herramienta ya viene configurada como clase escolar. Ahora completá la información principal."
-    },
-    "resumen-doc": {
+    "simple-explanation": {
       tipo: "resumen",
-      title: "Completá los datos del resumen",
-      text: "Esta herramienta ya viene configurada como resumen / explicación. Ahora definí el tema, enfoque y nivel."
-    },
-    "analisis-doc": {
-      tipo: "analisis",
-      title: "Completá los datos del análisis",
-      text: "Esta herramienta ya viene configurada como análisis de tema. Ahora definí el enfoque y el eje principal."
-    },
-    "documento-doc": {
-      tipo: "documento",
-      title: "Completá los datos del documento",
-      text: "Esta herramienta ya viene configurada como documento de estudio. Ahora definí título, estructura y contenido."
+      title: "Completá los datos de la explicación simple",
+      text: "Definí el tema, el público y el tono para generar una explicación más fácil de entender.",
+      resultTitle: "Explicación generada",
+      resultText: "Acá vas a ver la explicación antes de guardarla como documento.",
+      resultLabel: "Explicación"
     }
   };
 
@@ -2428,6 +2506,14 @@ function applyToolPreset() {
   if (stepTwoText) {
     stepTwoText.textContent = preset.text;
   }
+
+  const resultTitle = document.getElementById("result-title");
+  const resultText = document.getElementById("result-text");
+  const resultLabel = document.getElementById("result-label");
+
+  if (resultTitle) resultTitle.textContent = preset.resultTitle;
+  if (resultText) resultText.textContent = preset.resultText;
+  if (resultLabel) resultLabel.textContent = preset.resultLabel;
 
   renderDynamicFields();
   goToStep(2);
