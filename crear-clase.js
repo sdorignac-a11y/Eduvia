@@ -150,8 +150,13 @@ form?.addEventListener("submit", async (e) => {
   const objetivo = getValue("objetivo");
   const formato = getSelectedFormato();
 
-  const palabrasMin = limpiarNumeroPalabras(getValue("clase_palabras_min"));
-  const palabrasMax = limpiarNumeroPalabras(getValue("clase_palabras_max"));
+  const palabrasMin = limpiarNumeroPalabras(
+  getValue("contenido_palabras_min") || getValue("clase_palabras_min")
+);
+
+const palabrasMax = limpiarNumeroPalabras(
+  getValue("contenido_palabras_max") || getValue("clase_palabras_max")
+);
   const extensionDeseada = construirExtensionDeseada({
     palabrasMin,
     palabrasMax,
