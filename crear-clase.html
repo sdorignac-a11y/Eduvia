@@ -1372,8 +1372,8 @@
                   <div class="stepper-item" data-step="4">
                     <div class="stepper-dot">4</div>
                     <div class="stepper-copy">
-                      <strong>Archivos</strong>
-                      <span>Material de apoyo</span>
+                      <strong>Fuentes</strong>
+                    <span>Base exclusiva</span>
                     </div>
                   </div>
 
@@ -1786,32 +1786,6 @@ function goToStep(step) {
     updateWizardMode();
 goToStep(1);
   </script>
-
-<script>
-  const fileInput = document.getElementById("archivo");
-  const fileList = document.getElementById("file-list");
-  const sourceModeInput = document.getElementById("source_mode");
-
-  fileInput?.addEventListener("change", () => {
-    fileList.innerHTML = "";
-
-    const files = Array.from(fileInput.files || []);
-
-    if (!files.length) {
-      if (sourceModeInput) sourceModeInput.value = "general";
-      return;
-    }
-
-    if (sourceModeInput) sourceModeInput.value = "exclusive";
-
-    files.forEach((file) => {
-      const item = document.createElement("div");
-      item.className = "file-item";
-      item.textContent = `📄 ${file.name}`;
-      fileList.appendChild(item);
-    });
-  });
-</script>
 
   <script>
     const formatInputs = document.querySelectorAll('input[name="formato"]');
