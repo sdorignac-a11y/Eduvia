@@ -1307,7 +1307,7 @@
       }
     }
 
-    async function deleteDocumentById(documentId) {
+async function deleteItem(itemId, sourceCollection) {
   const user = auth.currentUser;
 
   if (!user) {
@@ -1316,22 +1316,25 @@
   }
 
   const confirmed = window.confirm(
-    "¿Seguro que querés borrar este documento? Esta acción no se puede deshacer."
+    "¿Seguro que querés borrar este elemento? Esta acción no se puede deshacer."
   );
 
   if (!confirmed) return;
 
   try {
-    await deleteDoc(doc(db, "usuarios", user.uid, "documentos", documentId));
+    const finalCollection =
+      sourceCollection === "clases" ? "clases" : "documentos";
+
+    await deleteDoc(doc(db, "usuarios", user.uid, finalCollection, itemId));
 
     allItems = allItems.filter(
-      (item) => !(item.id === documentId && item.type === "documento")
+      (item) => !(item.id === itemId && item.sourceCollection === finalCollection)
     );
 
     applyFilters();
   } catch (error) {
-    console.error("Error borrando documento:", error);
-    alert("No se pudo borrar el documento.");
+    console.error("Error borrando elemento:", error);
+    alert("No se pudo borrar el elemento.");
   }
 }
 
@@ -1422,19 +1425,20 @@
       Abrir
     </button>
 
-    ${
-      item.type === "documento"
-        ? `
-          <button
-            class="mini-btn delete-doc-btn"
-            type="button"
-            data-delete-doc-id="${escapeHtml(item.id)}"
-          >
-            Borrar
-          </button>
-        `
-        : ""
-    }
+${
+  item.type === "documento"
+    ? `
+      <button
+        class="mini-btn delete-doc-btn"
+        type="button"
+        data-delete-id="${escapeHtml(item.id)}"
+        data-delete-collection="${escapeHtml(item.sourceCollection || "documentos")}"
+      >
+        Borrar
+      </button>
+    `
+    : ""
+}
   </div>
 </div>
         </article>
