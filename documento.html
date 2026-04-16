@@ -3284,6 +3284,7 @@
       const chatToggle = $("doc-chat-toggle");
       const chatClose = $("doc-chat-close");
       const chatBody = $("doc-chat-body");
+      const chatToolbarToggle = $("chatToolbarToggle");
       const chatEmpty = $("doc-chat-empty");
       const chatForm = $("doc-chat-form");
       const chatInput = $("doc-chat-input");
@@ -3948,43 +3949,65 @@
         chatInput.style.height = `${Math.min(chatInput.scrollHeight, 140)}px`;
       }
 
-      function syncDocumentLayout() {
-        if (!documentApp || !chatPanel) return;
+function updateChatToolbarState() {
+  if (!chatToolbarToggle || !chatPanel) return;
 
-        const desktop = window.innerWidth > 1180;
-        const chatVisible = desktop
-          ? !chatPanel.classList.contains("hidden")
-          : chatPanel.classList.contains("is-open");
+  const isDesktop = window.innerWidth > 1180;
+  const isOpen = isDesktop
+    ? !chatPanel.classList.contains("hidden")
+    : chatPanel.classList.contains("is-open");
 
-        documentApp.classList.toggle("document-with-chat", chatVisible);
-        documentApp.classList.toggle("document-centered", !chatVisible);
-      }
+  chatToolbarToggle.classList.toggle("is-active", isOpen);
+  chatToolbarToggle.setAttribute("aria-pressed", String(isOpen));
+  chatToolbarToggle.setAttribute(
+    "title",
+    isOpen ? "Ocultar asistente" : "Mostrar asistente"
+  );
+  chatToolbarToggle.setAttribute(
+    "aria-label",
+    isOpen ? "Ocultar asistente" : "Mostrar asistente"
+  );
+}
 
-      function openChat() {
-        if (!chatPanel) return;
+function syncDocumentLayout() {
+  if (!documentApp || !chatPanel) return;
 
-        chatPanel.classList.remove("hidden");
+  const desktop = window.innerWidth > 1180;
+  const chatVisible = desktop
+    ? !chatPanel.classList.contains("hidden")
+    : chatPanel.classList.contains("is-open");
 
-        if (window.innerWidth <= 1180) {
-          chatPanel.classList.add("is-open");
-        } else {
-          chatPanel.classList.remove("is-open");
-        }
+  documentApp.classList.toggle("document-with-chat", chatVisible);
+  documentApp.classList.toggle("document-centered", !chatVisible);
 
-        syncDocumentLayout();
-      }
+  updateChatToolbarState();
+}
 
-      function closeChat() {
-        if (!chatPanel) return;
+function openChat() {
+  if (!chatPanel) return;
 
-        if (window.innerWidth <= 1180) {
-          chatPanel.classList.remove("is-open");
-        } else {
-          chatPanel.classList.add("hidden");
-        }
+  chatPanel.classList.remove("hidden");
 
-        syncDocumentLayout();
-      }
+  if (window.innerWidth <= 1180) {
+    chatPanel.classList.add("is-open");
+  } else {
+    chatPanel.classList.remove("is-open");
+  }
+
+  syncDocumentLayout();
+}
+
+function closeChat() {
+  if (!chatPanel) return;
+
+  if (window.innerWidth <= 1180) {
+    chatPanel.classList.remove("is-open");
+  } else {
+    chatPanel.classList.add("hidden");
+  }
+
+  syncDocumentLayout();
+}
 
       function localChatReply(message) {
         const data = getStudyData();
@@ -4454,8 +4477,18 @@
       });
 
       chatToggle?.addEventListener("click", openChat);
-      chatClose?.addEventListener("click", closeChat);
-      chatInput?.addEventListener("input", autoResizeChat);
+chatClose?.addEventListener("click", closeChat);
+chatInput?.addEventListener("input", autoResizeChat);
+
+chatToolbarToggle?.addEventListener("click", () => {
+  const isDesktop = window.innerWidth > 1180;
+  const isOpen = isDesktop
+    ? !chatPanel?.classList.contains("hidden")
+    : chatPanel?.classList.contains("is-open");
+
+  if (isOpen) closeChat();
+  else openChat();
+});
 
       chatChips.forEach((chip) => {
         chip.addEventListener("click", () => {
