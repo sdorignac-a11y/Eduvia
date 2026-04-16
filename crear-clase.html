@@ -1894,281 +1894,489 @@ const selectedTool = (urlParams.get("tool") || "").trim().toLowerCase();
 const stepTwoTitle = document.querySelector('.step-panel[data-panel="2"] .section-head h3');
 const stepTwoText = document.querySelector('.step-panel[data-panel="2"] .section-head p');
 
-    const fieldTemplates = {
-      clase: `
-        <div class="field">
-          <label for="clase_materia">Materia</label>
-          <input id="clase_materia" placeholder="Ejemplo: Historia" />
-          <span class="helper">Materia principal.</span>
-        </div>
+<script>
+  const dynamicFields = document.getElementById("dynamic-fields");
+  const tipoInputs = document.querySelectorAll('input[name="tipo_contenido"]');
 
-        <div class="field">
-          <label for="clase_tema">Tema</label>
-          <input id="clase_tema" placeholder="Ejemplo: Revolución Francesa" />
-          <span class="helper">Tema puntual o unidad.</span>
-        </div>
+  const legacyTipo = document.getElementById("tipo_contenido_hidden");
+  const legacyMateria = document.getElementById("materia");
+  const legacyTema = document.getElementById("tema");
+  const legacyNivel = document.getElementById("nivel");
+  const legacyDuracion = document.getElementById("duracion");
+  const legacyObjetivo = document.getElementById("objetivo");
+  const legacyToolMode = document.getElementById("tool_mode");
 
-        <div class="field">
-          <label for="clase_nivel">Nivel</label>
-          <select id="clase_nivel">
-            <option value="Primaria">Primaria</option>
-            <option value="Secundaria">Secundaria</option>
-            <option value="Universidad">Universidad</option>
-          </select>
-          <span class="helper">Ajusta dificultad y lenguaje.</span>
-        </div>
+  const urlParams = new URLSearchParams(window.location.search);
+  const selectedTool = (urlParams.get("tool") || "").trim().toLowerCase();
 
-<div class="field">
-  <label for="clase_palabras_min">Mínimo de palabras</label>
-  <input id="clase_palabras_min" type="number" min="0" placeholder="Ejemplo: 300" />
-  <span class="helper">Cantidad mínima de palabras deseada.</span>
-</div>
+  const stepTwoTitle = document.querySelector('.step-panel[data-panel="2"] .section-head h3');
+  const stepTwoText = document.querySelector('.step-panel[data-panel="2"] .section-head p');
 
-<div class="field">
-  <label for="clase_palabras_max">Máximo de palabras</label>
-  <input id="clase_palabras_max" type="number" min="0" placeholder="Ejemplo: 600" />
-  <span class="helper">Cantidad máxima de palabras deseada.</span>
-</div>
+  const sharedLengthFields = `
+    <div class="field">
+      <label for="contenido_palabras_min">Mínimo de palabras</label>
+      <input id="contenido_palabras_min" type="number" min="0" placeholder="Ejemplo: 300" />
+      <span class="helper">Cantidad mínima de palabras deseada.</span>
+    </div>
 
-        <div class="field full">
-          <label for="clase_objetivo">Objetivo</label>
-          <textarea id="clase_objetivo" placeholder="Ejemplo: Que el alumno entienda las causas y consecuencias principales."></textarea>
-          <span class="helper">Cuanto más claro sea, mejor responde la IA.</span>
-        </div>
-      `,
+    <div class="field">
+      <label for="contenido_palabras_max">Máximo de palabras</label>
+      <input id="contenido_palabras_max" type="number" min="0" placeholder="Ejemplo: 600" />
+      <span class="helper">Cantidad máxima de palabras deseada.</span>
+    </div>
+  `;
 
-      resumen: `
-        <div class="field full">
-          <label for="resumen_tema">Tema principal</label>
-          <input id="resumen_tema" placeholder="Ejemplo: Arquitectura de Roma" />
-          <span class="helper">Tema central a resumir o explicar.</span>
-        </div>
+  const fieldTemplates = {
+    clase: `
+      <div class="field">
+        <label for="clase_materia">Materia</label>
+        <input id="clase_materia" placeholder="Ejemplo: Historia" />
+        <span class="helper">Materia principal.</span>
+      </div>
 
-        <div class="field">
-          <label for="resumen_enfoque">Enfoque</label>
-          <input id="resumen_enfoque" placeholder="Ejemplo: características, materiales y legado" />
-          <span class="helper">Qué lado del tema querés desarrollar.</span>
-        </div>
+      <div class="field">
+        <label for="clase_tema">Tema</label>
+        <input id="clase_tema" placeholder="Ejemplo: Revolución Francesa" />
+        <span class="helper">Tema puntual o unidad.</span>
+      </div>
 
-        <div class="field">
-          <label for="resumen_publico">Dirigido a</label>
-          <select id="resumen_publico">
-            <option value="General">General</option>
-            <option value="Secundaria">Secundaria</option>
-            <option value="Universidad">Universidad</option>
-          </select>
-          <span class="helper">Ajusta lenguaje y complejidad.</span>
-        </div>
+      <div class="field">
+        <label for="clase_nivel">Nivel</label>
+        <select id="clase_nivel">
+          <option value="Primaria">Primaria</option>
+          <option value="Secundaria">Secundaria</option>
+          <option value="Universidad">Universidad</option>
+        </select>
+        <span class="helper">Ajusta dificultad y lenguaje.</span>
+      </div>
 
-        <div class="field">
-          <label for="resumen_profundidad">Profundidad</label>
-          <select id="resumen_profundidad">
-            <option value="Breve">Breve</option>
-            <option value="Media">Media</option>
-            <option value="Profunda">Profunda</option>
-          </select>
-          <span class="helper">Define cuánto detalle querés.</span>
-        </div>
+      ${sharedLengthFields}
 
-        <div class="field full">
-          <label for="resumen_pedido">Qué querés que explique</label>
-          <textarea id="resumen_pedido" placeholder="Ejemplo: Quiero un texto claro con ejemplos, partes principales y por qué fue importante."></textarea>
-          <span class="helper">Podés pedir ejemplos, contexto o una explicación más simple.</span>
-        </div>
-      `,
+      <div class="field full">
+        <label for="clase_objetivo">Objetivo</label>
+        <textarea id="clase_objetivo" placeholder="Ejemplo: Que el alumno entienda las causas y consecuencias principales."></textarea>
+        <span class="helper">Cuanto más claro sea, mejor responde la IA.</span>
+      </div>
+    `,
 
-      analisis: `
-        <div class="field full">
-          <label for="analisis_tema">Tema / obra / concepto</label>
-          <input id="analisis_tema" placeholder="Ejemplo: Arquitectura de Roma" />
-          <span class="helper">Podés analizar una idea, una obra o un tema.</span>
-        </div>
+    resumen: `
+      <div class="field full">
+        <label for="resumen_tema">Tema principal</label>
+        <input id="resumen_tema" placeholder="Ejemplo: Arquitectura de Roma" />
+        <span class="helper">Tema central a resumir o explicar.</span>
+      </div>
 
-        <div class="field">
-          <label for="analisis_tipo">Tipo de análisis</label>
-          <input id="analisis_tipo" placeholder="Ejemplo: histórico, comparativo o crítico" />
-          <span class="helper">Define el enfoque general.</span>
-        </div>
+      <div class="field">
+        <label for="resumen_enfoque">Enfoque</label>
+        <input id="resumen_enfoque" placeholder="Ejemplo: características, materiales y legado" />
+        <span class="helper">Qué lado del tema querés desarrollar.</span>
+      </div>
 
-        <div class="field">
-          <label for="analisis_publico">Dirigido a</label>
-          <select id="analisis_publico">
-            <option value="Secundaria">Secundaria</option>
-            <option value="Universidad">Universidad</option>
-            <option value="General">General</option>
-          </select>
-          <span class="helper">Ajusta nivel y vocabulario.</span>
-        </div>
+      <div class="field">
+        <label for="resumen_publico">Dirigido a</label>
+        <select id="resumen_publico">
+          <option value="General">General</option>
+          <option value="Secundaria">Secundaria</option>
+          <option value="Universidad">Universidad</option>
+        </select>
+        <span class="helper">Ajusta lenguaje y complejidad.</span>
+      </div>
 
-        <div class="field full">
-          <label for="analisis_eje">Eje principal</label>
-          <textarea id="analisis_eje" placeholder="Ejemplo: Analizar cómo la arquitectura romana reflejaba el poder del imperio."></textarea>
-          <span class="helper">La IA toma esto como línea central.</span>
-        </div>
-      `,
+      <div class="field">
+        <label for="resumen_profundidad">Profundidad</label>
+        <select id="resumen_profundidad">
+          <option value="Breve">Breve</option>
+          <option value="Media">Media</option>
+          <option value="Profunda">Profunda</option>
+        </select>
+        <span class="helper">Define cuánto detalle querés.</span>
+      </div>
 
-      documento: `
-        <div class="field full">
-          <label for="documento_titulo">Título del documento</label>
-          <input id="documento_titulo" placeholder="Ejemplo: Apunte sobre arquitectura romana" />
-          <span class="helper">Nombre del contenido.</span>
-        </div>
+      ${sharedLengthFields}
 
-        <div class="field">
-          <label for="documento_tema">Tema central</label>
-          <input id="documento_tema" placeholder="Ejemplo: Arquitectura de Roma" />
-          <span class="helper">Tema base del documento.</span>
-        </div>
+      <div class="field full">
+        <label for="resumen_pedido">Qué querés que explique</label>
+        <textarea id="resumen_pedido" placeholder="Ejemplo: Quiero un texto claro con ejemplos, partes principales y por qué fue importante."></textarea>
+        <span class="helper">Podés pedir ejemplos, contexto o una explicación más simple.</span>
+      </div>
+    `,
 
-        <div class="field">
-          <label for="documento_publico">Público</label>
-          <select id="documento_publico">
-            <option value="Secundaria">Secundaria</option>
-            <option value="Universidad">Universidad</option>
-            <option value="General">General</option>
-          </select>
-          <span class="helper">Define complejidad y estilo.</span>
-        </div>
+    analisis: `
+      <div class="field full">
+        <label for="analisis_tema">Tema / obra / concepto</label>
+        <input id="analisis_tema" placeholder="Ejemplo: Arquitectura de Roma" />
+        <span class="helper">Podés analizar una idea, una obra o un tema.</span>
+      </div>
 
-        <div class="field">
-          <label for="documento_estructura">Estructura</label>
-          <select id="documento_estructura">
-            <option value="Apunte">Apunte</option>
-            <option value="Resumen largo">Resumen largo</option>
-            <option value="Esquema">Esquema</option>
-            <option value="Desarrollo completo">Desarrollo completo</option>
-          </select>
-          <span class="helper">Organiza cómo se presenta.</span>
-        </div>
+      <div class="field">
+        <label for="analisis_tipo">Tipo de análisis</label>
+        <input id="analisis_tipo" placeholder="Ejemplo: histórico, comparativo o crítico" />
+        <span class="helper">Define el enfoque general.</span>
+      </div>
 
-        <div class="field full">
-          <label for="documento_incluir">Qué querés incluir</label>
-          <textarea id="documento_incluir" placeholder="Ejemplo: Introducción, características, ejemplos de edificios y conclusión."></textarea>
-          <span class="helper">Indicá los bloques importantes.</span>
-        </div>
-      `,
+      <div class="field">
+        <label for="analisis_publico">Dirigido a</label>
+        <select id="analisis_publico">
+          <option value="Secundaria">Secundaria</option>
+          <option value="Universidad">Universidad</option>
+          <option value="General">General</option>
+        </select>
+        <span class="helper">Ajusta nivel y vocabulario.</span>
+      </div>
 
-      investigacion: `
-        <div class="field full">
-          <label for="investigacion_pregunta">Pregunta o tema</label>
-          <input id="investigacion_pregunta" placeholder="Ejemplo: ¿Cómo influyó la arquitectura romana en la arquitectura occidental?" />
-          <span class="helper">Puede ser una pregunta o un tema general.</span>
-        </div>
+      ${sharedLengthFields}
 
-        <div class="field">
-          <label for="investigacion_objetivo">Objetivo</label>
-          <input id="investigacion_objetivo" placeholder="Ejemplo: Encontrar ideas clave y organizar la información" />
-          <span class="helper">Qué querés lograr con la investigación.</span>
-        </div>
+      <div class="field full">
+        <label for="analisis_eje">Eje principal</label>
+        <textarea id="analisis_eje" placeholder="Ejemplo: Analizar cómo la arquitectura romana reflejaba el poder del imperio."></textarea>
+        <span class="helper">La IA toma esto como línea central.</span>
+      </div>
+    `,
 
-        <div class="field">
-          <label for="investigacion_profundidad">Profundidad</label>
-          <select id="investigacion_profundidad">
-            <option value="Rápido">Rápido</option>
-            <option value="Intermedio">Intermedio</option>
-            <option value="Completo">Completo</option>
-          </select>
-          <span class="helper">Define cuánto querés investigar.</span>
-        </div>
+    documento: `
+      <div class="field full">
+        <label for="documento_titulo">Título del documento</label>
+        <input id="documento_titulo" placeholder="Ejemplo: Apunte sobre arquitectura romana" />
+        <span class="helper">Nombre del contenido.</span>
+      </div>
 
-        <div class="field full">
-          <label for="investigacion_resultado">Resultado esperado</label>
-          <textarea id="investigacion_resultado" placeholder="Ejemplo: Un texto ordenado con hallazgos principales, ejemplos y conclusión breve."></textarea>
-          <span class="helper">Esto guía el formato final.</span>
-        </div>
-      `
-    };
-improve: `
-  <div class="field full">
-    <label for="improve_texto">Texto a mejorar</label>
-    <textarea id="improve_texto" placeholder="Pegá acá el texto que querés mejorar."></textarea>
-    <span class="helper">Podés pegar una explicación, párrafo o contenido completo.</span>
-  </div>
+      <div class="field">
+        <label for="documento_tema">Tema central</label>
+        <input id="documento_tema" placeholder="Ejemplo: Arquitectura de Roma" />
+        <span class="helper">Tema base del documento.</span>
+      </div>
 
-  <div class="field">
-    <label for="improve_objetivo">Qué querés mejorar</label>
-    <select id="improve_objetivo">
-      <option value="Claridad" selected>Claridad</option>
-      <option value="Redacción">Redacción</option>
-      <option value="Orden">Orden</option>
-      <option value="Formalidad">Formalidad</option>
-    </select>
-    <span class="helper">Elegí el foco principal de la mejora.</span>
-  </div>
+      <div class="field">
+        <label for="documento_publico">Público</label>
+        <select id="documento_publico">
+          <option value="Secundaria">Secundaria</option>
+          <option value="Universidad">Universidad</option>
+          <option value="General">General</option>
+        </select>
+        <span class="helper">Define complejidad y estilo.</span>
+      </div>
 
-  <div class="field">
-    <label for="improve_tono">Tono final</label>
-    <select id="improve_tono">
-      <option value="Claro" selected>Claro</option>
-      <option value="Académico">Académico</option>
-      <option value="Formal">Formal</option>
-      <option value="Simple">Simple</option>
-    </select>
-    <span class="helper">Cómo querés que quede el texto.</span>
-  </div>
+      <div class="field">
+        <label for="documento_estructura">Estructura</label>
+        <select id="documento_estructura">
+          <option value="Apunte">Apunte</option>
+          <option value="Resumen largo">Resumen largo</option>
+          <option value="Esquema">Esquema</option>
+          <option value="Desarrollo completo">Desarrollo completo</option>
+        </select>
+        <span class="helper">Organiza cómo se presenta.</span>
+      </div>
 
-  <div class="field">
-    <label for="improve_extension">Extensión</label>
-    <select id="improve_extension">
-      <option value="Igual" selected>Igual</option>
-      <option value="Más breve">Más breve</option>
-      <option value="Más desarrollada">Más desarrollada</option>
-    </select>
-    <span class="helper">Define si querés mantener o cambiar la longitud.</span>
-  </div>
+      ${sharedLengthFields}
 
-  <div class="field full">
-    <label for="improve_indicaciones">Indicaciones extra</label>
-    <textarea id="improve_indicaciones" placeholder="Ejemplo: que suene más ordenado y fácil de estudiar."></textarea>
-    <span class="helper">Opcional, para afinar mejor el resultado.</span>
-  </div>
-`,
+      <div class="field full">
+        <label for="documento_incluir">Qué querés incluir</label>
+        <textarea id="documento_incluir" placeholder="Ejemplo: Introducción, características, ejemplos de edificios y conclusión."></textarea>
+        <span class="helper">Indicá los bloques importantes.</span>
+      </div>
+    `,
 
-paragraphs: `
-  <div class="field full">
-    <label for="paragraphs_tema">Tema</label>
-    <input id="paragraphs_tema" placeholder="Ejemplo: La contaminación ambiental" />
-    <span class="helper">Tema sobre el que querés generar párrafos.</span>
-  </div>
+    investigacion: `
+      <div class="field full">
+        <label for="investigacion_pregunta">Pregunta o tema</label>
+        <input id="investigacion_pregunta" placeholder="Ejemplo: ¿Cómo influyó la arquitectura romana en la arquitectura occidental?" />
+        <span class="helper">Puede ser una pregunta o un tema general.</span>
+      </div>
 
-  <div class="field">
-    <label for="paragraphs_cantidad">Cantidad de párrafos</label>
-    <select id="paragraphs_cantidad">
-      <option value="1">1</option>
-      <option value="2" selected>2</option>
-      <option value="3">3</option>
-      <option value="4">4</option>
-    </select>
-    <span class="helper">Cuántos párrafos querés generar.</span>
-  </div>
+      <div class="field">
+        <label for="investigacion_objetivo">Objetivo</label>
+        <input id="investigacion_objetivo" placeholder="Ejemplo: Encontrar ideas clave y organizar la información" />
+        <span class="helper">Qué querés lograr con la investigación.</span>
+      </div>
 
-  <div class="field">
-    <label for="paragraphs_tono">Tono</label>
-    <select id="paragraphs_tono">
-      <option value="Académico" selected>Académico</option>
-      <option value="Claro">Claro</option>
-      <option value="Formal">Formal</option>
-      <option value="Simple">Simple</option>
-    </select>
-    <span class="helper">Estilo general del texto.</span>
-  </div>
+      <div class="field">
+        <label for="investigacion_profundidad">Profundidad</label>
+        <select id="investigacion_profundidad">
+          <option value="Rápido">Rápido</option>
+          <option value="Intermedio">Intermedio</option>
+          <option value="Completo">Completo</option>
+        </select>
+        <span class="helper">Define cuánto querés investigar.</span>
+      </div>
 
-  <div class="field">
-    <label for="paragraphs_extension">Extensión</label>
-    <select id="paragraphs_extension">
-      <option value="Corta">Corta</option>
-      <option value="Media" selected>Media</option>
-      <option value="Larga">Larga</option>
-    </select>
-    <span class="helper">Tamaño aproximado de cada párrafo.</span>
-  </div>
+      ${sharedLengthFields}
 
-  <div class="field full">
-    <label for="paragraphs_enfoque">Enfoque o idea principal</label>
-    <textarea id="paragraphs_enfoque" placeholder="Ejemplo: explicar causas, consecuencias y posibles soluciones."></textarea>
-    <span class="helper">Qué querés que desarrollen los párrafos.</span>
-  </div>
-`
+      <div class="field full">
+        <label for="investigacion_resultado">Resultado esperado</label>
+        <textarea id="investigacion_resultado" placeholder="Ejemplo: Un texto ordenado con hallazgos principales, ejemplos y conclusión breve."></textarea>
+        <span class="helper">Esto guía el formato final.</span>
+      </div>
+    `
+  };
+
+  const toolTemplates = {
+    introduction: `
+      <div class="field full">
+        <label for="intro_tema">Tema</label>
+        <input id="intro_tema" placeholder="Ejemplo: La Revolución Francesa" />
+        <span class="helper">Tema central de la introducción.</span>
+      </div>
+
+      <div class="field">
+        <label for="intro_enfoque">Enfoque</label>
+        <input id="intro_enfoque" placeholder="Ejemplo: causas principales" />
+        <span class="helper">Qué aspecto querés destacar al empezar.</span>
+      </div>
+
+      <div class="field">
+        <label for="intro_tono">Tono</label>
+        <select id="intro_tono">
+          <option value="Académico">Académico</option>
+          <option value="Claro">Claro</option>
+          <option value="Formal">Formal</option>
+        </select>
+        <span class="helper">Define cómo va a sonar la introducción.</span>
+      </div>
+
+      <div class="field">
+        <label for="intro_extension">Extensión</label>
+        <select id="intro_extension">
+          <option value="Corta">Corta</option>
+          <option value="Media" selected>Media</option>
+          <option value="Larga">Larga</option>
+        </select>
+        <span class="helper">Cantidad aproximada de desarrollo.</span>
+      </div>
+
+      ${sharedLengthFields}
+
+      <div class="field full">
+        <label for="intro_indicaciones">Indicaciones extra</label>
+        <textarea id="intro_indicaciones" placeholder="Ejemplo: que tenga un comienzo atractivo y mencione el contexto histórico."></textarea>
+        <span class="helper">Podés sumar detalles opcionales.</span>
+      </div>
+    `,
+
+    conclusion: `
+      <div class="field full">
+        <label for="conclusion_enfoque">Idea central del cierre</label>
+        <input id="conclusion_enfoque" placeholder="Ejemplo: la importancia del tema en la actualidad" />
+        <span class="helper">Qué querés remarcar en la conclusión.</span>
+      </div>
+
+      <div class="field">
+        <label for="conclusion_tono">Tono</label>
+        <select id="conclusion_tono">
+          <option value="Académico">Académico</option>
+          <option value="Claro">Claro</option>
+          <option value="Formal">Formal</option>
+          <option value="Persuasivo">Persuasivo</option>
+        </select>
+        <span class="helper">Cómo querés que suene el cierre.</span>
+      </div>
+
+      <div class="field">
+        <label for="conclusion_extension">Extensión</label>
+        <select id="conclusion_extension">
+          <option value="Corta">Corta</option>
+          <option value="Media" selected>Media</option>
+          <option value="Larga">Larga</option>
+        </select>
+        <span class="helper">Cuánto querés que desarrolle el cierre.</span>
+      </div>
+
+      ${sharedLengthFields}
+
+      <div class="field full">
+        <label for="conclusion_cierre">Frase o idea final</label>
+        <textarea id="conclusion_cierre" placeholder="Ejemplo: Por eso, estudiar este proceso ayuda a comprender mejor el mundo actual."></textarea>
+        <span class="helper">Cierre final opcional o idea complementaria.</span>
+      </div>
+    `,
+
+    research: `
+      <div class="field full">
+        <label for="research_pregunta">Pregunta o tema</label>
+        <input id="research_pregunta" placeholder="Ejemplo: ¿Cómo influyó Roma en la arquitectura occidental?" />
+        <span class="helper">Puede ser una pregunta o un tema concreto.</span>
+      </div>
+
+      <div class="field">
+        <label for="research_enfoque">Enfoque</label>
+        <input id="research_enfoque" placeholder="Ejemplo: influencia cultural e histórica" />
+        <span class="helper">Qué ángulo querés priorizar.</span>
+      </div>
+
+      <div class="field">
+        <label for="research_profundidad">Profundidad</label>
+        <select id="research_profundidad">
+          <option value="Rápida">Rápida</option>
+          <option value="Intermedia" selected>Intermedia</option>
+          <option value="Profunda">Profunda</option>
+        </select>
+        <span class="helper">Define cuánto se desarrolla la investigación.</span>
+      </div>
+
+      <div class="field">
+        <label for="research_formato">Formato</label>
+        <select id="research_formato">
+          <option value="Ideas clave">Ideas clave</option>
+          <option value="Mini resumen">Mini resumen</option>
+          <option value="Texto breve">Texto breve</option>
+        </select>
+        <span class="helper">Cómo querés ver el resultado.</span>
+      </div>
+
+      ${sharedLengthFields}
+
+      <div class="field full">
+        <label for="research_indicaciones">Indicaciones extra</label>
+        <textarea id="research_indicaciones" placeholder="Ejemplo: incluir ejemplos concretos y una mirada comparativa."></textarea>
+        <span class="helper">Opcional, para afinar mejor el resultado.</span>
+      </div>
+    `,
+
+    "simple-explanation": `
+      <div class="field full">
+        <label for="simple_tema">Tema difícil</label>
+        <input id="simple_tema" placeholder="Ejemplo: fotosíntesis" />
+        <span class="helper">Tema que querés volver más fácil de entender.</span>
+      </div>
+
+      <div class="field">
+        <label for="simple_publico">Para quién es</label>
+        <select id="simple_publico">
+          <option value="Niño">Niño</option>
+          <option value="Secundaria" selected>Secundaria</option>
+          <option value="General">General</option>
+        </select>
+        <span class="helper">Ajusta el nivel de simplicidad.</span>
+      </div>
+
+      <div class="field">
+        <label for="simple_tono">Tono</label>
+        <select id="simple_tono">
+          <option value="Claro" selected>Claro</option>
+          <option value="Amigable">Amigable</option>
+          <option value="Académico">Académico</option>
+        </select>
+        <span class="helper">Forma en la que va a estar explicada.</span>
+      </div>
+
+      <div class="field">
+        <label for="simple_extension">Extensión</label>
+        <select id="simple_extension">
+          <option value="Corta">Corta</option>
+          <option value="Media" selected>Media</option>
+          <option value="Larga">Larga</option>
+        </select>
+        <span class="helper">Cuánto querés que se extienda la explicación.</span>
+      </div>
+
+      ${sharedLengthFields}
+
+      <div class="field full">
+        <label for="simple_indicaciones">Indicaciones extra</label>
+        <textarea id="simple_indicaciones" placeholder="Ejemplo: usar ejemplos cotidianos y lenguaje muy simple."></textarea>
+        <span class="helper">Opcional, para personalizar mejor la explicación.</span>
+      </div>
+    `,
+
+    improve: `
+      <div class="field full">
+        <label for="improve_texto">Texto a mejorar</label>
+        <textarea id="improve_texto" placeholder="Pegá acá el texto que querés mejorar."></textarea>
+        <span class="helper">Podés pegar una explicación, párrafo o contenido completo.</span>
+      </div>
+
+      <div class="field">
+        <label for="improve_objetivo">Qué querés mejorar</label>
+        <select id="improve_objetivo">
+          <option value="Claridad" selected>Claridad</option>
+          <option value="Redacción">Redacción</option>
+          <option value="Orden">Orden</option>
+          <option value="Formalidad">Formalidad</option>
+        </select>
+        <span class="helper">Elegí el foco principal de la mejora.</span>
+      </div>
+
+      <div class="field">
+        <label for="improve_tono">Tono final</label>
+        <select id="improve_tono">
+          <option value="Claro" selected>Claro</option>
+          <option value="Académico">Académico</option>
+          <option value="Formal">Formal</option>
+          <option value="Simple">Simple</option>
+        </select>
+        <span class="helper">Cómo querés que quede el texto.</span>
+      </div>
+
+      <div class="field">
+        <label for="improve_extension">Extensión</label>
+        <select id="improve_extension">
+          <option value="Igual" selected>Igual</option>
+          <option value="Más breve">Más breve</option>
+          <option value="Más desarrollada">Más desarrollada</option>
+        </select>
+        <span class="helper">Define si querés mantener o cambiar la longitud.</span>
+      </div>
+
+      ${sharedLengthFields}
+
+      <div class="field full">
+        <label for="improve_indicaciones">Indicaciones extra</label>
+        <textarea id="improve_indicaciones" placeholder="Ejemplo: que suene más ordenado y fácil de estudiar."></textarea>
+        <span class="helper">Opcional, para afinar mejor el resultado.</span>
+      </div>
+    `,
+
+    paragraphs: `
+      <div class="field full">
+        <label for="paragraphs_tema">Tema</label>
+        <input id="paragraphs_tema" placeholder="Ejemplo: La contaminación ambiental" />
+        <span class="helper">Tema sobre el que querés generar párrafos.</span>
+      </div>
+
+      <div class="field">
+        <label for="paragraphs_cantidad">Cantidad de párrafos</label>
+        <select id="paragraphs_cantidad">
+          <option value="1">1</option>
+          <option value="2" selected>2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+        </select>
+        <span class="helper">Cuántos párrafos querés generar.</span>
+      </div>
+
+      <div class="field">
+        <label for="paragraphs_tono">Tono</label>
+        <select id="paragraphs_tono">
+          <option value="Académico" selected>Académico</option>
+          <option value="Claro">Claro</option>
+          <option value="Formal">Formal</option>
+          <option value="Simple">Simple</option>
+        </select>
+        <span class="helper">Estilo general del texto.</span>
+      </div>
+
+      <div class="field">
+        <label for="paragraphs_extension">Extensión</label>
+        <select id="paragraphs_extension">
+          <option value="Corta">Corta</option>
+          <option value="Media" selected>Media</option>
+          <option value="Larga">Larga</option>
+        </select>
+        <span class="helper">Tamaño aproximado de cada párrafo.</span>
+      </div>
+
+      ${sharedLengthFields}
+
+      <div class="field full">
+        <label for="paragraphs_enfoque">Enfoque o idea principal</label>
+        <textarea id="paragraphs_enfoque" placeholder="Ejemplo: explicar causas, consecuencias y posibles soluciones."></textarea>
+        <span class="helper">Qué querés que desarrollen los párrafos.</span>
+      </div>
+    `
+  };
+
+  function valueOf(id) {
+    return document.getElementById(id)?.value?.trim() || "";
+  }
 
     function valueOf(id) {
       return document.getElementById(id)?.value?.trim() || "";
