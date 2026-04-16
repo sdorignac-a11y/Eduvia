@@ -681,7 +681,7 @@
 
   width: var(--left-rail-width);
   height: auto;
-  max-height: min(560px, calc(100vh - 140px));
+  max-height: min(520px, calc(100vh - 120px));
 
   padding: 10px 6px;
   border: 1px solid #e3e6ea;
@@ -2448,9 +2448,15 @@
   box-shadow: var(--shadow-chat);
 }
 
-/* Responsive */
 @media (max-width:1180px){
   .left-rail{
+    position: static;
+    top: auto;
+    left: auto;
+    bottom: auto;
+    transform: none;
+    width: auto;
+    max-height: none;
     overflow: visible;
   }
 
