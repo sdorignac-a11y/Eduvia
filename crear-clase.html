@@ -1548,10 +1548,20 @@
                         </div>
                       </div>
                     </div>
-
                     <div id="file-list" class="file-list"></div>
+                    <div class="field full" style="margin-top:16px;">
+  <label for="source-links">Links</label>
+  <textarea
+    id="source-links"
+    placeholder="Pegá uno o varios links, uno por línea. Ejemplo:
+https://es.wikipedia.org/wiki/Revoluci%C3%B3n_francesa
+https://www.britannica.com/event/French-Revolution"
+  ></textarea>
+  <span class="helper">Si agregás links, la IA también va a usar solo esas fuentes como base.</span>
+</div>
                   </div>
                 </section>
+                
 
                 <section class="step-panel" data-panel="5" id="result-step-panel" style="display:none;">
   <div class="section-head">
@@ -1573,7 +1583,7 @@
   </div>
 </section>
 
-               <div class="hidden-legacy" aria-hidden="true">
+<div class="hidden-legacy" aria-hidden="true">
   <input type="hidden" id="tipo_contenido_hidden" name="tipo_contenido_hidden" value="clase" />
   <input type="hidden" id="materia" name="materia" />
   <input type="hidden" id="tema" name="tema" />
@@ -1582,6 +1592,7 @@
   <textarea id="objetivo" name="objetivo"></textarea>
   <input type="hidden" id="tool_mode" name="tool_mode" value="" />
   <input type="hidden" id="source_mode" name="source_mode" value="general" />
+  <textarea id="source_links_hidden" name="source_links_hidden"></textarea>
 </div>
               </div>
 
