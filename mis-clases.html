@@ -1446,7 +1446,6 @@ ${
 
       cardsGrid.innerHTML = createCardHtml + itemsHtml;
       cardsGrid.classList.remove("hidden");
-
 const createCard = cardsGrid.querySelector('[data-create-empty="documento"]');
 const createButton = cardsGrid.querySelector(".create-main-btn");
 const openButtons = [...cardsGrid.querySelectorAll(".open-item-btn")];
@@ -1473,9 +1472,11 @@ deleteButtons.forEach((button) => {
     event.preventDefault();
     event.stopPropagation();
 
-    const documentId = button.dataset.deleteDocId;
-    if (documentId) {
-      deleteDocumentById(documentId);
+    const itemId = button.dataset.deleteId;
+    const sourceCollection = button.dataset.deleteCollection || "documentos";
+
+    if (itemId) {
+      deleteItem(itemId, sourceCollection);
     }
   });
 });
