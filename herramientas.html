@@ -597,6 +597,63 @@
       box-shadow:var(--shadow);
     }
 
+    .section-group{
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+}
+
+.section-group + .section-group{
+  margin-top:4px;
+}
+
+.group-head{
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:14px;
+  flex-wrap:wrap;
+}
+
+.group-copy h2{
+  font-size:1.28rem;
+  font-weight:900;
+  letter-spacing:-0.02em;
+  color:#232843;
+}
+
+.group-copy p{
+  margin-top:4px;
+  color:var(--muted);
+  font-weight:700;
+  font-size:.96rem;
+}
+
+.group-badge{
+  background:white;
+  border:1px solid var(--line);
+  padding:10px 14px;
+  border-radius:14px;
+  color:#68718b;
+  font-weight:800;
+  box-shadow:var(--shadow-soft);
+}
+
+@media (max-width:640px){
+  .group-copy h2{
+    font-size:1.12rem;
+  }
+
+  .group-copy p{
+    font-size:.92rem;
+  }
+
+  .group-badge{
+    width:100%;
+    text-align:center;
+  }
+}
+
     @media (max-width:1280px){
       .tools-grid{
         grid-template-columns:repeat(3, minmax(0, 1fr));
@@ -798,320 +855,347 @@
           </div>
         </div>
       </header>
-
       <section class="content">
-        <div class="section-head">
-          <div>
-            <h1 class="section-title">Herramientas de Eduvia</h1>
-            <p class="section-subtitle">
-              Accesos rápidos para crear clases, resúmenes, actividades y materiales.
-            </p>
-          </div>
+  <div class="section-head">
+    <div>
+      <h1 class="section-title">Herramientas de Eduvia</h1>
+      <p class="section-subtitle">
+        Accesos rápidos organizados según el tipo de trabajo que querés hacer.
+      </p>
+    </div>
 
-          <div class="section-meta" id="toolCount">
-            15 herramientas disponibles
-          </div>
-        </div>
-
-        <div class="tools-grid" id="toolsGrid">
-          <article class="tool-card featured" data-title="Clase escolar" data-desc="Para materias, temas y objetivos." data-href="crear-clase.html">
-            <div class="tool-top">
-              <div class="tool-icon">CL</div>
-              <button class="star-btn active" type="button" aria-label="Favorito">
-                <i data-lucide="star"></i>
-              </button>
-            </div>
-            <h3 class="tool-title">Clase escolar</h3>
-            <p class="tool-desc">Para materias, temas y objetivos.</p>
-            <div class="tool-foot">
-              <span class="tool-tag">
-                <i data-lucide="sparkles" style="width:14px;height:14px;"></i>
-                Base
-              </span>
-              <span class="tool-open">Abrir</span>
-            </div>
-          </article>
-
-          <article class="tool-card featured" data-title="Resumen / explicación" data-desc="Para entender un tema de forma clara." data-href="crear-clase.html">
-            <div class="tool-top">
-              <div class="tool-icon">RS</div>
-              <button class="star-btn active" type="button" aria-label="Favorito">
-                <i data-lucide="star"></i>
-              </button>
-            </div>
-            <h3 class="tool-title">Resumen / explicación</h3>
-            <p class="tool-desc">Para entender un tema de forma clara.</p>
-            <div class="tool-foot">
-              <span class="tool-tag">
-                <i data-lucide="sparkles" style="width:14px;height:14px;"></i>
-                Claro
-              </span>
-              <span class="tool-open">Abrir</span>
-            </div>
-          </article>
-
-          <article class="tool-card featured" data-title="Análisis de tema" data-desc="Para comparar, interpretar o profundizar." data-href="crear-clase.html">
-            <div class="tool-top">
-              <div class="tool-icon">AN</div>
-              <button class="star-btn active" type="button" aria-label="Favorito">
-                <i data-lucide="star"></i>
-              </button>
-            </div>
-            <h3 class="tool-title">Análisis de tema</h3>
-            <p class="tool-desc">Para comparar, interpretar o profundizar.</p>
-            <div class="tool-foot">
-              <span class="tool-tag">
-                <i data-lucide="sparkles" style="width:14px;height:14px;"></i>
-                Profundo
-              </span>
-              <span class="tool-open">Abrir</span>
-            </div>
-          </article>
-
-          <article class="tool-card featured" data-title="Documento de estudio" data-desc="Para apuntes y desarrollos más largos." data-href="crear-clase.html">
-            <div class="tool-top">
-              <div class="tool-icon">DC</div>
-              <button class="star-btn active" type="button" aria-label="Favorito">
-                <i data-lucide="star"></i>
-              </button>
-            </div>
-            <h3 class="tool-title">Documento de estudio</h3>
-            <p class="tool-desc">Para apuntes y desarrollos más largos.</p>
-            <div class="tool-foot">
-              <span class="tool-tag">
-                <i data-lucide="sparkles" style="width:14px;height:14px;"></i>
-                Ordenado
-              </span>
-              <span class="tool-open">Abrir</span>
-            </div>
-          </article>
-
-          <article class="tool-card featured" data-title="Investigación rápida" data-desc="Para preguntas, hallazgos e ideas clave." data-href="crear-clase.html">
-            <div class="tool-top">
-              <div class="tool-icon">IN</div>
-              <button class="star-btn active" type="button" aria-label="Favorito">
-                <i data-lucide="star"></i>
-              </button>
-            </div>
-            <h3 class="tool-title">Investigación rápida</h3>
-            <p class="tool-desc">Para preguntas, hallazgos e ideas clave.</p>
-            <div class="tool-foot">
-              <span class="tool-tag">
-                <i data-lucide="sparkles" style="width:14px;height:14px;"></i>
-                Rápido
-              </span>
-              <span class="tool-open">Abrir</span>
-            </div>
-          </article>
-
-          <article class="tool-card" data-title="Generador de introducción" data-desc="Crea una introducción clara y atractiva para tu clase o documento." data-href="crear-clase.html">
-            <div class="tool-top">
-              <div class="tool-icon"><i data-lucide="file-pen-line"></i></div>
-              <button class="star-btn" type="button" aria-label="Favorito">
-                <i data-lucide="star"></i>
-              </button>
-            </div>
-            <h3 class="tool-title">Generador de introducción</h3>
-            <p class="tool-desc">Redacta una apertura clara para una clase, guía o documento educativo.</p>
-            <div class="tool-foot">
-              <span class="tool-tag">
-                <i data-lucide="sparkles" style="width:14px;height:14px;"></i>
-                IA rápida
-              </span>
-              <span class="tool-open">Abrir</span>
-            </div>
-          </article>
-
-<article
-  class="tool-card"
-  data-title="Generador de conclusión"
-  data-desc="Crea un cierre final para clases, trabajos o actividades."
-  data-href="crear-clase.html"
-  data-tool="conclusion"
->
-  <div class="tool-top">
-    <div class="tool-icon"><i data-lucide="notebook-pen"></i></div>
-    <button class="star-btn" type="button" aria-label="Favorito">
-      <i data-lucide="star"></i>
-    </button>
+    <div class="section-meta" id="toolCount">
+      15 herramientas disponibles
+    </div>
   </div>
-  <h3 class="tool-title">Generador de conclusión</h3>
-  <p class="tool-desc">Cierra una clase o contenido con un párrafo sólido, simple y bien armado.</p>
-  <div class="tool-foot">
-    <span class="tool-tag">
-      <i data-lucide="sparkles" style="width:14px;height:14px;"></i>
-      IA rápida
-    </span>
-    <span class="tool-open">Abrir</span>
+
+  <div class="section-group">
+    <div class="group-head">
+      <div class="group-copy">
+        <h2>Con documento</h2>
+        <p>Herramientas pensadas para desarrollar contenido más completo o trabajar textos extensos.</p>
+      </div>
+      <div class="group-badge">Se guardan como documento</div>
+    </div>
+
+    <div class="tools-grid">
+      <article class="tool-card featured" data-title="Clase escolar" data-desc="Para materias, temas y objetivos." data-href="crear-clase.html">
+        <div class="tool-top">
+          <div class="tool-icon">CL</div>
+          <button class="star-btn active" type="button" aria-label="Favorito">
+            <i data-lucide="star"></i>
+          </button>
+        </div>
+        <h3 class="tool-title">Clase escolar</h3>
+        <p class="tool-desc">Para materias, temas y objetivos.</p>
+        <div class="tool-foot">
+          <span class="tool-tag">
+            <i data-lucide="sparkles" style="width:14px;height:14px;"></i>
+            Base
+          </span>
+          <span class="tool-open">Abrir</span>
+        </div>
+      </article>
+
+      <article class="tool-card featured" data-title="Resumen / explicación" data-desc="Para entender un tema de forma clara." data-href="crear-clase.html">
+        <div class="tool-top">
+          <div class="tool-icon">RS</div>
+          <button class="star-btn active" type="button" aria-label="Favorito">
+            <i data-lucide="star"></i>
+          </button>
+        </div>
+        <h3 class="tool-title">Resumen / explicación</h3>
+        <p class="tool-desc">Para entender un tema de forma clara.</p>
+        <div class="tool-foot">
+          <span class="tool-tag">
+            <i data-lucide="sparkles" style="width:14px;height:14px;"></i>
+            Claro
+          </span>
+          <span class="tool-open">Abrir</span>
+        </div>
+      </article>
+
+      <article class="tool-card featured" data-title="Análisis de tema" data-desc="Para comparar, interpretar o profundizar." data-href="crear-clase.html">
+        <div class="tool-top">
+          <div class="tool-icon">AN</div>
+          <button class="star-btn active" type="button" aria-label="Favorito">
+            <i data-lucide="star"></i>
+          </button>
+        </div>
+        <h3 class="tool-title">Análisis de tema</h3>
+        <p class="tool-desc">Para comparar, interpretar o profundizar.</p>
+        <div class="tool-foot">
+          <span class="tool-tag">
+            <i data-lucide="sparkles" style="width:14px;height:14px;"></i>
+            Profundo
+          </span>
+          <span class="tool-open">Abrir</span>
+        </div>
+      </article>
+
+      <article class="tool-card featured" data-title="Documento de estudio" data-desc="Para apuntes y desarrollos más largos." data-href="crear-clase.html">
+        <div class="tool-top">
+          <div class="tool-icon">DC</div>
+          <button class="star-btn active" type="button" aria-label="Favorito">
+            <i data-lucide="star"></i>
+          </button>
+        </div>
+        <h3 class="tool-title">Documento de estudio</h3>
+        <p class="tool-desc">Para apuntes y desarrollos más largos.</p>
+        <div class="tool-foot">
+          <span class="tool-tag">
+            <i data-lucide="sparkles" style="width:14px;height:14px;"></i>
+            Ordenado
+          </span>
+          <span class="tool-open">Abrir</span>
+        </div>
+      </article>
+
+      <article class="tool-card" data-title="Mejorador de contenido" data-desc="Reformula tus textos para que suenen más claros y ordenados." data-href="crear-clase.html" data-tool="improve">
+        <div class="tool-top">
+          <div class="tool-icon"><i data-lucide="plus"></i></div>
+          <button class="star-btn" type="button" aria-label="Favorito">
+            <i data-lucide="star"></i>
+          </button>
+        </div>
+        <h3 class="tool-title">Mejorador de contenido</h3>
+        <p class="tool-desc">Mejora explicaciones, actividades o textos para que queden más prolijos y útiles.</p>
+        <div class="tool-foot">
+          <span class="tool-tag">
+            <i data-lucide="sparkles" style="width:14px;height:14px;"></i>
+            Optimizar
+          </span>
+          <span class="tool-open">Abrir</span>
+        </div>
+      </article>
+
+      <article class="tool-card" data-title="Generador de párrafos" data-desc="Crea párrafos completos para tus materiales." data-href="crear-clase.html" data-tool="paragraphs">
+        <div class="tool-top">
+          <div class="tool-icon"><i data-lucide="list"></i></div>
+          <button class="star-btn" type="button" aria-label="Favorito">
+            <i data-lucide="star"></i>
+          </button>
+        </div>
+        <h3 class="tool-title">Generador de párrafos</h3>
+        <p class="tool-desc">Genera bloques de texto para clases, explicaciones y recursos didácticos.</p>
+        <div class="tool-foot">
+          <span class="tool-tag">
+            <i data-lucide="sparkles" style="width:14px;height:14px;"></i>
+            Texto
+          </span>
+          <span class="tool-open">Abrir</span>
+        </div>
+      </article>
+    </div>
   </div>
-</article>
 
-          <article class="tool-card" data-title="Mejorador de contenido" data-desc="Reformula tus textos para que suenen más claros y ordenados." data-href="crear-clase.html">
-            <div class="tool-top">
-              <div class="tool-icon"><i data-lucide="plus"></i></div>
-              <button class="star-btn" type="button" aria-label="Favorito">
-                <i data-lucide="star"></i>
-              </button>
-            </div>
-            <h3 class="tool-title">Mejorador de contenido</h3>
-            <p class="tool-desc">Mejora explicaciones, actividades o textos para que queden más prolijos y útiles.</p>
-            <div class="tool-foot">
-              <span class="tool-tag">
-                <i data-lucide="sparkles" style="width:14px;height:14px;"></i>
-                Optimizar
-              </span>
-              <span class="tool-open">Abrir</span>
-            </div>
-          </article>
+  <div class="section-group">
+    <div class="group-head">
+      <div class="group-copy">
+        <h2>Sin documento</h2>
+        <p>Herramientas rápidas para generar un resultado puntual sin crear un documento completo.</p>
+      </div>
+      <div class="group-badge">Muestran resultado rápido</div>
+    </div>
 
-          <article class="tool-card" data-title="Generador de párrafos" data-desc="Crea párrafos completos para tus materiales." data-href="crear-clase.html">
-            <div class="tool-top">
-              <div class="tool-icon"><i data-lucide="list"></i></div>
-              <button class="star-btn" type="button" aria-label="Favorito">
-                <i data-lucide="star"></i>
-              </button>
-            </div>
-            <h3 class="tool-title">Generador de párrafos</h3>
-            <p class="tool-desc">Genera bloques de texto para clases, explicaciones y recursos didácticos.</p>
-            <div class="tool-foot">
-              <span class="tool-tag">
-                <i data-lucide="sparkles" style="width:14px;height:14px;"></i>
-                Texto
-              </span>
-              <span class="tool-open">Abrir</span>
-            </div>
-          </article>
-
-          <article class="tool-card" data-title="Explicación simple" data-desc="Reescribe temas difíciles de forma más fácil." data-href="crear-clase.html">
-            <div class="tool-top">
-              <div class="tool-icon"><i data-lucide="circle-help"></i></div>
-              <button class="star-btn" type="button" aria-label="Favorito">
-                <i data-lucide="star"></i>
-              </button>
-            </div>
-            <h3 class="tool-title">Explicación simple</h3>
-            <p class="tool-desc">Toma conceptos complejos y los convierte en explicaciones más claras y directas.</p>
-            <div class="tool-foot">
-              <span class="tool-tag">Comprensión</span>
-              <span class="tool-open">Abrir</span>
-            </div>
-          </article>
-
-          <article
-            class="tool-card"
-            data-title="Resumen inteligente"
-            data-desc="Genera un resumen a partir de un documento que ya escribiste."
-            data-href="mis-clases.html?picker=1&tool=summary"
-            data-mode="requires-doc"
-            data-tool="summary"
-          >
-            <div class="tool-top">
-              <div class="tool-icon"><i data-lucide="filter"></i></div>
-              <button class="star-btn" type="button" aria-label="Favorito">
-                <i data-lucide="star"></i>
-              </button>
-            </div>
-            <h3 class="tool-title">Resumen inteligente</h3>
-            <p class="tool-desc">Tomá un documento ya creado y sacá una versión corta con ideas clave.</p>
-            <div class="tool-foot">
-              <span class="tool-tag">Necesita documento</span>
-              <span class="tool-open">Elegir</span>
-            </div>
-          </article>
-
-          <article
-            class="tool-card"
-            data-title="Quiz interactivo"
-            data-desc="Genera preguntas y respuestas a partir de un documento ya escrito."
-            data-href="mis-clases.html?picker=1&tool=quiz"
-            data-mode="requires-doc"
-            data-tool="quiz"
-          >
-            <div class="tool-top">
-              <div class="tool-icon"><i data-lucide="between-horizontal-start"></i></div>
-              <button class="star-btn" type="button" aria-label="Favorito">
-                <i data-lucide="star"></i>
-              </button>
-            </div>
-            <h3 class="tool-title">Quiz interactivo</h3>
-            <p class="tool-desc">Creá preguntas tipo examen o práctica a partir de un documento previo.</p>
-            <div class="tool-foot">
-              <span class="tool-tag">Necesita documento</span>
-              <span class="tool-open">Elegir</span>
-            </div>
-          </article>
-
-          <article
-            class="tool-card"
-            data-title="Completar"
-            data-desc="Crea ejercicios para completar conceptos usando un documento existente."
-            data-href="mis-clases.html?picker=1&tool=complete"
-            data-mode="requires-doc"
-            data-tool="complete"
-          >
-            <div class="tool-top">
-              <div class="tool-icon"><i data-lucide="square-pen"></i></div>
-              <button class="star-btn" type="button" aria-label="Favorito">
-                <i data-lucide="star"></i>
-              </button>
-            </div>
-            <h3 class="tool-title">Completar</h3>
-            <p class="tool-desc">Generá prácticas de completar usando el contenido de un documento previo.</p>
-            <div class="tool-foot">
-              <span class="tool-tag">Necesita documento</span>
-              <span class="tool-open">Elegir</span>
-            </div>
-          </article>
-
-          <article
-            class="tool-card"
-            data-title="Palabras clave"
-            data-desc="Extrae conceptos importantes a partir de un documento ya creado."
-            data-href="mis-clases.html?picker=1&tool=keywords"
-            data-mode="requires-doc"
-            data-tool="keywords"
-          >
-            <div class="tool-top">
-              <div class="tool-icon"><i data-lucide="key-round"></i></div>
-              <button class="star-btn" type="button" aria-label="Favorito">
-                <i data-lucide="star"></i>
-              </button>
-            </div>
-            <h3 class="tool-title">Palabras clave</h3>
-            <p class="tool-desc">Detectá términos importantes dentro de un documento y usalos para repasar.</p>
-            <div class="tool-foot">
-              <span class="tool-tag">Necesita documento</span>
-              <span class="tool-open">Elegir</span>
-            </div>
-          </article>
-
-          <article
-            class="tool-card"
-            data-title="Presentación rápida"
-            data-desc="Arma una estructura de presentación a partir de un documento ya escrito."
-            data-href="mis-clases.html?picker=1&tool=presentation"
-            data-mode="requires-doc"
-            data-tool="presentation"
-          >
-            <div class="tool-top">
-              <div class="tool-icon"><i data-lucide="presentation"></i></div>
-              <button class="star-btn" type="button" aria-label="Favorito">
-                <i data-lucide="star"></i>
-              </button>
-            </div>
-            <h3 class="tool-title">Presentación rápida</h3>
-            <p class="tool-desc">Convertí tu documento en una estructura de diapositivas lista para exponer.</p>
-            <div class="tool-foot">
-              <span class="tool-tag">Necesita documento</span>
-              <span class="tool-open">Elegir</span>
-            </div>
-          </article>
+    <div class="tools-grid">
+      <article class="tool-card featured" data-title="Investigación rápida" data-desc="Para preguntas, hallazgos e ideas clave." data-href="crear-clase.html" data-tool="research">
+        <div class="tool-top">
+          <div class="tool-icon">IN</div>
+          <button class="star-btn active" type="button" aria-label="Favorito">
+            <i data-lucide="star"></i>
+          </button>
         </div>
-
-        <div class="empty-state" id="emptyState">
-          No encontré herramientas con ese nombre.
+        <h3 class="tool-title">Investigación rápida</h3>
+        <p class="tool-desc">Para preguntas, hallazgos e ideas clave.</p>
+        <div class="tool-foot">
+          <span class="tool-tag">
+            <i data-lucide="sparkles" style="width:14px;height:14px;"></i>
+            Rápido
+          </span>
+          <span class="tool-open">Abrir</span>
         </div>
-      </section>
+      </article>
+
+      <article class="tool-card" data-title="Generador de introducción" data-desc="Crea una introducción clara y atractiva para tu clase o documento." data-href="crear-clase.html" data-tool="introduction">
+        <div class="tool-top">
+          <div class="tool-icon"><i data-lucide="file-pen-line"></i></div>
+          <button class="star-btn" type="button" aria-label="Favorito">
+            <i data-lucide="star"></i>
+          </button>
+        </div>
+        <h3 class="tool-title">Generador de introducción</h3>
+        <p class="tool-desc">Redacta una apertura clara para una clase, guía o documento educativo.</p>
+        <div class="tool-foot">
+          <span class="tool-tag">
+            <i data-lucide="sparkles" style="width:14px;height:14px;"></i>
+            IA rápida
+          </span>
+          <span class="tool-open">Abrir</span>
+        </div>
+      </article>
+
+      <article class="tool-card" data-title="Generador de conclusión" data-desc="Crea un cierre final para clases, trabajos o actividades." data-href="crear-clase.html" data-tool="conclusion">
+        <div class="tool-top">
+          <div class="tool-icon"><i data-lucide="notebook-pen"></i></div>
+          <button class="star-btn" type="button" aria-label="Favorito">
+            <i data-lucide="star"></i>
+          </button>
+        </div>
+        <h3 class="tool-title">Generador de conclusión</h3>
+        <p class="tool-desc">Cierra una clase o contenido con un párrafo sólido, simple y bien armado.</p>
+        <div class="tool-foot">
+          <span class="tool-tag">
+            <i data-lucide="sparkles" style="width:14px;height:14px;"></i>
+            IA rápida
+          </span>
+          <span class="tool-open">Abrir</span>
+        </div>
+      </article>
+
+      <article class="tool-card" data-title="Explicación simple" data-desc="Reescribe temas difíciles de forma más fácil." data-href="crear-clase.html" data-tool="simple-explanation">
+        <div class="tool-top">
+          <div class="tool-icon"><i data-lucide="circle-help"></i></div>
+          <button class="star-btn" type="button" aria-label="Favorito">
+            <i data-lucide="star"></i>
+          </button>
+        </div>
+        <h3 class="tool-title">Explicación simple</h3>
+        <p class="tool-desc">Toma conceptos complejos y los convierte en explicaciones más claras y directas.</p>
+        <div class="tool-foot">
+          <span class="tool-tag">Comprensión</span>
+          <span class="tool-open">Abrir</span>
+        </div>
+      </article>
+    </div>
+  </div>
+
+  <div class="section-group">
+    <div class="group-head">
+      <div class="group-copy">
+        <h2>Necesita documento o aula creada</h2>
+        <p>Herramientas que trabajan sobre contenido que ya creaste previamente en Eduvia.</p>
+      </div>
+      <div class="group-badge">Primero elegís una clase o documento</div>
+    </div>
+
+    <div class="tools-grid">
+      <article
+        class="tool-card"
+        data-title="Resumen inteligente"
+        data-desc="Genera un resumen a partir de un documento que ya escribiste."
+        data-href="mis-clases.html?picker=1&tool=summary"
+        data-mode="requires-doc"
+        data-tool="summary"
+      >
+        <div class="tool-top">
+          <div class="tool-icon"><i data-lucide="filter"></i></div>
+          <button class="star-btn" type="button" aria-label="Favorito">
+            <i data-lucide="star"></i>
+          </button>
+        </div>
+        <h3 class="tool-title">Resumen inteligente</h3>
+        <p class="tool-desc">Tomá un documento ya creado y sacá una versión corta con ideas clave.</p>
+        <div class="tool-foot">
+          <span class="tool-tag">Necesita documento</span>
+          <span class="tool-open">Elegir</span>
+        </div>
+      </article>
+
+      <article
+        class="tool-card"
+        data-title="Quiz interactivo"
+        data-desc="Genera preguntas y respuestas a partir de un documento ya escrito."
+        data-href="mis-clases.html?picker=1&tool=quiz"
+        data-mode="requires-doc"
+        data-tool="quiz"
+      >
+        <div class="tool-top">
+          <div class="tool-icon"><i data-lucide="between-horizontal-start"></i></div>
+          <button class="star-btn" type="button" aria-label="Favorito">
+            <i data-lucide="star"></i>
+          </button>
+        </div>
+        <h3 class="tool-title">Quiz interactivo</h3>
+        <p class="tool-desc">Creá preguntas tipo examen o práctica a partir de un documento previo.</p>
+        <div class="tool-foot">
+          <span class="tool-tag">Necesita documento</span>
+          <span class="tool-open">Elegir</span>
+        </div>
+      </article>
+
+      <article
+        class="tool-card"
+        data-title="Completar"
+        data-desc="Crea ejercicios para completar conceptos usando un documento existente."
+        data-href="mis-clases.html?picker=1&tool=complete"
+        data-mode="requires-doc"
+        data-tool="complete"
+      >
+        <div class="tool-top">
+          <div class="tool-icon"><i data-lucide="square-pen"></i></div>
+          <button class="star-btn" type="button" aria-label="Favorito">
+            <i data-lucide="star"></i>
+          </button>
+        </div>
+        <h3 class="tool-title">Completar</h3>
+        <p class="tool-desc">Generá prácticas de completar usando el contenido de un documento previo.</p>
+        <div class="tool-foot">
+          <span class="tool-tag">Necesita documento</span>
+          <span class="tool-open">Elegir</span>
+        </div>
+      </article>
+
+      <article
+        class="tool-card"
+        data-title="Palabras clave"
+        data-desc="Extrae conceptos importantes a partir de un documento ya creado."
+        data-href="mis-clases.html?picker=1&tool=keywords"
+        data-mode="requires-doc"
+        data-tool="keywords"
+      >
+        <div class="tool-top">
+          <div class="tool-icon"><i data-lucide="key-round"></i></div>
+          <button class="star-btn" type="button" aria-label="Favorito">
+            <i data-lucide="star"></i>
+          </button>
+        </div>
+        <h3 class="tool-title">Palabras clave</h3>
+        <p class="tool-desc">Detectá términos importantes dentro de un documento y usalos para repasar.</p>
+        <div class="tool-foot">
+          <span class="tool-tag">Necesita documento</span>
+          <span class="tool-open">Elegir</span>
+        </div>
+      </article>
+
+      <article
+        class="tool-card"
+        data-title="Presentación rápida"
+        data-desc="Arma una estructura de presentación a partir de un documento ya escrito."
+        data-href="mis-clases.html?picker=1&tool=presentation"
+        data-mode="requires-doc"
+        data-tool="presentation"
+      >
+        <div class="tool-top">
+          <div class="tool-icon"><i data-lucide="presentation"></i></div>
+          <button class="star-btn" type="button" aria-label="Favorito">
+            <i data-lucide="star"></i>
+          </button>
+        </div>
+        <h3 class="tool-title">Presentación rápida</h3>
+        <p class="tool-desc">Convertí tu documento en una estructura de diapositivas lista para exponer.</p>
+        <div class="tool-foot">
+          <span class="tool-tag">Necesita documento</span>
+          <span class="tool-open">Elegir</span>
+        </div>
+      </article>
+    </div>
+  </div>
+
+  <div class="empty-state" id="emptyState">
+    No encontré herramientas con ese nombre.
+  </div>
+</section>
     </main>
   </div>
 
@@ -1180,22 +1264,32 @@
       profileTrigger.setAttribute("aria-expanded", String(isOpen));
     });
 
-    searchInput.addEventListener("input", () => {
-      const value = searchInput.value.trim().toLowerCase();
-      let visible = 0;
+const groupSections = Array.from(document.querySelectorAll(".section-group"));
 
-      cards.forEach((card) => {
-        const title = (card.dataset.title || "").toLowerCase();
-        const desc = (card.dataset.desc || "").toLowerCase();
-        const match = title.includes(value) || desc.includes(value);
+searchInput.addEventListener("input", () => {
+  const value = searchInput.value.trim().toLowerCase();
+  let visible = 0;
 
-        card.style.display = match ? "" : "none";
-        if (match) visible++;
-      });
+  cards.forEach((card) => {
+    const title = (card.dataset.title || "").toLowerCase();
+    const desc = (card.dataset.desc || "").toLowerCase();
+    const match = title.includes(value) || desc.includes(value);
 
-      emptyState.style.display = visible === 0 ? "block" : "none";
-      toolCount.textContent = `${visible} herramienta${visible === 1 ? "" : "s"} disponible${visible === 1 ? "" : "s"}`;
-    });
+    card.style.display = match ? "" : "none";
+    if (match) visible++;
+  });
+
+  groupSections.forEach((group) => {
+    const visibleCards = Array.from(group.querySelectorAll(".tool-card")).some(
+      (card) => card.style.display !== "none"
+    );
+
+    group.style.display = visibleCards ? "" : "none";
+  });
+
+  emptyState.style.display = visible === 0 ? "block" : "none";
+  toolCount.textContent = `${visible} herramienta${visible === 1 ? "" : "s"} disponible${visible === 1 ? "" : "s"}`;
+});
 
     document.querySelectorAll(".star-btn").forEach((btn) => {
       btn.addEventListener("click", (e) => {
