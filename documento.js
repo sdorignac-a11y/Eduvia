@@ -2866,10 +2866,6 @@ function ensureSelectionAssistantUi() {
   });
 }
 
-/* =========================
-   INIT
-========================= */
-
 els.documentApp?.classList.add("hidden");
 els.accessGuard?.classList.remove("show");
 els.docLoading?.classList.add("show");
@@ -2885,3 +2881,187 @@ onAuthStateChanged(auth, async (user) => {
   state.currentUser = user;
   await loadClase(user);
 });
+
+function limpiarTextoChatDocumento(value = "") {
+  return String(value || "")
+    .replace(/\u00A0/g, " ")
+    .replace(/\s+\n/g, "\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+}
+
+function detectarAccionChatDocumento(message = "") {
+  const text = limpiarTextoChatDocumento(message).toLowerCase();
+
+  if (!text) return "";
+  if (text.includes("explic")) return "explicar";
+  if (text.includes("mejor")) return "mejorar";
+  if (text.includes("alarg") || text.includes("ampli") || text.includes("profund")) return "alargar";
+  if (text.includes("acort")) return "acortar";
+  if (text.includes("claro") || text.includes("más simple") || text.includes("mas simple")) return "claro";
+  if (text.includes("formal")) return "formal";
+  if (text.includes("resum")) return "resumir";
+  if (text.includes("reescrib") || text.includes("reformular")) return "reescritura";
+
+  return "";
+}
+
+function obtenerTextoSeleccionadoParaChat() {
+  const fromState = limpiarTextoChatDocumento(state?.currentSelectedText || "");
+  if (fromState) return fromState;
+
+  const selection = window.getSelection?.();
+  if (!selection || selection.rangeCount === 0) return "";
+
+  return limpiarTextoChatDocumento(selection.toString() || "");
+}
+
+function normalizarFuentesParaChat(fuentes = []) {
+  return (Array.isArray(fuentes) ? fuentes : [])
+    .map((item) => {
+      if (!item || typeof item !== "object") return null;
+
+      return {
+        title: limpiarTextoChatDocumento(item.title || item.titulo || item.name || "Fuente"),
+        url: limpiarTextoChatDocumento(item.url || item.link || ""),
+      };
+    })
+    .filter((item) => item && (item.title || item.url))
+    .slice(0, 10);
+}
+
+function formatearRespuestaChatDocumento(payload) {
+  if (!payload?.respuesta) {
+    return "No pude interpretar la respuesta del asistente.";
+  }
+
+  const { subtitulo = "", respuesta = {} } = payload;
+  const {
+    titulo = "Respuesta",
+    resumen = "",
+    cambios = [],
+    textoPropuesto = "",
+    preguntasSeguimiento = [],
+  } = respuesta;
+
+  const partes = [];
+
+  if (subtitulo) partes.push(subtitulo);
+  if (titulo) partes.push(titulo);
+  if (resumen) partes.push(resumen);
+
+  if (Array.isArray(cambios) && cambios.length) {
+    const bloqueCambios = cambios
+      .map((item, index) => {
+        const lineas = [];
+        lineas.push(`${index + 1}. ${limpiarTextoChatDocumento(item?.titulo || "Mejora sugerida")}`);
+
+        if (item?.detalle) {
+          lineas.push(limpiarTextoChatDocumento(item.detalle));
+        }
+
+        if (item?.ejemplo) {
+          lineas.push(`Ejemplo: ${limpiarTextoChatDocumento(item.ejemplo)}`);
+        }
+
+        return lineas.join("\n");
+      })
+      .join("\n\n");
+
+    if (bloqueCambios) {
+      partes.push(`Cambios sugeridos:\n${bloqueCambios}`);
+    }
+  }
+
+  if (textoPropuesto) {
+    partes.push(`Texto propuesto:\n${limpiarTextoChatDocumento(textoPropuesto)}`);
+  }
+
+  if (Array.isArray(preguntasSeguimiento) && preguntasSeguimiento.length) {
+    partes.push(
+      `Podés seguir con:\n${preguntasSeguimiento
+        .map((item) => `- ${limpiarTextoChatDocumento(item)}`)
+        .join("\n")}`
+    );
+  }
+
+  return partes.filter(Boolean).join("\n\n");
+}
+
+window.handleEduviaDocChat = async function handleEduviaDocChat({
+  message = "",
+  title = "",
+  objective = "",
+  content = "",
+} = {}) {
+  const pregunta = limpiarTextoChatDocumento(message);
+  const tituloDocumento =
+    limpiarTextoChatDocumento(title) ||
+    limpiarTextoChatDocumento(els.docTitle?.innerText || "") ||
+    limpiarTextoChatDocumento(getDocumentoTitle(state.currentClaseData || {}));
+
+  const objetivoDocumento =
+    limpiarTextoChatDocumento(stripObjectivePrefix(objective || "")) ||
+    limpiarTextoChatDocumento(stripObjectivePrefix(els.docObjective?.innerText || "")) ||
+    limpiarTextoChatDocumento(getDocumentoObjective(state.currentClaseData || {}));
+
+  const documentoActual =
+    limpiarTextoChatDocumento(content) ||
+    limpiarTextoChatDocumento(els.docContent?.innerText || "");
+
+  const textoSeleccionado = obtenerTextoSeleccionadoParaChat();
+  const accion = detectarAccionChatDocumento(pregunta);
+
+  const investigacion =
+    typeof getInvestigacionDocumento === "function"
+      ? limpiarTextoChatDocumento(getInvestigacionDocumento(state.currentClaseData || {}))
+      : "";
+
+  const fuentes =
+    typeof getFuentesDocumento === "function"
+      ? normalizarFuentesParaChat(getFuentesDocumento(state.currentClaseData || {}))
+      : [];
+
+  if (!pregunta) {
+    return "Escribí una consigna para analizar el documento.";
+  }
+
+  if (!documentoActual && !textoSeleccionado) {
+    return "No encontré contenido suficiente en el documento para analizar.";
+  }
+
+  try {
+    const { response, data } = await fetchJsonWithTimeout(
+      "/api/preguntar-documento",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          pregunta,
+          accion,
+          documentoActual,
+          tituloDocumento,
+          objetivoDocumento,
+          textoSeleccionado,
+          investigacion,
+          fuentes,
+          ultimaRespuesta: state.assistantLastResponse || null,
+        }),
+      },
+      180000
+    );
+
+    if (!response?.ok || !data?.ok || !data?.respuesta) {
+      return data?.error || "No se pudo analizar el documento.";
+    }
+
+    state.assistantLastResponse = data.respuesta;
+
+    return formatearRespuestaChatDocumento(data.respuesta);
+  } catch (error) {
+    console.error("Error conectando el chat con /api/preguntar-documento:", error);
+    return "Hubo un problema al conectar el chat del documento con la IA.";
+  }
+};
