@@ -3544,7 +3544,6 @@ let activeDocTabId = "tab-documento";
 
       let activeEditable = editor;
       let savedRange = null;
-      let currentStudyTool = "";
 
       const STOPWORDS = new Set([
         "este","esta","estos","estas","sobre","desde","hasta","entre","para","porque","como",
@@ -4027,226 +4026,220 @@ function bindDocTabsUi() {
         }).filter(Boolean);
       }
 
-      function renderFlashcards(data) {
-        const cards = data.sections.slice(0, 8).map((section, index) => ({
-          front: section.title === "Introducción"
-            ? "¿Cuál es la idea principal del documento?"
-            : `¿Qué explica la sección "${section.title}"?`,
-          back: section.items.slice(0, 2).join(" ")
-        })).filter((card) => cleanText(card.back));
+function renderFlashcards(data) {
+  const cards = data.sections.slice(0, 8).map((section, index) => ({
+    front: section.title === "Introducción"
+      ? "¿Cuál es la idea principal del documento?"
+      : `¿Qué explica la sección "${section.title}"?`,
+    back: section.items.slice(0, 2).join(" ")
+  })).filter((card) => cleanText(card.back));
 
-        if (!cards.length) {
-          studyContent.innerHTML = `<div class="study-empty">No hay suficiente contenido para crear tarjetas todavía.</div>`;
-          return;
-        }
+  if (!cards.length) {
+    return `<div class="study-empty">No hay suficiente contenido para crear tarjetas todavía.</div>`;
+  }
 
-        studyContent.innerHTML = `
-          <div class="study-grid">
-            ${cards.map((card, index) => `
-              <article class="study-flip-card" data-flip-card>
-                <div class="study-flip-inner">
-                  <div class="study-flip-face front">
-                    <div class="study-flip-top">
-                      <h4>Tarjeta ${index + 1}</h4>
-                      <span class="study-flip-hint">Tocá para girar</span>
-                    </div>
-                    <div class="study-question">${escapeHtml(card.front)}</div>
-                  </div>
+  return `
+    <div class="study-grid">
+      ${cards.map((card, index) => `
+        <article class="study-flip-card" data-flip-card>
+          <div class="study-flip-inner">
+            <div class="study-flip-face front">
+              <div class="study-flip-top">
+                <h4>Tarjeta ${index + 1}</h4>
+                <span class="study-flip-hint">Tocá para girar</span>
+              </div>
+              <div class="study-question">${escapeHtml(card.front)}</div>
+            </div>
 
-                  <div class="study-flip-face back">
-                    <div class="study-flip-top">
-                      <h4>Respuesta</h4>
-                      <span class="study-flip-hint">Volver</span>
-                    </div>
-                    <div class="study-solution">${escapeHtml(card.back)}</div>
-                  </div>
-                </div>
-              </article>
-            `).join("")}
+            <div class="study-flip-face back">
+              <div class="study-flip-top">
+                <h4>Respuesta</h4>
+                <span class="study-flip-hint">Volver</span>
+              </div>
+              <div class="study-solution">${escapeHtml(card.back)}</div>
+            </div>
           </div>
-        `;
-      }
+        </article>
+      `).join("")}
+    </div>
+  `;
+}
 
-      function renderQuiz(data) {
-        const questions = buildQuizQuestions(data);
+function renderQuiz(data) {
+  const questions = buildQuizQuestions(data);
 
-        if (!questions.length) {
-          studyContent.innerHTML = `<div class="study-empty">No hay suficiente contenido para generar preguntas.</div>`;
-          return;
-        }
+  if (!questions.length) {
+    return `<div class="study-empty">No hay suficiente contenido para generar preguntas.</div>`;
+  }
 
-        studyContent.innerHTML = questions.map((item, index) => `
-          <article class="study-card" data-quiz-card>
-            <h4>Pregunta ${index + 1}</h4>
-            <div class="study-question">${escapeHtml(item.question)}</div>
+  return questions.map((item, index) => `
+    <article class="study-card" data-quiz-card>
+      <h4>Pregunta ${index + 1}</h4>
+      <div class="study-question">${escapeHtml(item.question)}</div>
 
-            <div class="study-options">
-              ${item.options.map((option) => `
-                <button
-                  type="button"
-                  class="study-option-btn"
-                  data-quiz-option
-                  data-correct="${option.correct ? "true" : "false"}"
-                >
-                  ${escapeHtml(option.text)}
-                </button>
-              `).join("")}
-            </div>
+      <div class="study-options">
+        ${item.options.map((option) => `
+          <button
+            type="button"
+            class="study-option-btn"
+            data-quiz-option
+            data-correct="${option.correct ? "true" : "false"}"
+          >
+            ${escapeHtml(option.text)}
+          </button>
+        `).join("")}
+      </div>
 
-            <div class="study-feedback hidden" data-quiz-feedback>
-              <strong>Respuesta correcta</strong>
-              <span>${escapeHtml(item.explanation)}</span>
-            </div>
-          </article>
-        `).join("");
-      }
+      <div class="study-feedback hidden" data-quiz-feedback>
+        <strong>Respuesta correcta</strong>
+        <span>${escapeHtml(item.explanation)}</span>
+      </div>
+    </article>
+  `).join("");
+}
 
-      function renderTrueFalse(data) {
-        const items = buildTrueFalseItems(data);
+function renderTrueFalse(data) {
+  const items = buildTrueFalseItems(data);
 
-        if (!items.length) {
-          studyContent.innerHTML = `<div class="study-empty">No hay suficiente texto para crear este ejercicio.</div>`;
-          return;
-        }
+  if (!items.length) {
+    return `<div class="study-empty">No hay suficiente texto para crear este ejercicio.</div>`;
+  }
 
-        studyContent.innerHTML = items.map((item, index) => `
-          <article class="study-card" data-tf-card data-answer="${escapeHtml(item.answer)}">
-            <h4>Verdadero o falso ${index + 1}</h4>
-            <div class="study-question">${escapeHtml(item.text)}</div>
+  return items.map((item, index) => `
+    <article class="study-card" data-tf-card data-answer="${escapeHtml(item.answer)}">
+      <h4>Verdadero o falso ${index + 1}</h4>
+      <div class="study-question">${escapeHtml(item.text)}</div>
 
-            <div class="study-options">
-              <button type="button" class="study-tf-btn" data-tf-choice="verdadero">Verdadero</button>
-              <button type="button" class="study-tf-btn" data-tf-choice="falso">Falso</button>
-            </div>
+      <div class="study-options">
+        <button type="button" class="study-tf-btn" data-tf-choice="verdadero">Verdadero</button>
+        <button type="button" class="study-tf-btn" data-tf-choice="falso">Falso</button>
+      </div>
 
-            <div class="study-feedback hidden" data-tf-feedback>
-              <strong>Explicación</strong>
-              <span>${escapeHtml(item.explanation)}</span>
-            </div>
-          </article>
-        `).join("");
-      }
+      <div class="study-feedback hidden" data-tf-feedback>
+        <strong>Explicación</strong>
+        <span>${escapeHtml(item.explanation)}</span>
+      </div>
+    </article>
+  `).join("");
+}
 
-      function renderComplete(data) {
-        const items = buildCompleteItems(data);
+function renderComplete(data) {
+  const items = buildCompleteItems(data);
 
-        if (!items.length) {
-          studyContent.innerHTML = `<div class="study-empty">No se encontraron palabras clave suficientes para completar conceptos.</div>`;
-          return;
-        }
+  if (!items.length) {
+    return `<div class="study-empty">No se encontraron palabras clave suficientes para completar conceptos.</div>`;
+  }
 
-        studyContent.innerHTML = items.map((item, index) => `
-          <article class="study-card" data-complete-card data-answer="${escapeHtml(item.answer)}">
-            <h4>Completar ${index + 1}</h4>
-            <div class="study-question">${escapeHtml(item.prompt)}</div>
+  return items.map((item, index) => `
+    <article class="study-card" data-complete-card data-answer="${escapeHtml(item.answer)}">
+      <h4>Completar ${index + 1}</h4>
+      <div class="study-question">${escapeHtml(item.prompt)}</div>
 
-            <div class="study-answer-row">
-              <input
-                type="text"
-                class="study-answer-input"
-                placeholder="Escribí la palabra faltante"
-                data-complete-input
-              >
-              <button type="button" class="study-check-btn" data-check-complete>Revisar</button>
-              <button type="button" class="study-reveal-btn" data-reveal-complete>Mostrar respuesta</button>
-            </div>
+      <div class="study-answer-row">
+        <input
+          type="text"
+          class="study-answer-input"
+          placeholder="Escribí la palabra faltante"
+          data-complete-input
+        >
+        <button type="button" class="study-check-btn" data-check-complete>Revisar</button>
+        <button type="button" class="study-reveal-btn" data-reveal-complete>Mostrar respuesta</button>
+      </div>
 
-            <div class="study-complete-result hidden" data-complete-result></div>
-          </article>
-        `).join("");
-      }
+      <div class="study-complete-result hidden" data-complete-result></div>
+    </article>
+  `).join("");
+}
 
-      function renderSummary(data) {
-        const bullets = [];
+function renderSummary(data) {
+  const bullets = [];
 
-        if (data.objective) bullets.push(`Objetivo principal: ${data.objective}`);
+  if (data.objective) bullets.push(`Objetivo principal: ${data.objective}`);
 
-        data.sections.slice(0, 5).forEach((section) => {
-          const first = cleanText(section.items[0] || "");
-          if (first) bullets.push(`${section.title}: ${first}`);
+  data.sections.slice(0, 5).forEach((section) => {
+    const first = cleanText(section.items[0] || "");
+    if (first) bullets.push(`${section.title}: ${first}`);
+  });
+
+  if (!bullets.length && data.allText) {
+    bullets.push(...data.sentences.slice(0, 5));
+  }
+
+  if (!bullets.length) {
+    return `<div class="study-empty">Todavía no hay contenido suficiente para resumir.</div>`;
+  }
+
+  return `
+    <article class="study-card">
+      <h4>Resumen express</h4>
+      <div class="study-checklist">
+        ${bullets.map((item, index) => `
+          <label class="study-check-item">
+            <input type="checkbox">
+            <span>${index + 1}. ${escapeHtml(item)}</span>
+          </label>
+        `).join("")}
+      </div>
+    </article>
+  `;
+}
+
+function renderKeywords(data) {
+  const contexts = [];
+  const words = new Set();
+
+  data.sections.forEach((section) => {
+    const source = `${section.title} ${section.items.join(" ")}`;
+    const keyword = pickKeyword(source);
+    if (keyword && !words.has(keyword)) {
+      words.add(keyword);
+      contexts.push({
+        word: keyword,
+        context: shortenText(section.items[0] || source, 170)
+      });
+    }
+  });
+
+  if (contexts.length < 6) {
+    data.sentences.forEach((sentence) => {
+      const keyword = pickKeyword(sentence);
+      if (keyword && !words.has(keyword)) {
+        words.add(keyword);
+        contexts.push({
+          word: keyword,
+          context: shortenText(sentence, 170)
         });
-
-        if (!bullets.length && data.allText) {
-          bullets.push(...data.sentences.slice(0, 5));
-        }
-
-        if (!bullets.length) {
-          studyContent.innerHTML = `<div class="study-empty">Todavía no hay contenido suficiente para resumir.</div>`;
-          return;
-        }
-
-        studyContent.innerHTML = `
-          <article class="study-card">
-            <h4>Resumen express</h4>
-            <div class="study-checklist">
-              ${bullets.map((item, index) => `
-                <label class="study-check-item">
-                  <input type="checkbox">
-                  <span>${index + 1}. ${escapeHtml(item)}</span>
-                </label>
-              `).join("")}
-            </div>
-          </article>
-        `;
       }
+    });
+  }
 
-      function renderKeywords(data) {
-        const contexts = [];
-        const words = new Set();
+  const finalItems = contexts.slice(0, 12);
 
-        data.sections.forEach((section) => {
-          const source = `${section.title} ${section.items.join(" ")}`;
-          const keyword = pickKeyword(source);
-          if (keyword && !words.has(keyword)) {
-            words.add(keyword);
-            contexts.push({
-              word: keyword,
-              context: shortenText(section.items[0] || source, 170)
-            });
-          }
-        });
+  if (!finalItems.length) {
+    return `<div class="study-empty">No se detectaron palabras clave todavía.</div>`;
+  }
 
-        if (contexts.length < 6) {
-          data.sentences.forEach((sentence) => {
-            const keyword = pickKeyword(sentence);
-            if (keyword && !words.has(keyword)) {
-              words.add(keyword);
-              contexts.push({
-                word: keyword,
-                context: shortenText(sentence, 170)
-              });
-            }
-          });
-        }
+  return `
+    <article class="study-card">
+      <h4>Palabras clave del documento</h4>
+      <div class="study-keywords-wrap">
+        ${finalItems.map((item) => `
+          <button
+            type="button"
+            class="study-keyword-btn"
+            data-keyword-chip
+            data-keyword-word="${escapeHtml(item.word)}"
+            data-keyword-context="${escapeHtml(item.context)}"
+          >
+            ${escapeHtml(item.word)}
+          </button>
+        `).join("")}
+      </div>
 
-        const finalItems = contexts.slice(0, 12);
-
-        if (!finalItems.length) {
-          studyContent.innerHTML = `<div class="study-empty">No se detectaron palabras clave todavía.</div>`;
-          return;
-        }
-
-        studyContent.innerHTML = `
-          <article class="study-card">
-            <h4>Palabras clave del documento</h4>
-            <div class="study-keywords-wrap">
-              ${finalItems.map((item) => `
-                <button
-                  type="button"
-                  class="study-keyword-btn"
-                  data-keyword-chip
-                  data-keyword-word="${escapeHtml(item.word)}"
-                  data-keyword-context="${escapeHtml(item.context)}"
-                >
-                  ${escapeHtml(item.word)}
-                </button>
-              `).join("")}
-            </div>
-
-            <div class="study-keyword-context hidden" data-keyword-preview></div>
-          </article>
-        `;
-      }
+      <div class="study-keyword-context hidden" data-keyword-preview></div>
+    </article>
+  `;
+}
 
 function appendChatMessage(role, text) {
   if (!cleanText(text) || !chatBody) return;
@@ -4566,6 +4559,56 @@ function closeChat() {
         keywords: "keywords-panel",
         presentation: "presentation-panel"
       };
+
+      function runStudyTool(tool) {
+  const data = getStudyData();
+  currentStudyTool = tool;
+
+  const config = {
+    flashcards: {
+      title: "Tarjetas",
+      render: renderFlashcards
+    },
+    quiz: {
+      title: "Quiz",
+      render: renderQuiz
+    },
+    truefalse: {
+      title: "Verdadero o falso",
+      render: renderTrueFalse
+    },
+    complete: {
+      title: "Completar",
+      render: renderComplete
+    },
+    summary: {
+      title: "Resumen",
+      render: renderSummary
+    },
+    keywords: {
+      title: "Palabras clave",
+      render: renderKeywords
+    }
+  };
+
+  const selected = config[tool];
+  if (!selected) return;
+
+  const html = `
+    <div class="paper-wrap">
+      <article class="paper">
+        <div class="paper-inner">
+          <div class="doc-tool-view">
+            ${selected.render(data)}
+          </div>
+        </div>
+      </article>
+    </div>
+  `;
+
+  ensureDocTab(selected.title, tool, html);
+  closeToolPanel();
+}
 
       function runToolFromQuery() {
         if (!toolFromUrl) return;
