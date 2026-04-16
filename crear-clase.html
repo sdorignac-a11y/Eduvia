@@ -2538,8 +2538,6 @@ function renderDynamicFields() {
 
     renderDynamicFields();
 applyToolPreset();
-    
-
     const resultTextarea = document.getElementById("resultado_texto");
 const copyResultBtn = document.getElementById("copy-result-btn");
 const backToEditBtn = document.getElementById("back-to-edit-btn");
@@ -2582,8 +2580,120 @@ function buildConclusionResult() {
   return conclusion.trim();
 }
 
-function showConclusionResult() {
-  const result = buildConclusionResult();
+function buildIntroductionResult() {
+  const tema = valueOf("intro_tema");
+  const enfoque = valueOf("intro_enfoque");
+  const tono = document.getElementById("intro_tono")?.value || "Académico";
+  const extension = document.getElementById("intro_extension")?.value || "Media";
+  const indicaciones = valueOf("intro_indicaciones");
+
+  let intro = `${tema || "Este tema"} es importante para comprender mejor su significado general.`;
+
+  if (tono === "Formal") {
+    intro = `${tema || "Este tema"} representa un aspecto relevante que merece ser analizado con mayor profundidad.`;
+  } else if (tono === "Atractivo") {
+    intro = `${tema || "Este tema"} llama la atención por su importancia y por todo lo que permite analizar.`;
+  } else if (tono === "Claro") {
+    intro = `${tema || "Este tema"} es un tema que se puede entender de forma clara si se observan sus ideas principales.`;
+  }
+
+  if (enfoque) {
+    intro += ` En particular, resulta interesante observar ${enfoque.toLowerCase()}.`;
+  }
+
+  if (extension === "Media" || extension === "Larga") {
+    intro += ` A partir de esto, es posible desarrollar una visión más completa sobre ${tema || "el tema"}.`;
+  }
+
+  if (extension === "Larga") {
+    intro += " Además, esta introducción permite preparar mejor el desarrollo posterior del contenido.";
+  }
+
+  if (indicaciones) {
+    intro += ` ${indicaciones}`;
+  }
+
+  return intro.trim();
+}
+
+function buildResearchResult() {
+  const pregunta = valueOf("research_pregunta");
+  const enfoque = valueOf("research_enfoque");
+  const profundidad = document.getElementById("research_profundidad")?.value || "Media";
+  const formato = document.getElementById("research_formato")?.value || "Ideas clave";
+  const indicaciones = valueOf("research_indicaciones");
+
+  let text = "";
+
+  if (formato === "Ideas clave") {
+    text =
+      `• Tema o pregunta: ${pregunta || "No especificado"}\n` +
+      `• Enfoque: ${enfoque || "No especificado"}\n` +
+      `• Profundidad: ${profundidad}\n` +
+      `• Idea general: este tema puede organizarse de forma rápida y clara a partir de sus puntos principales.`;
+  } else if (formato === "Mini resumen") {
+    text =
+      `${pregunta || "Este tema"} puede analizarse de forma breve teniendo en cuenta ${enfoque || "sus aspectos principales"}. ` +
+      `Con una profundidad ${profundidad.toLowerCase()}, se obtiene una visión clara y ordenada del contenido.`;
+  } else {
+    text =
+      `${pregunta || "Este tema"} puede abordarse a partir de ${enfoque || "una mirada general"}. ` +
+      `El resultado es una investigación ${profundidad.toLowerCase()} que resume los puntos más relevantes de forma rápida.`;
+  }
+
+  if (indicaciones) {
+    text += ` ${indicaciones}`;
+  }
+
+  return text.trim();
+}
+
+function buildSimpleExplanationResult() {
+  const tema = valueOf("simple_tema");
+  const publico = document.getElementById("simple_publico")?.value || "Secundaria";
+  const tono = document.getElementById("simple_tono")?.value || "Claro";
+  const extension = document.getElementById("simple_extension")?.value || "Media";
+  const indicaciones = valueOf("simple_indicaciones");
+
+  let text = `${tema || "Este tema"} puede entenderse de manera más simple si se explica con palabras claras.`;
+
+  if (publico === "Niño") {
+    text = `${tema || "Este tema"} se puede explicar como una idea importante que ayuda a entender algo de forma fácil y directa.`;
+  }
+
+  if (tono === "Amigable") {
+    text += " La idea es que suene cercano y fácil de seguir.";
+  } else if (tono === "Académico") {
+    text += " Aun así, mantiene un orden lógico y una explicación precisa.";
+  } else {
+    text += " Así resulta más sencillo comprender la idea principal sin dificultad.";
+  }
+
+  if (extension === "Media" || extension === "Larga") {
+    text += " De este modo, el contenido conserva su sentido principal pero se vuelve mucho más accesible.";
+  }
+
+  if (extension === "Larga") {
+    text += " Además, permite relacionar la explicación con ejemplos simples que facilitan todavía más la comprensión.";
+  }
+
+  if (indicaciones) {
+    text += ` ${indicaciones}`;
+  }
+
+  return text.trim();
+}
+
+function buildQuickResult() {
+  if (selectedTool === "conclusion") return buildConclusionResult();
+  if (selectedTool === "introduction") return buildIntroductionResult();
+  if (selectedTool === "research") return buildResearchResult();
+  if (selectedTool === "simple-explanation") return buildSimpleExplanationResult();
+  return "";
+}
+
+function showQuickResult() {
+  const result = buildQuickResult();
 
   if (resultTextarea) {
     resultTextarea.value = result;
@@ -2593,7 +2703,7 @@ function showConclusionResult() {
 }
 
 form?.addEventListener("submit", (event) => {
-  if (selectedTool !== "conclusion") {
+  if (!isQuickResultMode()) {
     syncLegacyFields();
     return;
   }
@@ -2603,7 +2713,7 @@ form?.addEventListener("submit", (event) => {
   event.stopImmediatePropagation();
 
   syncLegacyFields();
-  showConclusionResult();
+  showQuickResult();
 
   return false;
 }, true);
