@@ -672,34 +672,6 @@
       max-width:1040px;
     }
 
-.left-rail{
-  position: fixed;
-  top: 50%;
-  left: 14px;
-  bottom: auto;
-  transform: translateY(-50%);
-
-  width: var(--left-rail-width);
-  height: auto;
-  max-height: min(520px, calc(100vh - 120px));
-
-  padding: 10px 6px;
-  border: 1px solid #e3e6ea;
-  border-radius: 20px;
-  background: rgba(255,255,255,.98);
-  box-shadow: 0 1px 3px rgba(60,64,67,.16);
-  backdrop-filter: none;
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-
-  overflow-y: auto;
-  overflow-x: hidden;
-}
-
     .left-rail-head{
       width:100%;
       display:flex;
@@ -2369,18 +2341,29 @@
   line-height: 1.82;
 }
 
-/* Barra izquierda más chica y sin movimiento lateral */
 .left-rail{
-  top: 118px;
+  position: fixed;
+  top: 132px;
   left: 14px;
-  bottom: 20px;
+  bottom: auto;
+  transform: none;
+
   width: var(--left-rail-width);
+  height: auto;
+  max-height: calc(100vh - 160px);
+
   padding: 10px 6px;
   border: 1px solid #e3e6ea;
   border-radius: 20px;
   background: rgba(255,255,255,.98);
   box-shadow: 0 1px 3px rgba(60,64,67,.16);
-  backdrop-filter: none;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+
   overflow-y: auto;
   overflow-x: hidden;
 }
