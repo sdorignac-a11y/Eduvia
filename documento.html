@@ -2512,6 +2512,9 @@
     padding: 26px 18px 34px;
   }
 }
+    #chatToolbarToggle{
+  margin-left: 2px;
+}
   </style>
 </head>
 <body>
@@ -2747,6 +2750,16 @@
               <button type="button" class="tool-btn" data-command="justifyFull" title="Justificar">
                 <svg viewBox="0 0 24 24"><path d="M4 6h16"/><path d="M4 10h16"/><path d="M4 14h16"/><path d="M4 18h16"/></svg>
               </button>
+              <button
+  id="chatToolbarToggle"
+  class="tool-btn"
+  type="button"
+  title="Mostrar u ocultar asistente"
+  aria-label="Mostrar u ocultar asistente"
+  aria-pressed="true"
+>
+  <i data-lucide="message-square"></i>
+</button>
             </div>
           </div>
         </div>
@@ -2910,14 +2923,6 @@
         <button type="button" class="doc-chat-close" id="doc-chat-close" aria-label="Cerrar chat">×</button>
       </div>
 
-      <div class="doc-chat-body" id="doc-chat-body">
-        <div class="doc-chat-empty" id="doc-chat-empty">
-          Probá con algo como:
-          <br>• “Agregá una conclusión”
-          <br>• “Resumí esta parte”
-          <br>• “Explicalo más simple”
-        </div>
-      </div>
 
       <div class="doc-chat-suggestions">
         <button type="button" class="doc-chat-chip" data-chat-chip="Resumí el contenido actual">Resumir</button>
