@@ -2334,6 +2334,105 @@
   }
 }
   
+
+/* ===== Ajustes finales de layout fijo ===== */
+:root{
+  --floating-top: 188px;
+  --workspace-gap: 28px;
+}
+
+#document-app.document-with-chat .workspace,
+#document-app.document-centered .workspace{
+  padding-left:calc(var(--left-rail-width) + var(--workspace-gap));
+  padding-right:calc(var(--chat-width) + var(--workspace-gap));
+  padding-top:22px;
+}
+
+#document-app.document-with-chat .tool-panel,
+#document-app.document-centered .tool-panel{
+  left:calc(var(--left-rail-width) + 20px);
+  right:auto;
+}
+
+.left-rail,
+.doc-tabs-sidebar,
+.tool-panel,
+.doc-chat-panel{
+  top:var(--floating-top);
+}
+
+.left-rail{
+  max-height:calc(100vh - var(--floating-top) - 24px);
+}
+
+.doc-chat-panel{
+  bottom:auto;
+  height:calc(100vh - var(--floating-top) - 24px);
+  max-height:calc(100vh - var(--floating-top) - 24px);
+}
+
+.format-topbar{
+  overflow:hidden;
+}
+
+.format-scroll{
+  overflow:visible;
+  padding-bottom:0;
+}
+
+.format-toolbar{
+  width:100%;
+  min-width:0;
+  flex-wrap:wrap;
+  row-gap:10px;
+  justify-content:flex-start;
+}
+
+.toolbar-group{
+  flex:none;
+}
+
+.format-divider{
+  display:none;
+}
+
+@media (max-width:1180px){
+  #document-app.document-with-chat .workspace,
+  #document-app.document-centered .workspace{
+    padding-left:14px;
+    padding-right:14px;
+    padding-top:14px;
+  }
+
+  .format-topbar{
+    overflow:visible;
+  }
+
+  .format-scroll{
+    overflow-x:auto;
+    overflow-y:hidden;
+    padding-bottom:2px;
+  }
+
+  .format-toolbar{
+    width:max-content;
+    min-width:max-content;
+    flex-wrap:nowrap;
+    row-gap:0;
+  }
+
+  .format-divider{
+    display:block;
+  }
+
+  .left-rail,
+  .doc-chat-panel,
+  .tool-panel,
+  .doc-tabs-sidebar{
+    top:auto;
+  }
+}
+
 </style>
 </head>
 <body>
