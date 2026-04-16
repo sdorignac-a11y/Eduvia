@@ -2040,7 +2040,7 @@ const stepTwoText = document.querySelector('.step-panel[data-panel="2"] .section
         </div>
       `
     };
-    const toolTemplates = {
+const toolTemplates = {
   conclusion: `
     <div class="field full">
       <label for="conclusion_texto_base">Texto base</label>
@@ -2089,6 +2089,110 @@ const stepTwoText = document.querySelector('.step-panel[data-panel="2"] .section
       ></textarea>
       <span class="helper">Opcional.</span>
     </div>
+  `,
+
+  improve: `
+    <div class="field full">
+      <label for="improve_texto_base">Texto a mejorar</label>
+      <textarea
+        id="improve_texto_base"
+        placeholder="Pegá el texto que querés mejorar."
+      ></textarea>
+      <span class="helper">Podés pegar un texto corto o largo.</span>
+    </div>
+
+    <div class="field">
+      <label for="improve_objetivo">Qué querés mejorar</label>
+      <select id="improve_objetivo">
+        <option value="Claridad">Claridad</option>
+        <option value="Orden">Orden</option>
+        <option value="Redacción">Redacción</option>
+        <option value="Formalidad">Formalidad</option>
+      </select>
+      <span class="helper">Elegí el foco principal de la mejora.</span>
+    </div>
+
+    <div class="field">
+      <label for="improve_tono">Tono final</label>
+      <select id="improve_tono">
+        <option value="Académico">Académico</option>
+        <option value="Claro">Claro</option>
+        <option value="Formal">Formal</option>
+        <option value="Natural">Natural</option>
+      </select>
+      <span class="helper">Cómo querés que suene el texto final.</span>
+    </div>
+
+    <div class="field">
+      <label for="improve_extension">Mantener extensión</label>
+      <select id="improve_extension">
+        <option value="Similar" selected>Similar</option>
+        <option value="Más corto">Más corto</option>
+        <option value="Más largo">Más largo</option>
+      </select>
+      <span class="helper">Define si el texto debe quedar parecido en largo o no.</span>
+    </div>
+
+    <div class="field full">
+      <label for="improve_indicaciones">Indicaciones extra</label>
+      <textarea
+        id="improve_indicaciones"
+        placeholder="Ejemplo: que suene más profesional y que no repita ideas."
+      ></textarea>
+      <span class="helper">Opcional.</span>
+    </div>
+  `,
+
+  paragraphs: `
+    <div class="field full">
+      <label for="paragraphs_tema">Tema o idea principal</label>
+      <input
+        id="paragraphs_tema"
+        placeholder="Ejemplo: Lionel Messi y su impacto en el fútbol"
+      />
+      <span class="helper">Tema base sobre el que se van a generar los párrafos.</span>
+    </div>
+
+    <div class="field">
+      <label for="paragraphs_cantidad">Cantidad de párrafos</label>
+      <select id="paragraphs_cantidad">
+        <option value="1">1</option>
+        <option value="2" selected>2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+      </select>
+      <span class="helper">Cuántos párrafos querés generar.</span>
+    </div>
+
+    <div class="field">
+      <label for="paragraphs_tono">Tono</label>
+      <select id="paragraphs_tono">
+        <option value="Académico">Académico</option>
+        <option value="Claro">Claro</option>
+        <option value="Formal">Formal</option>
+        <option value="Narrativo">Narrativo</option>
+      </select>
+      <span class="helper">Cómo querés que suenen los párrafos.</span>
+    </div>
+
+    <div class="field">
+      <label for="paragraphs_longitud">Longitud</label>
+      <select id="paragraphs_longitud">
+        <option value="Corta">Corta</option>
+        <option value="Media" selected>Media</option>
+        <option value="Larga">Larga</option>
+      </select>
+      <span class="helper">Largo aproximado de cada párrafo.</span>
+    </div>
+
+    <div class="field full">
+      <label for="paragraphs_incluir">Qué querés que incluyan</label>
+      <textarea
+        id="paragraphs_incluir"
+        placeholder="Ejemplo: contexto, idea principal, ejemplo y cierre."
+      ></textarea>
+      <span class="helper">Indicá los puntos que no querés que falten.</span>
+    </div>
   `
 };
 
@@ -2123,6 +2227,52 @@ if (selectedTool === "conclusion") {
     `Tono: ${tono}.\n` +
     `Extensión: ${extension}.\n` +
     `Indicaciones extra: ${cierre || "No especificado"}.`;
+
+  return;
+}
+
+  if (selectedTool === "improve") {
+  const textoBase = valueOf("improve_texto_base");
+  const objetivo = document.getElementById("improve_objetivo")?.value || "Claridad";
+  const tono = document.getElementById("improve_tono")?.value || "Académico";
+  const extension = document.getElementById("improve_extension")?.value || "Similar";
+  const indicaciones = valueOf("improve_indicaciones");
+
+  legacyTipo.value = "documento";
+  legacyMateria.value = "Mejorador de contenido";
+  legacyTema.value = objetivo;
+  legacyNivel.value = tono;
+  legacyDuracion.value = extension;
+  legacyObjetivo.value =
+    `Herramienta: Mejorador de contenido.\n` +
+    `Texto base:\n${textoBase || "No especificado"}\n\n` +
+    `Objetivo de mejora: ${objetivo}.\n` +
+    `Tono final: ${tono}.\n` +
+    `Extensión: ${extension}.\n` +
+    `Indicaciones extra: ${indicaciones || "No especificado"}.`;
+
+  return;
+}
+
+if (selectedTool === "paragraphs") {
+  const tema = valueOf("paragraphs_tema");
+  const cantidad = document.getElementById("paragraphs_cantidad")?.value || "2";
+  const tono = document.getElementById("paragraphs_tono")?.value || "Académico";
+  const longitud = document.getElementById("paragraphs_longitud")?.value || "Media";
+  const incluir = valueOf("paragraphs_incluir");
+
+  legacyTipo.value = "documento";
+  legacyMateria.value = "Generador de párrafos";
+  legacyTema.value = tema || "Párrafos";
+  legacyNivel.value = tono;
+  legacyDuracion.value = `${cantidad} párrafo(s) - ${longitud}`;
+  legacyObjetivo.value =
+    `Herramienta: Generador de párrafos.\n` +
+    `Tema: ${tema || "No especificado"}.\n` +
+    `Cantidad de párrafos: ${cantidad}.\n` +
+    `Tono: ${tono}.\n` +
+    `Longitud: ${longitud}.\n` +
+    `Qué incluir: ${incluir || "No especificado"}.`;
 
   return;
 }
@@ -2226,10 +2376,25 @@ if (selected === "clase") {
     }
 function applyToolPreset() {
   const presets = {
+    conclusion: {
+      tipo: "documento",
+      title: "Pegá el texto para generar la conclusión",
+      text: "Usá tu texto base para crear un cierre coherente, con el tono y la extensión que elijas."
+    },
+    improve: {
+      tipo: "documento",
+      title: "Pegá el texto que querés mejorar",
+      text: "Esta herramienta ya viene configurada para mejorar redacción, claridad, orden o tono sobre un texto existente."
+    },
+    paragraphs: {
+      tipo: "documento",
+      title: "Completá la idea para generar párrafos",
+      text: "Esta herramienta ya viene configurada para crear párrafos completos a partir de un tema, tono y cantidad definida."
+    },
     "clase-doc": {
       tipo: "clase",
       title: "Completá los datos de la clase",
-      text: "Esta herramienta ya viene configurada como clase escolar. Ahora solo completá la información principal."
+      text: "Esta herramienta ya viene configurada como clase escolar. Ahora completá la información principal."
     },
     "resumen-doc": {
       tipo: "resumen",
@@ -2245,11 +2410,6 @@ function applyToolPreset() {
       tipo: "documento",
       title: "Completá los datos del documento",
       text: "Esta herramienta ya viene configurada como documento de estudio. Ahora definí título, estructura y contenido."
-    },
-    "conclusion": {
-      tipo: "documento",
-      title: "Pegá el texto para generar la conclusión",
-      text: "Usá tu texto base para crear un cierre coherente, con el tono y la extensión que elijas."
     }
   };
 
@@ -2276,8 +2436,8 @@ function applyToolPreset() {
 function renderDynamicFields() {
   const selected = document.querySelector('input[name="tipo_contenido"]:checked')?.value || "clase";
 
-  if (selectedTool === "conclusion") {
-    dynamicFields.innerHTML = toolTemplates.conclusion;
+  if (selectedTool && toolTemplates[selectedTool]) {
+    dynamicFields.innerHTML = toolTemplates[selectedTool];
   } else {
     dynamicFields.innerHTML = fieldTemplates[selected] || fieldTemplates.clase;
   }
