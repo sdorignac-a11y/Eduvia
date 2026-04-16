@@ -10,6 +10,8 @@ const form = document.getElementById("clase-form");
 const archivoInput = document.getElementById("archivo");
 const fileList = document.getElementById("file-list");
 const sourceModeInput = document.getElementById("source_mode");
+const sourceLinksInput = document.getElementById("source-links");
+const sourceLinksHidden = document.getElementById("source_links_hidden");
 
 let currentUser = null;
 let isSubmitting = false;
@@ -150,14 +152,26 @@ form?.addEventListener("submit", async (e) => {
     duracion,
   });
 
-  const files = Array.from(archivoInput?.files || []);
-  const hasAttachedSources = files.length > 0;
-  const sourceMode = hasAttachedSources ? "exclusive" : "general";
-  const attachedSources = getAttachedSources(files);
+const files = Array.from(archivoInput?.files || []);
+const rawLinks = sourceLinksInput?.value?.trim() || "";
+const sourceLinks = rawLinks
+  .split("\n")
+  .map((link) => link.trim())
+  .filter(Boolean);
 
-  if (sourceModeInput) {
-    sourceModeInput.value = sourceMode;
-  }
+const hasFileSources = files.length > 0;
+const hasLinkSources = sourceLinks.length > 0;
+const hasAttachedSources = hasFileSources || hasLinkSources;
+const sourceMode = hasAttachedSources ? "exclusive" : "general";
+const attachedSources = getAttachedSources(files);
+
+if (sourceModeInput) {
+  sourceModeInput.value = sourceMode;
+}
+
+if (sourceLinksHidden) {
+  sourceLinksHidden.value = rawLinks;
+}
 
   if (!materia || !tema || !nivel) {
     alert("Completá materia, tema y nivel.");
@@ -173,28 +187,29 @@ form?.addEventListener("submit", async (e) => {
   setSubmitState(true);
 
   try {
-    const payload = {
-      materia,
-      tema,
-      nivel,
-      duracion: extensionDeseada || duracion || "",
-      palabrasMin,
-      palabrasMax,
-      extensionDeseada,
-      objetivo,
-      formato,
-      sourceMode,
-      hasAttachedSources,
-      attachedSources,
-      ownerUid: currentUser.uid,
-      ownerEmail: currentUser.email || "",
-      creadoEn: serverTimestamp(),
-      updatedAt: serverTimestamp(),
-      sharedWithEmails: [],
-      sharedViewerEmails: [],
-      sharedEditorEmails: [],
-      sharedUsers: {}
-    };
+const payload = {
+  materia,
+  tema,
+  nivel,
+  duracion: extensionDeseada || duracion || "",
+  palabrasMin,
+  palabrasMax,
+  extensionDeseada,
+  objetivo,
+  formato,
+  sourceMode,
+  hasAttachedSources,
+  attachedSources,
+  sourceLinks,
+  ownerUid: currentUser.uid,
+  ownerEmail: currentUser.email || "",
+  creadoEn: serverTimestamp(),
+  updatedAt: serverTimestamp(),
+  sharedWithEmails: [],
+  sharedViewerEmails: [],
+  sharedEditorEmails: [],
+  sharedUsers: {}
+};
 
     const docRef = await addDoc(
       collection(db, "usuarios", currentUser.uid, "clases"),
@@ -215,6 +230,7 @@ form?.addEventListener("submit", async (e) => {
       sourceMode,
       hasAttachedSources,
       attachedSources,
+      sourceLinks,
       ownerUid: currentUser.uid,
       ownerEmail: currentUser.email || "",
       sharedWithEmails: [],
@@ -244,6 +260,21 @@ if (archivoInput) {
 
     if (sourceModeInput) {
       sourceModeInput.value = files.length ? "exclusive" : "general";
+    }
+  });
+}
+
+if (sourceLinksInput) {
+  sourceLinksInput.addEventListener("input", () => {
+    const rawLinks = sourceLinksInput.value.trim();
+    const files = Array.from(archivoInput?.files || []);
+
+    if (sourceModeInput) {
+      sourceModeInput.value = (files.length || rawLinks) ? "exclusive" : "general";
+    }
+
+    if (sourceLinksHidden) {
+      sourceLinksHidden.value = rawLinks;
     }
   });
 }
