@@ -1530,10 +1530,10 @@
                 </section>
 
                 <section class="step-panel" data-panel="4">
-                  <div class="section-head">
-                    <h3>Agregá material de apoyo</h3>
-                    <p>Podés subir archivos para darle más contexto a la IA.</p>
-                  </div>
+                 <div class="section-head">
+  <h3>Agregá fuentes</h3>
+  <p>Si cargás algo en esta etapa, la IA va a usar solo esta información como base.</p>
+</div>
 
                   <div class="field full">
                     <label for="archivo">Archivos</label>
@@ -1543,8 +1543,8 @@
                       <div class="upload-inner">
                         <div class="upload-icon">AR</div>
                         <div>
-                          <strong>Subí apuntes, PDFs, guías o imágenes</strong>
-                          <p>Sumá solo material que realmente ayude a construir mejor el contenido.</p>
+                        <strong>Subí apuntes, PDFs, guías o imágenes</strong>
+                        <p>Si agregás archivos acá, Eduvia trabajará únicamente con ese material.</p>
                         </div>
                       </div>
                     </div>
@@ -1573,15 +1573,16 @@
   </div>
 </section>
 
-                <div class="hidden-legacy" aria-hidden="true">
-                  <input type="hidden" id="tipo_contenido_hidden" name="tipo_contenido_hidden" value="clase" />
-                  <input type="hidden" id="materia" name="materia" />
-                  <input type="hidden" id="tema" name="tema" />
-                  <input type="hidden" id="nivel" name="nivel" />
-                  <input type="hidden" id="duracion" name="duracion" />
-                  <textarea id="objetivo" name="objetivo"></textarea>
-                  <input type="hidden" id="tool_mode" name="tool_mode" value="" />
-                </div>
+               <div class="hidden-legacy" aria-hidden="true">
+  <input type="hidden" id="tipo_contenido_hidden" name="tipo_contenido_hidden" value="clase" />
+  <input type="hidden" id="materia" name="materia" />
+  <input type="hidden" id="tema" name="tema" />
+  <input type="hidden" id="nivel" name="nivel" />
+  <input type="hidden" id="duracion" name="duracion" />
+  <textarea id="objetivo" name="objetivo"></textarea>
+  <input type="hidden" id="tool_mode" name="tool_mode" value="" />
+  <input type="hidden" id="source_mode" name="source_mode" value="general" />
+</div>
               </div>
 
               <div class="wizard-footer">
@@ -1786,24 +1787,31 @@ function goToStep(step) {
 goToStep(1);
   </script>
 
-  <script>
-    const fileInput = document.getElementById("archivo");
-    const fileList = document.getElementById("file-list");
+<script>
+  const fileInput = document.getElementById("archivo");
+  const fileList = document.getElementById("file-list");
+  const sourceModeInput = document.getElementById("source_mode");
 
-    fileInput?.addEventListener("change", () => {
-      fileList.innerHTML = "";
+  fileInput?.addEventListener("change", () => {
+    fileList.innerHTML = "";
 
-      const files = Array.from(fileInput.files || []);
-      if (!files.length) return;
+    const files = Array.from(fileInput.files || []);
 
-      files.forEach((file) => {
-        const item = document.createElement("div");
-        item.className = "file-item";
-        item.textContent = `📄 ${file.name}`;
-        fileList.appendChild(item);
-      });
+    if (!files.length) {
+      if (sourceModeInput) sourceModeInput.value = "general";
+      return;
+    }
+
+    if (sourceModeInput) sourceModeInput.value = "exclusive";
+
+    files.forEach((file) => {
+      const item = document.createElement("div");
+      item.className = "file-item";
+      item.textContent = `📄 ${file.name}`;
+      fileList.appendChild(item);
     });
-  </script>
+  });
+</script>
 
   <script>
     const formatInputs = document.querySelectorAll('input[name="formato"]');
