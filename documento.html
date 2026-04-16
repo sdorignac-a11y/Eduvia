@@ -10,28 +10,29 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@600;700&display=swap" rel="stylesheet">
 
   <style>
+
     :root{
-      --bg:#f1f3f4;
-      --paper:#ffffff;
-      --line:#dadce0;
-      --text:#202124;
-      --muted:#5f6368;
-      --blue:#1a73e8;
-      --blue-strong:#0b57d0;
-      --blue-soft:#e8f0fe;
-      --success:#1e8e3e;
+  --bg:#f1f3f4;
+  --paper:#ffffff;
+  --line:#dadce0;
+  --text:#202124;
+  --muted:#5f6368;
+  --blue:#1a73e8;
+  --blue-strong:#0b57d0;
+  --blue-soft:#e8f0fe;
+  --success:#1e8e3e;
 
-      --shadow:0 1px 2px rgba(60,64,67,.16),0 4px 12px rgba(60,64,67,.10);
-      --shadow-panel:0 18px 40px rgba(15,23,42,.12);
-      --shadow-chat:0 22px 46px rgba(15,23,42,.16);
+  --shadow:0 1px 2px rgba(60,64,67,.16),0 4px 12px rgba(60,64,67,.10);
+  --shadow-panel:0 1px 3px rgba(60,64,67,.16);
+  --shadow-chat:0 8px 24px rgba(15,23,42,.10);
 
-      --radius-md:16px;
-      --radius-xl:24px;
-      --radius-pill:999px;
+  --radius-md:16px;
+  --radius-xl:24px;
+  --radius-pill:999px;
 
-      --chat-width:360px;
-      --left-rail-width:92px;
-    }
+  --chat-width:390px;
+  --left-rail-width:68px;
+}
 
     *{ box-sizing:border-box; margin:0; padding:0; }
     html,body{ min-height:100%; }
@@ -2159,428 +2160,45 @@
 
       .paper-inner{ padding:0; }
     }
-    :root{
-  --chat-width: 390px;
-  --left-rail-width: 68px;
-  --shadow-panel: 0 1px 3px rgba(60,64,67,.16);
-  --shadow-chat: 0 8px 24px rgba(15,23,42,.10);
-}
 
-.editor-chrome{
-  position: sticky;
-  top: 0;
-  z-index: 70;
-  padding: 8px 14px 0;
-  background: var(--bg);
-}
-
-.topbar{
-  min-height: 58px;
-  padding: 8px 10px;
-  border: none;
-  border-radius: 0;
-  background: transparent;
-  backdrop-filter: none;
-  box-shadow: none;
-  gap: 12px;
-}
-
-.topbar-left{
-  gap: 10px;
-}
-
-.doc-icon{
-  width: 28px;
-  height: 34px;
-  border-radius: 8px;
-  background: #1a73e8;
-  box-shadow: none;
-}
-
-.doc-icon svg{
-  width: 16px;
-  height: 16px;
-}
-
-.topbar-title-row strong{
-  font-size: .95rem;
-  font-weight: 600;
-}
-
-.topbar-sub{
-  font-size: .77rem;
-  gap: 8px;
-}
-
-.topbar-actions{
-  gap: 6px;
-}
-
-.btn{
-  padding: 7px 12px;
-  font-size: .84rem;
-  font-weight: 600;
-  border-radius: 999px;
-}
-
-.btn:hover{
-  transform: none;
-}
-
-.btn-soft{
-  background: #f1f3f4;
-}
-
-.btn-outline{
-  background: #fff;
-  border: 1px solid #dadce0;
-}
-
-.btn-primary{
-  background: #c2e7ff;
-  color: #0b57d0;
-}
-
-/* Toolbar superior más tipo Google Docs */
-.format-topbar{
-  margin-top: 2px;
-  padding: 8px 10px;
-  border: 1px solid #e0e3e7;
-  border-radius: 16px;
-  background: #fff;
-  backdrop-filter: none;
-  box-shadow: none;
-}
-
-.format-scroll{
-  padding-bottom: 0;
-}
-
-.format-scroll::-webkit-scrollbar{
-  height: 6px;
-}
-
-.format-toolbar{
-  gap: 10px;
-}
-
-.toolbar-group{
-  gap: 6px;
-}
-
-.format-divider{
-  height: 24px;
-  background: #e3e6ea;
-}
-
-.tool-btn{
-  min-width: 34px;
-  height: 34px;
-  padding: 0 8px;
-  border-radius: 8px;
-  background: transparent;
-  border: none;
-  box-shadow: none;
-  color: #3c4043;
-}
-
-.tool-btn:hover{
-  background: #f1f3f4;
-  border-color: transparent;
-  box-shadow: none;
-  transform: none;
-}
-
-.tool-btn.is-active{
-  background: #e8f0fe;
-  color: #0b57d0;
-  border: none;
-  box-shadow: none;
-}
-
-.tool-btn svg{
-  width: 16px;
-  height: 16px;
-}
-
-.tool-btn.text-btn{
-  font-size: .88rem;
-}
-
-.tool-select{
-  min-width: 104px;
-  height: 34px;
-  padding: 0 10px;
-  border: none;
-  border-radius: 8px;
-  background: transparent;
-  font-size: .84rem;
-}
-
-.tool-select:hover,
-.tool-select:focus{
-  background: #f1f3f4;
-  border-color: transparent;
-  box-shadow: none;
-}
-
-#font-size-select{
-  min-width: 68px;
-}
-
-.tool-label{
-  min-width: 92px;
-  height: 34px;
-  padding: 0 10px;
-  border: none;
-  border-radius: 8px;
-  background: transparent;
-  font-size: .8rem;
-}
-
-.tool-label:hover{
-  background: #f1f3f4;
-  border-color: transparent;
-}
-
-/* Hoja más chica = menos zoom visual */
-#document-app.document-with-chat .workspace{
-  padding-left: calc(var(--left-rail-width) + 26px);
-  padding-right: calc(var(--chat-width) + 28px);
-  padding-top: 14px;
-}
-
-#document-app.document-centered .workspace{
-  padding-left: calc(var(--left-rail-width) + 26px);
-  padding-right: 22px;
-  padding-top: 14px;
-}
-
-#document-app.document-with-chat .tool-panel,
-#document-app.document-centered .tool-panel{
-  left: calc(var(--left-rail-width) + 16px);
-}
-
-.paper-wrap{
-  max-width: 900px;
-}
-
-.paper{
-  max-width: 760px;
-  min-height: 1040px;
-  border: 1px solid #dadce0;
-  border-radius: 2px;
-  box-shadow: 0 1px 3px rgba(60,64,67,.18);
-}
-
-.paper-inner{
-  padding: 46px 52px 62px;
-}
-
-.doc-title{
-  font-size: 1.9rem;
-  line-height: 1.12;
-}
-
-.doc-meta{
-  font-size: .9rem;
-}
-
-.doc-content{
-  font-size: .98rem;
-  line-height: 1.82;
-}
 
 .left-rail{
-  position: fixed;
-  top: 132px;
-  left: 14px;
-  bottom: auto;
-  transform: none;
-
-  width: var(--left-rail-width);
-  height: auto;
-  max-height: calc(100vh - 160px);
-
-  padding: 10px 6px;
-  border: 1px solid #e3e6ea;
-  border-radius: 20px;
-  background: rgba(255,255,255,.98);
-  box-shadow: 0 1px 3px rgba(60,64,67,.16);
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 10px;
-
-  overflow-y: auto;
-  overflow-x: hidden;
+  position:fixed;
+  top:132px;
+  left:14px;
+  bottom:auto;
+  width:var(--left-rail-width);
+  max-height:calc(100vh - 160px);
+  padding:10px 6px;
+  border:1px solid #e3e6ea;
+  border-radius:20px;
+  background:rgba(255,255,255,.98);
+  box-shadow:0 1px 3px rgba(60,64,67,.16);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:flex-start;
+  gap:10px;
+  overflow-y:auto;
+  overflow-x:hidden;
+  z-index:92;
 }
 
-.left-rail-head{
-  display: none;
-}
-
-.tool-dock{
-  gap: 8px;
-}
-
-.tool-dock-group{
-  gap: 8px;
-}
-
-.tool-dock-divider{
-  width: 28px;
-  margin: 2px auto;
-  background: #e3e6ea;
-}
-
-.tool-dock-btn{
-  width: 44px;
-  height: 44px;
-  margin: 0 auto;
-  border-radius: 12px;
-  background: #fff;
-  border: 1px solid transparent;
-  box-shadow: none;
-  color: #5f6368;
-}
-
-.tool-dock-btn:hover{
-  transform: none;
-  background: #f1f3f4;
-  border-color: transparent;
-  box-shadow: none;
-  color: #202124;
-}
-
-.tool-dock-btn.is-active{
-  background: #e8f0fe;
-  border-color: transparent;
-  color: #0b57d0;
-  box-shadow: none;
-}
-
-.tool-dock-btn.is-active::before,
-.tool-dock-btn::after{
-  display: none;
-}
-
-.tool-dock-btn svg{
-  width: 18px;
-  height: 18px;
-}
-
-.doc-chat-panel{
-  position: fixed;
-  top: 132px;
-  right: 16px;
-  bottom: auto;
-  width: var(--chat-width);
-  height: calc(100vh - 160px);
-  max-height: calc(100vh - 160px);
-  z-index: 94;
-  display: flex;
-  flex-direction: column;
-  background: rgba(255,255,255,.98);
-  border: 1px solid #e7ecf2;
-  border-radius: 24px;
-  box-shadow: var(--shadow-chat);
-  backdrop-filter: blur(12px);
-  overflow: hidden;
-}
-
-@media (max-width:1180px){
-  .left-rail{
-    position: static;
-    top: auto;
-    left: auto;
-    bottom: auto;
-    transform: none;
-    width: auto;
-    max-height: none;
-    overflow: visible;
-  }
-
-  .tool-dock-btn{
-    width: 100%;
-    height: 42px;
-  }
-
-  #document-app.document-with-chat .workspace,
-  #document-app.document-centered .workspace{
-    padding-left: 12px;
-    padding-right: 12px;
-  }
-}
-
-@media (max-width:720px){
-  .editor-chrome{
-    padding: 8px 8px 0;
-  }
-
-  .topbar{
-    padding: 6px 4px;
-  }
-
-  .format-topbar{
-    padding: 6px 8px;
-  }
-
-  .paper{
-    max-width: 100%;
-  }
-
-  .paper-inner{
-    padding: 26px 18px 34px;
-  }
-}
-    #chatToolbarToggle{
-  margin-left: 2px;
-}
-    #chatToolbarToggle{
-  margin-left: 2px;
+#chatToolbarToggle{
+  margin-left:2px;
 }
 
 #chatToolbarToggle svg{
-  width: 17px;
-  height: 17px;
-  stroke: currentColor;
-  fill: none;
-  stroke-width: 2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
+  width:17px;
+  height:17px;
+  stroke:currentColor;
+  fill:none;
+  stroke-width:2;
+  stroke-linecap:round;
+  stroke-linejoin:round;
 }
 
-.doc-chat-body{
-  flex: 1;
-  min-height: 0;
-}
-
-.doc-chat-suggestions{
-  padding: 8px 16px 8px;
-}
-
-.doc-chat-form{
-  padding: 10px 16px 12px;
-  border-top: 1px solid #edf1f5;
-  background: #fff;
-}
-
-.doc-chat-input{
-  min-height: 48px;
-  padding: 12px 14px;
-}
-
-.doc-chat-send{
-  height: 48px;
-  min-width: 48px;
-}
-    .references-title{
-  display:none;
-}
-    .doc-shell{
+.doc-shell{
   display:grid;
   grid-template-columns:280px minmax(0, 1fr);
   gap:18px;
@@ -2621,6 +2239,7 @@
   color:#202124;
   font-size:1.25rem;
   cursor:pointer;
+  transition:background .16s ease;
 }
 
 .doc-tabs-add:hover{
@@ -2646,7 +2265,7 @@
   justify-content:space-between;
   gap:12px;
   text-align:left;
-  transition:.16s ease;
+  transition:background .16s ease, color .16s ease;
 }
 
 .doc-side-tab:hover{
@@ -2714,7 +2333,8 @@
     top:auto;
   }
 }
-  </style>
+  
+</style>
 </head>
 <body>
   <div class="access-guard" id="access-guard">
@@ -4026,226 +3646,220 @@ function bindDocTabsUi() {
         }).filter(Boolean);
       }
 
-      function renderFlashcards(data) {
-        const cards = data.sections.slice(0, 8).map((section, index) => ({
-          front: section.title === "Introducción"
-            ? "¿Cuál es la idea principal del documento?"
-            : `¿Qué explica la sección "${section.title}"?`,
-          back: section.items.slice(0, 2).join(" ")
-        })).filter((card) => cleanText(card.back));
+function renderFlashcards(data) {
+  const cards = data.sections.slice(0, 8).map((section, index) => ({
+    front: section.title === "Introducción"
+      ? "¿Cuál es la idea principal del documento?"
+      : `¿Qué explica la sección "${section.title}"?`,
+    back: section.items.slice(0, 2).join(" ")
+  })).filter((card) => cleanText(card.back));
 
-        if (!cards.length) {
-          studyContent.innerHTML = `<div class="study-empty">No hay suficiente contenido para crear tarjetas todavía.</div>`;
-          return;
-        }
+  if (!cards.length) {
+    return `<div class="study-empty">No hay suficiente contenido para crear tarjetas todavía.</div>`;
+  }
 
-        studyContent.innerHTML = `
-          <div class="study-grid">
-            ${cards.map((card, index) => `
-              <article class="study-flip-card" data-flip-card>
-                <div class="study-flip-inner">
-                  <div class="study-flip-face front">
-                    <div class="study-flip-top">
-                      <h4>Tarjeta ${index + 1}</h4>
-                      <span class="study-flip-hint">Tocá para girar</span>
-                    </div>
-                    <div class="study-question">${escapeHtml(card.front)}</div>
-                  </div>
+  return `
+    <div class="study-grid">
+      ${cards.map((card, index) => `
+        <article class="study-flip-card" data-flip-card>
+          <div class="study-flip-inner">
+            <div class="study-flip-face front">
+              <div class="study-flip-top">
+                <h4>Tarjeta ${index + 1}</h4>
+                <span class="study-flip-hint">Tocá para girar</span>
+              </div>
+              <div class="study-question">${escapeHtml(card.front)}</div>
+            </div>
 
-                  <div class="study-flip-face back">
-                    <div class="study-flip-top">
-                      <h4>Respuesta</h4>
-                      <span class="study-flip-hint">Volver</span>
-                    </div>
-                    <div class="study-solution">${escapeHtml(card.back)}</div>
-                  </div>
-                </div>
-              </article>
-            `).join("")}
+            <div class="study-flip-face back">
+              <div class="study-flip-top">
+                <h4>Respuesta</h4>
+                <span class="study-flip-hint">Volver</span>
+              </div>
+              <div class="study-solution">${escapeHtml(card.back)}</div>
+            </div>
           </div>
-        `;
-      }
+        </article>
+      `).join("")}
+    </div>
+  `;
+}
 
-      function renderQuiz(data) {
-        const questions = buildQuizQuestions(data);
+function renderQuiz(data) {
+  const questions = buildQuizQuestions(data);
 
-        if (!questions.length) {
-          studyContent.innerHTML = `<div class="study-empty">No hay suficiente contenido para generar preguntas.</div>`;
-          return;
-        }
+  if (!questions.length) {
+    return `<div class="study-empty">No hay suficiente contenido para generar preguntas.</div>`;
+  }
 
-        studyContent.innerHTML = questions.map((item, index) => `
-          <article class="study-card" data-quiz-card>
-            <h4>Pregunta ${index + 1}</h4>
-            <div class="study-question">${escapeHtml(item.question)}</div>
+  return questions.map((item, index) => `
+    <article class="study-card" data-quiz-card>
+      <h4>Pregunta ${index + 1}</h4>
+      <div class="study-question">${escapeHtml(item.question)}</div>
 
-            <div class="study-options">
-              ${item.options.map((option) => `
-                <button
-                  type="button"
-                  class="study-option-btn"
-                  data-quiz-option
-                  data-correct="${option.correct ? "true" : "false"}"
-                >
-                  ${escapeHtml(option.text)}
-                </button>
-              `).join("")}
-            </div>
+      <div class="study-options">
+        ${item.options.map((option) => `
+          <button
+            type="button"
+            class="study-option-btn"
+            data-quiz-option
+            data-correct="${option.correct ? "true" : "false"}"
+          >
+            ${escapeHtml(option.text)}
+          </button>
+        `).join("")}
+      </div>
 
-            <div class="study-feedback hidden" data-quiz-feedback>
-              <strong>Respuesta correcta</strong>
-              <span>${escapeHtml(item.explanation)}</span>
-            </div>
-          </article>
-        `).join("");
-      }
+      <div class="study-feedback hidden" data-quiz-feedback>
+        <strong>Respuesta correcta</strong>
+        <span>${escapeHtml(item.explanation)}</span>
+      </div>
+    </article>
+  `).join("");
+}
 
-      function renderTrueFalse(data) {
-        const items = buildTrueFalseItems(data);
+function renderTrueFalse(data) {
+  const items = buildTrueFalseItems(data);
 
-        if (!items.length) {
-          studyContent.innerHTML = `<div class="study-empty">No hay suficiente texto para crear este ejercicio.</div>`;
-          return;
-        }
+  if (!items.length) {
+    return `<div class="study-empty">No hay suficiente texto para crear este ejercicio.</div>`;
+  }
 
-        studyContent.innerHTML = items.map((item, index) => `
-          <article class="study-card" data-tf-card data-answer="${escapeHtml(item.answer)}">
-            <h4>Verdadero o falso ${index + 1}</h4>
-            <div class="study-question">${escapeHtml(item.text)}</div>
+  return items.map((item, index) => `
+    <article class="study-card" data-tf-card data-answer="${escapeHtml(item.answer)}">
+      <h4>Verdadero o falso ${index + 1}</h4>
+      <div class="study-question">${escapeHtml(item.text)}</div>
 
-            <div class="study-options">
-              <button type="button" class="study-tf-btn" data-tf-choice="verdadero">Verdadero</button>
-              <button type="button" class="study-tf-btn" data-tf-choice="falso">Falso</button>
-            </div>
+      <div class="study-options">
+        <button type="button" class="study-tf-btn" data-tf-choice="verdadero">Verdadero</button>
+        <button type="button" class="study-tf-btn" data-tf-choice="falso">Falso</button>
+      </div>
 
-            <div class="study-feedback hidden" data-tf-feedback>
-              <strong>Explicación</strong>
-              <span>${escapeHtml(item.explanation)}</span>
-            </div>
-          </article>
-        `).join("");
-      }
+      <div class="study-feedback hidden" data-tf-feedback>
+        <strong>Explicación</strong>
+        <span>${escapeHtml(item.explanation)}</span>
+      </div>
+    </article>
+  `).join("");
+}
 
-      function renderComplete(data) {
-        const items = buildCompleteItems(data);
+function renderComplete(data) {
+  const items = buildCompleteItems(data);
 
-        if (!items.length) {
-          studyContent.innerHTML = `<div class="study-empty">No se encontraron palabras clave suficientes para completar conceptos.</div>`;
-          return;
-        }
+  if (!items.length) {
+    return `<div class="study-empty">No se encontraron palabras clave suficientes para completar conceptos.</div>`;
+  }
 
-        studyContent.innerHTML = items.map((item, index) => `
-          <article class="study-card" data-complete-card data-answer="${escapeHtml(item.answer)}">
-            <h4>Completar ${index + 1}</h4>
-            <div class="study-question">${escapeHtml(item.prompt)}</div>
+  return items.map((item, index) => `
+    <article class="study-card" data-complete-card data-answer="${escapeHtml(item.answer)}">
+      <h4>Completar ${index + 1}</h4>
+      <div class="study-question">${escapeHtml(item.prompt)}</div>
 
-            <div class="study-answer-row">
-              <input
-                type="text"
-                class="study-answer-input"
-                placeholder="Escribí la palabra faltante"
-                data-complete-input
-              >
-              <button type="button" class="study-check-btn" data-check-complete>Revisar</button>
-              <button type="button" class="study-reveal-btn" data-reveal-complete>Mostrar respuesta</button>
-            </div>
+      <div class="study-answer-row">
+        <input
+          type="text"
+          class="study-answer-input"
+          placeholder="Escribí la palabra faltante"
+          data-complete-input
+        >
+        <button type="button" class="study-check-btn" data-check-complete>Revisar</button>
+        <button type="button" class="study-reveal-btn" data-reveal-complete>Mostrar respuesta</button>
+      </div>
 
-            <div class="study-complete-result hidden" data-complete-result></div>
-          </article>
-        `).join("");
-      }
+      <div class="study-complete-result hidden" data-complete-result></div>
+    </article>
+  `).join("");
+}
 
-      function renderSummary(data) {
-        const bullets = [];
+function renderSummary(data) {
+  const bullets = [];
 
-        if (data.objective) bullets.push(`Objetivo principal: ${data.objective}`);
+  if (data.objective) bullets.push(`Objetivo principal: ${data.objective}`);
 
-        data.sections.slice(0, 5).forEach((section) => {
-          const first = cleanText(section.items[0] || "");
-          if (first) bullets.push(`${section.title}: ${first}`);
+  data.sections.slice(0, 5).forEach((section) => {
+    const first = cleanText(section.items[0] || "");
+    if (first) bullets.push(`${section.title}: ${first}`);
+  });
+
+  if (!bullets.length && data.allText) {
+    bullets.push(...data.sentences.slice(0, 5));
+  }
+
+  if (!bullets.length) {
+    return `<div class="study-empty">Todavía no hay contenido suficiente para resumir.</div>`;
+  }
+
+  return `
+    <article class="study-card">
+      <h4>Resumen express</h4>
+      <div class="study-checklist">
+        ${bullets.map((item, index) => `
+          <label class="study-check-item">
+            <input type="checkbox">
+            <span>${index + 1}. ${escapeHtml(item)}</span>
+          </label>
+        `).join("")}
+      </div>
+    </article>
+  `;
+}
+
+function renderKeywords(data) {
+  const contexts = [];
+  const words = new Set();
+
+  data.sections.forEach((section) => {
+    const source = `${section.title} ${section.items.join(" ")}`;
+    const keyword = pickKeyword(source);
+    if (keyword && !words.has(keyword)) {
+      words.add(keyword);
+      contexts.push({
+        word: keyword,
+        context: shortenText(section.items[0] || source, 170)
+      });
+    }
+  });
+
+  if (contexts.length < 6) {
+    data.sentences.forEach((sentence) => {
+      const keyword = pickKeyword(sentence);
+      if (keyword && !words.has(keyword)) {
+        words.add(keyword);
+        contexts.push({
+          word: keyword,
+          context: shortenText(sentence, 170)
         });
-
-        if (!bullets.length && data.allText) {
-          bullets.push(...data.sentences.slice(0, 5));
-        }
-
-        if (!bullets.length) {
-          studyContent.innerHTML = `<div class="study-empty">Todavía no hay contenido suficiente para resumir.</div>`;
-          return;
-        }
-
-        studyContent.innerHTML = `
-          <article class="study-card">
-            <h4>Resumen express</h4>
-            <div class="study-checklist">
-              ${bullets.map((item, index) => `
-                <label class="study-check-item">
-                  <input type="checkbox">
-                  <span>${index + 1}. ${escapeHtml(item)}</span>
-                </label>
-              `).join("")}
-            </div>
-          </article>
-        `;
       }
+    });
+  }
 
-      function renderKeywords(data) {
-        const contexts = [];
-        const words = new Set();
+  const finalItems = contexts.slice(0, 12);
 
-        data.sections.forEach((section) => {
-          const source = `${section.title} ${section.items.join(" ")}`;
-          const keyword = pickKeyword(source);
-          if (keyword && !words.has(keyword)) {
-            words.add(keyword);
-            contexts.push({
-              word: keyword,
-              context: shortenText(section.items[0] || source, 170)
-            });
-          }
-        });
+  if (!finalItems.length) {
+    return `<div class="study-empty">No se detectaron palabras clave todavía.</div>`;
+  }
 
-        if (contexts.length < 6) {
-          data.sentences.forEach((sentence) => {
-            const keyword = pickKeyword(sentence);
-            if (keyword && !words.has(keyword)) {
-              words.add(keyword);
-              contexts.push({
-                word: keyword,
-                context: shortenText(sentence, 170)
-              });
-            }
-          });
-        }
+  return `
+    <article class="study-card">
+      <h4>Palabras clave del documento</h4>
+      <div class="study-keywords-wrap">
+        ${finalItems.map((item) => `
+          <button
+            type="button"
+            class="study-keyword-btn"
+            data-keyword-chip
+            data-keyword-word="${escapeHtml(item.word)}"
+            data-keyword-context="${escapeHtml(item.context)}"
+          >
+            ${escapeHtml(item.word)}
+          </button>
+        `).join("")}
+      </div>
 
-        const finalItems = contexts.slice(0, 12);
-
-        if (!finalItems.length) {
-          studyContent.innerHTML = `<div class="study-empty">No se detectaron palabras clave todavía.</div>`;
-          return;
-        }
-
-        studyContent.innerHTML = `
-          <article class="study-card">
-            <h4>Palabras clave del documento</h4>
-            <div class="study-keywords-wrap">
-              ${finalItems.map((item) => `
-                <button
-                  type="button"
-                  class="study-keyword-btn"
-                  data-keyword-chip
-                  data-keyword-word="${escapeHtml(item.word)}"
-                  data-keyword-context="${escapeHtml(item.context)}"
-                >
-                  ${escapeHtml(item.word)}
-                </button>
-              `).join("")}
-            </div>
-
-            <div class="study-keyword-context hidden" data-keyword-preview></div>
-          </article>
-        `;
-      }
+      <div class="study-keyword-context hidden" data-keyword-preview></div>
+    </article>
+  `;
+}
 
 function appendChatMessage(role, text) {
   if (!cleanText(text) || !chatBody) return;
@@ -4566,6 +4180,56 @@ function closeChat() {
         presentation: "presentation-panel"
       };
 
+      function runStudyTool(tool) {
+  const data = getStudyData();
+  currentStudyTool = tool;
+
+  const config = {
+    flashcards: {
+      title: "Tarjetas",
+      render: renderFlashcards
+    },
+    quiz: {
+      title: "Quiz",
+      render: renderQuiz
+    },
+    truefalse: {
+      title: "Verdadero o falso",
+      render: renderTrueFalse
+    },
+    complete: {
+      title: "Completar",
+      render: renderComplete
+    },
+    summary: {
+      title: "Resumen",
+      render: renderSummary
+    },
+    keywords: {
+      title: "Palabras clave",
+      render: renderKeywords
+    }
+  };
+
+  const selected = config[tool];
+  if (!selected) return;
+
+  const html = `
+    <div class="paper-wrap">
+      <article class="paper">
+        <div class="paper-inner">
+          <div class="doc-tool-view">
+            ${selected.render(data)}
+          </div>
+        </div>
+      </article>
+    </div>
+  `;
+
+  ensureDocTab(selected.title, tool, html);
+  closeToolPanel();
+}
+
       function runToolFromQuery() {
         if (!toolFromUrl) return;
 
@@ -4807,15 +4471,16 @@ generatePresentationBtn?.addEventListener("click", () => {
         }
       });
 
- const referencesToggleBtn = document.getElementById("references-toggle-btn");
-const referencesSub = document.getElementById("references-sub");
+      const referencesToggleBtn = document.getElementById("references-toggle-btn");
+      const referencesSub = document.getElementById("references-sub");
 
-referencesToggleBtn?.addEventListener("click", () => {
-  const isHidden = referencesSub.classList.contains("is-collapsed");
-
-  referencesSub.classList.toggle("is-collapsed");
-  referencesToggleBtn.setAttribute("aria-expanded", String(isHidden));
-});
+      if (referencesToggleBtn && referencesSub) {
+        referencesToggleBtn.addEventListener("click", () => {
+          const isHidden = referencesSub.classList.contains("is-collapsed");
+          referencesSub.classList.toggle("is-collapsed");
+          referencesToggleBtn.setAttribute("aria-expanded", String(isHidden));
+        });
+      }
 
 chatToggle?.addEventListener("click", openChat);
 chatClose?.addEventListener("click", closeChat);
