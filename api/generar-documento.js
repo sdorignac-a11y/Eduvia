@@ -194,6 +194,41 @@ function limpiarFuentes(value) {
     .slice(0, MAX_SOURCE_COUNT);
 }
 
+function limpiarLinksUsuario(value) {
+  if (!Array.isArray(value)) return [];
+
+  const seen = new Set();
+
+  return value
+    .map((item) => sanitizeUrl(item))
+    .filter(Boolean)
+    .filter((url) => {
+      if (seen.has(url)) return false;
+      seen.add(url);
+      return true;
+    })
+    .slice(0, MAX_SOURCE_COUNT);
+}
+
+function construirFuentesDesdeLinks(links = []) {
+  return links.map((url) => ({
+    title: extraerDominio(url) || "Fuente",
+    url,
+  }));
+}
+
+function construirLinksUsuarioTexto(links = []) {
+  const texto = links
+    .slice(0, MAX_SOURCE_COUNT)
+    .map((url, i) => {
+      const dominio = extraerDominio(url);
+      return `${i + 1}. ${dominio || "Fuente"} - ${url}`;
+    })
+    .join("\n");
+
+  return texto.slice(0, MAX_FUENTES_TEXTO_CHARS) || "No disponibles";
+}
+
 function extractWebSources(response) {
   const encontrados = new Map();
 
@@ -299,7 +334,23 @@ function buildResearchPrompt({
   extensionDeseada,
   objetivo,
   contenidoBase,
+  sourceMode = "general",
+  sourceLinksTexto = "",
 }) {
+  const bloqueLinks =
+    sourceMode === "exclusive" && sourceLinksTexto
+      ? `Links obligatorios del usuario:\n${sourceLinksTexto}\n`
+      : "";
+
+  const reglasExtras =
+    sourceMode === "exclusive" && sourceLinksTexto
+      ? `
+- Usá únicamente los links proporcionados por el usuario como base externa.
+- No uses otras fuentes, aunque encuentres resultados relacionados.
+- Si los links no alcanzan, decilo claramente.
+`
+      : "";
+
   return `
 Investigá este tema para preparar un documento de estudio completo y serio.
 
@@ -311,6 +362,7 @@ Datos:
 - Objetivo: ${objetivo || "No especificado"}
 
 ${contenidoBase ? `Contenido base ya disponible:\n${contenidoBase}\n` : ""}
+${bloqueLinks}
 
 Instrucciones:
 - Buscá información confiable y útil para estudiar.
@@ -323,6 +375,7 @@ Instrucciones:
 - Si ya hay contenido base, usalo para orientar la investigación y completarlo.
 - Incluí datos concretos solo cuando aporten valor real.
 - Ajustá la cantidad de desarrollo según la extensión deseada.
+${reglasExtras}
 
 Necesito:
 1. idea central del tema
@@ -363,7 +416,23 @@ function buildDocumentoPrompt({
   investigacionFinal,
   contenidoBase,
   fuentesTexto,
+  sourceMode = "general",
+  sourceLinksTexto = "",
 }) {
+  const bloqueLinks =
+    sourceMode === "exclusive" && sourceLinksTexto
+      ? `Links obligatorios del usuario:\n${sourceLinksTexto}\n`
+      : "";
+
+  const reglasExtras =
+    sourceMode === "exclusive" && sourceLinksTexto
+      ? `
+- Usá únicamente la información respaldada por los links proporcionados por el usuario.
+- No agregues conocimiento general ni otras fuentes externas.
+- Si algo no está en esos links o en el contenido base, decilo claramente.
+`
+      : "";
+
   return `
 Creá un documento de estudio en español.
 
@@ -383,6 +452,8 @@ ${contenidoBase || "No disponible"}
 Fuentes consultadas:
 ${fuentesTexto}
 
+${bloqueLinks}
+
 Requisitos:
 - Hacé una introducción breve y clara.
 - Desarrollá el tema por secciones bien organizadas.
@@ -397,6 +468,7 @@ Requisitos:
 - No agregues las fuentes dentro del HTML.
 - El documento debe sentirse completo, no como un borrador.
 - El contenidoHtml debe traer suficiente desarrollo real.
+${reglasExtras}
 
 Devolvé SOLO JSON válido con:
 tituloDocumento, objetivoDocumento, contenidoHtml, resumenCorto
@@ -703,6 +775,8 @@ async function investigarTemaConWeb({
   extensionDeseada,
   objetivo,
   contenidoBase,
+  sourceMode = "general",
+  sourceLinksTexto = "",
 }) {
   try {
     const researchResponse = await client.responses.create({
@@ -726,6 +800,8 @@ Devolvé SOLO JSON válido.
         extensionDeseada,
         objetivo,
         contenidoBase,
+        sourceMode,
+        sourceLinksTexto,
       }),
       text: {
         format: {
@@ -809,6 +885,8 @@ async function generarDocumentoConIA({
   investigacionFinal,
   contenidoBase,
   fuentesTexto,
+  sourceMode = "general",
+  sourceLinksTexto = "",
   intento = 1,
   maxOutputTokens = DOCUMENT_MAX_OUTPUT_TOKENS_INITIAL,
 }) {
@@ -853,6 +931,8 @@ ${refuerzo ? `- ${refuerzo.replace(/\n/g, "\n- ")}` : ""}
         investigacionFinal,
         contenidoBase,
         fuentesTexto,
+        sourceMode,
+        sourceLinksTexto,
       }),
       text: {
         format: {
@@ -938,6 +1018,8 @@ export default async function handler(req, res) {
       investigacion = "",
       fuentes = [],
       contenidoBase = "",
+      sourceMode = "general",
+      sourceLinks = [],
     } = req.body || {};
 
     const materiaLimpia = limitarTexto(materia, 180);
@@ -962,11 +1044,23 @@ export default async function handler(req, res) {
       });
     }
 
+    const sourceLinksLimpios = limpiarLinksUsuario(sourceLinks);
+    const sourceModeFinal =
+      sourceMode === "exclusive" && sourceLinksLimpios.length
+        ? "exclusive"
+        : "general";
+
+    const sourceLinksTexto = construirLinksUsuarioTexto(sourceLinksLimpios);
+
     let investigacionFinal = limitarTexto(
       investigacion,
       MAX_INVESTIGACION_CHARS
     );
-    let fuentesFinales = limpiarFuentes(fuentes);
+
+    let fuentesFinales =
+      sourceModeFinal === "exclusive"
+        ? construirFuentesDesdeLinks(sourceLinksLimpios)
+        : limpiarFuentes(fuentes);
 
     const faltaInvestigacion = !investigacionFinal;
     const faltanFuentes = !fuentesFinales.length;
@@ -981,17 +1075,19 @@ export default async function handler(req, res) {
         extensionDeseada,
         objetivo: objetivoLimpio,
         contenidoBase: contenidoBaseLimpio,
+        sourceMode: sourceModeFinal,
+        sourceLinksTexto,
       });
 
       investigacionFinal =
         researchData.investigacionCompacta || investigacionFinal;
 
-      if (faltanFuentes) {
+      if (sourceModeFinal !== "exclusive" && faltanFuentes) {
         fuentesFinales = limpiarFuentes(researchData.fuentes);
       }
 
       console.timeEnd("research_web");
-    } else if (faltanFuentes) {
+    } else if (faltanFuentes && sourceModeFinal !== "exclusive") {
       console.time("buscar_fuentes_web");
 
       fuentesFinales = await buscarFuentesConWeb({
@@ -1021,6 +1117,8 @@ export default async function handler(req, res) {
       investigacionLen: investigacionFinal.length,
       contenidoBaseLen: contenidoBaseLimpio.length,
       fuentesCount: fuentesFinales.length,
+      sourceMode: sourceModeFinal,
+      sourceLinksCount: sourceLinksLimpios.length,
     });
 
     console.time("documento_ia");
@@ -1040,6 +1138,8 @@ export default async function handler(req, res) {
           investigacionFinal: contextoDocumento || investigacionFinal,
           contenidoBase: contenidoBaseLimpio,
           fuentesTexto,
+          sourceMode: sourceModeFinal,
+          sourceLinksTexto,
           intento,
           maxOutputTokens: currentMaxOutputTokens,
         });
