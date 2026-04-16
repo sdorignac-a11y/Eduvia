@@ -2951,43 +2951,48 @@
       </main>
     </div>
 
-    <aside class="doc-chat-panel" id="doc-chat-panel" aria-label="Chat del documento">
-      <div class="doc-chat-head">
-        <div class="doc-chat-head-left">
-          <div class="doc-chat-badge">Asistente IA</div>
-          <div class="doc-chat-title">Completar o corregir contexto</div>
-          <div class="doc-chat-subtitle">
-            Pedí agregar, resumir, alargar o ajustar partes sin rehacer el documento.
-          </div>
-        </div>
-        <button type="button" class="doc-chat-close" id="doc-chat-close" aria-label="Cerrar chat">×</button>
+<aside class="doc-chat-panel" id="doc-chat-panel" aria-label="Chat del documento">
+  <div class="doc-chat-head">
+    <div class="doc-chat-head-left">
+      <div class="doc-chat-badge">Asistente IA</div>
+      <div class="doc-chat-title">Completar o corregir contexto</div>
+      <div class="doc-chat-subtitle">
+        Pedí agregar, resumir, alargar o ajustar partes sin rehacer el documento.
       </div>
+    </div>
+    <button type="button" class="doc-chat-close" id="doc-chat-close" aria-label="Cerrar chat">×</button>
+  </div>
 
+  <div class="doc-chat-body" id="doc-chat-body">
+    <div class="doc-chat-empty" id="doc-chat-empty">
+      Escribí una indicación y el asistente te va a responder acá.
+    </div>
+  </div>
 
-      <div class="doc-chat-suggestions">
-        <button type="button" class="doc-chat-chip" data-chat-chip="Resumí el contenido actual">Resumir</button>
-        <button type="button" class="doc-chat-chip" data-chat-chip="Agregá ejemplos al documento">Agregar ejemplos</button>
-        <button type="button" class="doc-chat-chip" data-chat-chip="Escribí una conclusión para este texto">Conclusión</button>
-      </div>
+  <div class="doc-chat-suggestions">
+    <button type="button" class="doc-chat-chip" data-chat-chip="Resumí el contenido actual">Resumir</button>
+    <button type="button" class="doc-chat-chip" data-chat-chip="Agregá ejemplos al documento">Agregar ejemplos</button>
+    <button type="button" class="doc-chat-chip" data-chat-chip="Escribí una conclusión para este texto">Conclusión</button>
+  </div>
 
-      <form class="doc-chat-form" id="doc-chat-form">
-        <div class="doc-chat-input-wrap">
-          <textarea
-            id="doc-chat-input"
-            class="doc-chat-input"
-            placeholder="Escribí qué querés cambiar o agregar..."
-            rows="1"
-          ></textarea>
-        </div>
+  <form class="doc-chat-form" id="doc-chat-form">
+    <div class="doc-chat-input-wrap">
+      <textarea
+        id="doc-chat-input"
+        class="doc-chat-input"
+        placeholder="Escribí qué querés cambiar o agregar..."
+        rows="1"
+      ></textarea>
+    </div>
 
-        <button type="submit" class="doc-chat-send" id="doc-chat-send" aria-label="Enviar">
-          <svg viewBox="0 0 24 24">
-            <path d="M5 12h14"/>
-            <path d="m13 5 7 7-7 7"/>
-          </svg>
-        </button>
-      </form>
-    </aside>
+    <button type="submit" class="doc-chat-send" id="doc-chat-send" aria-label="Enviar">
+      <svg viewBox="0 0 24 24">
+        <path d="M5 12h14"/>
+        <path d="m13 5 7 7-7 7"/>
+      </svg>
+    </button>
+  </form>
+</aside>
 
     <button type="button" class="doc-chat-toggle" id="doc-chat-toggle" aria-label="Abrir chat">
       <svg viewBox="0 0 24 24">
@@ -3962,26 +3967,26 @@
         closeToolPanel();
       }
 
-      function appendChatMessage(role, text) {
-        if (!cleanText(text)) return;
+function appendChatMessage(role, text) {
+  if (!cleanText(text) || !chatBody) return;
 
-        if (chatEmpty) chatEmpty.remove();
+  chatEmpty?.remove();
 
-        const bubble = document.createElement("div");
-        bubble.className = `doc-chat-msg ${role}`;
+  const bubble = document.createElement("div");
+  bubble.className = `doc-chat-msg ${role}`;
 
-        const content = document.createElement("div");
-        content.textContent = text;
+  const content = document.createElement("div");
+  content.textContent = text;
 
-        const meta = document.createElement("div");
-        meta.className = "doc-chat-meta";
-        meta.textContent = role === "user" ? "Vos" : "Eduvia";
+  const meta = document.createElement("div");
+  meta.className = "doc-chat-meta";
+  meta.textContent = role === "user" ? "Vos" : "Eduvia";
 
-        bubble.appendChild(content);
-        bubble.appendChild(meta);
-        chatBody.appendChild(bubble);
-        chatBody.scrollTop = chatBody.scrollHeight;
-      }
+  bubble.appendChild(content);
+  bubble.appendChild(meta);
+  chatBody.appendChild(bubble);
+  chatBody.scrollTop = chatBody.scrollHeight;
+}
 
       function autoResizeChat() {
         if (!chatInput) return;
