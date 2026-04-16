@@ -158,6 +158,16 @@ function isTemporaryDocumentPlaceholder(value = "") {
   );
 }
 
+function isManualEmptyDocument(clase = {}) {
+  return (
+    sourceParam === "documentos" &&
+    (clase.origen === "vacio" ||
+      clase.tipo === "documento" ||
+      clase.formato === "documento") &&
+    !hasDocumentoReal(clase)
+  );
+}
+
 function sanitizeCssStyle(styleText = "") {
   if (!styleText || typeof styleText !== "string") return "";
 
@@ -1760,24 +1770,43 @@ async function loadClase(user) {
       setLoadingStage("sources", "Todavía no hay contenido final, así que vamos a generarlo.");
     }
 
-    const claseFinal = await generarDocumentoSiFalta(claseBase);
+if (isManualEmptyDocument(claseBase)) {
+  state.currentClaseData = {
+    ...claseBase,
+    tituloDocumento: claseBase.tituloDocumento || claseBase.titulo || "Documento sin título",
+    objetivoDocumento: claseBase.objetivoDocumento || "",
+    contenidoHtml: claseBase.contenidoHtml || ""
+  };
 
-    state.currentClaseData = claseFinal;
-    writeClaseToLocalStorage(claseFinal, state.currentOwnerUid, state.currentClaseId);
+  writeClaseToLocalStorage(state.currentClaseData, state.currentOwnerUid, state.currentClaseId);
+  setBasicMeta(state.currentClaseData);
 
-    renderClase(claseFinal);
-    applyRoleUi(state.currentRole);
-    setLastSaveLabel("Guardado automático");
-    finishLoadingAndShowDocument();
+  if (els.docContent) els.docContent.innerHTML = state.currentClaseData.contenidoHtml || "";
+
+  clearSupportPanel();
+  bindReferencesUi();
+  renderReferencesSection();
+  applyRoleUi(state.currentRole);
+  syncSavedSignatureFromDom();
+  setLastSaveLabel("Listo para editar");
+  finishLoadingAndShowDocument();
+  return;
+}
+
+const claseFinal = await generarDocumentoSiFalta(claseBase);
+
+state.currentClaseData = claseFinal;
+writeClaseToLocalStorage(claseFinal, state.currentOwnerUid, state.currentClaseId);
+
+renderClase(claseFinal);
+applyRoleUi(state.currentRole);
+setLastSaveLabel("Guardado automático");
+finishLoadingAndShowDocument();
   } catch (error) {
     console.error("Error al cargar la clase:", error);
     renderError(error?.message || "Hubo un problema al cargar la clase.");
   }
 }
-
-/* =========================
-   PRESENTATION EXPORT
-========================= */
 
 function normalizePresentationText(value = "") {
   return String(value || "")
