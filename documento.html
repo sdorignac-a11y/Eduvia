@@ -2577,6 +2577,9 @@
   height: 48px;
   min-width: 48px;
 }
+    .references-title{
+  display:none;
+}
   </style>
 </head>
 <body>
@@ -2955,7 +2958,21 @@
               <section class="references-panel" id="references-section">
                 <div class="references-top">
                  <div class="references-heading">
-  <h2 class="references-title" id="references-title">Fuentes</h2>
+ <div class="references-heading">
+  <button
+    type="button"
+    class="references-toggle-btn"
+    id="references-toggle-btn"
+    aria-expanded="false"
+    aria-controls="references-sub"
+  >
+    Base investigada por Eduvia
+  </button>
+
+  <p class="references-sub is-collapsed" id="references-sub">
+    Material utilizado para construir este documento.
+  </p>
+</div>
 
   <button
     type="button"
