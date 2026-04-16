@@ -1875,25 +1875,6 @@ https://www.britannica.com/event/French-Revolution"
 
     updateFormatPreview();
   </script>
-
-  <script>
-    const dynamicFields = document.getElementById("dynamic-fields");
-    const tipoInputs = document.querySelectorAll('input[name="tipo_contenido"]');
-
-    const legacyTipo = document.getElementById("tipo_contenido_hidden");
-    const legacyMateria = document.getElementById("materia");
-    const legacyTema = document.getElementById("tema");
-    const legacyNivel = document.getElementById("nivel");
-    const legacyDuracion = document.getElementById("duracion");
-    const legacyObjetivo = document.getElementById("objetivo");
-    const legacyToolMode = document.getElementById("tool_mode");
-
-const urlParams = new URLSearchParams(window.location.search);
-const selectedTool = (urlParams.get("tool") || "").trim().toLowerCase();
-
-const stepTwoTitle = document.querySelector('.step-panel[data-panel="2"] .section-head h3');
-const stepTwoText = document.querySelector('.step-panel[data-panel="2"] .section-head p');
-
 <script>
   const dynamicFields = document.getElementById("dynamic-fields");
   const tipoInputs = document.querySelectorAll('input[name="tipo_contenido"]');
