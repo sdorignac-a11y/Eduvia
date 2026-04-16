@@ -2224,20 +2224,49 @@ if (selected === "clase") {
         input.addEventListener("change", syncLegacyFields);
       });
     }
-    function applyToolPreset() {
-  if (selectedTool !== "conclusion") return;
+function applyToolPreset() {
+  const presets = {
+    "clase-doc": {
+      tipo: "clase",
+      title: "Completá los datos de la clase",
+      text: "Esta herramienta ya viene configurada como clase escolar. Ahora solo completá la información principal."
+    },
+    "resumen-doc": {
+      tipo: "resumen",
+      title: "Completá los datos del resumen",
+      text: "Esta herramienta ya viene configurada como resumen / explicación. Ahora definí el tema, enfoque y nivel."
+    },
+    "analisis-doc": {
+      tipo: "analisis",
+      title: "Completá los datos del análisis",
+      text: "Esta herramienta ya viene configurada como análisis de tema. Ahora definí el enfoque y el eje principal."
+    },
+    "documento-doc": {
+      tipo: "documento",
+      title: "Completá los datos del documento",
+      text: "Esta herramienta ya viene configurada como documento de estudio. Ahora definí título, estructura y contenido."
+    },
+    "conclusion": {
+      tipo: "documento",
+      title: "Pegá el texto para generar la conclusión",
+      text: "Usá tu texto base para crear un cierre coherente, con el tono y la extensión que elijas."
+    }
+  };
 
-  const documentoInput = document.querySelector('input[name="tipo_contenido"][value="documento"]');
-  if (documentoInput) {
-    documentoInput.checked = true;
+  const preset = presets[selectedTool];
+  if (!preset) return;
+
+  const input = document.querySelector(`input[name="tipo_contenido"][value="${preset.tipo}"]`);
+  if (input) {
+    input.checked = true;
   }
 
   if (stepTwoTitle) {
-    stepTwoTitle.textContent = "Pegá el texto para generar la conclusión";
+    stepTwoTitle.textContent = preset.title;
   }
 
   if (stepTwoText) {
-    stepTwoText.textContent = "Usá tu texto base para crear un cierre coherente, con el tono y la extensión que elijas.";
+    stepTwoText.textContent = preset.text;
   }
 
   renderDynamicFields();
