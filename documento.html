@@ -4248,56 +4248,6 @@ function bindDocTabsUi() {
         `;
       }
 
-function runStudyTool(tool) {
-  const data = getStudyData();
-  currentStudyTool = tool;
-
-  const config = {
-    flashcards: {
-      title: "Tarjetas",
-      render: renderFlashcards
-    },
-    quiz: {
-      title: "Quiz",
-      render: renderQuiz
-    },
-    truefalse: {
-      title: "Verdadero o falso",
-      render: renderTrueFalse
-    },
-    complete: {
-      title: "Completar",
-      render: renderComplete
-    },
-    summary: {
-      title: "Resumen",
-      render: renderSummary
-    },
-    keywords: {
-      title: "Palabras clave",
-      render: renderKeywords
-    }
-  };
-
-  const selected = config[tool];
-  if (!selected) return;
-
-  const html = `
-    <div class="paper-wrap">
-      <article class="paper">
-        <div class="paper-inner">
-          <div class="doc-tool-view">
-            ${selected.render(data)}
-          </div>
-        </div>
-      </article>
-    </div>
-  `;
-
-  ensureDocTab(selected.title, tool, html);
-  closeToolPanel();
-}
-
 function appendChatMessage(role, text) {
   if (!cleanText(text) || !chatBody) return;
 
@@ -4651,6 +4601,8 @@ function closeChat() {
       }
 
       setTimeout(runToolFromQuery, 300);
+      bindDocTabsUi();
+activateDocTab("tab-documento");
 
       toolDockButtons.forEach((btn) => {
         btn.addEventListener("click", () => {
@@ -4682,44 +4634,48 @@ function closeChat() {
         window.print();
       });
 
-      generatePresentationBtn?.addEventListener("click", () => {
-        const pages = $("presentation-pages")?.value || "7";
-        const style = $("presentation-style")?.value || "clean";
-        const topics = $("presentation-topics")?.value || "";
+generatePresentationBtn?.addEventListener("click", () => {
+  const pages = $("presentation-pages")?.value || "7";
+  const style = $("presentation-style")?.value || "clean";
+  const topics = $("presentation-topics")?.value || "";
 
-        closeToolPanel();
+  closeToolPanel();
 
-        studyBadge.textContent = "Slides";
-        studyTitle.textContent = "Borrador de presentación";
-        studySubtitle.textContent = `Configuración: ${pages} diapositivas · estilo ${style}`;
+  const data = getStudyData();
+  const sections = data.sections.slice(0, Number(pages));
+  const extraTopics = topics.split(",").map((item) => cleanText(item)).filter(Boolean);
 
-        const data = getStudyData();
-        const sections = data.sections.slice(0, Number(pages));
-        const extraTopics = topics.split(",").map((item) => cleanText(item)).filter(Boolean);
+  const html = `
+    <div class="paper-wrap">
+      <article class="paper">
+        <div class="paper-inner">
+          <div class="doc-tool-view">
+            <article class="study-card">
+              <h4>Configuración aplicada</h4>
+              <p><strong>Diapositivas:</strong> ${escapeHtml(pages)}</p>
+              <p><strong>Estilo:</strong> ${escapeHtml(style)}</p>
+              <p><strong>Temas pedidos:</strong> ${extraTopics.length ? escapeHtml(extraTopics.join(", ")) : "Ninguno especificado"}</p>
+            </article>
 
-        studyContent.innerHTML = `
-          <article class="study-card">
-            <h4>Configuración aplicada</h4>
-            <p><strong>Diapositivas:</strong> ${escapeHtml(pages)}</p>
-            <p><strong>Estilo:</strong> ${escapeHtml(style)}</p>
-            <p><strong>Temas pedidos:</strong> ${extraTopics.length ? escapeHtml(extraTopics.join(", ")) : "Ninguno especificado"}</p>
-          </article>
+            <article class="study-card">
+              <h4>Estructura sugerida</h4>
+              <div class="study-checklist">
+                ${sections.map((section, index) => `
+                  <label class="study-check-item">
+                    <input type="checkbox">
+                    <span><strong>Slide ${index + 1}:</strong> ${escapeHtml(section.title)} — ${escapeHtml(shortenText(section.items[0] || "", 140))}</span>
+                  </label>
+                `).join("")}
+              </div>
+            </article>
+          </div>
+        </div>
+      </article>
+    </div>
+  `;
 
-          <article class="study-card">
-            <h4>Estructura sugerida</h4>
-            <div class="study-checklist">
-              ${sections.map((section, index) => `
-                <label class="study-check-item">
-                  <input type="checkbox">
-                  <span><strong>Slide ${index + 1}:</strong> ${escapeHtml(section.title)} — ${escapeHtml(shortenText(section.items[0] || "", 140))}</span>
-                </label>
-              `).join("")}
-            </div>
-          </article>
-        `;
-
-        openStudyModal();
-      });
+  ensureDocTab("Presentación", "presentation", html);
+});
 
       closeStudyBtn?.addEventListener("click", closeStudyModal);
 
