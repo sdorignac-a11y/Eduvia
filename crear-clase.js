@@ -9,6 +9,7 @@ import {
 const form = document.getElementById("clase-form");
 const archivoInput = document.getElementById("archivo");
 const fileList = document.getElementById("file-list");
+const sourceModeInput = document.getElementById("source_mode");
 
 let currentUser = null;
 let isSubmitting = false;
@@ -57,6 +58,15 @@ function renderFiles(files = []) {
 
 function getSelectedFormato() {
   return document.querySelector('input[name="formato"]:checked')?.value || "pizarron";
+}
+
+function getAttachedSources(files = []) {
+  return files.map((file) => ({
+    name: file.name || "",
+    type: file.type || "",
+    size: Number(file.size || 0),
+    lastModified: Number(file.lastModified || 0),
+  }));
 }
 
 const pageParams = new URLSearchParams(window.location.search);
@@ -140,6 +150,15 @@ form?.addEventListener("submit", async (e) => {
     duracion,
   });
 
+  const files = Array.from(archivoInput?.files || []);
+  const hasAttachedSources = files.length > 0;
+  const sourceMode = hasAttachedSources ? "exclusive" : "general";
+  const attachedSources = getAttachedSources(files);
+
+  if (sourceModeInput) {
+    sourceModeInput.value = sourceMode;
+  }
+
   if (!materia || !tema || !nivel) {
     alert("Completá materia, tema y nivel.");
     return;
@@ -164,6 +183,9 @@ form?.addEventListener("submit", async (e) => {
       extensionDeseada,
       objetivo,
       formato,
+      sourceMode,
+      hasAttachedSources,
+      attachedSources,
       ownerUid: currentUser.uid,
       ownerEmail: currentUser.email || "",
       creadoEn: serverTimestamp(),
@@ -190,6 +212,9 @@ form?.addEventListener("submit", async (e) => {
       extensionDeseada,
       objetivo,
       formato,
+      sourceMode,
+      hasAttachedSources,
+      attachedSources,
       ownerUid: currentUser.uid,
       ownerEmail: currentUser.email || "",
       sharedWithEmails: [],
@@ -200,9 +225,9 @@ form?.addEventListener("submit", async (e) => {
 
     saveClaseInLocalStorage(claseGuardada);
 
-const destino = buildDestino(formato, docRef.id, currentUser.uid, pendingTool);
-localStorage.removeItem("eduvia_pending_tool");
-window.location.href = destino;
+    const destino = buildDestino(formato, docRef.id, currentUser.uid, pendingTool);
+    localStorage.removeItem("eduvia_pending_tool");
+    window.location.href = destino;
   } catch (error) {
     console.error("Error al crear la clase:", error);
     alert("Error al crear la clase: " + (error.message || "No se pudo guardar."));
@@ -216,5 +241,9 @@ if (archivoInput) {
   archivoInput.addEventListener("change", () => {
     const files = Array.from(archivoInput.files || []);
     renderFiles(files);
+
+    if (sourceModeInput) {
+      sourceModeInput.value = files.length ? "exclusive" : "general";
+    }
   });
 }
