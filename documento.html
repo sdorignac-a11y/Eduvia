@@ -3493,14 +3493,24 @@
       const dockPdfBtn = $("dock-pdf-btn");
       const generatePresentationBtn = $("generate-presentation-btn");
 
-      const studyModal = $("study-modal");
-      const studyBadge = $("study-badge");
-      const studyTitle = $("study-title");
-      const studySubtitle = $("study-subtitle");
-      const studyContent = $("study-content");
-      const closeStudyBtn = $("close-study-btn");
-      const studyRegenerateBtn = $("study-regenerate-btn");
+const studyModal = $("study-modal");
+const studyBadge = $("study-badge");
+const studyTitle = $("study-title");
+const studySubtitle = $("study-subtitle");
+const studyContent = $("study-content");
+const closeStudyBtn = $("close-study-btn");
+const studyRegenerateBtn = $("study-regenerate-btn");
 
+const docTabsList = $("doc-tabs-list");
+const docTabPanels = $("doc-tab-panels");
+const docTabAddBtn = $("doc-tab-add-btn");
+
+let currentStudyTool = "";
+const docTabsState = [
+  { id: "tab-documento", title: "Documento", type: "documento", locked: true }
+];
+let activeDocTabId = "tab-documento";
+      
       const openShareBtn = $("open-share-btn");
       const closeShareBtn = $("close-share-btn");
       const shareModal = $("share-modal");
@@ -3569,6 +3579,135 @@
           .replace(/\s+/g, " ")
           .trim();
       }
+
+      function slugifyTab(value = "") {
+  return String(value || "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+function getDocTabIconSvg() {
+  return `
+    <svg class="doc-side-tab-icon" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M6 4h9l3 3v13H6z" fill="none" stroke="currentColor" stroke-width="2"></path>
+      <path d="M15 4v4h4" fill="none" stroke="currentColor" stroke-width="2"></path>
+    </svg>
+  `;
+}
+
+function activateDocTab(tabId) {
+  activeDocTabId = tabId;
+
+  document.querySelectorAll(".doc-side-tab").forEach((tab) => {
+    tab.classList.toggle("is-active", tab.dataset.tabTarget === tabId);
+  });
+
+  document.querySelectorAll(".doc-panel").forEach((panel) => {
+    panel.classList.toggle("is-active", panel.id === tabId);
+  });
+}
+
+function createDocTabButton(tabId, title) {
+  const btn = document.createElement("button");
+  btn.type = "button";
+  btn.className = "doc-side-tab";
+  btn.dataset.tabTarget = tabId;
+  btn.innerHTML = `
+    <span class="doc-side-tab-left">
+      ${getDocTabIconSvg()}
+      <span class="doc-side-tab-label">${escapeHtml(title)}</span>
+    </span>
+    <span class="doc-side-tab-menu">⋮</span>
+  `;
+
+  btn.addEventListener("click", () => activateDocTab(tabId));
+  return btn;
+}
+
+function createDocTabPanel(tabId, html = "") {
+  const panel = document.createElement("section");
+  panel.className = "doc-panel";
+  panel.id = tabId;
+  panel.innerHTML = html;
+  return panel;
+}
+
+function ensureDocTab(title, type, html = "") {
+  if (!docTabsList || !docTabPanels) return null;
+
+  const safeType = slugifyTab(type || title || "tab");
+  const existing = docTabsState.find((tab) => tab.type === safeType);
+
+  if (existing) {
+    const panel = document.getElementById(existing.id);
+    if (panel && !existing.locked) {
+      panel.innerHTML = html;
+    }
+    activateDocTab(existing.id);
+    return existing.id;
+  }
+
+  const tabId = `tab-${safeType}`;
+  const finalTitle = title || "Nueva pestaña";
+
+  const btn = createDocTabButton(tabId, finalTitle);
+  const panel = createDocTabPanel(tabId, html);
+
+  docTabsList.appendChild(btn);
+  docTabPanels.appendChild(panel);
+
+  docTabsState.push({
+    id: tabId,
+    title: finalTitle,
+    type: safeType,
+    locked: false
+  });
+
+  activateDocTab(tabId);
+  return tabId;
+}
+
+function createEmptyDocTab() {
+  const count = docTabsState.filter((tab) => !tab.locked).length + 1;
+
+  ensureDocTab(
+    `Pestaña ${count + 1}`,
+    `manual-${count}`,
+    `
+      <div class="paper-wrap">
+        <article class="paper">
+          <div class="paper-inner">
+            <section
+              class="doc-content doc-editable"
+              contenteditable="true"
+              spellcheck="true"
+              data-placeholder="Escribí acá..."
+            ></section>
+          </div>
+        </article>
+      </div>
+    `
+  );
+}
+
+function bindDocTabsUi() {
+  document.querySelectorAll(".doc-side-tab").forEach((tab) => {
+    if (tab.dataset.bound === "true") return;
+    tab.dataset.bound = "true";
+
+    tab.addEventListener("click", () => {
+      activateDocTab(tab.dataset.tabTarget);
+    });
+  });
+
+  if (docTabAddBtn && docTabAddBtn.dataset.bound !== "true") {
+    docTabAddBtn.dataset.bound = "true";
+    docTabAddBtn.addEventListener("click", createEmptyDocTab);
+  }
+}
 
       function shortenText(text = "", max = 120) {
         const value = cleanText(text);
@@ -4109,59 +4248,55 @@
         `;
       }
 
-      function runStudyTool(tool) {
-        const data = getStudyData();
-        currentStudyTool = tool;
+function runStudyTool(tool) {
+  const data = getStudyData();
+  currentStudyTool = tool;
 
-        const config = {
-          flashcards: {
-            badge: "Memoria",
-            title: "Tarjetas de memoria",
-            subtitle: "Tarjetas interactivas para tocar y girar.",
-            render: renderFlashcards
-          },
-          quiz: {
-            badge: "Práctica",
-            title: "Quiz rápido",
-            subtitle: "Respondé opciones y recibí corrección instantánea.",
-            render: renderQuiz
-          },
-          truefalse: {
-            badge: "Juego",
-            title: "Verdadero o falso",
-            subtitle: "Elegí una respuesta y comprobá si entendiste bien el texto.",
-            render: renderTrueFalse
-          },
-          complete: {
-            badge: "Repaso",
-            title: "Completar conceptos",
-            subtitle: "Escribí la palabra faltante y revisá tu respuesta.",
-            render: renderComplete
-          },
-          summary: {
-            badge: "Resumen",
-            title: "Resumen express",
-            subtitle: "Checklist corto para marcar lo que ya repasaste.",
-            render: renderSummary
-          },
-          keywords: {
-            badge: "Claves",
-            title: "Palabras clave",
-            subtitle: "Tocá cada término para ver su contexto en el documento.",
-            render: renderKeywords
-          }
-        };
+  const config = {
+    flashcards: {
+      title: "Tarjetas",
+      render: renderFlashcards
+    },
+    quiz: {
+      title: "Quiz",
+      render: renderQuiz
+    },
+    truefalse: {
+      title: "Verdadero o falso",
+      render: renderTrueFalse
+    },
+    complete: {
+      title: "Completar",
+      render: renderComplete
+    },
+    summary: {
+      title: "Resumen",
+      render: renderSummary
+    },
+    keywords: {
+      title: "Palabras clave",
+      render: renderKeywords
+    }
+  };
 
-        const selected = config[tool];
-        if (!selected) return;
+  const selected = config[tool];
+  if (!selected) return;
 
-        studyBadge.textContent = selected.badge;
-        studyTitle.textContent = selected.title;
-        studySubtitle.textContent = selected.subtitle;
-        selected.render(data);
-        openStudyModal();
-        closeToolPanel();
-      }
+  const html = `
+    <div class="paper-wrap">
+      <article class="paper">
+        <div class="paper-inner">
+          <div class="doc-tool-view">
+            ${selected.render(data)}
+          </div>
+        </div>
+      </article>
+    </div>
+  `;
+
+  ensureDocTab(selected.title, tool, html);
+  closeToolPanel();
+}
 
 function appendChatMessage(role, text) {
   if (!cleanText(text) || !chatBody) return;
