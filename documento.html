@@ -2515,6 +2515,44 @@
     #chatToolbarToggle{
   margin-left: 2px;
 }
+    #chatToolbarToggle{
+  margin-left: 2px;
+}
+
+#chatToolbarToggle svg{
+  width: 17px;
+  height: 17px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.doc-chat-body{
+  flex: 1;
+  min-height: 0;
+}
+
+.doc-chat-suggestions{
+  padding: 8px 16px 8px;
+}
+
+.doc-chat-form{
+  padding: 10px 16px 12px;
+  border-top: 1px solid #edf1f5;
+  background: #fff;
+}
+
+.doc-chat-input{
+  min-height: 48px;
+  padding: 12px 14px;
+}
+
+.doc-chat-send{
+  height: 48px;
+  min-width: 48px;
+}
   </style>
 </head>
 <body>
@@ -2758,7 +2796,9 @@
   aria-label="Mostrar u ocultar asistente"
   aria-pressed="true"
 >
-  <i data-lucide="message-square"></i>
+  <svg viewBox="0 0 24 24" aria-hidden="true">
+    <path d="M21 15a2 2 0 0 1-2 2H8l-5 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+  </svg>
 </button>
             </div>
           </div>
