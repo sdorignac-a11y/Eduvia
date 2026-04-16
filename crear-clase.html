@@ -1702,101 +1702,145 @@ https://www.britannica.com/event/French-Revolution"
     });
   </script>
 
-  <script>
-    let TOTAL_STEPS = 4;
-let currentStep = 1;
+<script>
+  let TOTAL_STEPS = 4;
+  let currentStep = 1;
 
-const resultStepItem = document.getElementById("result-step-item");
-const resultStepPanel = document.getElementById("result-step-panel");
+  const resultStepItem = document.getElementById("result-step-item");
+  const resultStepPanel = document.getElementById("result-step-panel");
+  const stepperItems = Array.from(document.querySelectorAll(".stepper-item"));
+  const stepPanels = Array.from(document.querySelectorAll(".step-panel"));
+  const prevStepBtn = document.getElementById("prev-step-btn");
+  const nextStepBtn = document.getElementById("next-step-btn");
+  const submitStepBtn = document.getElementById("submit-step-btn");
+  const stepCounter = document.getElementById("step-counter");
 
-function isQuickResultMode() {
-  const params = new URLSearchParams(window.location.search);
-  const tool = (params.get("tool") || "").trim().toLowerCase();
-  return ["conclusion", "introduction", "research", "simple-explanation"].includes(tool);
-}
+  const pageParams = new URLSearchParams(window.location.search);
+  const incomingTool = (
+    pageParams.get("tool") ||
+    localStorage.getItem("eduvia_pending_tool") ||
+    ""
+  ).trim().toLowerCase();
 
-function updateWizardMode() {
-  const quickMode = isQuickResultMode();
+  const toolTypeMap = {
+    "clase-doc": "clase",
+    "resumen-doc": "resumen",
+    "analisis-doc": "analisis",
+    "documento-doc": "documento",
+    "research": "investigacion",
 
-  TOTAL_STEPS = quickMode ? 5 : 4;
+    // estas también entran por crear-clase
+    "simple-explanation": "resumen",
+    "improve": "documento",
+    "paragraphs": "documento",
+    "introduction": "documento",
+    "conclusion": "documento"
+  };
 
-  if (resultStepItem) {
-    resultStepItem.style.display = quickMode ? "flex" : "none";
+  function isQuickResultMode() {
+    return ["conclusion", "introduction", "research", "simple-explanation"].includes(incomingTool);
   }
 
-  if (resultStepPanel) {
-    resultStepPanel.style.display = quickMode ? "" : "none";
-  }
+  function updateWizardMode() {
+    const quickMode = isQuickResultMode();
 
-  if (stepCounter) {
-    stepCounter.textContent = `Paso ${currentStep} de ${TOTAL_STEPS}`;
-  }
+    TOTAL_STEPS = quickMode ? 5 : 4;
 
-  if (submitStepBtn) {
-    submitStepBtn.textContent = quickMode ? "Generar resultado" : "Crear contenido";
-  }
-}
-
-    const stepperItems = Array.from(document.querySelectorAll(".stepper-item"));
-    const stepPanels = Array.from(document.querySelectorAll(".step-panel"));
-    const prevStepBtn = document.getElementById("prev-step-btn");
-    const nextStepBtn = document.getElementById("next-step-btn");
-    const submitStepBtn = document.getElementById("submit-step-btn");
-    const stepCounter = document.getElementById("step-counter");
-
-function goToStep(step) {
-  currentStep = Math.min(Math.max(step, 1), TOTAL_STEPS);
-
-  stepPanels.forEach((panel) => {
-    panel.classList.toggle("active", Number(panel.dataset.panel) === currentStep);
-  });
-
-  stepperItems.forEach((item) => {
-    const itemStep = Number(item.dataset.step);
-    if (itemStep > TOTAL_STEPS) {
-      item.classList.remove("active", "done");
-      return;
+    if (resultStepItem) {
+      resultStepItem.style.display = quickMode ? "flex" : "none";
     }
 
-    item.classList.toggle("active", itemStep === currentStep);
-    item.classList.toggle("done", itemStep < currentStep);
-  });
+    if (resultStepPanel) {
+      resultStepPanel.style.display = quickMode ? "" : "none";
+    }
 
-  if (stepCounter) {
-    stepCounter.textContent = `Paso ${currentStep} de ${TOTAL_STEPS}`;
+    if (stepCounter) {
+      stepCounter.textContent = `Paso ${currentStep} de ${TOTAL_STEPS}`;
+    }
+
+    if (submitStepBtn) {
+      submitStepBtn.textContent = quickMode ? "Generar resultado" : "Crear contenido";
+    }
   }
 
-  if (prevStepBtn) {
-    prevStepBtn.style.display = currentStep === 1 ? "none" : "inline-flex";
+  function applyIncomingTool() {
+    if (!incomingTool) return;
+
+    const toolModeInput = document.getElementById("tool_mode");
+    if (toolModeInput) {
+      toolModeInput.value = incomingTool;
+    }
+
+    const targetType = toolTypeMap[incomingTool];
+    if (!targetType) return;
+
+    const radio = document.querySelector(`input[name="tipo_contenido"][value="${targetType}"]`);
+    if (radio) {
+      radio.checked = true;
+      radio.dispatchEvent(new Event("change", { bubbles: true }));
+    }
+
+    const hiddenType = document.getElementById("tipo_contenido_hidden");
+    if (hiddenType) {
+      hiddenType.value = targetType;
+    }
   }
 
-  if (nextStepBtn) {
-    nextStepBtn.style.display = currentStep === TOTAL_STEPS ? "none" : "inline-flex";
-  }
+  function goToStep(step) {
+    currentStep = Math.min(Math.max(step, 1), TOTAL_STEPS);
 
-  if (submitStepBtn) {
-    submitStepBtn.style.display = currentStep === TOTAL_STEPS ? "inline-flex" : "none";
-  }
-}
-
-    prevStepBtn?.addEventListener("click", () => {
-      goToStep(currentStep - 1);
-    });
-
-    nextStepBtn?.addEventListener("click", () => {
-      goToStep(currentStep + 1);
+    stepPanels.forEach((panel) => {
+      panel.classList.toggle("active", Number(panel.dataset.panel) === currentStep);
     });
 
     stepperItems.forEach((item) => {
-      item.addEventListener("click", () => {
-        const step = Number(item.dataset.step);
-        goToStep(step);
-      });
+      const itemStep = Number(item.dataset.step);
+
+      if (itemStep > TOTAL_STEPS) {
+        item.classList.remove("active", "done");
+        return;
+      }
+
+      item.classList.toggle("active", itemStep === currentStep);
+      item.classList.toggle("done", itemStep < currentStep);
     });
 
-    updateWizardMode();
-goToStep(1);
-  </script>
+    if (stepCounter) {
+      stepCounter.textContent = `Paso ${currentStep} de ${TOTAL_STEPS}`;
+    }
+
+    if (prevStepBtn) {
+      prevStepBtn.style.display = currentStep === 1 ? "none" : "inline-flex";
+    }
+
+    if (nextStepBtn) {
+      nextStepBtn.style.display = currentStep === TOTAL_STEPS ? "none" : "inline-flex";
+    }
+
+    if (submitStepBtn) {
+      submitStepBtn.style.display = currentStep === TOTAL_STEPS ? "inline-flex" : "none";
+    }
+  }
+
+  prevStepBtn?.addEventListener("click", () => {
+    goToStep(currentStep - 1);
+  });
+
+  nextStepBtn?.addEventListener("click", () => {
+    goToStep(currentStep + 1);
+  });
+
+  stepperItems.forEach((item) => {
+    item.addEventListener("click", () => {
+      const step = Number(item.dataset.step);
+      goToStep(step);
+    });
+  });
+
+  updateWizardMode();
+  applyIncomingTool();
+  goToStep(incomingTool ? 2 : 1);
+</script>
 
   <script>
     const formatInputs = document.querySelectorAll('input[name="formato"]');
