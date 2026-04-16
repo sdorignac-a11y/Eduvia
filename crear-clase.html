@@ -2079,17 +2079,51 @@ const stepTwoText = document.querySelector('.step-panel[data-panel="2"] .section
       `
     };
 const toolTemplates = {
-  conclusion: `
+  introduction: `
     <div class="field full">
-      <label for="conclusion_texto_base">Texto base</label>
-      <textarea id="conclusion_texto_base" placeholder="Pegá acá el texto completo o la parte principal para generar una conclusión coherente."></textarea>
-      <span class="helper">Este texto es la base principal del cierre.</span>
+      <label for="intro_tema">Tema</label>
+      <input id="intro_tema" placeholder="Ejemplo: La Revolución Francesa" />
+      <span class="helper">Tema central de la introducción.</span>
     </div>
 
     <div class="field">
-      <label for="conclusion_enfoque">Idea a cerrar</label>
-      <input id="conclusion_enfoque" placeholder="Ejemplo: cerrar destacando las consecuencias principales" />
-      <span class="helper">Qué querés que deje claro la conclusión.</span>
+      <label for="intro_enfoque">Enfoque</label>
+      <input id="intro_enfoque" placeholder="Ejemplo: causas principales" />
+      <span class="helper">Qué aspecto querés destacar al empezar.</span>
+    </div>
+
+    <div class="field">
+      <label for="intro_tono">Tono</label>
+      <select id="intro_tono">
+        <option value="Académico">Académico</option>
+        <option value="Claro">Claro</option>
+        <option value="Formal">Formal</option>
+      </select>
+      <span class="helper">Define cómo va a sonar la introducción.</span>
+    </div>
+
+    <div class="field">
+      <label for="intro_extension">Extensión</label>
+      <select id="intro_extension">
+        <option value="Corta">Corta</option>
+        <option value="Media" selected>Media</option>
+        <option value="Larga">Larga</option>
+      </select>
+      <span class="helper">Cantidad aproximada de desarrollo.</span>
+    </div>
+
+    <div class="field full">
+      <label for="intro_indicaciones">Indicaciones extra</label>
+      <textarea id="intro_indicaciones" placeholder="Ejemplo: que tenga un comienzo atractivo y mencione el contexto histórico."></textarea>
+      <span class="helper">Podés sumar detalles opcionales.</span>
+    </div>
+  `,
+
+  conclusion: `
+    <div class="field full">
+      <label for="conclusion_enfoque">Idea central del cierre</label>
+      <input id="conclusion_enfoque" placeholder="Ejemplo: la importancia del tema en la actualidad" />
+      <span class="helper">Qué querés remarcar en la conclusión.</span>
     </div>
 
     <div class="field">
@@ -2110,122 +2144,81 @@ const toolTemplates = {
         <option value="Media" selected>Media</option>
         <option value="Larga">Larga</option>
       </select>
-      <span class="helper">Largo aproximado de la conclusión.</span>
+      <span class="helper">Cuánto querés que desarrolle el cierre.</span>
     </div>
 
     <div class="field full">
-      <label for="conclusion_cierre">Indicaciones extra</label>
-      <textarea id="conclusion_cierre" placeholder="Ejemplo: que termine con una reflexión final y sin repetir literalmente el texto."></textarea>
-      <span class="helper">Opcional.</span>
-    </div>
-  `,
-
-  introduction: `
-    <div class="field full">
-      <label for="intro_tema">Tema principal</label>
-      <input id="intro_tema" placeholder="Ejemplo: Lionel Messi y su impacto en el fútbol" />
-      <span class="helper">Tema central de la introducción.</span>
-    </div>
-
-    <div class="field">
-      <label for="intro_enfoque">Enfoque</label>
-      <input id="intro_enfoque" placeholder="Ejemplo: su legado, su carrera o su estilo de juego" />
-      <span class="helper">Qué querés destacar desde el inicio.</span>
-    </div>
-
-    <div class="field">
-      <label for="intro_tono">Tono</label>
-      <select id="intro_tono">
-        <option value="Académico">Académico</option>
-        <option value="Claro">Claro</option>
-        <option value="Formal">Formal</option>
-        <option value="Atractivo">Atractivo</option>
-      </select>
-      <span class="helper">Cómo querés que suene la introducción.</span>
-    </div>
-
-    <div class="field">
-      <label for="intro_extension">Extensión</label>
-      <select id="intro_extension">
-        <option value="Corta">Corta</option>
-        <option value="Media" selected>Media</option>
-        <option value="Larga">Larga</option>
-      </select>
-      <span class="helper">Largo aproximado del texto.</span>
-    </div>
-
-    <div class="field full">
-      <label for="intro_indicaciones">Indicaciones extra</label>
-      <textarea id="intro_indicaciones" placeholder="Ejemplo: que empiece con una idea general y cierre presentando la importancia del tema."></textarea>
-      <span class="helper">Opcional.</span>
+      <label for="conclusion_cierre">Frase o idea final</label>
+      <textarea id="conclusion_cierre" placeholder="Ejemplo: Por eso, estudiar este proceso ayuda a comprender mejor el mundo actual."></textarea>
+      <span class="helper">Cierre final opcional o idea complementaria.</span>
     </div>
   `,
 
   research: `
     <div class="field full">
       <label for="research_pregunta">Pregunta o tema</label>
-      <input id="research_pregunta" placeholder="Ejemplo: ¿Por qué Messi es considerado uno de los mejores futbolistas de la historia?" />
-      <span class="helper">La pregunta o eje principal de la investigación.</span>
+      <input id="research_pregunta" placeholder="Ejemplo: ¿Cómo influyó Roma en la arquitectura occidental?" />
+      <span class="helper">Puede ser una pregunta o un tema concreto.</span>
     </div>
 
     <div class="field">
       <label for="research_enfoque">Enfoque</label>
-      <input id="research_enfoque" placeholder="Ejemplo: logros, estilo de juego y legado" />
-      <span class="helper">Qué aspecto querés investigar.</span>
+      <input id="research_enfoque" placeholder="Ejemplo: influencia cultural e histórica" />
+      <span class="helper">Qué ángulo querés priorizar.</span>
     </div>
 
     <div class="field">
       <label for="research_profundidad">Profundidad</label>
       <select id="research_profundidad">
         <option value="Rápida">Rápida</option>
-        <option value="Media" selected>Media</option>
+        <option value="Intermedia" selected>Intermedia</option>
         <option value="Profunda">Profunda</option>
       </select>
-      <span class="helper">Cuánto detalle querés.</span>
+      <span class="helper">Define cuánto se desarrolla la investigación.</span>
     </div>
 
     <div class="field">
       <label for="research_formato">Formato</label>
       <select id="research_formato">
         <option value="Ideas clave">Ideas clave</option>
-        <option value="Texto breve">Texto breve</option>
         <option value="Mini resumen">Mini resumen</option>
+        <option value="Texto breve">Texto breve</option>
       </select>
       <span class="helper">Cómo querés ver el resultado.</span>
     </div>
 
     <div class="field full">
       <label for="research_indicaciones">Indicaciones extra</label>
-      <textarea id="research_indicaciones" placeholder="Ejemplo: incluir datos concretos y cerrar con una idea general."></textarea>
-      <span class="helper">Opcional.</span>
+      <textarea id="research_indicaciones" placeholder="Ejemplo: incluir ejemplos concretos y una mirada comparativa."></textarea>
+      <span class="helper">Opcional, para afinar mejor el resultado.</span>
     </div>
   `,
 
   "simple-explanation": `
     <div class="field full">
-      <label for="simple_tema">Tema o concepto</label>
-      <input id="simple_tema" placeholder="Ejemplo: por qué Lionel Messi es importante en la historia del fútbol" />
-      <span class="helper">Qué querés que la IA explique de forma sencilla.</span>
+      <label for="simple_tema">Tema difícil</label>
+      <input id="simple_tema" placeholder="Ejemplo: fotosíntesis" />
+      <span class="helper">Tema que querés volver más fácil de entender.</span>
     </div>
 
     <div class="field">
-      <label for="simple_publico">Dirigido a</label>
+      <label for="simple_publico">Para quién es</label>
       <select id="simple_publico">
         <option value="Niño">Niño</option>
         <option value="Secundaria" selected>Secundaria</option>
         <option value="General">General</option>
       </select>
-      <span class="helper">A quién va dirigida la explicación.</span>
+      <span class="helper">Ajusta el nivel de simplicidad.</span>
     </div>
 
     <div class="field">
       <label for="simple_tono">Tono</label>
       <select id="simple_tono">
-        <option value="Claro">Claro</option>
+        <option value="Claro" selected>Claro</option>
         <option value="Amigable">Amigable</option>
         <option value="Académico">Académico</option>
       </select>
-      <span class="helper">Cómo querés que suene.</span>
+      <span class="helper">Forma en la que va a estar explicada.</span>
     </div>
 
     <div class="field">
@@ -2235,13 +2228,13 @@ const toolTemplates = {
         <option value="Media" selected>Media</option>
         <option value="Larga">Larga</option>
       </select>
-      <span class="helper">Largo aproximado.</span>
+      <span class="helper">Cuánto querés que se extienda la explicación.</span>
     </div>
 
     <div class="field full">
       <label for="simple_indicaciones">Indicaciones extra</label>
-      <textarea id="simple_indicaciones" placeholder="Ejemplo: usar palabras fáciles y un ejemplo concreto."></textarea>
-      <span class="helper">Opcional.</span>
+      <textarea id="simple_indicaciones" placeholder="Ejemplo: usar ejemplos cotidianos y lenguaje muy simple."></textarea>
+      <span class="helper">Opcional, para personalizar mejor la explicación.</span>
     </div>
   `
 };
