@@ -355,6 +355,9 @@ const els = {
   simpleViewBtn: $("simple-view-btn"),
   apaViewBtn: $("apa-view-btn"),
   toggleReferenceViewBtn: $("toggle-reference-view-btn"),
+    tabList: $("doc-tabs-list"),
+  tabPanels: $("doc-tab-panels"),
+  tabAddBtn: $("doc-tab-add-btn"),
 };
 
 /* =========================
@@ -390,6 +393,10 @@ const state = {
 
   referenceMode:
     localStorage.getItem(CONFIG.referenceViewKey) === "apa" ? "apa" : "simple",
+    tabs: [
+    { id: "tab-documento", title: "Documento", type: "documento", locked: true }
+  ],
+  activeTabId: "tab-documento",
 };
 
 /* =========================
@@ -751,6 +758,136 @@ function applyRoleUi(role = "viewer") {
 
   if (els.openShareBtn) {
     els.openShareBtn.style.display = role === "owner" ? "" : "none";
+  }
+}
+
+function slugifyTab(value = "") {
+  return String(value || "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+function getTabIconSvg() {
+  return `
+    <svg class="doc-side-tab-icon" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M6 4h9l3 3v13H6z" fill="none" stroke="currentColor" stroke-width="2"></path>
+      <path d="M15 4v4h4" fill="none" stroke="currentColor" stroke-width="2"></path>
+    </svg>
+  `;
+}
+
+function activateDocTab(tabId) {
+  state.activeTabId = tabId;
+
+  document.querySelectorAll(".doc-side-tab").forEach((tab) => {
+    tab.classList.toggle("is-active", tab.dataset.tabTarget === tabId);
+  });
+
+  document.querySelectorAll(".doc-panel").forEach((panel) => {
+    panel.classList.toggle("is-active", panel.id === tabId);
+  });
+}
+
+function createTabButton(tabId, title) {
+  const btn = document.createElement("button");
+  btn.type = "button";
+  btn.className = "doc-side-tab";
+  btn.dataset.tabTarget = tabId;
+  btn.innerHTML = `
+    <span class="doc-side-tab-left">
+      ${getTabIconSvg()}
+      <span class="doc-side-tab-label">${escapeHtml(title)}</span>
+    </span>
+    <span class="doc-side-tab-menu">⋮</span>
+  `;
+
+  btn.addEventListener("click", () => activateDocTab(tabId));
+  return btn;
+}
+
+function createTabPanel(tabId, html = "") {
+  const panel = document.createElement("section");
+  panel.className = "doc-panel";
+  panel.id = tabId;
+  panel.innerHTML = html;
+  return panel;
+}
+
+function ensureDocTab(title, type, html = "") {
+  if (!els.tabList || !els.tabPanels) return null;
+
+  const safeType = slugifyTab(type || title || "tab");
+  const existing = state.tabs.find((tab) => tab.type === safeType);
+
+  if (existing) {
+    const panel = document.getElementById(existing.id);
+    if (panel && !existing.locked) {
+      panel.innerHTML = html;
+    }
+    activateDocTab(existing.id);
+    return existing.id;
+  }
+
+  const tabId = `tab-${safeType}`;
+  const titleFinal = title || "Nueva pestaña";
+
+  const tabButton = createTabButton(tabId, titleFinal);
+  const tabPanel = createTabPanel(tabId, html);
+
+  els.tabList.appendChild(tabButton);
+  els.tabPanels.appendChild(tabPanel);
+
+  state.tabs.push({
+    id: tabId,
+    title: titleFinal,
+    type: safeType,
+    locked: false
+  });
+
+  activateDocTab(tabId);
+  return tabId;
+}
+
+function createEmptyUserTab() {
+  const count = state.tabs.filter((tab) => !tab.locked).length + 1;
+  const title = `Pestaña ${count + 1}`;
+
+  ensureDocTab(
+    title,
+    `manual-${count}`,
+    `
+      <div class="paper-wrap">
+        <article class="paper">
+          <div class="paper-inner">
+            <section
+              class="doc-content doc-editable"
+              contenteditable="true"
+              spellcheck="true"
+              data-placeholder="Escribí acá..."
+            ></section>
+          </div>
+        </article>
+      </div>
+    `
+  );
+}
+
+function bindDocTabsUi() {
+  document.querySelectorAll(".doc-side-tab").forEach((tab) => {
+    if (tab.dataset.bound === "true") return;
+    tab.dataset.bound = "true";
+
+    tab.addEventListener("click", () => {
+      activateDocTab(tab.dataset.tabTarget);
+    });
+  });
+
+  if (els.tabAddBtn && els.tabAddBtn.dataset.bound !== "true") {
+    els.tabAddBtn.dataset.bound = "true";
+    els.tabAddBtn.addEventListener("click", createEmptyUserTab);
   }
 }
 
@@ -1757,10 +1894,12 @@ async function loadClase(user) {
     els.accessGuard?.classList.remove("show");
     keepLoadingVisible();
 
-    bindAutosave();
-    bindShareUi();
-    ensureSelectionAssistantUi();
-    setupPresentationExport();
+bindAutosave();
+bindShareUi();
+ensureSelectionAssistantUi();
+setupPresentationExport();
+bindDocTabsUi();
+activateDocTab("tab-documento");
 
     const tieneDocumentoReal = hasDocumentoReal(claseBase);
 
