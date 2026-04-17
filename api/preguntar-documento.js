@@ -78,10 +78,15 @@ function limpiarLista(value, max = 6) {
 
 function sanitizeUrl(value = "") {
   try {
-    const url = new URL(String(value), "https://example.com");
+    const raw = String(value || "").trim();
+
+    if (!raw) return "";
+
+    const url = new URL(raw);
     if (url.protocol === "http:" || url.protocol === "https:") {
       return url.href;
     }
+
     return "";
   } catch {
     return "";
@@ -213,10 +218,7 @@ function normalizarModo(modo = "", accion = "", pregunta = "") {
     return "expansion";
   }
 
-  if (
-    preguntaLimpia.includes("resum") ||
-    preguntaLimpia.includes("acort")
-  ) {
+  if (preguntaLimpia.includes("resum") || preguntaLimpia.includes("acort")) {
     return "resumen";
   }
 
@@ -338,6 +340,268 @@ Acción general.
   }
 }
 
+function stripHtml(html = "") {
+  return String(html || "")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function detectarPedidoGenerativo(pregunta = "", accion = "") {
+  const accionLimpia = limpiarTexto(accion).toLowerCase();
+  const texto = limpiarTexto(pregunta).toLowerCase();
+
+  const accionesGenerativas = new Set([
+    "explicar",
+    "mejorar",
+    "alargar",
+    "acortar",
+    "claro",
+    "formal",
+    "resumir",
+    "reescribir",
+    "reescritura",
+    "ampliar",
+    "expandir",
+    "profundizar",
+    "generar",
+  ]);
+
+  if (accionesGenerativas.has(accionLimpia)) return true;
+
+  const patrones = [
+    /\bhaceme\b/,
+    /\bhazme\b/,
+    /\bgener(a|ame|ame una|ame un)\b/,
+    /\bescrib(i|ime)\b/,
+    /\bcre(a|ame)\b/,
+    /\barm(a|ame)\b/,
+    /\bdesarroll(a|ame)\b/,
+    /\bintroducci[oó]n\b/,
+    /\bconclusi[oó]n\b/,
+    /\bresumen\b/,
+    /\bexplic(a|ame|alo|arlo)\b/,
+    /\bdesarrollo\b/,
+    /\bp[aá]rrafo\b/,
+    /\bampli(a|ame|arlo)\b/,
+    /\bprofundiz(a|ame|arlo)\b/,
+    /\breescrib(i|ime|ilo|irlo)\b/,
+    /\breformul(a|ame|arlo)\b/,
+    /\bmejor(a|ame|arlo)\b/,
+  ];
+
+  return patrones.some((regex) => regex.test(texto));
+}
+
+function respuestaIndicaFaltaDeContexto(texto = "") {
+  const t = limpiarTexto(texto).toLowerCase();
+
+  if (!t) return false;
+
+  return [
+    "no tengo suficiente información",
+    "no tengo suficiente informacion",
+    "no cuento con suficiente información",
+    "no cuento con suficiente informacion",
+    "no hay suficiente información",
+    "no hay suficiente informacion",
+    "no hay contenido del documento",
+    "falta contexto",
+    "no dispongo de suficiente contexto",
+    "no puedo responder con el contenido disponible",
+    "no hay contenido suficiente",
+    "necesito más información",
+    "necesito mas informacion",
+  ].some((frase) => t.includes(frase));
+}
+
+function obtenerBaseUrl(req) {
+  const forwardedProto = limpiarTexto(req.headers["x-forwarded-proto"]);
+  const forwardedHost = limpiarTexto(req.headers["x-forwarded-host"]);
+  const host = forwardedHost || limpiarTexto(req.headers.host);
+
+  const protocol =
+    forwardedProto ||
+    (host.includes("localhost") || host.startsWith("127.0.0.1") ? "http" : "https");
+
+  if (!host) {
+    return "http://localhost:3000";
+  }
+
+  return `${protocol}://${host}`;
+}
+
+function construirPayloadGenerador({
+  pregunta,
+  documentoActual,
+  tituloDocumento,
+  objetivoDocumento,
+  textoSeleccionado,
+  investigacion,
+  fuentes,
+}) {
+  const tema = limpiarTexto(textoSeleccionado || tituloDocumento || pregunta || "Tema general");
+  const contenidoBase = limpiarTexto(
+    [textoSeleccionado, documentoActual].filter(Boolean).join("\n\n")
+  );
+
+  return {
+    materia: limpiarTexto(tituloDocumento || "Documento"),
+    tema,
+    nivel: "general",
+    objetivo:
+      limpiarTexto(objetivoDocumento) ||
+      `Generar contenido útil para este pedido del usuario: ${limpiarTexto(pregunta)}`,
+    investigacion: limpiarTexto(investigacion),
+    fuentes: limpiarFuentes(fuentes),
+    contenidoBase,
+    sourceMode: "general",
+    sourceLinks: [],
+  };
+}
+
+async function llamarGeneradorDocumento(req, payload) {
+  const baseUrl = obtenerBaseUrl(req);
+
+  const response = await fetch(`${baseUrl}/api/generar-documento`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      cookie: req.headers.cookie || "",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  const data = await response.json().catch(() => null);
+
+  if (!response.ok || !data?.ok) {
+    throw new Error(
+      data?.detail || data?.error || "No se pudo obtener contexto desde generar-documento."
+    );
+  }
+
+  return data;
+}
+
+async function generarRespuestaIA({
+  preguntaLimpia,
+  accionLimpia,
+  documentoLimpio,
+  tituloLimpio,
+  objetivoLimpio,
+  seleccionadoLimpio,
+  investigacionLimpia,
+  fuentesLimpias,
+  ultimaRespuesta,
+  contextoGenerado = "",
+  documentoDeApoyo = "",
+  pedidoGenerativo = false,
+}) {
+  const response = await client.responses.create({
+    model: process.env.OPENAI_MODEL || "gpt-5.4-mini",
+    input: [
+      {
+        role: "developer",
+        content: `
+Sos el asistente editorial de Eduvia dentro de documento.html.
+
+Tu trabajo:
+- responder preguntas sobre el documento,
+- detectar partes flojas, cortas, confusas, repetitivas o mejorables,
+- sugerir cambios concretos,
+- proponer una nueva versión de un fragmento cuando haga falta.
+
+Reglas:
+- Respondé en español rioplatense neutro.
+- Sé claro, didáctico y útil.
+- No hables como chat casual.
+- Si el usuario pregunta sobre el documento, priorizá el documento actual.
+- Si hay texto seleccionado, priorizalo por encima del resto del documento.
+- Si hay objetivo del documento, tenelo en cuenta.
+- Si hay investigación previa y fuentes, usalas para sostener mejor la respuesta.
+- Si el usuario pide generar contenido nuevo y el documento actual no alcanza, podés apoyarte en la investigación previa, las fuentes y el contexto generado.
+- No inventes hechos específicos si no están respaldados por el documento, la investigación o las fuentes.
+- No reescribas todo el documento salvo que el usuario lo pida.
+- Cuando propongas cambios, que sean accionables.
+- "textoPropuesto" debe ser realmente usable cuando la acción implique modificar o generar texto.
+- Si el pedido es generativo, intentá devolver un "textoPropuesto" útil siempre que haya contexto suficiente.
+- Devolvé SOLO JSON válido.
+
+Interpretación de pedidos:
+- Si pregunta algo sobre el contenido => modo "respuesta".
+- Si pide mejorar o corregir => modo "mejora".
+- Si pide alargar o profundizar => modo "expansion".
+- Si pide resumir o achicar => modo "resumen".
+- Si pide reescribir una parte => modo "reescritura".
+
+${construirInstruccionSegunAccion(accionLimpia)}
+
+Contexto adicional:
+- Pedido generativo detectado: ${pedidoGenerativo ? "sí" : "no"}
+        `.trim(),
+      },
+      {
+        role: "user",
+        content: `
+TÍTULO DEL DOCUMENTO:
+${tituloLimpio || "Sin título"}
+
+OBJETIVO DEL DOCUMENTO:
+${objetivoLimpio || "No especificado."}
+
+TEXTO SELECCIONADO:
+${seleccionadoLimpio || "No hay texto seleccionado."}
+
+DOCUMENTO COMPLETO:
+${documentoLimpio || "No disponible."}
+
+INVESTIGACIÓN PREVIA:
+${investigacionLimpia || "No disponible."}
+
+FUENTES:
+${construirTextoFuentes(fuentesLimpias)}
+
+CONTEXTO GENERADO DE APOYO:
+${contextoGenerado || "No disponible."}
+
+BORRADOR / DOCUMENTO DE APOYO GENERADO:
+${documentoDeApoyo || "No disponible."}
+
+ÚLTIMA RESPUESTA DEL ASISTENTE:
+${JSON.stringify(ultimaRespuesta || {}, null, 2)}
+
+PEDIDO DEL USUARIO:
+${preguntaLimpia}
+        `.trim(),
+      },
+    ],
+    text: {
+      format: {
+        type: "json_schema",
+        name: "respuesta_documento_eduvia",
+        strict: true,
+        schema: RESPUESTA_SCHEMA,
+      },
+    },
+  });
+
+  const rawText = extraerOutputText(response);
+
+  if (!rawText) {
+    throw new Error("La IA no devolvió contenido.");
+  }
+
+  let parsed;
+  try {
+    parsed = JSON.parse(rawText);
+  } catch (error) {
+    console.error("JSON inválido devuelto por la IA:", rawText);
+    throw new Error("La IA respondió con un formato inválido.");
+  }
+
+  return normalizarRespuesta(parsed, accionLimpia, preguntaLimpia);
+}
+
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({
@@ -361,12 +625,13 @@ export default async function handler(req, res) {
 
     const preguntaLimpia = limpiarTexto(pregunta);
     const accionLimpia = limpiarTexto(accion);
-    const documentoLimpio = limpiarTexto(documentoActual);
+
+    let documentoLimpio = limpiarTexto(documentoActual);
     const tituloLimpio = limpiarTexto(tituloDocumento);
     const objetivoLimpio = limpiarTexto(objetivoDocumento);
     const seleccionadoLimpio = limpiarTexto(textoSeleccionado);
-    const investigacionLimpia = limpiarTexto(investigacion);
-    const fuentesLimpias = limpiarFuentes(fuentes);
+    let investigacionLimpia = limpiarTexto(investigacion);
+    let fuentesLimpias = limpiarFuentes(fuentes);
 
     if (!preguntaLimpia) {
       return res.status(400).json({
@@ -375,122 +640,132 @@ export default async function handler(req, res) {
       });
     }
 
-    if (!documentoLimpio && !seleccionadoLimpio) {
+    const hayContextoDocumento = Boolean(documentoLimpio || seleccionadoLimpio);
+    const hayContextoExtra = Boolean(
+      tituloLimpio || objetivoLimpio || investigacionLimpia || fuentesLimpias.length
+    );
+
+    if (!hayContextoDocumento && !hayContextoExtra) {
       return res.status(400).json({
         ok: false,
-        error: "No hay contenido del documento para analizar.",
+        error: "No hay suficiente contexto para responder o generar contenido.",
       });
     }
 
-    const response = await client.responses.create({
-      model: process.env.OPENAI_MODEL || "gpt-5.4-mini",
-      input: [
-        {
-          role: "developer",
-          content: `
-Sos el asistente editorial de Eduvia dentro de documento.html.
+    const pedidoGenerativo = detectarPedidoGenerativo(preguntaLimpia, accionLimpia);
 
-Tu trabajo:
-- responder preguntas sobre el documento,
-- detectar partes flojas, cortas, confusas, repetitivas o mejorables,
-- sugerir cambios concretos,
-- proponer una nueva versión de un fragmento cuando haga falta.
+    let contextoGenerado = "";
+    let documentoDeApoyo = "";
 
-Reglas:
-- Respondé en español rioplatense neutro.
-- Sé claro, didáctico y útil.
-- No hables como chat casual.
-- No inventes contenido fuera del documento salvo que el usuario te pida explícitamente ampliarlo.
-- Si el usuario pide alargar, expandí con contenido útil, no con relleno.
-- Si el usuario pide acortar, conservá la idea central.
-- Si el usuario pide mejorar estilo, hacelo más claro y natural.
-- Si hay texto seleccionado, priorizalo por encima del resto del documento.
-- Si hay objetivo del documento, tenelo en cuenta.
-- Si hay investigación previa y fuentes, usalas para sostener mejor la respuesta.
-- No reescribas todo el documento salvo que el usuario lo pida.
-- Cuando propongas cambios, que sean accionables.
-- "textoPropuesto" debe ser realmente usable cuando la acción implique modificar el texto.
-- Devolvé SOLO JSON válido.
+    const necesitaEnriquecerAntes =
+      pedidoGenerativo && (!hayContextoDocumento || !investigacionLimpia);
 
-Interpretación de pedidos:
-- Si pregunta algo sobre el contenido => modo "respuesta".
-- Si pide mejorar o corregir => modo "mejora".
-- Si pide alargar o profundizar => modo "expansion".
-- Si pide resumir o achicar => modo "resumen".
-- Si pide reescribir una parte => modo "reescritura".
+    if (necesitaEnriquecerAntes) {
+      try {
+        const dataGenerador = await llamarGeneradorDocumento(
+          req,
+          construirPayloadGenerador({
+            pregunta: preguntaLimpia,
+            documentoActual: documentoLimpio,
+            tituloDocumento: tituloLimpio,
+            objetivoDocumento: objetivoLimpio,
+            textoSeleccionado: seleccionadoLimpio,
+            investigacion: investigacionLimpia,
+            fuentes: fuentesLimpias,
+          })
+        );
 
-${construirInstruccionSegunAccion(accionLimpia)}
+        contextoGenerado = limpiarTexto(dataGenerador?.investigacion || "");
+        documentoDeApoyo = stripHtml(dataGenerador?.documento?.contenidoHtml || "");
 
-Formato:
-- subtitulo: etiqueta breve.
-- respuesta.titulo: encabezado principal.
-- respuesta.modo: uno de los modos válidos.
-- respuesta.resumen: explicación principal.
-- respuesta.cambios: lista concreta de sugerencias.
-- respuesta.textoPropuesto: texto nuevo o reformulado cuando aporte valor real.
-- respuesta.preguntasSeguimiento: preguntas cortas para seguir mejorando el documento.
-          `.trim(),
-        },
-        {
-          role: "user",
-          content: `
-TÍTULO DEL DOCUMENTO:
-${tituloLimpio || "Sin título"}
+        if (!investigacionLimpia && contextoGenerado) {
+          investigacionLimpia = contextoGenerado;
+        }
 
-OBJETIVO DEL DOCUMENTO:
-${objetivoLimpio || "No especificado."}
+        if ((!fuentesLimpias || !fuentesLimpias.length) && Array.isArray(dataGenerador?.fuentes)) {
+          fuentesLimpias = limpiarFuentes(dataGenerador.fuentes);
+        }
 
-TEXTO SELECCIONADO:
-${seleccionadoLimpio || "No hay texto seleccionado."}
+        if (!documentoLimpio && documentoDeApoyo) {
+          documentoLimpio = documentoDeApoyo;
+        }
+      } catch (error) {
+        console.error("No se pudo enriquecer contexto antes de responder:", error);
+      }
+    }
 
-DOCUMENTO COMPLETO:
-${documentoLimpio || "No disponible."}
-
-INVESTIGACIÓN PREVIA:
-${investigacionLimpia || "No disponible."}
-
-FUENTES:
-${construirTextoFuentes(fuentesLimpias)}
-
-ÚLTIMA RESPUESTA DEL ASISTENTE:
-${JSON.stringify(ultimaRespuesta || {}, null, 2)}
-
-PEDIDO DEL USUARIO:
-${preguntaLimpia}
-          `.trim(),
-        },
-      ],
-      text: {
-        format: {
-          type: "json_schema",
-          name: "respuesta_documento_eduvia",
-          strict: true,
-          schema: RESPUESTA_SCHEMA,
-        },
-      },
+    let respuesta = await generarRespuestaIA({
+      preguntaLimpia,
+      accionLimpia,
+      documentoLimpio,
+      tituloLimpio,
+      objetivoLimpio,
+      seleccionadoLimpio,
+      investigacionLimpia,
+      fuentesLimpias,
+      ultimaRespuesta,
+      contextoGenerado,
+      documentoDeApoyo,
+      pedidoGenerativo,
     });
 
-    const rawText = extraerOutputText(response);
+    const textoEvaluable = [
+      respuesta?.respuesta?.resumen || "",
+      respuesta?.respuesta?.textoPropuesto || "",
+    ]
+      .join("\n")
+      .trim();
 
-    if (!rawText) {
-      return res.status(500).json({
-        ok: false,
-        error: "La IA no devolvió contenido.",
-      });
+    const necesitaFallback =
+      pedidoGenerativo &&
+      respuestaIndicaFaltaDeContexto(textoEvaluable) &&
+      (hayContextoExtra || hayContextoDocumento) &&
+      !contextoGenerado;
+
+    if (necesitaFallback) {
+      try {
+        const dataGenerador = await llamarGeneradorDocumento(
+          req,
+          construirPayloadGenerador({
+            pregunta: preguntaLimpia,
+            documentoActual: documentoLimpio,
+            tituloDocumento: tituloLimpio,
+            objetivoDocumento: objetivoLimpio,
+            textoSeleccionado: seleccionadoLimpio,
+            investigacion: investigacionLimpia,
+            fuentes: fuentesLimpias,
+          })
+        );
+
+        contextoGenerado = limpiarTexto(dataGenerador?.investigacion || "");
+        documentoDeApoyo = stripHtml(dataGenerador?.documento?.contenidoHtml || "");
+
+        if (!investigacionLimpia && contextoGenerado) {
+          investigacionLimpia = contextoGenerado;
+        }
+
+        if ((!fuentesLimpias || !fuentesLimpias.length) && Array.isArray(dataGenerador?.fuentes)) {
+          fuentesLimpias = limpiarFuentes(dataGenerador.fuentes);
+        }
+
+        respuesta = await generarRespuestaIA({
+          preguntaLimpia,
+          accionLimpia,
+          documentoLimpio,
+          tituloLimpio,
+          objetivoLimpio,
+          seleccionadoLimpio,
+          investigacionLimpia,
+          fuentesLimpias,
+          ultimaRespuesta,
+          contextoGenerado,
+          documentoDeApoyo,
+          pedidoGenerativo,
+        });
+      } catch (error) {
+        console.error("Falló el fallback con generar-documento:", error);
+      }
     }
-
-    let parsed;
-    try {
-      parsed = JSON.parse(rawText);
-    } catch (error) {
-      console.error("JSON inválido devuelto por la IA:", rawText);
-      return res.status(500).json({
-        ok: false,
-        error: "La IA respondió con un formato inválido.",
-      });
-    }
-
-    const respuesta = normalizarRespuesta(parsed, accionLimpia, preguntaLimpia);
 
     return res.status(200).json({
       ok: true,
