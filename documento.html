@@ -310,6 +310,145 @@
   position:relative;
   z-index:1;
 }
+  .topbar{
+  min-height:58px;
+  padding:8px 10px;
+  border:none;
+  border-radius:0;
+  background:transparent;
+  backdrop-filter:none;
+  box-shadow:none;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+}
+
+.topbar-left{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  min-width:0;
+  flex:1;
+}
+
+.doc-icon{
+  width:28px;
+  height:34px;
+  border-radius:8px;
+  display:grid;
+  place-items:center;
+  background:#1a73e8;
+  color:#fff;
+  flex:none;
+  box-shadow:none;
+}
+
+.doc-icon svg{
+  width:16px;
+  height:16px;
+  stroke:currentColor;
+  fill:none;
+  stroke-width:2;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+}
+
+.topbar-text{
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+}
+
+.topbar-title-row{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  min-width:0;
+}
+
+.topbar-title-row strong{
+  display:block;
+  font-size:.95rem;
+  font-weight:600;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  min-width:0;
+}
+
+.topbar-sub{
+  color:var(--muted);
+  font-size:.77rem;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex-wrap:wrap;
+}
+
+.topbar-actions{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  flex-wrap:nowrap;
+  flex:none;
+}
+
+.btn{
+  border:none;
+  border-radius:999px;
+  padding:7px 12px;
+  font-size:.84rem;
+  font-weight:600;
+  cursor:pointer;
+  transition:.16s ease;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  white-space:nowrap;
+}
+
+.btn:hover{ transform:none; }
+
+.btn-soft{
+  background:#f1f3f4;
+  color:var(--text);
+}
+
+.btn-soft:hover{ background:#e8eaed; }
+
+.btn-outline{
+  background:#fff;
+  color:var(--text);
+  border:1px solid #dadce0;
+}
+
+.btn-outline:hover{ background:#f8fafc; }
+
+.btn-primary{
+  background:#c2e7ff;
+  color:#0b57d0;
+}
+
+.btn-primary:hover{ background:#b5e0ff; }
+
+.btn-icon{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+}
+
+.btn-icon svg{
+  width:16px;
+  height:16px;
+  stroke:currentColor;
+  fill:none;
+  stroke-width:2.2;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+}
 
 .format-topbar{
   margin-top:4px;
