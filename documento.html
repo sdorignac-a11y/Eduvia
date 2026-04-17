@@ -699,42 +699,45 @@
 }
 
 .doc-tabs-bar{
+  width:100%;
   display:flex;
+  flex-direction:column;
   align-items:center;
-  justify-content:space-between;
-  gap:10px;
-  padding:6px 10px;
-  background:#f8f9fa;
-  border:1px solid #e3e6ea;
-  border-radius:16px 16px 0 0;
+  gap:8px;
+  padding:0;
+  background:transparent;
+  border:none;
+  border-radius:0;
   box-shadow:none;
 }
 
 .doc-tabs-list{
+  width:100%;
   display:flex;
+  flex-direction:column;
   align-items:center;
-  gap:4px;
-  flex-wrap:wrap;
+  gap:8px;
 }
 
 .doc-side-tab{
   position:relative;
+  width:44px;
+  height:44px;
+  margin:0 auto;
+  padding:0;
   border:none;
-  border-radius:10px;
-  background:transparent;
+  border-radius:12px;
+  background:#fff;
   color:#5f6368;
-  padding:10px 14px;
   cursor:pointer;
-  display:flex;
-  align-items:center;
-  gap:10px;
-  text-align:left;
-  transition:background .16s ease, color .16s ease;
-  min-height:40px;
+  display:grid;
+  place-items:center;
+  box-shadow:none;
+  transition:background .18s ease,color .18s ease,border-color .18s ease;
 }
 
 .doc-side-tab:hover{
-  background:#eef2f7;
+  background:#f1f3f4;
   color:#202124;
 }
 
@@ -744,54 +747,46 @@
 }
 
 .doc-side-tab.is-active::after{
-  content:"";
-  position:absolute;
-  left:12px;
-  right:12px;
-  bottom:5px;
-  height:2px;
-  border-radius:999px;
-  background:#1a73e8;
+  display:none;
 }
 
 .doc-side-tab-left{
-  display:flex;
-  align-items:center;
-  gap:8px;
-  min-width:0;
+  width:100%;
+  height:100%;
+  display:grid;
+  place-items:center;
 }
 
 .doc-side-tab-icon{
-  width:16px;
-  height:16px;
+  width:18px;
+  height:18px;
   flex:none;
-  opacity:.92;
+  opacity:1;
 }
 
 .doc-side-tab-label{
-  font-size:.95rem;
-  font-weight:700;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
+  display:none;
 }
 
 .doc-tabs-add{
-  width:34px;
-  height:34px;
+  width:44px;
+  height:44px;
+  margin:0 auto;
+  padding:0;
   border:none;
-  border-radius:10px;
-  background:transparent;
+  border-radius:12px;
+  background:#fff;
   color:#5f6368;
-  font-size:1.2rem;
+  font-size:1.3rem;
   font-weight:600;
   cursor:pointer;
-  transition:background .16s ease, color .16s ease;
-  flex:none;
+  display:grid;
+  place-items:center;
+  transition:background .18s ease,color .18s ease;
 }
 
 .doc-tabs-add:hover{
-  background:#eef2f7;
+  background:#f1f3f4;
   color:#202124;
 }
 
@@ -2659,27 +2654,27 @@
             </button>
           </div>
         </div>
+        <div class="tool-dock-divider"></div>
+
+<div class="doc-tabs-bar">
+  <div class="doc-tabs-list" id="doc-tabs-list">
+    <button type="button" class="doc-side-tab is-active" data-tab-target="tab-documento" title="Documento">
+      <span class="doc-side-tab-left">
+        <svg class="doc-side-tab-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M6 4h9l3 3v13H6z" fill="none" stroke="currentColor" stroke-width="2"></path>
+          <path d="M15 4v4h4" fill="none" stroke="currentColor" stroke-width="2"></path>
+        </svg>
+        <span class="doc-side-tab-label">Documento</span>
+      </span>
+    </button>
+  </div>
+
+  <button type="button" class="doc-tabs-add" id="doc-tab-add-btn" title="Nueva pestaña">+</button>
+</div>
       </aside>
 
 <main class="workspace">
   <div class="doc-shell">
-
-    <div class="doc-tabs-bar">
-      <div class="doc-tabs-list" id="doc-tabs-list">
-        <button type="button" class="doc-side-tab is-active" data-tab-target="tab-documento">
-          <span class="doc-side-tab-left">
-            <svg class="doc-side-tab-icon" viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M6 4h9l3 3v13H6z" fill="none" stroke="currentColor" stroke-width="2"></path>
-              <path d="M15 4v4h4" fill="none" stroke="currentColor" stroke-width="2"></path>
-            </svg>
-            <span class="doc-side-tab-label">Documento</span>
-          </span>
-        </button>
-      </div>
-
-      <button type="button" class="doc-tabs-add" id="doc-tab-add-btn">+</button>
-    </div>
-
     <div class="doc-panels" id="doc-tab-panels">
       <section class="doc-panel is-active" id="tab-documento">
         <div class="paper-wrap">
