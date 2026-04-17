@@ -306,342 +306,242 @@
   }
 
   .topbar,
+.format-topbar{
+  margin-top:4px;
+  padding:6px 10px;
+  border:1px solid #dadce0;
+  border-radius:24px;
+  background:#f8f9fa;
+  box-shadow:none;
+  overflow:hidden;
+}
+
+.format-scroll{
+  overflow-x:auto;
+  overflow-y:hidden;
+  padding-bottom:0;
+  scrollbar-width:none;
+}
+
+.format-scroll::-webkit-scrollbar{
+  display:none;
+}
+
+.toolbar{
+  display:flex;
+  border:none;
+  background:transparent;
+  padding:0;
+  min-height:auto;
+  overflow:visible;
+}
+
+.format-toolbar{
+  width:max-content;
+  min-width:100%;
+  display:flex;
+  align-items:center;
+  gap:4px;
+  flex-wrap:nowrap;
+}
+
+.toolbar-group{
+  display:flex;
+  align-items:center;
+  gap:2px;
+  flex:none;
+  flex-wrap:nowrap;
+}
+
+.format-divider{
+  width:1px;
+  height:26px;
+  margin:0 4px;
+  background:#dadce0;
+  border-radius:999px;
+  flex:none;
+}
+
+.tool-btn{
+  position:relative;
+  min-width:32px;
+  width:32px;
+  height:32px;
+  padding:0;
+  border:none;
+  border-radius:6px;
+  background:transparent;
+  color:#3c4043;
+  cursor:pointer;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  box-shadow:none;
+  transition:background .14s ease,color .14s ease;
+}
+
+.tool-btn:hover{
+  background:#e8eaed;
+  color:#202124;
+  transform:none;
+}
+
+.tool-btn:focus-visible{
+  outline:none;
+  background:#e8f0fe;
+  color:#0b57d0;
+}
+
+.tool-btn.is-active{
+  background:#e8f0fe;
+  color:#0b57d0;
+}
+
+.tool-btn svg{
+  width:18px;
+  height:18px;
+  stroke:currentColor;
+  fill:none;
+  stroke-width:2;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+}
+
+.tool-btn.text-btn{
+  font-size:.95rem;
+  font-weight:700;
+}
+
+.text-btn strong,
+.text-btn em,
+.text-btn u,
+.text-btn s{
+  font-size:1rem;
+  line-height:1;
+}
+
+.tool-select{
+  width:auto;
+  min-width:0;
+  height:32px;
+  padding:0 28px 0 10px;
+  border:none;
+  border-radius:6px;
+  background:
+    linear-gradient(45deg,transparent 50%,#5f6368 50%) calc(100% - 14px) 13px/5px 5px no-repeat,
+    linear-gradient(135deg,#5f6368 50%,transparent 50%) calc(100% - 9px) 13px/5px 5px no-repeat,
+    transparent;
+  color:#3c4043;
+  outline:none;
+  font-weight:500;
+  font-size:.875rem;
+  appearance:none;
+  transition:background-color .14s ease,color .14s ease;
+}
+
+.tool-select:hover,
+.tool-select:focus{
+  background-color:#e8eaed;
+}
+
+#format-block{ min-width:150px; }
+#font-family-select{ min-width:96px; }
+#font-size-select{
+  min-width:56px;
+  text-align:center;
+  padding-left:10px;
+}
+
+.color-tool{
+  width:32px;
+  min-width:32px;
+  padding:0;
+  overflow:hidden;
+}
+
+.color-tool-input{
+  position:absolute;
+  inset:0;
+  opacity:0;
+  cursor:pointer;
+}
+
+.color-tool-letter{
+  position:relative;
+  font-size:15px;
+  font-weight:700;
+  line-height:1;
+}
+
+.color-tool-letter.highlight{
+  width:14px;
+  height:14px;
+  border-radius:3px;
+  background:var(--highlight-color, #fff59d);
+  border:1px solid rgba(60,64,67,.18);
+  display:block;
+}
+
+.color-tool-indicator{
+  position:absolute;
+  left:7px;
+  right:7px;
+  bottom:5px;
+  height:3px;
+  border-radius:999px;
+  background:var(--indicator-color, #202124);
+}
+
+#chatToolbarToggle{
+  margin-left:2px;
+}
+
+#chatToolbarToggle svg{
+  width:18px;
+  height:18px;
+}
+
+@media (max-width:1180px){
   .format-topbar{
-    position:relative;
-    z-index:1;
-  }
-
-  .topbar{
-    min-height:58px;
-    padding:8px 10px;
-    border:none;
-    border-radius:0;
-    background:transparent;
-    backdrop-filter:none;
-    box-shadow:none;
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:12px;
-  }
-
-  .topbar-left{
-    display:flex;
-    align-items:center;
-    gap:10px;
-    min-width:0;
-    flex:1;
-  }
-
-  .doc-icon{
-    width:28px;
-    height:34px;
-    border-radius:8px;
-    display:grid;
-    place-items:center;
-    background:#1a73e8;
-    color:#fff;
-    flex:none;
-    box-shadow:none;
-  }
-
-  .doc-icon svg{
-    width:16px;
-    height:16px;
-    stroke:currentColor;
-    fill:none;
-    stroke-width:2;
-    stroke-linecap:round;
-    stroke-linejoin:round;
-  }
-
-  .topbar-text{
-    min-width:0;
-    display:flex;
-    flex-direction:column;
-    gap:4px;
-  }
-
-  .topbar-title-row{
-    display:flex;
-    align-items:center;
-    gap:8px;
-    min-width:0;
-  }
-
-  .topbar-title-row strong{
-    display:block;
-    font-size:.95rem;
-    font-weight:600;
-    white-space:nowrap;
-    overflow:hidden;
-    text-overflow:ellipsis;
-    min-width:0;
-  }
-
-  .topbar-sub{
-    color:var(--muted);
-    font-size:.77rem;
-    display:flex;
-    align-items:center;
-    gap:8px;
-    flex-wrap:wrap;
-  }
-
-  .topbar-actions{
-    display:flex;
-    align-items:center;
-    gap:6px;
-    flex-wrap:nowrap;
-    flex:none;
-  }
-
-  .btn{
-    border:none;
-    border-radius:999px;
-    padding:7px 12px;
-    font-size:.84rem;
-    font-weight:600;
-    cursor:pointer;
-    transition:.16s ease;
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-    gap:8px;
-    white-space:nowrap;
-  }
-
-  .btn:hover{ transform:none; }
-
-  .btn-soft{
-    background:#f1f3f4;
-    color:var(--text);
-  }
-
-  .btn-soft:hover{ background:#e8eaed; }
-
-  .btn-outline{
-    background:#fff;
-    color:var(--text);
-    border:1px solid #dadce0;
-  }
-
-  .btn-outline:hover{ background:#f8fafc; }
-
-  .btn-primary{
-    background:#c2e7ff;
-    color:#0b57d0;
-  }
-
-  .btn-primary:hover{ background:#b5e0ff; }
-
-  .btn-icon{
-    display:inline-flex;
-    align-items:center;
-    gap:8px;
-  }
-
-  .btn-icon svg{
-    width:16px;
-    height:16px;
-    stroke:currentColor;
-    fill:none;
-    stroke-width:2.2;
-    stroke-linecap:round;
-    stroke-linejoin:round;
-  }
-
-  .format-topbar{
-    margin-top:2px;
-    padding:8px 10px;
-    border:1px solid #e0e3e7;
-    border-radius:16px;
-    background:#fff;
-    backdrop-filter:none;
-    box-shadow:none;
-    overflow:hidden;
-  }
-
-  .format-scroll{
-    overflow:hidden;
-    padding-bottom:0;
-  }
-
-  .format-scroll::-webkit-scrollbar{ height:6px; }
-  .format-scroll::-webkit-scrollbar-thumb{
-    background:#d7dce2;
-    border-radius:999px;
-  }
-
-  .toolbar{
-    display:flex;
-    border:none;
-    background:transparent;
-    padding:0;
-    min-height:auto;
+    padding:6px 8px;
+    border-radius:20px;
     overflow:visible;
   }
 
+  .format-scroll{
+    overflow-x:auto;
+    overflow-y:hidden;
+    padding-bottom:2px;
+  }
+
   .format-toolbar{
-    width:100%;
-    min-width:0;
-    display:flex;
-    align-items:center;
-    gap:10px;
-    flex-wrap:nowrap;
+    width:max-content;
+    min-width:max-content;
+  }
+}
+
+@media (max-width:720px){
+  .format-topbar{
+    padding:5px 7px;
+    border-radius:18px;
   }
 
-  .toolbar-group{
-    display:flex;
-    align-items:center;
-    gap:6px;
-    flex:none;
-    flex-wrap:nowrap;
-  }
-
-  .format-divider{
-    width:1px;
-    height:24px;
-    background:#e3e6ea;
-    border-radius:999px;
-    flex:none;
+  .tool-btn,
+  .tool-select{
+    height:30px;
   }
 
   .tool-btn{
-    min-width:34px;
-    width:34px;
-    height:34px;
-    padding:0 8px;
-    border:none;
-    border-radius:8px;
-    background:transparent;
-    color:#3c4043;
-    cursor:pointer;
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-    gap:6px;
-    box-shadow:none;
-    transition:background .16s ease,color .16s ease;
-  }
-
-  .tool-btn:hover{
-    background:#f1f3f4;
-    color:#202124;
-    transform:none;
-  }
-
-  .tool-btn.is-active{
-    background:#e8f0fe;
-    color:#0b57d0;
-    box-shadow:none;
+    width:30px;
+    min-width:30px;
   }
 
   .tool-btn svg{
-    width:16px;
-    height:16px;
-    stroke:currentColor;
-    fill:none;
-    stroke-width:2;
-    stroke-linecap:round;
-    stroke-linejoin:round;
-  }
-
-  .tool-btn.text-btn{
-    font-size:.88rem;
-    font-weight:800;
-    letter-spacing:-.01em;
-  }
-
-  .text-btn strong,
-  .text-btn em,
-  .text-btn u,
-  .text-btn s{
-    font-size:1rem;
-    line-height:1;
-  }
-
-  .tool-select{
-    width:auto;
-    min-width:104px;
-    height:34px;
-    padding:0 10px;
-    border:none;
-    border-radius:8px;
-    background:transparent;
-    color:var(--text);
-    outline:none;
-    font-weight:500;
-    font-size:.84rem;
-    appearance:none;
-    transition:background .15s ease;
-  }
-
-  .tool-select:hover,
-  .tool-select:focus{
-    background:#f1f3f4;
-    box-shadow:none;
-  }
-
-  #format-block{ min-width:138px; }
-  #font-family-select{ min-width:110px; }
-  #font-size-select{ min-width:68px; }
-
-  .tool-label{
-    display:inline-flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:10px;
-    min-width:92px;
-    height:34px;
-    padding:0 10px;
-    border:none;
-    border-radius:8px;
-    background:transparent;
-    color:#3c4043;
-    cursor:pointer;
-    font-size:.8rem;
-    font-weight:700;
-    white-space:nowrap;
-    transition:background .15s ease;
-    flex:none;
-  }
-
-  .tool-label:hover{ background:#f1f3f4; }
-
-  .color-wrap{
-    position:relative;
-    overflow:hidden;
-    width:18px;
-    height:18px;
-    border-radius:5px;
-    border:1px solid #cfd4da;
-    background:#fff;
-    flex:none;
-  }
-
-  .color-wrap input{
-    position:absolute;
-    inset:0;
-    width:100%;
-    height:100%;
-    border:none;
-    cursor:pointer;
-    background:none;
-    padding:0;
-  }
-
-  #chatToolbarToggle{ margin-left:2px; }
-
-  #chatToolbarToggle svg{
     width:17px;
     height:17px;
-    stroke:currentColor;
-    fill:none;
-    stroke-width:2;
-    stroke-linecap:round;
-    stroke-linejoin:round;
   }
+}
 
   .page-shell{
     position:relative;
@@ -2486,21 +2386,19 @@
 
             <div class="format-divider"></div>
 
-            <div class="toolbar-group">
-              <label class="tool-label" title="Color de texto">
-                Texto
-                <span class="color-wrap">
-                  <input type="color" id="text-color" value="#202124">
-                </span>
-              </label>
+<div class="toolbar-group">
+  <button type="button" class="tool-btn color-tool" id="text-color-tool" title="Color de texto" aria-label="Color de texto">
+    <span class="color-tool-letter">A</span>
+    <span class="color-tool-indicator" id="text-color-indicator"></span>
+    <input type="color" id="text-color" class="color-tool-input" value="#202124">
+  </button>
 
-              <label class="tool-label" title="Resaltado">
-                Fondo
-                <span class="color-wrap">
-                  <input type="color" id="highlight-color" value="#fff59d">
-                </span>
-              </label>
-            </div>
+  <button type="button" class="tool-btn color-tool" id="highlight-color-tool" title="Color de resaltado" aria-label="Color de resaltado">
+    <span class="color-tool-letter highlight"></span>
+    <span class="color-tool-indicator" id="highlight-color-indicator"></span>
+    <input type="color" id="highlight-color" class="color-tool-input" value="#fff59d">
+  </button>
+</div>
 
             <div class="format-divider"></div>
 
@@ -3084,6 +2982,29 @@
       const fontSizeSelect = $("font-size-select");
       const textColor = $("text-color");
       const highlightColor = $("highlight-color");
+      const textColorIndicator = $("text-color-indicator");
+const highlightColorIndicator = $("highlight-color-indicator");
+const highlightColorTool = $("highlight-color-tool");
+
+function syncToolbarColorIndicators() {
+  if (textColorIndicator && textColor) {
+    textColorIndicator.style.setProperty("--indicator-color", textColor.value || "#202124");
+    textColorIndicator.style.background = textColor.value || "#202124";
+  }
+
+  if (highlightColorIndicator && highlightColor) {
+    highlightColorIndicator.style.setProperty("--indicator-color", highlightColor.value || "#fff59d");
+    highlightColorIndicator.style.background = highlightColor.value || "#fff59d";
+  }
+
+  if (highlightColorTool && highlightColor) {
+    highlightColorTool.style.setProperty("--highlight-color", highlightColor.value || "#fff59d");
+  }
+}
+
+textColor?.addEventListener("input", syncToolbarColorIndicators);
+highlightColor?.addEventListener("input", syncToolbarColorIndicators);
+syncToolbarColorIndicators();
 
       const toolDockButtons = $$(".tool-dock-btn[data-panel]");
       const toolPanel = $("tool-panel");
