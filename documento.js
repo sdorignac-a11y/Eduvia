@@ -22,7 +22,9 @@ const CONFIG = {
   maxSources: 20,
 };
 
+const DOCUMENTOS_COLLECTION = "documentos";
 const params = new URLSearchParams(window.location.search);
+const sourceParam = params.get("source") || "clases";
 
 const $ = (id) => document.getElementById(id);
 const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
@@ -47,15 +49,21 @@ const escapeHtml = (value = "") =>
 
 const normalizeEmail = (email = "") => txt(email).toLowerCase();
 const normalizeRole = (role = "") => (role === "editor" ? "editor" : "viewer");
-const emailToKey = (email = "") => normalizeEmail(email).replace(/[^a-z0-9]/gi, "_");
-
-const DOCUMENTOS_COLLECTION = "documentos";
-const sourceParam = params.get("source") || "clases";
-
 const toArray = (value) => (Array.isArray(value) ? value : []);
+const emailToKey = (email = "") => normalizeEmail(email).replace(/[^a-z0-9]/gi, "_");
 
 const localDocKey = (ownerUid, claseId) =>
   `claseActual:${ownerUid || "unknown"}:${claseId || "unknown"}`;
+
+const sanitizeUrl = (value = "") => {
+  try {
+    const url = new URL(String(value), window.location.origin);
+    if (url.protocol === "http:" || url.protocol === "https:") return url.href;
+    return "";
+  } catch {
+    return "";
+  }
+};
 
 const getDomainLabel = (url = "") => {
   try {
@@ -70,30 +78,17 @@ const extractYear = (value = "") => {
   return match ? match[0] : "";
 };
 
-const sanitizeUrl = (value = "") => {
-  try {
-    const url = new URL(String(value), window.location.origin);
-    if (url.protocol === "http:" || url.protocol === "https:") return url.href;
-    return "";
-  } catch {
-    return "";
-  }
-};
-
 const stripObjectivePrefix = (value = "") =>
   String(value || "").replace(/^objetivo:\s*/i, "").trim();
 
-const plainTextToBlocks = (text = "") => {
-  const clean = txt(text);
-  if (!clean) return "";
-
-  return clean
-    .split(/\n{2,}/)
-    .map((block) => block.trim())
-    .filter(Boolean)
-    .map((block) => `<p>${escapeHtml(block).replace(/\n/g, "<br>")}</p>`)
-    .join("");
-};
+const normalizeCompareText = (value = "") =>
+  txt(value)
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^\w\s]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
 
 const splitResearchParagraphs = (text = "") => {
   const clean = txt(text);
@@ -303,10 +298,6 @@ function sanitizeHtml(inputHtml = "") {
   return cleanRoot.innerHTML.trim();
 }
 
-/* =========================
-   ELEMENTS
-========================= */
-
 const els = {
   topbarTitle: $("topbar-title"),
   topbarLastSave: $("topbar-last-save"),
@@ -355,14 +346,7 @@ const els = {
   simpleViewBtn: $("simple-view-btn"),
   apaViewBtn: $("apa-view-btn"),
   toggleReferenceViewBtn: $("toggle-reference-view-btn"),
-    tabList: $("doc-tabs-list"),
-  tabPanels: $("doc-tab-panels"),
-  tabAddBtn: $("doc-tab-add-btn"),
 };
-
-/* =========================
-   STATE
-========================= */
 
 const state = {
   currentUser: null,
@@ -393,15 +377,7 @@ const state = {
 
   referenceMode:
     localStorage.getItem(CONFIG.referenceViewKey) === "apa" ? "apa" : "simple",
-    tabs: [
-    { id: "tab-documento", title: "Documento", type: "documento", locked: true }
-  ],
-  activeTabId: "tab-documento",
 };
-
-/* =========================
-   DOM BASICS
-========================= */
 
 function setLastSaveLabel(text = "") {
   if (els.topbarLastSave) els.topbarLastSave.textContent = text;
@@ -468,17 +444,6 @@ function updateTopbarTitleFromEditor() {
   els.topbarTitle.textContent = txt(els.docTitle.textContent) || "Documento sin título";
 }
 
-function replaceNodeToClearListeners(node) {
-  if (!node || !node.parentNode) return node;
-  const clone = node.cloneNode(true);
-  node.parentNode.replaceChild(clone, node);
-  return clone;
-}
-
-/* =========================
-   STORAGE
-========================= */
-
 function readClaseFromLocalStorage(ownerUid, claseId) {
   try {
     const specific = localStorage.getItem(localDocKey(ownerUid, claseId));
@@ -532,10 +497,6 @@ function setSharedDocSession(role, user, ownerUid, claseId) {
   }
 }
 
-/* =========================
-   DOCUMENT DATA
-========================= */
-
 function getDocumentoTitle(clase = {}) {
   return clase.tituloDocumento || clase.tema || clase.titulo || "Documento sin título";
 }
@@ -568,7 +529,7 @@ function normalizeSourceItem(item, index = 0) {
   if (!title && !url) return null;
 
   return {
-    id: item.id || index + 1,
+    id: String(item.id || index + 1),
     author,
     year: year || "s.f.",
     title: title || `Fuente ${index + 1}`,
@@ -703,12 +664,15 @@ function normalizeGeneratedDocumentResult(apiDocumento = {}, claseBase = {}) {
     documento: structured || null,
     documentoTexto: !safeHtml && plainText ? plainText : "",
     resumenDocumento: txt(apiDocumento.resumenCorto || apiDocumento.resumen || ""),
+    fuentes:
+      toArray(apiDocumento.fuentes || apiDocumento.sources || apiDocumento.referencias).length
+        ? toArray(apiDocumento.fuentes || apiDocumento.sources || apiDocumento.referencias)
+        : toArray(claseBase.fuentes || claseBase.sources || claseBase.referencias),
+    investigacion:
+      txt(apiDocumento.investigacion || apiDocumento.research || apiDocumento.baseInvestigada) ||
+      txt(claseBase.investigacion || claseBase.research || claseBase.baseInvestigada),
   };
 }
-
-/* =========================
-   META + UI ROLE
-========================= */
 
 function setBasicMeta(clase = {}) {
   const titulo = getDocumentoTitle(clase);
@@ -760,140 +724,6 @@ function applyRoleUi(role = "viewer") {
     els.openShareBtn.style.display = role === "owner" ? "" : "none";
   }
 }
-
-function slugifyTab(value = "") {
-  return String(value || "")
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
-}
-
-function getTabIconSvg() {
-  return `
-    <svg class="doc-side-tab-icon" viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M6 4h9l3 3v13H6z" fill="none" stroke="currentColor" stroke-width="2"></path>
-      <path d="M15 4v4h4" fill="none" stroke="currentColor" stroke-width="2"></path>
-    </svg>
-  `;
-}
-
-function activateDocTab(tabId) {
-  state.activeTabId = tabId;
-
-  document.querySelectorAll(".doc-side-tab").forEach((tab) => {
-    tab.classList.toggle("is-active", tab.dataset.tabTarget === tabId);
-  });
-
-  document.querySelectorAll(".doc-panel").forEach((panel) => {
-    panel.classList.toggle("is-active", panel.id === tabId);
-  });
-}
-
-function createTabButton(tabId, title) {
-  const btn = document.createElement("button");
-  btn.type = "button";
-  btn.className = "doc-side-tab";
-  btn.dataset.tabTarget = tabId;
-  btn.innerHTML = `
-    <span class="doc-side-tab-left">
-      ${getTabIconSvg()}
-      <span class="doc-side-tab-label">${escapeHtml(title)}</span>
-    </span>
-    <span class="doc-side-tab-menu">⋮</span>
-  `;
-
-  btn.addEventListener("click", () => activateDocTab(tabId));
-  return btn;
-}
-
-function createTabPanel(tabId, html = "") {
-  const panel = document.createElement("section");
-  panel.className = "doc-panel";
-  panel.id = tabId;
-  panel.innerHTML = html;
-  return panel;
-}
-
-function ensureDocTab(title, type, html = "") {
-  if (!els.tabList || !els.tabPanels) return null;
-
-  const safeType = slugifyTab(type || title || "tab");
-  const existing = state.tabs.find((tab) => tab.type === safeType);
-
-  if (existing) {
-    const panel = document.getElementById(existing.id);
-    if (panel && !existing.locked) {
-      panel.innerHTML = html;
-    }
-    activateDocTab(existing.id);
-    return existing.id;
-  }
-
-  const tabId = `tab-${safeType}`;
-  const titleFinal = title || "Nueva pestaña";
-
-  const tabButton = createTabButton(tabId, titleFinal);
-  const tabPanel = createTabPanel(tabId, html);
-
-  els.tabList.appendChild(tabButton);
-  els.tabPanels.appendChild(tabPanel);
-
-  state.tabs.push({
-    id: tabId,
-    title: titleFinal,
-    type: safeType,
-    locked: false
-  });
-
-  activateDocTab(tabId);
-  return tabId;
-}
-
-function createEmptyUserTab() {
-  const count = state.tabs.filter((tab) => !tab.locked).length + 1;
-  const title = `Pestaña ${count + 1}`;
-
-  ensureDocTab(
-    title,
-    `manual-${count}`,
-    `
-      <div class="paper-wrap">
-        <article class="paper">
-          <div class="paper-inner">
-            <section
-              class="doc-content doc-editable"
-              contenteditable="true"
-              spellcheck="true"
-              data-placeholder="Escribí acá..."
-            ></section>
-          </div>
-        </article>
-      </div>
-    `
-  );
-}
-
-function bindDocTabsUi() {
-  document.querySelectorAll(".doc-side-tab").forEach((tab) => {
-    if (tab.dataset.bound === "true") return;
-    tab.dataset.bound = "true";
-
-    tab.addEventListener("click", () => {
-      activateDocTab(tab.dataset.tabTarget);
-    });
-  });
-
-  if (els.tabAddBtn && els.tabAddBtn.dataset.bound !== "true") {
-    els.tabAddBtn.dataset.bound = "true";
-    els.tabAddBtn.addEventListener("click", createEmptyUserTab);
-  }
-}
-
-/* =========================
-   SUPPORT PANEL
-========================= */
 
 function ensureSupportPanel() {
   if (!els.docContent || !els.docContent.parentNode) return null;
@@ -1003,53 +833,44 @@ function renderSupportPanel(clase = {}) {
   }
 
   panel.innerHTML = html;
-  panel.style.display = "";
-}
-
-/* =========================
-   REFERENCES / APA
-========================= */
-
-function bindReferencesUi() {
-  if (state.referencesBound) return;
-  state.referencesBound = true;
-
-  els.simpleViewBtn?.addEventListener("click", () => setReferenceMode("simple"));
-  els.apaViewBtn?.addEventListener("click", () => setReferenceMode("apa"));
-  els.toggleReferenceViewBtn?.addEventListener("click", () => {
-    setReferenceMode(state.referenceMode === "apa" ? "simple" : "apa");
-  });
+  panel.style.display = "block";
 }
 
 function getSourceById(id, sources = []) {
-  return sources.find((source) => String(source.id) === String(id));
+  const stringId = String(id || "").trim();
+  return sources.find((source) => String(source.id) === stringId) || null;
 }
 
 function formatSimpleReference(source) {
-  const url = sanitizeUrl(source.url || "");
+  const safeUrl = sanitizeUrl(source.url || "");
+  const title = escapeHtml(source.title || "Fuente");
+  const site = escapeHtml(source.site || "");
+  const year = escapeHtml(source.year || "s.f.");
+
   return `
-    <strong>${escapeHtml(source.title)}</strong><br>
-    <span>${escapeHtml(source.author)} · ${escapeHtml(source.year)}${
-      source.site ? ` · ${escapeHtml(source.site)}` : ""
-    }</span>
+    <strong>${title}</strong>
+    ${site ? ` — ${site}` : ""}
+    ${year ? ` (${year})` : ""}
     ${
-      url
-        ? `<br><a class="reference-link" href="${url}" target="_blank" rel="noopener noreferrer">${escapeHtml(url)}</a>`
+      safeUrl
+        ? ` — <a class="reference-link" href="${safeUrl}" target="_blank" rel="noopener noreferrer">${escapeHtml(
+            safeUrl.replace(/^https?:\/\//, "")
+          )}</a>`
         : ""
     }
   `;
 }
 
 function formatApaReference(source) {
-  const url = sanitizeUrl(source.url || "");
+  const author = escapeHtml(source.author || "Autor desconocido");
+  const year = escapeHtml(source.year || "s.f.");
+  const title = escapeHtml(source.title || "Sin título");
+  const site = escapeHtml(source.site || "");
+  const safeUrl = sanitizeUrl(source.url || "");
+
   return `
-    <span>${escapeHtml(source.author)}. (${escapeHtml(source.year || "s.f.")}). <em>${escapeHtml(
-      source.title
-    )}</em>${source.site ? `. ${escapeHtml(source.site)}` : ""}.</span>
-    ${
-      url
-        ? `<a class="reference-link" href="${url}" target="_blank" rel="noopener noreferrer">${escapeHtml(url)}</a>`
-        : ""
+    ${author}. (${year}). <em>${title}</em>${site ? `. ${site}` : ""}${
+      safeUrl ? `. <a class="reference-link" href="${safeUrl}" target="_blank" rel="noopener noreferrer">${escapeHtml(safeUrl)}</a>` : ""
     }
   `;
 }
@@ -1146,9 +967,17 @@ function setReferenceMode(mode) {
   renderReferencesSection();
 }
 
-/* =========================
-   DOCUMENT RENDER
-========================= */
+function bindReferencesUi() {
+  if (state.referencesBound) return;
+  state.referencesBound = true;
+
+  els.simpleViewBtn?.addEventListener("click", () => setReferenceMode("simple"));
+  els.apaViewBtn?.addEventListener("click", () => setReferenceMode("apa"));
+  els.toggleReferenceViewBtn?.addEventListener("click", () => {
+    const next = state.referenceMode === "apa" ? "simple" : "apa";
+    setReferenceMode(next);
+  });
+}
 
 function renderGeneratingDocument(clase = {}) {
   setBasicMeta(clase);
@@ -1166,144 +995,72 @@ function renderGeneratingDocument(clase = {}) {
 function renderGeneratedStructure(clase = {}) {
   if (!els.docContent) return;
 
-  const materia = escapeHtml(clase.materia || "la materia");
-  const tema = escapeHtml(getDocumentoTitle(clase));
-  const nivel = escapeHtml(clase.nivel || "el nivel seleccionado");
-  const duracion = escapeHtml(clase.duracion || "la duración indicada");
-  const objetivo = escapeHtml(
-    getDocumentoObjective(clase) || "comprender mejor el contenido trabajado"
-  );
+  const structured = getDocumentoStructuredRaw(clase);
+  if (!structured) {
+    els.docContent.innerHTML = "";
+    return;
+  }
 
-  const researchParagraphs = splitResearchParagraphs(getInvestigacionDocumento(clase));
+  const parts = [];
 
-  els.docContent.innerHTML = `
-    <h2>Resumen</h2>
-    <p>
-      Este documento organiza la clase de <strong>${materia}</strong> sobre
-      <strong>${tema}</strong> en un formato claro y fácil de estudiar.
-      Está pensado para una explicación adaptada a <strong>${nivel}</strong>,
-      con una duración estimada de <strong>${duracion}</strong>.
-    </p>
+  if (txt(structured.resumen)) {
+    parts.push(`<p>${escapeHtml(structured.resumen)}</p>`);
+  }
 
-    <p>
-      El foco principal de esta clase es <strong>${objetivo}</strong>.
-      Por eso, el contenido debería avanzar de forma ordenada, con definiciones,
-      explicación paso a paso y ejemplos simples antes de pasar a ideas más complejas.
-    </p>
+  if (txt(structured.explicacion)) {
+    parts.push(`<h2>Explicación</h2><p>${escapeHtml(structured.explicacion)}</p>`);
+  }
 
-    <h2>Desarrollo del tema</h2>
-    <p>En esta sección debería aparecer la explicación principal del tema.</p>
-
-    ${
-      researchParagraphs.length
-        ? `
-          <h2>Base investigada</h2>
-          ${researchParagraphs
-            .slice(0, 3)
-            .map((item) => `<p>${escapeHtml(item)}</p>`)
-            .join("")}
-        `
-        : ""
-    }
-
-    <h2>Puntos clave</h2>
-    <ul>
-      <li>La clase está centrada en el tema: <strong>${tema}</strong>.</li>
-      <li>El contenido debe estar adaptado al nivel: <strong>${nivel}</strong>.</li>
-      <li>El objetivo principal es: <strong>${objetivo}</strong>.</li>
-    </ul>
-
-    <h2>Cierre</h2>
-    <p>Este documento quedó como base visual, pero no se recibió contenido completo.</p>
-  `;
-}
-
-function renderRichHtmlDocumento(clase = {}) {
-  const rawHtml = getDocumentoHtmlRaw(clase);
-  if (!hasRealHtml(rawHtml) || !els.docContent) return false;
-
-  const safeHtml = sanitizeHtml(rawHtml);
-  if (!safeHtml) return false;
-
-  els.docContent.innerHTML = safeHtml;
-  return true;
-}
-
-function renderStructuredDocumento(clase = {}) {
-  if (!els.docContent) return false;
-
-  const content = getDocumentoStructuredRaw(clase);
-  if (!hasRealStructuredDoc(content)) return false;
-
-  const resumen = escapeHtml(content.resumen || "");
-  const explicacion = escapeHtml(content.explicacion || "");
-  const ejemplo = escapeHtml(content.ejemplo || "");
-  const cierre = escapeHtml(content.cierre || "");
-  const puntosClave = toArray(content.puntosClave);
-  const preguntas = toArray(content.preguntas);
-
-  let html = "";
-
-  if (resumen) html += `<h2>Resumen</h2><p>${resumen}</p>`;
-  if (explicacion) html += `<h2>Desarrollo del tema</h2><p>${explicacion}</p>`;
-
+  const puntosClave = toArray(structured.puntosClave).filter((item) => txt(item));
   if (puntosClave.length) {
-    html += `<h2>Puntos clave</h2><ul>${puntosClave
-      .map((item) => `<li>${escapeHtml(item)}</li>`)
-      .join("")}</ul>`;
+    parts.push(`
+      <h2>Puntos clave</h2>
+      <ul>
+        ${puntosClave.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}
+      </ul>
+    `);
   }
 
-  if (ejemplo) html += `<h2>Ejemplo o aplicación</h2><p>${ejemplo}</p>`;
+  if (txt(structured.ejemplo)) {
+    parts.push(`<h2>Ejemplo</h2><p>${escapeHtml(structured.ejemplo)}</p>`);
+  }
 
+  const preguntas = toArray(structured.preguntas).filter((item) => txt(item));
   if (preguntas.length) {
-    html += `<h2>Preguntas para practicar</h2><ol>${preguntas
-      .map((item) => `<li>${escapeHtml(item)}</li>`)
-      .join("")}</ol>`;
+    parts.push(`
+      <h2>Preguntas para estudiar</h2>
+      <ol>
+        ${preguntas.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}
+      </ol>
+    `);
   }
 
-  if (cierre) html += `<h2>Cierre</h2><p>${cierre}</p>`;
-  if (!html.trim()) return false;
+  if (txt(structured.cierre)) {
+    parts.push(`<h2>Cierre</h2><p>${escapeHtml(structured.cierre)}</p>`);
+  }
 
-  els.docContent.innerHTML = html;
-  return true;
-}
-
-function renderPlainTextDocumento(clase = {}) {
-  if (!els.docContent) return false;
-
-  const rawText = getDocumentoPlainTextRaw(clase);
-  if (!hasRealText(rawText)) return false;
-
-  const blocks = rawText
-    .split(/\n{2,}/)
-    .map((block) => block.trim())
-    .filter(Boolean);
-
-  if (!blocks.length) return false;
-
-  els.docContent.innerHTML = blocks
-    .map((block, index) =>
-      index === 0
-        ? `<p><strong>${escapeHtml(block)}</strong></p>`
-        : `<p>${escapeHtml(block)}</p>`
-    )
-    .join("");
-
-  return true;
-}
-
-function syncSavedSignatureFromDom() {
-  state.lastSavedSignature = getPayloadSignature(getCurrentDocumentPayload());
+  els.docContent.innerHTML = parts.join("") || "";
 }
 
 function renderClase(clase = {}) {
   setBasicMeta(clase);
 
-  if (
-    !renderRichHtmlDocumento(clase) &&
-    !renderStructuredDocumento(clase) &&
-    !renderPlainTextDocumento(clase)
-  ) {
+  if (!els.docContent) return;
+
+  const html = sanitizeHtml(getDocumentoHtmlRaw(clase));
+  const text = getDocumentoPlainTextRaw(clase);
+
+  if (html && !isTemporaryDocumentPlaceholder(html)) {
+    els.docContent.innerHTML = html;
+  } else if (text && !isTemporaryDocumentPlaceholder(text)) {
+    const paragraphs = text
+      .split(/\n{2,}/)
+      .map((block) => block.trim())
+      .filter(Boolean)
+      .map((block) => `<p>${escapeHtml(block).replace(/\n/g, "<br>")}</p>`)
+      .join("");
+    els.docContent.innerHTML = paragraphs;
+  } else {
     renderGeneratedStructure(clase);
   }
 
@@ -1313,10 +1070,6 @@ function renderClase(clase = {}) {
   renderReferencesSection();
   syncSavedSignatureFromDom();
 }
-
-/* =========================
-   SAVE
-========================= */
 
 function getCurrentDocumentPayload() {
   const titulo = txt(els.docTitle?.textContent || "") || "Documento sin título";
@@ -1339,6 +1092,11 @@ function getPayloadSignature(payload = {}) {
     objetivoDocumento: payload.objetivoDocumento || "",
     contenidoHtml: payload.contenidoHtml || "",
   });
+}
+
+function syncSavedSignatureFromDom() {
+  const payload = getCurrentDocumentPayload();
+  state.lastSavedSignature = getPayloadSignature(payload);
 }
 
 function scheduleSave() {
@@ -1435,168 +1193,106 @@ function bindAutosave() {
     node?.addEventListener("paste", handlePlainTextPaste);
   });
 
-  document.addEventListener("visibilitychange", () => {
-    if (document.hidden) {
-      clearTimeout(state.saveTimer);
-      void saveDocumentEdits(true);
-    }
-  });
-
-  window.addEventListener("pagehide", () => {
-    clearTimeout(state.saveTimer);
-    void saveDocumentEdits(true);
+  window.addEventListener("beforeunload", () => {
+    if (state.saveTimer) clearTimeout(state.saveTimer);
   });
 }
 
-/* =========================
-   SHARE
-========================= */
+function isValidEmail(email = "") {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(txt(email));
+}
 
-function getShareUrl() {
-  if (!state.currentClaseId || !state.currentOwnerUid) return window.location.href;
+async function handleShareInvite({ email, role }) {
+  if (!state.currentClaseRef) throw new Error("No hay documento cargado.");
+  if (state.currentRole !== "owner") throw new Error("Solo el dueño puede compartir.");
+  if (!isValidEmail(email)) throw new Error("Ingresá un email válido.");
 
-  const url = new URL(window.location.href);
-  url.searchParams.set("id", state.currentClaseId);
-  url.searchParams.set("owner", state.currentOwnerUid);
+  const normalizedEmail = normalizeEmail(email);
+  const normalized = normalizeRole(role);
 
-  if (state.currentClaseRef?.path?.includes("/documentos/")) {
-    url.searchParams.set("source", "documentos");
+  const payload = {
+    sharedWithEmails: arrayUnion(normalizedEmail),
+    sharedUsers: {
+      ...(state.currentClaseData?.sharedUsers || {}),
+      [emailToKey(normalizedEmail)]: {
+        email: normalizedEmail,
+        role: normalized,
+        invitedAt: new Date().toISOString(),
+      },
+    },
+    sharedWith: arrayUnion({
+      email: normalizedEmail,
+      role: normalized,
+    }),
+    updatedAt: serverTimestamp(),
+  };
+
+  if (normalized === "editor") {
+    payload.sharedEditorEmails = arrayUnion(normalizedEmail);
+    payload.sharedViewerEmails = arrayRemove(normalizedEmail);
   } else {
-    url.searchParams.delete("source");
+    payload.sharedViewerEmails = arrayUnion(normalizedEmail);
+    payload.sharedEditorEmails = arrayRemove(normalizedEmail);
   }
 
-  return url.toString();
+  await setDoc(state.currentClaseRef, payload, { merge: true });
+
+  state.currentClaseData = {
+    ...(state.currentClaseData || {}),
+    sharedWithEmails: Array.from(
+      new Set([...(state.currentClaseData?.sharedWithEmails || []), normalizedEmail])
+    ),
+    sharedViewerEmails:
+      normalized === "viewer"
+        ? Array.from(new Set([...(state.currentClaseData?.sharedViewerEmails || []), normalizedEmail]))
+        : (state.currentClaseData?.sharedViewerEmails || []).filter(
+            (item) => normalizeEmail(item) !== normalizedEmail
+          ),
+    sharedEditorEmails:
+      normalized === "editor"
+        ? Array.from(new Set([...(state.currentClaseData?.sharedEditorEmails || []), normalizedEmail]))
+        : (state.currentClaseData?.sharedEditorEmails || []).filter(
+            (item) => normalizeEmail(item) !== normalizedEmail
+          ),
+    sharedUsers: {
+      ...(state.currentClaseData?.sharedUsers || {}),
+      [emailToKey(normalizedEmail)]: {
+        email: normalizedEmail,
+        role: normalized,
+        invitedAt: new Date().toISOString(),
+      },
+    },
+  };
+
+  writeClaseToLocalStorage(state.currentClaseData, state.currentOwnerUid, state.currentClaseId);
 }
 
-function rebindShareElements() {
-  els.openShareBtn = replaceNodeToClearListeners(els.openShareBtn);
-  els.closeShareBtn = replaceNodeToClearListeners(els.closeShareBtn);
-  els.copyLinkBtn = replaceNodeToClearListeners(els.copyLinkBtn);
-  els.sendShareBtn = replaceNodeToClearListeners(els.sendShareBtn);
+function openShareModal() {
+  els.shareModal?.classList.add("show");
+  if (els.docLinkInput) els.docLinkInput.value = window.location.href;
+  if (els.shareStatus) els.shareStatus.textContent = "";
+}
+
+function closeShareModal() {
+  els.shareModal?.classList.remove("show");
+  if (els.shareStatus) els.shareStatus.textContent = "";
 }
 
 function bindShareUi() {
-  if (state.shareBound || !els.shareModal) return;
+  if (state.shareBound) return;
   state.shareBound = true;
 
-  rebindShareElements();
+  if (els.docLinkInput) els.docLinkInput.value = window.location.href;
 
-  const openModal = () => {
-    if (els.docLinkInput) els.docLinkInput.value = getShareUrl();
-    if (els.shareStatus) els.shareStatus.textContent = "";
-    els.shareModal?.classList.add("show");
+  window.handleEduviaShareInvite = async ({ email, role }) => {
+    await handleShareInvite({ email, role });
+    if (els.shareEmailInput) els.shareEmailInput.value = "";
+    if (els.shareRoleSelect) els.shareRoleSelect.value = "viewer";
   };
 
-  const closeModal = () => {
-    els.shareModal?.classList.remove("show");
-  };
-
-  els.openShareBtn?.addEventListener("click", openModal);
-  els.closeShareBtn?.addEventListener("click", closeModal);
-
-  els.shareModal?.addEventListener("click", (event) => {
-    if (event.target === els.shareModal) closeModal();
-  });
-
-  els.copyLinkBtn?.addEventListener("click", async () => {
-    try {
-      const url = getShareUrl();
-      await navigator.clipboard.writeText(url);
-      if (els.docLinkInput) els.docLinkInput.value = url;
-      if (els.shareStatus) els.shareStatus.textContent = "Link copiado.";
-    } catch {
-      if (els.shareStatus) els.shareStatus.textContent = "No se pudo copiar el link.";
-    }
-  });
-
-  els.sendShareBtn?.addEventListener("click", async () => {
-    if (state.currentRole !== "owner") {
-      if (els.shareStatus) els.shareStatus.textContent = "Solo el dueño puede compartir.";
-      return;
-    }
-
-    const email = normalizeEmail(els.shareEmailInput?.value || "");
-    const role = normalizeRole(els.shareRoleSelect?.value || "viewer");
-
-    if (!email || !email.includes("@")) {
-      if (els.shareStatus) els.shareStatus.textContent = "Escribí un email válido.";
-      return;
-    }
-
-    if (!state.currentClaseRef || !state.currentClaseId || !state.currentOwnerUid) {
-      if (els.shareStatus) els.shareStatus.textContent = "No se pudo identificar el documento.";
-      return;
-    }
-
-    if (email === normalizeEmail(state.currentUser?.email || "")) {
-      if (els.shareStatus) els.shareStatus.textContent = "Ese email ya es el dueño.";
-      return;
-    }
-
-    try {
-      const sharedUserKey = `sharedUsers.${emailToKey(email)}`;
-
-      const updates = {
-        sharedWithEmails: arrayUnion(email),
-        [sharedUserKey]: {
-          email,
-          role,
-          invitedBy: normalizeEmail(state.currentUser?.email || ""),
-          invitedAt: new Date().toISOString(),
-        },
-        updatedAt: serverTimestamp(),
-      };
-
-      if (role === "editor") {
-        updates.sharedEditorEmails = arrayUnion(email);
-        updates.sharedViewerEmails = arrayRemove(email);
-      } else {
-        updates.sharedViewerEmails = arrayUnion(email);
-        updates.sharedEditorEmails = arrayRemove(email);
-      }
-
-      await updateDoc(state.currentClaseRef, updates);
-
-      state.currentClaseData = {
-        ...(state.currentClaseData || {}),
-        sharedWithEmails: Array.from(
-          new Set([...(state.currentClaseData?.sharedWithEmails || []), email])
-        ),
-      };
-
-      writeClaseToLocalStorage(state.currentClaseData, state.currentOwnerUid, state.currentClaseId);
-
-      const shareUrl = getShareUrl();
-      const subject = encodeURIComponent("Te compartieron un documento de Eduvia");
-      const body = encodeURIComponent(
-        `Hola.\n\nTe compartieron este documento de Eduvia:\n${shareUrl}\n\nPermiso: ${
-          role === "editor" ? "Puede editar" : "Solo ver"
-        }\n\nEse enlace te da acceso únicamente a este documento.`
-      );
-
-      window.open(
-        `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(
-          email
-        )}&su=${subject}&body=${body}`,
-        "_blank"
-      );
-
-      if (els.shareStatus) {
-        els.shareStatus.textContent = "Permiso guardado y Gmail abierto con la invitación.";
-      }
-
-      if (els.shareEmailInput) els.shareEmailInput.value = "";
-      if (els.shareRoleSelect) els.shareRoleSelect.value = "viewer";
-    } catch (error) {
-      console.error("Error compartiendo documento:", error);
-      if (els.shareStatus) els.shareStatus.textContent = "No se pudo compartir el documento.";
-    }
-  });
+  window.openEduviaShareModal = openShareModal;
+  window.closeEduviaShareModal = closeShareModal;
 }
-
-/* =========================
-   ROLE RESOLUTION
-========================= */
 
 function resolveUserRole(clase, user, ownerUid) {
   if (!user) return null;
@@ -1625,10 +1321,6 @@ function resolveUserRole(clase, user, ownerUid) {
 
   return null;
 }
-
-/* =========================
-   API
-========================= */
 
 async function fetchJsonWithTimeout(url, options = {}, timeoutMs = CONFIG.generateTimeoutMs) {
   const controller = new AbortController();
@@ -1668,6 +1360,101 @@ async function fetchJsonWithTimeout(url, options = {}, timeoutMs = CONFIG.genera
   }
 }
 
+async function requestDocumentGeneration(clase = {}) {
+  const body = {
+    materia: clase.materia || "",
+    tema: clase.tema || clase.titulo || "",
+    nivel: clase.nivel || "",
+    duracion: clase.duracion || "",
+    objetivo: clase.objetivo || clase.objetivoDocumento || "",
+    fuentes: toArray(clase.fuentes || clase.sources || clase.referencias),
+    contenidoBase:
+      txt(clase.contenido || "") ||
+      txt(clase.documentoTexto || "") ||
+      txt(clase.investigacion || ""),
+    documentId: state.currentClaseId,
+    ownerUid: state.currentOwnerUid,
+    source: sourceParam,
+  };
+
+  const endpoints = [
+    "/api/generar-documento",
+    "/api/generate-document",
+    "/api/documento/generar",
+    "/api/crear-documento",
+  ];
+
+  let lastError = null;
+
+  for (const endpoint of endpoints) {
+    try {
+      const { data } = await fetchJsonWithTimeout(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+
+      const payload = data?.documento || data?.result || data?.data || data;
+      if (payload && typeof payload === "object") return payload;
+    } catch (error) {
+      lastError = error;
+    }
+  }
+
+  throw lastError || new Error("No se pudo generar el documento.");
+}
+
+function buildFallbackGeneratedDocument(clase = {}) {
+  const tema = txt(clase.tema || clase.titulo || "este tema");
+  const objetivo = txt(clase.objetivo || clase.objetivoDocumento || "");
+  const materia = txt(clase.materia || "la materia");
+  const nivel = txt(clase.nivel || "el nivel indicado");
+  const investigacion = txt(clase.investigacion || "");
+
+  const safeInvestigacion = investigacion
+    ? investigacion
+        .split(/\n{2,}/)
+        .map((block) => block.trim())
+        .filter(Boolean)
+        .slice(0, 4)
+    : [];
+
+  const html = `
+    <h2>Introducción</h2>
+    <p>${escapeHtml(
+      `Este documento desarrolla ${tema} dentro de ${materia}, pensado para ${nivel}.`
+    )}</p>
+    ${
+      objetivo
+        ? `<p>${escapeHtml(`El objetivo principal es ${objetivo}.`)}</p>`
+        : ""
+    }
+    <h2>Desarrollo</h2>
+    ${
+      safeInvestigacion.length
+        ? safeInvestigacion.map((block) => `<p>${escapeHtml(block)}</p>`).join("")
+        : `<p>${escapeHtml(
+            `Todavía no llegó una generación completa desde el backend, pero esta base ya te deja el documento editable para seguir trabajando ${tema}.`
+          )}</p>`
+    }
+    <h2>Cierre</h2>
+    <p>${escapeHtml(
+      `Como síntesis, ${tema} puede estudiarse retomando sus ideas principales, ejemplos y relaciones con el resto del contenido.`
+    )}</p>
+  `;
+
+  return {
+    tituloDocumento: getDocumentoTitle(clase),
+    objetivoDocumento: getDocumentoObjective(clase),
+    contenidoHtml: sanitizeHtml(html),
+    documentoTexto: "",
+    documento: null,
+    resumenDocumento: "",
+    investigacion: clase.investigacion || "",
+    fuentes: toArray(clase.fuentes || clase.sources || clase.referencias),
+  };
+}
+
 async function generarDocumentoSiFalta(clase = {}) {
   if (state.generationPromise) return state.generationPromise;
 
@@ -1687,155 +1474,83 @@ async function generarDocumentoSiFalta(clase = {}) {
       renderGeneratingDocument(clase);
       setLoadingStage("sources", "Estamos buscando fuentes confiables para construir el documento.");
 
-      const payload = {
-        materia: clase.materia || "",
-        tema: clase.tema || "",
-        nivel: clase.nivel || "",
-        duracion: clase.duracion || "",
-        objetivo: clase.objetivo || clase.objetivoDocumento || "",
-        investigacion: getInvestigacionDocumento(clase),
-        fuentes: getFuentesDocumento(clase),
-        contenidoBase: getDocumentoPlainTextRaw(clase),
-      };
-
-      console.log("CLASE BASE:", clase);
-      console.log("INVESTIGACION ENVIADA:", payload.investigacion);
-      console.log("FUENTES ENVIADAS:", payload.fuentes);
-      console.log("TEXTO BASE:", payload.contenidoBase);
-
-      const { response, data } = await fetchJsonWithTimeout("/api/generar-documento", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
-
-      console.log("RESPUESTA /api/generar-documento:", {
-        status: response?.status,
-        okHttp: response?.ok,
-        okBody: data?.ok,
-        error: data?.error,
-        detail: data?.detail,
-        hasDocumento: Boolean(data?.documento),
-      });
-
-      setLoadingStage(
-        "analysis",
-        "Ordenando la investigación y preparando la mejor versión del contenido."
-      );
-
-      if (!response.ok || !data?.ok || !data?.documento) {
-        console.error("Respuesta completa del backend:", data);
-        throw new Error(data?.detail || data?.error || "No se pudo generar el documento.");
+      let generatedRaw = null;
+      try {
+        generatedRaw = await requestDocumentGeneration(clase);
+      } catch (error) {
+        console.warn("No se pudo generar desde backend. Se usa fallback local.", error);
       }
 
-      const normalizedDoc = normalizeGeneratedDocumentResult(data.documento, clase);
+      const normalized = generatedRaw
+        ? normalizeGeneratedDocumentResult(generatedRaw, clase)
+        : buildFallbackGeneratedDocument(clase);
 
-      const documentoGeneradoValido =
-        hasRealHtml(normalizedDoc.contenidoHtml) ||
-        hasRealText(normalizedDoc.documentoTexto) ||
-        hasRealStructuredDoc(normalizedDoc.documento);
-
-      if (!documentoGeneradoValido) {
-        console.error("Respuesta cruda del backend:", data);
-        throw new Error(
-          data?.detail || "La IA respondió, pero no devolvió contenido utilizable."
-        );
-      }
-
-      setLoadingStage("writing", "Pegando el contenido final y terminando el documento.");
-
-      const merged = {
+      const claseFinal = {
         ...clase,
-        tituloDocumento: normalizedDoc.tituloDocumento,
-        objetivoDocumento: normalizedDoc.objetivoDocumento,
-        contenidoHtml: normalizedDoc.contenidoHtml || "",
-        documento: normalizedDoc.documento || null,
-        documentoTexto: normalizedDoc.documentoTexto || "",
-        resumenDocumento: normalizedDoc.resumenDocumento || "",
-        investigacion: txt(data.investigacion || getInvestigacionDocumento(clase)),
-        fuentes: toArray(data.fuentes).length ? data.fuentes : getFuentesDocumento(clase),
+        ...normalized,
         updatedAt: new Date().toISOString(),
       };
 
-      if (state.currentClaseRef && canEdit()) {
-        try {
-          await setDoc(
-            state.currentClaseRef,
-            {
-              tituloDocumento: merged.tituloDocumento,
-              objetivoDocumento: merged.objetivoDocumento,
-              contenidoHtml: merged.contenidoHtml || "",
-              documento: merged.documento || null,
-              documentoTexto: merged.documentoTexto || "",
-              resumenDocumento: merged.resumenDocumento || "",
-              investigacion: merged.investigacion,
-              fuentes: merged.fuentes,
-              updatedAt: serverTimestamp(),
-            },
-            { merge: true }
-          );
-        } catch (error) {
-          console.error("Error guardando documento generado:", error);
-        }
+      if (state.currentClaseRef) {
+        await setDoc(
+          state.currentClaseRef,
+          {
+            tituloDocumento: claseFinal.tituloDocumento,
+            objetivoDocumento: claseFinal.objetivoDocumento,
+            contenidoHtml: claseFinal.contenidoHtml || "",
+            documentoTexto: claseFinal.documentoTexto || "",
+            documento: claseFinal.documento || null,
+            resumenDocumento: claseFinal.resumenDocumento || "",
+            investigacion: claseFinal.investigacion || "",
+            fuentes: toArray(claseFinal.fuentes),
+            updatedAt: serverTimestamp(),
+          },
+          { merge: true }
+        );
       }
 
-      state.currentClaseData = merged;
-      writeClaseToLocalStorage(merged, state.currentOwnerUid, state.currentClaseId);
-      return merged;
+      return claseFinal;
     } finally {
       state.isGeneratingDocument = false;
+      state.generationPromise = null;
     }
   })();
 
-  try {
-    return await state.generationPromise;
-  } finally {
-    state.generationPromise = null;
-  }
+  return state.generationPromise;
 }
 
-/* =========================
-   LOAD DOC
-========================= */
 async function resolveClaseFromFirestoreOrLocal(user) {
-  const fallbackOwner = state.currentOwnerUid || user.uid;
-  const localClase = readClaseFromLocalStorage(fallbackOwner, state.currentClaseId);
+  const ownerFromQuery = params.get("owner");
+  const localOwner = ownerFromQuery || user.uid;
+  const localClase = readClaseFromLocalStorage(localOwner, state.currentClaseId);
 
-  if (!state.currentClaseId && localClase?.id) state.currentClaseId = localClase.id;
-  if (!state.currentOwnerUid) state.currentOwnerUid = localClase?.ownerUid || user.uid;
+  state.currentOwnerUid = ownerFromQuery || localClase?.ownerUid || user.uid;
 
   if (!state.currentClaseId) {
-  if (localClase) {
-  state.currentClaseData = localClase;
-  state.currentRole = state.currentOwnerUid === user.uid ? "owner" : "viewer";
-  state.currentClaseRef = doc(
-    db,
-    "usuarios",
-    state.currentOwnerUid,
-    sourceParam === "documentos" ? DOCUMENTOS_COLLECTION : "clases",
-    localClase.id
-  );
+    if (localClase?.id) {
+      state.currentClaseId = localClase.id;
+      state.currentClaseData = localClase;
+      state.currentRole = state.currentOwnerUid === user.uid ? "owner" : "viewer";
 
-  if (state.currentRole === "owner") clearSharedDocSession();
-  else setSharedDocSession(state.currentRole, user, state.currentOwnerUid, localClase.id);
+      if (state.currentRole === "owner") clearSharedDocSession();
+      else setSharedDocSession(state.currentRole, user, state.currentOwnerUid, localClase.id);
 
-  return { clase: localClase, origin: "local" };
-}
+      return { clase: localClase, origin: "local" };
+    }
 
     throw new Error("No se encontró el identificador del documento.");
   }
 
-  const refs = sourceParam === "documentos"
-    ? [
-        doc(db, "usuarios", state.currentOwnerUid, DOCUMENTOS_COLLECTION, state.currentClaseId),
-        doc(db, "usuarios", state.currentOwnerUid, "clases", state.currentClaseId),
-      ]
-    : [
-        doc(db, "usuarios", state.currentOwnerUid, "clases", state.currentClaseId),
-        doc(db, "usuarios", state.currentOwnerUid, DOCUMENTOS_COLLECTION, state.currentClaseId),
-      ];
+  const refs =
+    sourceParam === "documentos"
+      ? [
+          doc(db, "usuarios", state.currentOwnerUid, DOCUMENTOS_COLLECTION, state.currentClaseId),
+          doc(db, "usuarios", state.currentOwnerUid, "clases", state.currentClaseId),
+        ]
+      : [
+          doc(db, "usuarios", state.currentOwnerUid, "clases", state.currentClaseId),
+          doc(db, "usuarios", state.currentOwnerUid, DOCUMENTOS_COLLECTION, state.currentClaseId),
+        ];
 
   for (const ref of refs) {
     try {
@@ -1894,12 +1609,10 @@ async function loadClase(user) {
     els.accessGuard?.classList.remove("show");
     keepLoadingVisible();
 
-bindAutosave();
-bindShareUi();
-ensureSelectionAssistantUi();
-setupPresentationExport();
-bindDocTabsUi();
-activateDocTab("tab-documento");
+    bindAutosave();
+    bindShareUi();
+    ensureSelectionAssistantUi();
+    setupPresentationExport();
 
     const tieneDocumentoReal = hasDocumentoReal(claseBase);
 
@@ -1909,38 +1622,38 @@ activateDocTab("tab-documento");
       setLoadingStage("sources", "Todavía no hay contenido final, así que vamos a generarlo.");
     }
 
-if (isManualEmptyDocument(claseBase)) {
-  state.currentClaseData = {
-    ...claseBase,
-    tituloDocumento: claseBase.tituloDocumento || claseBase.titulo || "Documento sin título",
-    objetivoDocumento: claseBase.objetivoDocumento || "",
-    contenidoHtml: claseBase.contenidoHtml || ""
-  };
+    if (isManualEmptyDocument(claseBase)) {
+      state.currentClaseData = {
+        ...claseBase,
+        tituloDocumento: claseBase.tituloDocumento || claseBase.titulo || "Documento sin título",
+        objetivoDocumento: claseBase.objetivoDocumento || "",
+        contenidoHtml: claseBase.contenidoHtml || "",
+      };
 
-  writeClaseToLocalStorage(state.currentClaseData, state.currentOwnerUid, state.currentClaseId);
-  setBasicMeta(state.currentClaseData);
+      writeClaseToLocalStorage(state.currentClaseData, state.currentOwnerUid, state.currentClaseId);
+      setBasicMeta(state.currentClaseData);
 
-  if (els.docContent) els.docContent.innerHTML = state.currentClaseData.contenidoHtml || "";
+      if (els.docContent) els.docContent.innerHTML = state.currentClaseData.contenidoHtml || "";
 
-  clearSupportPanel();
-  bindReferencesUi();
-  renderReferencesSection();
-  applyRoleUi(state.currentRole);
-  syncSavedSignatureFromDom();
-  setLastSaveLabel("Listo para editar");
-  finishLoadingAndShowDocument();
-  return;
-}
+      clearSupportPanel();
+      bindReferencesUi();
+      renderReferencesSection();
+      applyRoleUi(state.currentRole);
+      syncSavedSignatureFromDom();
+      setLastSaveLabel("Listo para editar");
+      finishLoadingAndShowDocument();
+      return;
+    }
 
-const claseFinal = await generarDocumentoSiFalta(claseBase);
+    const claseFinal = await generarDocumentoSiFalta(claseBase);
 
-state.currentClaseData = claseFinal;
-writeClaseToLocalStorage(claseFinal, state.currentOwnerUid, state.currentClaseId);
+    state.currentClaseData = claseFinal;
+    writeClaseToLocalStorage(claseFinal, state.currentOwnerUid, state.currentClaseId);
 
-renderClase(claseFinal);
-applyRoleUi(state.currentRole);
-setLastSaveLabel("Guardado automático");
-finishLoadingAndShowDocument();
+    renderClase(claseFinal);
+    applyRoleUi(state.currentRole);
+    setLastSaveLabel("Guardado automático");
+    finishLoadingAndShowDocument();
   } catch (error) {
     console.error("Error al cargar la clase:", error);
     renderError(error?.message || "Hubo un problema al cargar la clase.");
@@ -2041,186 +1754,213 @@ function extractPresentationSectionsFromDom() {
   const children = Array.from(els.docContent.children || []);
 
   const pushSection = () => {
-    const title = normalizePresentationText(currentSection.title);
-    const bullets = currentSection.bullets
-      .map((item) => normalizePresentationText(item))
-      .filter(Boolean);
-
-    if (title || bullets.length) sections.push({ title: title || "Contenido", bullets });
+    if (currentSection.bullets.length || currentSection.title !== "Contenido") {
+      sections.push({
+        title: currentSection.title,
+        bullets: currentSection.bullets.slice(0, 12),
+      });
+    }
   };
 
-  if (!children.length) {
-    const fallbackText = normalizePresentationText(els.docContent.innerText || "");
-    return fallbackText
-      ? [{ title: "Contenido", bullets: splitPresentationText(fallbackText, 120) }]
-      : [];
-  }
+  const pushTextAsBullets = (text) => {
+    splitPresentationText(text, 120).forEach((block) => {
+      if (block) currentSection.bullets.push(block);
+    });
+  };
 
-  for (const child of children) {
-    const tag = (child.tagName || "").toLowerCase();
+  for (const node of children) {
+    const tag = String(node.tagName || "").toUpperCase();
+    const text = normalizePresentationText(node.innerText || node.textContent || "");
+    if (!text) continue;
 
-    if (tag === "h1" || tag === "h2") {
+    if (tag === "H2" || tag === "H3") {
       pushSection();
-      currentSection = {
-        title: normalizePresentationText(child.textContent || "Sección"),
-        bullets: [],
-      };
+      currentSection = { title: text, bullets: [] };
       continue;
     }
 
-    if (tag === "h3") {
-      const subtitle = normalizePresentationText(child.textContent || "");
-      if (subtitle) currentSection.bullets.push(subtitle);
+    if (tag === "UL" || tag === "OL") {
+      Array.from(node.querySelectorAll("li")).forEach((li) => {
+        const liText = normalizePresentationText(li.innerText || li.textContent || "");
+        if (liText) currentSection.bullets.push(liText);
+      });
       continue;
     }
 
-    if (tag === "p" || tag === "blockquote") {
-      const text = normalizePresentationText(child.innerText || child.textContent || "");
-      if (text) currentSection.bullets.push(...splitPresentationText(text, 120));
-      continue;
-    }
-
-    if (tag === "ul" || tag === "ol") {
-      const items = Array.from(child.querySelectorAll(":scope > li"))
-        .map((li) => normalizePresentationText(li.innerText || li.textContent || ""))
-        .filter(Boolean);
-
-      for (const item of items) currentSection.bullets.push(...splitPresentationText(item, 100));
-      continue;
-    }
-
-    const fallback = normalizePresentationText(child.innerText || child.textContent || "");
-    if (fallback) currentSection.bullets.push(...splitPresentationText(fallback, 120));
+    pushTextAsBullets(text);
   }
 
   pushSection();
-  return sections.filter((section) => section.bullets.length);
+
+  if (!sections.length) {
+    const fallbackText = normalizePresentationText(els.docContent.innerText || "");
+    if (fallbackText) {
+      sections.push({
+        title: "Contenido",
+        bullets: splitPresentationText(fallbackText, 120),
+      });
+    }
+  }
+
+  return sections.slice(0, 12);
+}
+
+function addSlideHeader(slide, title = "", number = "") {
+  slide.addText(title, {
+    x: 0.7,
+    y: 0.45,
+    w: 10.4,
+    h: 0.55,
+    fontFace: "Aptos",
+    fontSize: 24,
+    bold: true,
+    color: "1F2937",
+  });
+
+  if (number) {
+    slide.addText(String(number), {
+      x: 12.05,
+      y: 0.42,
+      w: 0.6,
+      h: 0.4,
+      fontFace: "Aptos",
+      fontSize: 11,
+      bold: true,
+      align: "right",
+      color: "64748B",
+    });
+  }
+
+  slide.addShape(window.PptxGenJS.ShapeType.line, {
+    x: 0.7,
+    y: 1.08,
+    w: 12,
+    h: 0,
+    line: { color: "DCE3EA", pt: 1.2 },
+  });
 }
 
 function addPresentationCoverSlide(pptx, meta) {
   const slide = pptx.addSlide();
-  slide.background = { color: "F8F4EC" };
+  slide.background = { color: "F7FAFC" };
+
+  slide.addShape(window.PptxGenJS.ShapeType.rect, {
+    x: 0,
+    y: 0,
+    w: 13.333,
+    h: 0.38,
+    line: { color: "3B82F6", pt: 0 },
+    fill: { color: "3B82F6" },
+  });
 
   slide.addText(meta.titulo || "Presentación", {
-    x: 0.65,
-    y: 0.8,
-    w: 11.8,
+    x: 0.85,
+    y: 1.15,
+    w: 11.6,
     h: 1.0,
-    fontFace: "Inter",
-    fontSize: 24,
+    fontFace: "Aptos",
+    fontSize: 28,
     bold: true,
-    color: "2B2434",
-    margin: 0,
-    valign: "mid",
+    color: "0F172A",
   });
 
   if (meta.objetivo) {
     slide.addText(meta.objetivo, {
-      x: 0.65,
-      y: 1.95,
+      x: 0.9,
+      y: 2.2,
       w: 11.3,
-      h: 0.8,
-      fontFace: "Inter",
-      fontSize: 12,
-      color: "6F6577",
-      margin: 0,
-    });
-  }
-
-  const chips = [
-    meta.materia ? `Materia: ${meta.materia}` : "",
-    meta.nivel ? `Nivel: ${meta.nivel}` : "",
-    meta.duracion ? `Duración: ${meta.duracion}` : "",
-  ].filter(Boolean);
-
-  let chipX = 0.65;
-
-  for (const chip of chips) {
-    slide.addText(chip, {
-      x: chipX,
-      y: 3.0,
-      w: 2.35,
-      h: 0.38,
-      fontFace: "Inter",
-      fontSize: 9,
-      bold: true,
-      color: "5A4FCF",
-      align: "center",
-      valign: "mid",
-      margin: 0.06,
-      fill: { color: "EFEAFF" },
-      line: { color: "EFEAFF" },
-      radius: 0.1,
-    });
-    chipX += 2.5;
-  }
-
-  slide.addText("Eduvia", {
-    x: 0.68,
-    y: 6.65,
-    w: 1.1,
-    h: 0.2,
-    fontFace: "Inter",
-    fontSize: 9,
-    bold: true,
-    color: "8E7FE8",
-    margin: 0,
-  });
-}
-
-function addPresentationContentSlide(pptx, title, bullets = [], slideNumber = 1) {
-  const slide = pptx.addSlide();
-  slide.background = { color: "FFFDF8" };
-
-  slide.addText(title || "Contenido", {
-    x: 0.65,
-    y: 0.45,
-    w: 11.6,
-    h: 0.5,
-    fontFace: "Inter",
-    fontSize: 20,
-    bold: true,
-    color: "2B2434",
-    margin: 0,
-  });
-
-  slide.addText(
-    bullets.map((item) => `• ${normalizePresentationText(item)}`).join("\n") || "• Contenido",
-    {
-      x: 0.85,
-      y: 1.25,
-      w: 11.25,
-      h: 5.25,
-      fontFace: "Inter",
-      fontSize: 15,
-      color: "3C3547",
+      h: 1.2,
+      fontFace: "Aptos",
+      fontSize: 16,
+      color: "334155",
       breakLine: false,
-      margin: 0,
-      valign: "top",
-      paraSpaceAfterPt: 14,
-    }
-  );
+      valign: "mid",
+    });
+  }
 
-  slide.addText(String(slideNumber), {
-    x: 12.2,
-    y: 6.85,
-    w: 0.35,
-    h: 0.18,
-    fontFace: "Inter",
-    fontSize: 8,
-    color: "9A90A8",
-    align: "right",
-    margin: 0,
+  const chips = [meta.materia, meta.nivel, meta.duracion].filter(Boolean);
+  let currentX = 0.9;
+
+  chips.forEach((chip) => {
+    const width = Math.min(Math.max(chip.length * 0.09, 1.4), 3.4);
+
+    slide.addShape(window.PptxGenJS.ShapeType.roundRect, {
+      x: currentX,
+      y: 4.35,
+      w: width,
+      h: 0.48,
+      rectRadius: 0.08,
+      line: { color: "DBEAFE", pt: 1 },
+      fill: { color: "EFF6FF" },
+    });
+
+    slide.addText(chip, {
+      x: currentX + 0.12,
+      y: 4.45,
+      w: width - 0.24,
+      h: 0.18,
+      fontFace: "Aptos",
+      fontSize: 10.5,
+      bold: true,
+      color: "1D4ED8",
+      align: "center",
+    });
+
+    currentX += width + 0.18;
+  });
+
+  slide.addText("Generado desde Eduvia", {
+    x: 0.9,
+    y: 6.7,
+    w: 4.4,
+    h: 0.28,
+    fontFace: "Aptos",
+    fontSize: 10.5,
+    color: "64748B",
   });
 }
 
-function addPresentationSourcesSlide(pptx, sources = [], slideNumber = 1) {
-  if (!sources.length) return;
+function addPresentationContentSlide(pptx, title, bullets = [], slideNumber = "") {
+  const slide = pptx.addSlide();
+  slide.background = { color: "FFFFFF" };
 
-  const bullets = sources.slice(0, 8).map((source, index) => {
-    const title = normalizePresentationText(source.title || `Fuente ${index + 1}`);
-    const url = normalizePresentationText((source.url || "").replace(/^https?:\/\//, ""));
-    return url ? `${title} — ${url}` : title;
+  addSlideHeader(slide, title || "Contenido", slideNumber);
+
+  const bulletRuns = bullets.slice(0, 5).map((item) => ({
+    text: item,
+    options: {
+      bullet: { indent: 14 },
+      hanging: 3,
+      breakLine: true,
+    },
+  }));
+
+  slide.addText(bulletRuns, {
+    x: 1.0,
+    y: 1.45,
+    w: 10.9,
+    h: 4.9,
+    fontFace: "Aptos",
+    fontSize: 18,
+    color: "1F2937",
+    breakLine: false,
+    paraSpaceAfterPt: 10,
+    valign: "top",
+  });
+}
+
+function addPresentationSourcesSlide(pptx, sources = [], slideNumber = "") {
+  const bullets = sources.slice(0, 8).map((source) => {
+    const base = [
+      txt(source.author || "Autor"),
+      txt(source.year || "s.f."),
+      txt(source.title || "Fuente"),
+      txt(source.site || ""),
+    ]
+      .filter(Boolean)
+      .join(" — ");
+
+    return source.url ? `${base} — ${source.url}` : base;
   });
 
   addPresentationContentSlide(pptx, "Fuentes consultadas", bullets, slideNumber);
@@ -2319,11 +2059,11 @@ async function exportDocumentToPresentation() {
     }
 
     await pptx.writeFile({ fileName: getPresentationFileName(meta.titulo) });
-    setMoreStatus("Presentación generada.");
+    setMoreStatus("Presentación lista.");
   } catch (error) {
-    console.error("Error exportando a presentación:", error);
-    alert("No se pudo generar la presentación.");
+    console.error("Error exportando presentación:", error);
     setMoreStatus("No se pudo generar la presentación.");
+    alert("No se pudo generar la presentación.");
   } finally {
     if (els.exportPptBtn) {
       els.exportPptBtn.disabled = false;
@@ -2334,33 +2074,15 @@ async function exportDocumentToPresentation() {
 }
 
 function setupPresentationExport() {
-  if (state.pptBound || !els.exportPptBtn) return;
+  if (state.pptBound) return;
   state.pptBound = true;
 
-  els.exportPptBtn = replaceNodeToClearListeners(els.exportPptBtn);
+  window.exportEduviaPresentation = exportDocumentToPresentation;
 
-  els.exportPptBtn.addEventListener("click", () => {
-    void exportDocumentToPresentation();
+  els.exportPptBtn?.addEventListener("click", async (event) => {
+    event.preventDefault();
+    await exportDocumentToPresentation();
   });
-}
-
-/* =========================
-   SELECTION ASSISTANT
-========================= */
-
-function setSelectionAssistantVisibility(visible) {
-  const toolbar = $(CONFIG.selectionToolbarId);
-  const panel = $(CONFIG.selectionResultId);
-
-  if (toolbar) {
-    toolbar.style.display = visible ? "" : "none";
-    if (!visible) toolbar.classList.remove("show");
-  }
-
-  if (panel) {
-    panel.style.display = visible ? "" : "none";
-    if (!visible) panel.classList.remove("show");
-  }
 }
 
 function injectSelectionAssistantStyles() {
@@ -2370,251 +2092,76 @@ function injectSelectionAssistantStyles() {
   style.id = CONFIG.selectionStyleId;
   style.textContent = `
     #${CONFIG.selectionToolbarId}{
-      position:absolute;
-      z-index:1300;
+      position:fixed;
+      z-index:220;
       display:none;
       align-items:center;
       gap:8px;
       flex-wrap:wrap;
-      max-width:min(620px, calc(100vw - 32px));
       padding:10px;
       border-radius:18px;
-      background:rgba(255,255,255,.96);
-      border:1px solid rgba(53,93,149,.12);
-      box-shadow:0 18px 45px rgba(20,34,60,.18);
-      backdrop-filter:blur(8px);
+      background:rgba(255,255,255,.98);
+      border:1px solid rgba(15,23,42,.08);
+      box-shadow:0 18px 40px rgba(15,23,42,.14);
+      backdrop-filter:blur(10px);
+      max-width:min(92vw,680px);
     }
-
     #${CONFIG.selectionToolbarId}.show{ display:flex; }
-
     .doc-selection-tool-btn{
       border:none;
-      border-radius:12px;
+      border-radius:999px;
       padding:9px 12px;
       background:#eef4ff;
-      color:#355d95;
-      font-weight:800;
-      font-size:.84rem;
+      color:#0b57d0;
+      font-weight:700;
       cursor:pointer;
-      transition:.18s ease;
     }
-
-    .doc-selection-tool-btn:hover{
-      background:#e2eeff;
-      transform:translateY(-1px);
-    }
-
+    .doc-selection-tool-btn:hover{ background:#e2edff; }
     #${CONFIG.selectionResultId}{
       position:fixed;
-      right:22px;
-      top:96px;
-      width:min(420px, calc(100vw - 28px));
-      max-height:min(75vh, 720px);
-      overflow:auto;
-      z-index:1250;
+      z-index:219;
       display:none;
+      max-width:min(92vw,560px);
+      min-width:280px;
       padding:16px;
-      border-radius:24px;
-      background:#fff;
-      border:1px solid rgba(53,93,149,.12);
-      box-shadow:0 28px 72px rgba(24,39,75,.18);
+      border-radius:22px;
+      background:#ffffff;
+      border:1px solid rgba(15,23,42,.08);
+      box-shadow:0 22px 50px rgba(15,23,42,.16);
     }
-
     #${CONFIG.selectionResultId}.show{ display:block; }
-
-    .doc-selection-result-header{
-      display:flex;
-      align-items:flex-start;
-      justify-content:space-between;
-      gap:12px;
-      margin-bottom:10px;
+    #${CONFIG.selectionResultId} h4{
+      margin:0 0 8px;
+      font-size:1rem;
+      color:#0f172a;
     }
-
-    .doc-selection-result-header h3{
-      margin:6px 0 0;
-      color:#223b59;
-      font-size:1.06rem;
-      line-height:1.35;
-      font-weight:800;
-    }
-
-    .doc-selection-result-chip{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      padding:5px 10px;
-      border-radius:999px;
-      background:#edf4ff;
-      color:#355d95;
-      font-size:.74rem;
-      font-weight:800;
-    }
-
-    .doc-selection-result-close{
-      border:none;
-      background:#eef4ff;
-      color:#355d95;
-      width:34px;
-      height:34px;
-      border-radius:999px;
-      cursor:pointer;
-      font-size:18px;
-      flex-shrink:0;
-    }
-
-    .doc-selection-result-summary{
-      margin:0 0 14px;
-      color:#4a6077;
-      line-height:1.65;
+    #${CONFIG.selectionResultId} p{
+      margin:0;
+      line-height:1.7;
+      color:#334155;
       white-space:pre-wrap;
     }
-
-    .doc-selection-result-section{ margin-top:14px; }
-
-    .doc-selection-result-label{
-      margin-bottom:8px;
-      color:#2d4f76;
-      font-size:.82rem;
-      font-weight:800;
-      letter-spacing:.02em;
-      text-transform:uppercase;
-    }
-
-    .doc-selection-result-list{
-      display:grid;
-      gap:8px;
-    }
-
-    .doc-selection-change{
-      padding:11px 12px;
-      border-radius:14px;
-      background:#f7faff;
-      border:1px solid rgba(53,93,149,.08);
-    }
-
-    .doc-selection-change-top{
-      display:flex;
-      align-items:center;
-      gap:8px;
-      flex-wrap:wrap;
-      margin-bottom:6px;
-    }
-
-    .doc-selection-change p{
-      margin:0;
-      color:#4b6177;
-      line-height:1.55;
-    }
-
-    .doc-selection-example{
-      margin-top:8px;
-      padding:10px;
-      border-radius:12px;
-      background:#fff;
-      border:1px dashed rgba(53,93,149,.16);
-      color:#40576f;
-      line-height:1.55;
-      white-space:pre-wrap;
-    }
-
-    .doc-selection-proposed{
-      margin:0;
-      padding:12px;
-      border-radius:14px;
-      background:#f7f9fc;
-      border:1px solid rgba(53,93,149,.10);
-      color:#33485f;
-      font-size:.92rem;
-      line-height:1.6;
-      white-space:pre-wrap;
-      overflow:auto;
-      font-family:Inter, sans-serif;
-    }
-
-    .doc-selection-followup{
-      margin:0;
-      padding-left:18px;
-      color:#4b6075;
-      line-height:1.6;
-    }
-
     .doc-selection-result-actions{
       display:flex;
-      gap:8px;
+      gap:10px;
       flex-wrap:wrap;
-      margin-top:16px;
+      margin-top:14px;
     }
-
-    .doc-selection-action-btn{
+    .doc-selection-result-btn{
       border:none;
       border-radius:12px;
       padding:10px 12px;
-      background:#eef4ff;
-      color:#355d95;
-      font-weight:800;
+      font-weight:700;
       cursor:pointer;
+      background:#f1f5f9;
+      color:#0f172a;
     }
-
-    .doc-selection-action-btn.primary{
-      background:linear-gradient(135deg,#355d95 0%, #4d7bc0 100%);
-      color:#fff;
-    }
-
-    @media (max-width: 768px){
-      #${CONFIG.selectionResultId}{
-        right:14px;
-        left:14px;
-        top:auto;
-        bottom:18px;
-        width:auto;
-        max-height:58vh;
-      }
-
-      #${CONFIG.selectionToolbarId}{
-        max-width:calc(100vw - 24px);
-      }
-
-      .doc-selection-tool-btn{
-        font-size:.8rem;
-        padding:8px 10px;
-      }
+    .doc-selection-result-btn.primary{
+      background:#c2e7ff;
+      color:#0b57d0;
     }
   `;
-
   document.head.appendChild(style);
-}
-
-function nodeBelongsToDocument(node) {
-  const element = node?.nodeType === Node.ELEMENT_NODE ? node : node?.parentElement;
-  if (!element) return false;
-
-  return Boolean(
-    els.docTitle?.contains(element) ||
-      els.docObjective?.contains(element) ||
-      els.docContent?.contains(element)
-  );
-}
-
-function rangeBelongsToDocument(range) {
-  return (
-    range &&
-    nodeBelongsToDocument(range.startContainer) &&
-    nodeBelongsToDocument(range.endContainer)
-  );
-}
-
-function getClosestEditableRoot(node) {
-  const element = node?.nodeType === Node.ELEMENT_NODE ? node : node?.parentElement;
-  if (!element) return null;
-  if (els.docTitle?.contains(element)) return els.docTitle;
-  if (els.docObjective?.contains(element)) return els.docObjective;
-  if (els.docContent?.contains(element)) return els.docContent;
-  return null;
-}
-
-function getClosestBlockElement(node) {
-  const element = node?.nodeType === Node.ELEMENT_NODE ? node : node?.parentElement;
-  return element?.closest?.("p, li, h1, h2, h3, blockquote, div") || null;
 }
 
 function hideSelectionToolbar() {
@@ -2625,31 +2172,88 @@ function hideSelectionResult() {
   $(CONFIG.selectionResultId)?.classList.remove("show");
 }
 
+function setSelectionAssistantVisibility(visible) {
+  if (!visible) {
+    hideSelectionToolbar();
+    hideSelectionResult();
+  }
+}
+
 function showSelectionToolbarAt(rect) {
   const toolbar = $(CONFIG.selectionToolbarId);
-  if (!toolbar || !rect) return;
+  if (!toolbar) return;
 
-  toolbar.classList.add("show");
+  const top = Math.max(10, rect.top + window.scrollY - 58);
+  const left = Math.max(10, rect.left + window.scrollX);
 
-  const margin = 16;
-  const maxWidth = Math.min(620, window.innerWidth - 32);
-  const toolbarWidth = Math.min(toolbar.offsetWidth || maxWidth, maxWidth);
-  const top = window.scrollY + rect.top - toolbar.offsetHeight - 12;
-  const rawLeft = window.scrollX + rect.left + rect.width / 2 - toolbarWidth / 2;
-  const left = Math.max(
-    window.scrollX + margin,
-    Math.min(rawLeft, window.scrollX + window.innerWidth - toolbarWidth - margin)
-  );
-
-  toolbar.style.top = `${Math.max(window.scrollY + 12, top)}px`;
+  toolbar.style.top = `${top}px`;
   toolbar.style.left = `${left}px`;
+  toolbar.classList.add("show");
+}
+
+function showSelectionResult(content, rect) {
+  const panel = $(CONFIG.selectionResultId);
+  if (!panel) return;
+
+  panel.innerHTML = `
+    <h4>Resultado</h4>
+    <p>${escapeHtml(content)}</p>
+    <div class="doc-selection-result-actions">
+      <button type="button" class="doc-selection-result-btn primary" data-selection-apply>Aplicar texto</button>
+      <button type="button" class="doc-selection-result-btn" data-selection-copy>Copiar</button>
+      <button type="button" class="doc-selection-result-btn" data-selection-close>Cerrar</button>
+    </div>
+  `;
+
+  const top = Math.max(10, rect.bottom + window.scrollY + 12);
+  const left = Math.max(10, rect.left + window.scrollX);
+
+  panel.style.top = `${top}px`;
+  panel.style.left = `${left}px`;
+  panel.classList.add("show");
+
+  panel.querySelector("[data-selection-close]")?.addEventListener("click", hideSelectionResult);
+  panel.querySelector("[data-selection-copy]")?.addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText(content);
+    } catch {
+      // no-op
+    }
+  });
+
+  panel.querySelector("[data-selection-apply]")?.addEventListener("click", () => {
+    applySelectionReplacement(content);
+    hideSelectionResult();
+  });
+}
+
+function getAllowedSelectionContainer(node) {
+  if (!node) return null;
+  if (els.docTitle?.contains(node)) return els.docTitle;
+  if (els.docObjective?.contains(node)) return els.docObjective;
+  if (els.docContent?.contains(node)) return els.docContent;
+  return null;
 }
 
 function trackSelectedTextForAssistant() {
-  if (state.selectionActionBusy) return;
+  if (!canEdit()) {
+    hideSelectionToolbar();
+    return;
+  }
 
   const selection = window.getSelection();
-  if (!selection || !selection.rangeCount) {
+  if (!selection || selection.rangeCount === 0 || selection.isCollapsed) {
+    state.currentSelectedText = "";
+    state.currentSelectedRange = null;
+    hideSelectionToolbar();
+    return;
+  }
+
+  const range = selection.getRangeAt(0);
+  const common = range.commonAncestorContainer;
+  const container = getAllowedSelectionContainer(common);
+
+  if (!container) {
     state.currentSelectedText = "";
     state.currentSelectedRange = null;
     hideSelectionToolbar();
@@ -2657,309 +2261,93 @@ function trackSelectedTextForAssistant() {
   }
 
   const text = txt(selection.toString());
-  const range = selection.getRangeAt(0);
-
-  if (!text || !rangeBelongsToDocument(range)) {
+  if (!text || text.length < 2) {
     state.currentSelectedText = "";
     state.currentSelectedRange = null;
     hideSelectionToolbar();
     return;
   }
 
-  const rect = range.getBoundingClientRect();
-  if (!rect || (!rect.width && !rect.height)) {
-    hideSelectionToolbar();
-    return;
-  }
-
-  state.currentSelectedText = text.slice(0, 5000);
+  state.currentSelectedText = text;
   state.currentSelectedRange = range.cloneRange();
-  showSelectionToolbarAt(rect);
+
+  const rect = range.getBoundingClientRect();
+  if (rect && (rect.width || rect.height)) showSelectionToolbarAt(rect);
 }
 
-function getPlainDocumentText() {
-  const titulo = txt(els.docTitle?.textContent || "");
-  const objetivo = stripObjectivePrefix(txt(els.docObjective?.textContent || ""));
-  const contenido = txt(els.docContent?.innerText || els.docContent?.textContent || "");
-  return [titulo, objetivo, contenido].filter(Boolean).join("\n\n");
-}
+function applySelectionReplacement(content = "") {
+  if (!state.currentSelectedRange || !content) return;
 
-function getDocumentAssistantQuestion(action, selectedText = "") {
-  const base = txt(selectedText);
-
-  switch (action) {
-    case "explicar":
-      return `Explicá mejor el texto seleccionado de forma clara, didáctica y fácil de entender. Si conviene, proponé una versión mejor explicada del fragmento. Texto: ${base}`;
-    case "mejorar":
-      return `Mejorá la redacción del texto seleccionado sin cambiar la idea principal. Texto: ${base}`;
-    case "alargar":
-      return `Alargá el texto seleccionado agregando contenido útil, contexto o desarrollo, sin meter relleno. Texto: ${base}`;
-    case "acortar":
-      return `Acortá el texto seleccionado conservando la idea principal y lo más importante. Texto: ${base}`;
-    case "claro":
-      return `Reescribí el texto seleccionado para que quede más claro, más simple y más fácil de estudiar. Texto: ${base}`;
-    case "formal":
-      return `Reescribí el texto seleccionado con un tono más formal, prolijo y académico. Texto: ${base}`;
-    case "resumir":
-      return `Resumí el texto seleccionado en una versión más breve y directa. Texto: ${base}`;
-    default:
-      return `Ayudame con este texto seleccionado del documento: ${base}`;
-  }
-}
-
-function restoreStoredSelection() {
-  if (!state.currentSelectedRange) return false;
-
+  const range = state.currentSelectedRange.cloneRange();
   const selection = window.getSelection();
-  if (!selection) return false;
 
   selection.removeAllRanges();
-  selection.addRange(state.currentSelectedRange);
+  selection.addRange(range);
 
-  const root = getClosestEditableRoot(state.currentSelectedRange.startContainer);
-  root?.focus?.();
+  range.deleteContents();
+  range.insertNode(document.createTextNode(content));
 
-  return true;
-}
-
-function replaceSelectedTextWithResult(text = "") {
-  if (!canEdit()) return;
-  const clean = txt(text);
-  if (!clean || !restoreStoredSelection()) return;
-
-  document.execCommand("insertText", false, clean);
-  scheduleSave();
+  selection.removeAllRanges();
+  state.currentSelectedRange = null;
+  state.currentSelectedText = "";
   hideSelectionToolbar();
-}
-
-function insertResultBelowSelection(text = "") {
-  if (!canEdit()) return;
-  const clean = txt(text);
-  if (!clean) return;
-
-  const html = plainTextToBlocks(clean);
-  if (!html) return;
-
-  const startNode = state.currentSelectedRange?.startContainer || null;
-  const root = getClosestEditableRoot(startNode);
-
-  if (root === els.docContent) {
-    const block = getClosestBlockElement(startNode);
-    if (block && els.docContent.contains(block)) block.insertAdjacentHTML("afterend", html);
-    else els.docContent.insertAdjacentHTML("beforeend", html);
-  } else if (root === els.docObjective) {
-    els.docObjective.insertAdjacentHTML("afterend", html);
-  } else {
-    els.docContent?.insertAdjacentHTML("afterbegin", html);
-  }
-
   scheduleSave();
 }
 
-async function copyAssistantText(text = "") {
-  const value = txt(text);
-  if (!value) return false;
+function localSelectionTransform(action, text) {
+  const clean = txt(text);
+  if (!clean) return "";
 
-  try {
-    await navigator.clipboard.writeText(value);
-    return true;
-  } catch {
-    return false;
+  switch (action) {
+    case "resumir":
+      return clean.split(/(?<=[.!?])\s+/).slice(0, 2).join(" ");
+    case "explicar":
+      return `Explicación simple: ${clean}`;
+    case "mejorar":
+      return clean;
+    case "alargar":
+      return `${clean} Además, este punto puede profundizarse con una explicación más desarrollada y un ejemplo concreto para que quede más claro.`;
+    case "acortar":
+      return clean.length > 180 ? `${clean.slice(0, 177).trim()}...` : clean;
+    case "claro":
+      return clean
+        .replace(/\s+/g, " ")
+        .replace(/, /g, ". ")
+        .replace(/\.\s*\./g, ". ");
+    case "formal":
+      return clean.replace(/\bvos\b/gi, "usted");
+    default:
+      return clean;
   }
 }
 
-function normalizeAssistantResponse(raw = {}) {
-  const response = raw?.respuesta && typeof raw.respuesta === "object" ? raw.respuesta : raw;
-
-  return {
-    subtitulo: txt(raw?.subtitulo || "Asistente del documento"),
-    titulo: txt(response?.titulo || "Sugerencia"),
-    modo: txt(response?.modo || "respuesta"),
-    resumen: txt(response?.resumen || ""),
-    cambios: toArray(response?.cambios),
-    textoPropuesto: txt(response?.textoPropuesto || ""),
-    preguntasSeguimiento: toArray(response?.preguntasSeguimiento),
-  };
-}
-
-function renderSelectionResult(raw = {}, actionLabel = "Acción") {
-  const panel = $(CONFIG.selectionResultId);
-  if (!panel) return;
-
-  const data = normalizeAssistantResponse(raw);
-  state.assistantLastResponse = data;
-
-  const copyValue = data.textoPropuesto || data.resumen || "";
-
-  panel.innerHTML = `
-    <div class="doc-selection-result-header">
-      <div>
-        <div class="doc-selection-result-chip">${escapeHtml(actionLabel)}</div>
-        <h3>${escapeHtml(data.titulo)}</h3>
-      </div>
-      <button type="button" class="doc-selection-result-close" data-close-selection-panel>×</button>
-    </div>
-
-    ${
-      data.resumen
-        ? `<p class="doc-selection-result-summary">${escapeHtml(data.resumen)}</p>`
-        : ""
-    }
-
-    ${
-      data.cambios.length
-        ? `
-          <div class="doc-selection-result-section">
-            <div class="doc-selection-result-label">Cambios sugeridos</div>
-            <div class="doc-selection-result-list">
-              ${data.cambios
-                .map((item) => {
-                  const tipo = escapeHtml(item?.tipo || "mejora");
-                  const titulo = escapeHtml(item?.titulo || "Cambio");
-                  const detalle = escapeHtml(item?.detalle || "");
-                  const ejemplo = escapeHtml(item?.ejemplo || "");
-
-                  return `
-                    <article class="doc-selection-change">
-                      <div class="doc-selection-change-top">
-                        <span class="doc-selection-mini-chip">${tipo}</span>
-                        <strong>${titulo}</strong>
-                      </div>
-                      ${detalle ? `<p>${detalle}</p>` : ""}
-                      ${ejemplo ? `<div class="doc-selection-example">${ejemplo}</div>` : ""}
-                    </article>
-                  `;
-                })
-                .join("")}
-            </div>
-          </div>
-        `
-        : ""
-    }
-
-    ${
-      data.textoPropuesto
-        ? `
-          <div class="doc-selection-result-section">
-            <div class="doc-selection-result-label">Texto propuesto</div>
-            <pre class="doc-selection-proposed">${escapeHtml(data.textoPropuesto)}</pre>
-          </div>
-        `
-        : ""
-    }
-
-    ${
-      data.preguntasSeguimiento.length
-        ? `
-          <div class="doc-selection-result-section">
-            <div class="doc-selection-result-label">Siguientes ideas</div>
-            <ul class="doc-selection-followup">
-              ${data.preguntasSeguimiento
-                .map((item) => `<li>${escapeHtml(item)}</li>`)
-                .join("")}
-            </ul>
-          </div>
-        `
-        : ""
-    }
-
-    <div class="doc-selection-result-actions">
-      <button type="button" class="doc-selection-action-btn" data-copy-selection-result>Copiar</button>
-      ${
-        data.textoPropuesto && canEdit()
-          ? `
-            <button type="button" class="doc-selection-action-btn" data-insert-selection-result>Insertar debajo</button>
-            <button type="button" class="doc-selection-action-btn primary" data-replace-selection-result>Reemplazar selección</button>
-          `
-          : ""
-      }
-    </div>
-  `;
-
-  panel
-    .querySelector("[data-close-selection-panel]")
-    ?.addEventListener("click", hideSelectionResult);
-  panel
-    .querySelector("[data-copy-selection-result]")
-    ?.addEventListener("click", () => copyAssistantText(copyValue));
-  panel
-    .querySelector("[data-insert-selection-result]")
-    ?.addEventListener("click", () => insertResultBelowSelection(data.textoPropuesto));
-  panel
-    .querySelector("[data-replace-selection-result]")
-    ?.addEventListener("click", () => replaceSelectedTextWithResult(data.textoPropuesto));
-
-  panel.classList.add("show");
-}
-
-async function runSelectionAction(action = "mejorar", label = "Mejorar") {
+async function runSelectionAction(action, label) {
   if (state.selectionActionBusy || !state.currentSelectedText) return;
-
   state.selectionActionBusy = true;
-  hideSelectionToolbar();
-
-  const panel = $(CONFIG.selectionResultId);
-  if (panel) {
-    panel.innerHTML = `
-      <div class="doc-selection-result-header">
-        <div>
-          <div class="doc-selection-result-chip">${escapeHtml(label)}</div>
-          <h3>Generando propuesta...</h3>
-        </div>
-      </div>
-      <p class="doc-selection-result-summary">Estamos analizando el fragmento seleccionado.</p>
-    `;
-    panel.classList.add("show");
-  }
 
   try {
-    const response = await fetch("/api/preguntar-documento", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        pregunta: getDocumentAssistantQuestion(action, state.currentSelectedText),
-        accion: action,
-        tituloDocumento: txt(els.docTitle?.textContent || ""),
-        objetivoDocumento: stripObjectivePrefix(txt(els.docObjective?.textContent || "")),
-        documentoActual: getPlainDocumentText(),
-        textoSeleccionado: state.currentSelectedText,
-        investigacion: getInvestigacionDocumento(state.currentClaseData || {}),
-        fuentes: getFuentesDocumento(state.currentClaseData || {}),
-        ultimaRespuesta: state.assistantLastResponse,
-      }),
-    });
+    let output = "";
 
-    const data = await response.json().catch(() => null);
-
-    if (!response.ok || !data?.ok) {
-      throw new Error(data?.error || "No se pudo procesar la selección.");
+    if (typeof window.handleEduviaSelectionAction === "function") {
+      const response = await window.handleEduviaSelectionAction({
+        action,
+        label,
+        selectedText: state.currentSelectedText,
+        title: txt(els.docTitle?.textContent || ""),
+        objective: txt(els.docObjective?.textContent || ""),
+        content: txt(stripHtmlTags(els.docContent?.innerHTML || "")),
+      });
+      output = txt(typeof response === "string" ? response : response?.text || "");
     }
 
-    renderSelectionResult(data.respuesta, label);
+    if (!output) {
+      output = localSelectionTransform(action, state.currentSelectedText);
+    }
+
+    const rect = state.currentSelectedRange?.getBoundingClientRect?.();
+    showSelectionResult(output, rect || { left: 20, bottom: 80 });
   } catch (error) {
-    console.error("Error procesando selección:", error);
-
-    if (panel) {
-      panel.innerHTML = `
-        <div class="doc-selection-result-header">
-          <div>
-            <div class="doc-selection-result-chip">${escapeHtml(label)}</div>
-            <h3>No se pudo generar la sugerencia</h3>
-          </div>
-          <button type="button" class="doc-selection-result-close" data-close-selection-panel>×</button>
-        </div>
-        <p class="doc-selection-result-summary">
-          ${escapeHtml(error?.message || "Hubo un problema al consultar la IA.")}
-        </p>
-      `;
-
-      panel
-        .querySelector("[data-close-selection-panel]")
-        ?.addEventListener("click", hideSelectionResult);
-      panel.classList.add("show");
-    }
+    console.error("Error en acción de selección:", error);
   } finally {
     state.selectionActionBusy = false;
   }
@@ -3034,6 +2422,76 @@ function ensureSelectionAssistantUi() {
   });
 }
 
+function localDocChatReply(message) {
+  const normalized = normalizeCompareText(message);
+  const content = txt(stripHtmlTags(els.docContent?.innerHTML || ""));
+  const title = txt(els.docTitle?.textContent || "documento");
+
+  if (!content) {
+    return "Todavía no hay contenido suficiente en el documento. Primero cargá o generá el texto y después pedime cambios.";
+  }
+
+  const sentences = content.split(/(?<=[.!?])\s+/).filter(Boolean);
+
+  if (normalized.includes("resum")) {
+    return `Resumen rápido: ${sentences.slice(0, 3).join(" ") || content.slice(0, 260)}`;
+  }
+
+  if (normalized.includes("conclusion")) {
+    return `Podés cerrar el documento con una conclusión que retome ${title.toLowerCase()} y resuma las ideas principales trabajadas.`;
+  }
+
+  if (normalized.includes("ejemplo")) {
+    return "Podés sumar un ejemplo concreto después del concepto principal, explicando el caso y cómo se relaciona con la idea teórica.";
+  }
+
+  if (normalized.includes("simple") || normalized.includes("facil")) {
+    return "Para hacerlo más simple, conviene usar oraciones más cortas, menos palabras técnicas y explicar cada concepto con una idea central por párrafo.";
+  }
+
+  if (normalized.includes("alarg")) {
+    return "Para alargarlo bien, agregá una explicación más profunda por sección, un ejemplo por tema y una mini conclusión al final de cada bloque importante.";
+  }
+
+  return "Ya quedó armado el puente del chat lateral con documento.js. Ahora podés pedir resumen, conclusión, mejoras o una explicación más clara.";
+}
+
+window.handleEduviaDocChat = async ({ message, title, objective, content }) => {
+  const body = {
+    message,
+    title: txt(title),
+    objective: txt(objective),
+    content: txt(content),
+    ownerUid: state.currentOwnerUid,
+    documentId: state.currentClaseId,
+  };
+
+  const endpoints = ["/api/chat-documento", "/api/documento/chat", "/api/chat"];
+
+  for (const endpoint of endpoints) {
+    try {
+      const { data } = await fetchJsonWithTimeout(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      }, 45000);
+
+      const reply =
+        data?.reply ||
+        data?.respuesta ||
+        data?.message ||
+        data?.output ||
+        data?.text;
+
+      if (txt(reply)) return txt(reply);
+    } catch {
+      // sigue al próximo endpoint
+    }
+  }
+
+  return localDocChatReply(message);
+};
+
 els.documentApp?.classList.add("hidden");
 els.accessGuard?.classList.remove("show");
 els.docLoading?.classList.add("show");
@@ -3049,187 +2507,3 @@ onAuthStateChanged(auth, async (user) => {
   state.currentUser = user;
   await loadClase(user);
 });
-
-function limpiarTextoChatDocumento(value = "") {
-  return String(value || "")
-    .replace(/\u00A0/g, " ")
-    .replace(/\s+\n/g, "\n")
-    .replace(/\n{3,}/g, "\n\n")
-    .trim();
-}
-
-function detectarAccionChatDocumento(message = "") {
-  const text = limpiarTextoChatDocumento(message).toLowerCase();
-
-  if (!text) return "";
-  if (text.includes("explic")) return "explicar";
-  if (text.includes("mejor")) return "mejorar";
-  if (text.includes("alarg") || text.includes("ampli") || text.includes("profund")) return "alargar";
-  if (text.includes("acort")) return "acortar";
-  if (text.includes("claro") || text.includes("más simple") || text.includes("mas simple")) return "claro";
-  if (text.includes("formal")) return "formal";
-  if (text.includes("resum")) return "resumir";
-  if (text.includes("reescrib") || text.includes("reformular")) return "reescritura";
-
-  return "";
-}
-
-function obtenerTextoSeleccionadoParaChat() {
-  const fromState = limpiarTextoChatDocumento(state?.currentSelectedText || "");
-  if (fromState) return fromState;
-
-  const selection = window.getSelection?.();
-  if (!selection || selection.rangeCount === 0) return "";
-
-  return limpiarTextoChatDocumento(selection.toString() || "");
-}
-
-function normalizarFuentesParaChat(fuentes = []) {
-  return (Array.isArray(fuentes) ? fuentes : [])
-    .map((item) => {
-      if (!item || typeof item !== "object") return null;
-
-      return {
-        title: limpiarTextoChatDocumento(item.title || item.titulo || item.name || "Fuente"),
-        url: limpiarTextoChatDocumento(item.url || item.link || ""),
-      };
-    })
-    .filter((item) => item && (item.title || item.url))
-    .slice(0, 10);
-}
-
-function formatearRespuestaChatDocumento(payload) {
-  if (!payload?.respuesta) {
-    return "No pude interpretar la respuesta del asistente.";
-  }
-
-  const { subtitulo = "", respuesta = {} } = payload;
-  const {
-    titulo = "Respuesta",
-    resumen = "",
-    cambios = [],
-    textoPropuesto = "",
-    preguntasSeguimiento = [],
-  } = respuesta;
-
-  const partes = [];
-
-  if (subtitulo) partes.push(subtitulo);
-  if (titulo) partes.push(titulo);
-  if (resumen) partes.push(resumen);
-
-  if (Array.isArray(cambios) && cambios.length) {
-    const bloqueCambios = cambios
-      .map((item, index) => {
-        const lineas = [];
-        lineas.push(`${index + 1}. ${limpiarTextoChatDocumento(item?.titulo || "Mejora sugerida")}`);
-
-        if (item?.detalle) {
-          lineas.push(limpiarTextoChatDocumento(item.detalle));
-        }
-
-        if (item?.ejemplo) {
-          lineas.push(`Ejemplo: ${limpiarTextoChatDocumento(item.ejemplo)}`);
-        }
-
-        return lineas.join("\n");
-      })
-      .join("\n\n");
-
-    if (bloqueCambios) {
-      partes.push(`Cambios sugeridos:\n${bloqueCambios}`);
-    }
-  }
-
-  if (textoPropuesto) {
-    partes.push(`Texto propuesto:\n${limpiarTextoChatDocumento(textoPropuesto)}`);
-  }
-
-  if (Array.isArray(preguntasSeguimiento) && preguntasSeguimiento.length) {
-    partes.push(
-      `Podés seguir con:\n${preguntasSeguimiento
-        .map((item) => `- ${limpiarTextoChatDocumento(item)}`)
-        .join("\n")}`
-    );
-  }
-
-  return partes.filter(Boolean).join("\n\n");
-}
-
-window.handleEduviaDocChat = async function handleEduviaDocChat({
-  message = "",
-  title = "",
-  objective = "",
-  content = "",
-} = {}) {
-  const pregunta = limpiarTextoChatDocumento(message);
-  const tituloDocumento =
-    limpiarTextoChatDocumento(title) ||
-    limpiarTextoChatDocumento(els.docTitle?.innerText || "") ||
-    limpiarTextoChatDocumento(getDocumentoTitle(state.currentClaseData || {}));
-
-  const objetivoDocumento =
-    limpiarTextoChatDocumento(stripObjectivePrefix(objective || "")) ||
-    limpiarTextoChatDocumento(stripObjectivePrefix(els.docObjective?.innerText || "")) ||
-    limpiarTextoChatDocumento(getDocumentoObjective(state.currentClaseData || {}));
-
-  const documentoActual =
-    limpiarTextoChatDocumento(content) ||
-    limpiarTextoChatDocumento(els.docContent?.innerText || "");
-
-  const textoSeleccionado = obtenerTextoSeleccionadoParaChat();
-  const accion = detectarAccionChatDocumento(pregunta);
-
-  const investigacion =
-    typeof getInvestigacionDocumento === "function"
-      ? limpiarTextoChatDocumento(getInvestigacionDocumento(state.currentClaseData || {}))
-      : "";
-
-  const fuentes =
-    typeof getFuentesDocumento === "function"
-      ? normalizarFuentesParaChat(getFuentesDocumento(state.currentClaseData || {}))
-      : [];
-
-  if (!pregunta) {
-    return "Escribí una consigna para analizar el documento.";
-  }
-
-  if (!documentoActual && !textoSeleccionado) {
-    return "No encontré contenido suficiente en el documento para analizar.";
-  }
-
-  try {
-    const { response, data } = await fetchJsonWithTimeout(
-      "/api/preguntar-documento",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          pregunta,
-          accion,
-          documentoActual,
-          tituloDocumento,
-          objetivoDocumento,
-          textoSeleccionado,
-          investigacion,
-          fuentes,
-          ultimaRespuesta: state.assistantLastResponse || null,
-        }),
-      },
-      180000
-    );
-
-    if (!response?.ok || !data?.ok || !data?.respuesta) {
-      return data?.error || "No se pudo analizar el documento.";
-    }
-
-    state.assistantLastResponse = data.respuesta;
-
-    return formatearRespuestaChatDocumento(data.respuesta);
-  } catch (error) {
-    console.error("Error conectando el chat con /api/preguntar-documento:", error);
-    return "Hubo un problema al conectar el chat del documento con la IA.";
-  }
-};
