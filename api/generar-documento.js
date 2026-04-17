@@ -575,7 +575,9 @@ Datos:
 - Tema: ${tema}
 - Nivel: ${nivel}
 - Extensión deseada: ${extensionDeseada || "No especificada"}
-- Objetivo: ${objetivo || "No especificado"}
+
+Indicaciones del usuario:
+${objetivo || "No especificado"}
 
 Base de investigación:
 ${investigacionFinal || "No disponible"}
@@ -588,7 +590,20 @@ ${fuentesTexto}
 
 ${bloqueLinks}
 
-Requisitos:
+Requisitos de redacción:
+- Escribí como un profesor humano que explica bien.
+- El texto debe sonar natural, claro, fluido y bien conectado.
+- Evitá frases robóticas, repetitivas o demasiado genéricas.
+- Usá transiciones naturales entre párrafos y secciones.
+- Alterná frases cortas y medias para que no suene mecánico.
+- No repitas la misma estructura una y otra vez.
+- Si las indicaciones del usuario piden más claridad, priorizá comprensión.
+- Si las indicaciones del usuario piden más precisión o rigor, priorizá exactitud.
+- Si las indicaciones del usuario piden ejemplos, incluí ejemplos útiles y concretos.
+- Si las indicaciones del usuario piden lenguaje simple, bajá la complejidad sin volverlo infantil.
+- Si las indicaciones del usuario piden tono académico o formal, mantenelo sin sonar duro ni artificial.
+
+Requisitos de contenido:
 - Hacé una introducción breve y clara.
 - Desarrollá el tema por secciones bien organizadas.
 - Explicá de forma útil para estudiar.
@@ -598,10 +613,10 @@ Requisitos:
 - Adaptá la profundidad al nivel indicado.
 - Respetá la extensión deseada.
 - No pongas relleno.
-- No repitas demasiado las mismas ideas.
 - No agregues las fuentes dentro del HTML.
 - El documento debe sentirse completo, no como un borrador.
-- El contenidoHtml debe traer suficiente desarrollo real.
+- El contenidoHtml debe traer desarrollo real, no una síntesis superficial.
+
 ${reglasExtras}
 
 Devolvé SOLO JSON válido con:
@@ -1165,7 +1180,7 @@ export default async function handler(req, res) {
     const duracionLimpia = limitarTexto(duracion, 120);
     const palabrasMinLimpias = limitarTexto(palabrasMin, 20);
     const palabrasMaxLimpias = limitarTexto(palabrasMax, 20);
-    const objetivoLimpio = limitarTexto(objetivo, 400);
+    const objetivoLimpio = limitarTexto(objetivo, 1600);
     const contenidoBaseLimpio = limpiarContenidoBase(contenidoBase);
 
     const extensionDeseada = construirExtensionDeseada({
