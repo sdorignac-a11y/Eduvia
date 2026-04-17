@@ -656,15 +656,23 @@
 }
 
 .paper-wrap{
-  max-width:1280px;
+  width:100%;
+  max-width:1040px;
+  margin:0 auto;
+  display:flex;
+  flex-direction:column;
+  gap:14px;
 }
 
 .paper{
+  width:100%;
   max-width:1040px;
   min-height:1040px;
+  background:#ffffff;
   border:1px solid #dadce0;
-  border-radius:2px;
-  box-shadow:0 1px 3px rgba(60,64,67,.18);
+  border-radius:18px;
+  box-shadow:0 8px 24px rgba(60,64,67,.12);
+  overflow:hidden;
 }
 
   #document-app.document-centered .workspace{
@@ -2650,29 +2658,24 @@
 
 <main class="workspace">
   <div class="doc-shell">
-    <aside class="doc-tabs-sidebar">
-      <div class="doc-tabs-sidebar-head">
-        <div class="doc-tabs-sidebar-title">Pestañas del documento</div>
-        <button type="button" class="doc-tabs-add" id="doc-tab-add-btn">+</button>
-      </div>
-
-      <div class="doc-tabs-list" id="doc-tabs-list">
-        <button type="button" class="doc-side-tab is-active" data-tab-target="tab-documento">
-          <span class="doc-side-tab-left">
-            <svg class="doc-side-tab-icon" viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M6 4h9l3 3v13H6z" fill="none" stroke="currentColor" stroke-width="2"></path>
-              <path d="M15 4v4h4" fill="none" stroke="currentColor" stroke-width="2"></path>
-            </svg>
-            <span class="doc-side-tab-label">Documento</span>
-          </span>
-          <span class="doc-side-tab-menu">⋮</span>
-        </button>
-      </div>
-    </aside>
-
     <div class="doc-panels" id="doc-tab-panels">
       <section class="doc-panel is-active" id="tab-documento">
         <div class="paper-wrap">
+          <div class="doc-tabs-bar">
+  <div class="doc-tabs-list" id="doc-tabs-list">
+    <button type="button" class="doc-side-tab is-active" data-tab-target="tab-documento">
+      <span class="doc-side-tab-left">
+        <svg class="doc-side-tab-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M6 4h9l3 3v13H6z" fill="none" stroke="currentColor" stroke-width="2"></path>
+          <path d="M15 4v4h4" fill="none" stroke="currentColor" stroke-width="2"></path>
+        </svg>
+        <span class="doc-side-tab-label">Documento</span>
+      </span>
+    </button>
+  </div>
+
+  <button type="button" class="doc-tabs-add" id="doc-tab-add-btn">+</button>
+</div>
           <article class="paper">
             <div class="paper-inner">
               <header class="doc-header">
