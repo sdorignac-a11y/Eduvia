@@ -12,9 +12,10 @@ function toPositiveInt(value, fallback) {
 const RESEARCH_MODEL = process.env.OPENAI_RESEARCH_MODEL || "gpt-5.4-mini";
 const DOCUMENT_MODEL = process.env.OPENAI_MODEL || "gpt-5.4";
 
-const MAX_SOURCE_COUNT = 10;
+const MAX_SOURCE_COUNT = 18;
+const MAX_SOURCES_FOR_MODEL = 8;
 const MAX_INVESTIGACION_CHARS = 3500;
-const MAX_FUENTES_TEXTO_CHARS = 900;
+const MAX_FUENTES_TEXTO_CHARS = 2200;
 const MAX_CONTENIDO_BASE_CHARS = 5000;
 const MAX_RETRY_DOCUMENTO = toPositiveInt(
   process.env.EDUVIA_MAX_RETRY_DOCUMENTO,
@@ -147,6 +148,160 @@ function extraerDominio(url = "") {
   }
 }
 
+function puntuarAutoridadFuente(url = "", title = "") {
+  const domain = extraerDominio(url).toLowerCase();
+  const titleLower = String(title || "").toLowerCase();
+
+  if (!domain) return 35;
+
+  const veryHighHosts = [
+    "who.int",
+    "un.org",
+    "unesco.org",
+    "oecd.org",
+    "worldbank.org",
+    "nih.gov",
+    "ncbi.nlm.nih.gov",
+    "pubmed.ncbi.nlm.nih.gov",
+    "nature.com",
+    "science.org",
+    "britannica.com",
+    "sciencedirect.com",
+    "springer.com",
+    "jstor.org",
+  ];
+
+  if (
+    veryHighHosts.some(
+      (host) => domain === host || domain.endsWith(`.${host}`)
+    )
+  ) {
+    return 95;
+  }
+
+  if (
+    domain.endsWith(".gov") ||
+    domain.endsWith(".gob.ar") ||
+    domain.endsWith(".edu") ||
+    domain.endsWith(".edu.ar") ||
+    domain.endsWith(".ac.uk")
+  ) {
+    return 92;
+  }
+
+  if (domain.endsWith(".org") || domain.endsWith(".int")) {
+    return 82;
+  }
+
+  if (domain.includes("wikipedia.org")) {
+    return 72;
+  }
+
+  if (
+    domain.includes("medium.com") ||
+    domain.includes("blogspot.com") ||
+    titleLower.includes("blog")
+  ) {
+    return 48;
+  }
+
+  return 65;
+}
+
+function puntuarRecencia(publishedAt = "") {
+  if (!publishedAt) return 8;
+
+  const ts = new Date(publishedAt).getTime();
+  if (!Number.isFinite(ts)) return 8;
+
+  const days = Math.floor((Date.now() - ts) / 86400000);
+
+  if (days <= 30) return 15;
+  if (days <= 180) return 12;
+  if (days <= 365) return 9;
+  if (days <= 730) return 6;
+  return 3;
+}
+
+function normalizarFuente(source = {}) {
+  const title = limitarTexto(
+    source.title ||
+      source.titulo ||
+      source.name ||
+      source.display_name ||
+      "Fuente",
+    180
+  );
+
+  const url = sanitizeUrl(source.url || source.link || "");
+  const snippet = limitarTexto(
+    source.snippet || source.summary || source.description || "",
+    220
+  );
+  const publishedAt = limpiarTexto(
+    source.published_at || source.publishedAt || source.date || ""
+  );
+  const domain = extraerDominio(url);
+
+  const authorityScore =
+    Number.isFinite(source.authorityScore) && source.authorityScore >= 0
+      ? Math.min(100, Math.floor(source.authorityScore))
+      : puntuarAutoridadFuente(url, title);
+
+  const freshnessScore =
+    Number.isFinite(source.freshnessScore) && source.freshnessScore >= 0
+      ? Math.min(20, Math.floor(source.freshnessScore))
+      : puntuarRecencia(publishedAt);
+
+  const detailScore =
+    Number.isFinite(source.detailScore) && source.detailScore >= 0
+      ? Math.min(10, Math.floor(source.detailScore))
+      : snippet
+        ? 8
+        : 4;
+
+  const trustScore =
+    Number.isFinite(source.trustScore) && source.trustScore >= 0
+      ? Math.min(100, Math.floor(source.trustScore))
+      : Math.min(100, authorityScore + freshnessScore + detailScore);
+
+  return {
+    title,
+    url,
+    domain,
+    snippet,
+    publishedAt,
+    authorityScore,
+    freshnessScore,
+    detailScore,
+    trustScore,
+  };
+}
+
+function rankearFuentes(value) {
+  if (!Array.isArray(value)) return [];
+
+  const seen = new Set();
+
+  return value
+    .map((item) => normalizarFuente(item))
+    .filter((item) => item.title || item.url)
+    .filter((item) => {
+      const key = `${item.title}|${item.url}`;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    })
+    .sort((a, b) => {
+      if (b.trustScore !== a.trustScore) return b.trustScore - a.trustScore;
+      if ((b.authorityScore || 0) !== (a.authorityScore || 0)) {
+        return (b.authorityScore || 0) - (a.authorityScore || 0);
+      }
+      return (a.title || "").localeCompare(b.title || "");
+    })
+    .slice(0, MAX_SOURCE_COUNT);
+}
+
 function limpiarListaStrings(value, maxItems = 8, maxItemChars = 220) {
   if (!Array.isArray(value)) return [];
 
@@ -165,33 +320,7 @@ function limpiarListaStrings(value, maxItems = 8, maxItemChars = 220) {
 }
 
 function limpiarFuentes(value) {
-  if (!Array.isArray(value)) return [];
-
-  const seen = new Set();
-
-  return value
-    .map((item) => {
-      if (!item || typeof item !== "object") return null;
-
-      const title = limitarTexto(
-        item.title || item.titulo || item.name || "Fuente",
-        180
-      );
-      const url = sanitizeUrl(item.url || item.link || "");
-
-      if (!title && !url) return null;
-
-      const key = `${title}|${url}`;
-      if (seen.has(key)) return null;
-      seen.add(key);
-
-      return {
-        title: title || "Fuente",
-        url,
-      };
-    })
-    .filter(Boolean)
-    .slice(0, MAX_SOURCE_COUNT);
+  return rankearFuentes(value);
 }
 
 function limpiarLinksUsuario(value) {
@@ -211,10 +340,12 @@ function limpiarLinksUsuario(value) {
 }
 
 function construirFuentesDesdeLinks(links = []) {
-  return links.map((url) => ({
-    title: extraerDominio(url) || "Fuente",
-    url,
-  }));
+  return rankearFuentes(
+    links.map((url) => ({
+      title: extraerDominio(url) || "Fuente",
+      url,
+    }))
+  );
 }
 
 function construirLinksUsuarioTexto(links = []) {
@@ -235,21 +366,12 @@ function extractWebSources(response) {
   function pushSource(source) {
     if (!source || typeof source !== "object") return;
 
-    const title =
-      limitarTexto(source.title, 180) ||
-      limitarTexto(source.name, 180) ||
-      limitarTexto(source.display_name, 180);
+    const normalized = normalizarFuente(source);
+    if (!normalized.title && !normalized.url) return;
 
-    const url = sanitizeUrl(source.url || source.link || "");
-
-    if (!title && !url) return;
-
-    const key = url || title;
+    const key = normalized.url || normalized.title;
     if (!encontrados.has(key)) {
-      encontrados.set(key, {
-        title: title || "Fuente",
-        url,
-      });
+      encontrados.set(key, normalized);
     }
   }
 
@@ -277,7 +399,7 @@ function extractWebSources(response) {
   }
 
   walk(response);
-  return Array.from(encontrados.values()).slice(0, MAX_SOURCE_COUNT);
+  return rankearFuentes(Array.from(encontrados.values()));
 }
 
 function limpiarContenidoBase(value = "") {
@@ -349,7 +471,12 @@ function buildResearchPrompt({
 - No uses otras fuentes, aunque encuentres resultados relacionados.
 - Si los links no alcanzan, decilo claramente.
 `
-      : "";
+      : `
+- En modo general, analizá idealmente entre 12 y 20 fuentes distintas.
+- Priorizá organismos oficiales, universidades, material académico y enciclopedias reconocidas.
+- Compará varias fuentes y basate sobre todo en lo que coincida entre las más confiables.
+- Si dos fuentes se contradicen, priorizá la más confiable y reciente.
+`;
 
   return `
 Investigá este tema para preparar un documento de estudio completo y serio.
@@ -402,6 +529,8 @@ ${contenidoBase ? `Contenido base para orientar la búsqueda:\n${contenidoBase}\
 Instrucciones:
 - Priorizá contenido educativo, académico o enciclopédico.
 - Evitá foros, resultados duplicados o páginas débiles.
+- Intentá reunir una base amplia y variada de fuentes.
+- Priorizá universidades, organismos oficiales, enciclopedias serias y material académico.
 - Respondé en español con una síntesis muy breve del tema.
 - Lo importante es encontrar buenas fuentes.
   `.trim();
@@ -431,7 +560,12 @@ function buildDocumentoPrompt({
 - No agregues conocimiento general ni otras fuentes externas.
 - Si algo no está en esos links o en el contenido base, decilo claramente.
 `
-      : "";
+      : `
+- Las fuentes listadas ya están ordenadas de mayor a menor confiabilidad.
+- Priorizá las primeras fuentes para sostener la explicación.
+- Cuando varias fuentes fuertes coincidan, dale más peso a esa idea.
+- Evitá apoyarte demasiado en una sola fuente débil o secundaria.
+`;
 
   return `
 Creá un documento de estudio en español.
@@ -746,11 +880,13 @@ function construirInvestigacionCompacta(data) {
 
 function construirFuentesTextoParaModelo(fuentes) {
   const texto = (Array.isArray(fuentes) ? fuentes : [])
-    .slice(0, 6)
+    .slice(0, MAX_SOURCES_FOR_MODEL)
     .map((f, i) => {
       const title = limitarTexto(f?.title || "Fuente", 120);
       const dominio = extraerDominio(f?.url || "");
-      return `${i + 1}. ${title}${dominio ? ` (${dominio})` : ""}`;
+      const score =
+        Number.isFinite(f?.trustScore) ? ` | score ${f.trustScore}` : "";
+      return `${i + 1}. ${title}${dominio ? ` (${dominio})` : ""}${score}`;
     })
     .join("\n");
 
@@ -861,6 +997,7 @@ async function buscarFuentesConWeb({
     instructions: `
 Sos el investigador de Eduvia.
 Tu objetivo principal es encontrar buenas fuentes web.
+Priorizá amplitud, calidad y diversidad.
 Respondé en español, breve.
     `.trim(),
     input: buildFuentesOnlyPrompt({
@@ -1082,8 +1219,19 @@ export default async function handler(req, res) {
       investigacionFinal =
         researchData.investigacionCompacta || investigacionFinal;
 
-      if (sourceModeFinal !== "exclusive" && faltanFuentes) {
-        fuentesFinales = limpiarFuentes(researchData.fuentes);
+      if (sourceModeFinal !== "exclusive") {
+        const fuentesExtra = await buscarFuentesConWeb({
+          materia: materiaLimpia,
+          tema: temaLimpio,
+          nivel: nivelLimpio,
+          contenidoBase: contenidoBaseLimpio,
+        });
+
+        fuentesFinales = rankearFuentes([
+          ...fuentesFinales,
+          ...researchData.fuentes,
+          ...fuentesExtra,
+        ]);
       }
 
       console.timeEnd("research_web");
@@ -1100,6 +1248,8 @@ export default async function handler(req, res) {
       fuentesFinales = limpiarFuentes(fuentesFinales);
 
       console.timeEnd("buscar_fuentes_web");
+    } else if (sourceModeFinal !== "exclusive") {
+      fuentesFinales = rankearFuentes(fuentesFinales);
     }
 
     const fuentesTexto = construirFuentesTextoParaModelo(fuentesFinales);
@@ -1119,6 +1269,11 @@ export default async function handler(req, res) {
       fuentesCount: fuentesFinales.length,
       sourceMode: sourceModeFinal,
       sourceLinksCount: sourceLinksLimpios.length,
+      topSources: fuentesFinales.slice(0, 5).map((f) => ({
+        title: f.title,
+        domain: f.domain,
+        trustScore: f.trustScore,
+      })),
     });
 
     console.time("documento_ia");
