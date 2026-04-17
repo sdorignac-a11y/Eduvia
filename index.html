@@ -3,1967 +3,882 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Eduvia | Estudiá mejor con IA</title>
+  <title>Eduvia — Estudia y escribe mejor con IA</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap"
-    rel="stylesheet"
-  />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
 
   <style>
-    :root{
-      --bg:#f6f7fb;
-      --bg-2:#fbfcff;
-      --surface:#ffffff;
-      --surface-soft:#fbfcff;
-      --line:#ececf3;
-      --line-soft:#f2f3f8;
-      --text:#20243a;
-      --muted:#7a8198;
-      --muted-2:#98a1b5;
-
-      --brand:#1fb8c9;
-      --brand-dark:#1498a8;
-      --brand-soft:#e9fbfd;
-
-      --shadow-sm:0 10px 24px rgba(31,42,68,.06);
-      --shadow-md:0 18px 44px rgba(31,42,68,.10);
-      --shadow-lg:0 28px 70px rgba(31,42,68,.14);
-
-      --radius-xl:30px;
-      --radius-lg:24px;
-      --radius-md:18px;
-      --radius-sm:14px;
-
-      --container:min(1180px, calc(100% - 32px));
-      --header-h:84px;
-    }
-
-    *{
-      box-sizing:border-box;
-      margin:0;
-      padding:0;
-    }
-
-    html{
-      scroll-behavior:smooth;
-    }
-
-    body{
-      font-family:"Nunito", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background:
-        radial-gradient(circle at top left, rgba(31,184,201,.10), transparent 28%),
-        radial-gradient(circle at 90% 10%, rgba(31,184,201,.08), transparent 22%),
-        linear-gradient(180deg, #f7f9fc 0%, #f6f7fb 100%);
-      color:var(--text);
-      min-height:100vh;
-      overflow-x:hidden;
-    }
-
-    a{
-      color:inherit;
-      text-decoration:none;
-    }
-
-    button{
-      font:inherit;
-      border:none;
-      background:none;
-      cursor:pointer;
-    }
-
-    img{
-      display:block;
-      max-width:100%;
-    }
-
-    .container{
-      width:var(--container);
-      margin:0 auto;
-    }
-
-    .section{
-      padding:96px 0;
-      position:relative;
-    }
-
-    .section-head{
-      max-width:760px;
-      margin:0 auto 44px;
-      text-align:center;
-    }
-
-    .section-kicker{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      gap:8px;
-      min-height:36px;
-      padding:0 16px;
-      border-radius:999px;
-      border:1px solid rgba(31,184,201,.16);
-      background:rgba(255,255,255,.72);
-      color:var(--brand-dark);
-      font-size:.95rem;
-      font-weight:800;
-      box-shadow:var(--shadow-sm);
-      margin-bottom:16px;
-    }
-
-    .section-head h2{
-      font-size:clamp(2rem, 2.7vw, 3rem);
-      line-height:1.06;
-      font-weight:900;
-      letter-spacing:-.03em;
-      margin-bottom:14px;
-    }
-
-    .section-head p{
-      font-size:1.08rem;
-      line-height:1.75;
-      color:var(--muted);
-      font-weight:600;
-    }
-
-    .btn{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      gap:10px;
-      min-height:54px;
-      padding:0 22px;
-      border-radius:16px;
-      font-size:1rem;
-      font-weight:800;
-      transition:.22s ease;
-      white-space:nowrap;
-    }
-
-    .btn:hover{
-      transform:translateY(-2px);
-    }
-
-    .btn-primary{
-      color:#fff;
-      background:linear-gradient(135deg, var(--brand) 0%, var(--brand-dark) 100%);
-      box-shadow:0 14px 28px rgba(31,184,201,.24);
-    }
-
-    .btn-primary:hover{
-      box-shadow:0 18px 34px rgba(31,184,201,.30);
-    }
-
-    .btn-ghost{
-      background:rgba(255,255,255,.86);
-      border:1px solid var(--line);
-      color:var(--text);
-      box-shadow:var(--shadow-sm);
-    }
-
-    .btn-ghost:hover{
-      border-color:rgba(31,184,201,.25);
-      background:#fff;
-    }
-
-    .site-header{
-      position:sticky;
-      top:0;
-      z-index:1000;
-      backdrop-filter:blur(18px);
-      background:rgba(255,255,255,.72);
-      border-bottom:1px solid rgba(236,236,243,.84);
-    }
-
-    .header-inner{
-      min-height:var(--header-h);
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:20px;
-    }
-
-    .logo{
-      display:flex;
-      align-items:center;
-      gap:12px;
-      font-weight:900;
-      font-size:1.2rem;
-      letter-spacing:-.02em;
-    }
-
-    .logo-mark{
-      width:42px;
-      height:42px;
-      border-radius:14px;
-      display:grid;
-      place-items:center;
-      color:#fff;
-      font-weight:900;
-      font-size:1.05rem;
-      background:linear-gradient(135deg, var(--brand) 0%, var(--brand-dark) 100%);
-      box-shadow:0 12px 24px rgba(31,184,201,.24);
-    }
-
-    .desktop-nav{
-      display:flex;
-      align-items:center;
-      gap:28px;
-    }
-
-    .desktop-nav a{
-      color:var(--muted);
-      font-weight:800;
-      font-size:.98rem;
-      transition:.18s ease;
-      position:relative;
-    }
-
-    .desktop-nav a:hover{
-      color:var(--text);
-    }
-
-    .header-actions{
-      display:flex;
-      align-items:center;
-      gap:12px;
-    }
-
-    .menu-toggle{
-      display:none;
-      width:50px;
-      height:50px;
-      border-radius:16px;
-      border:1px solid var(--line);
-      background:#fff;
-      box-shadow:var(--shadow-sm);
-      position:relative;
-    }
-
-    .menu-toggle span{
-      position:absolute;
-      left:50%;
-      width:20px;
-      height:2px;
-      background:var(--text);
-      border-radius:999px;
-      transform:translateX(-50%);
-      transition:.2s ease;
-    }
-
-    .menu-toggle span:nth-child(1){ top:17px; }
-    .menu-toggle span:nth-child(2){ top:24px; }
-    .menu-toggle span:nth-child(3){ top:31px; }
-
-    .menu-toggle.is-open span:nth-child(1){
-      top:24px;
-      transform:translateX(-50%) rotate(45deg);
-    }
-    .menu-toggle.is-open span:nth-child(2){
-      opacity:0;
-    }
-    .menu-toggle.is-open span:nth-child(3){
-      top:24px;
-      transform:translateX(-50%) rotate(-45deg);
-    }
-
-    .mobile-panel{
-      display:none;
-      padding:0 0 18px;
-    }
-
-    .mobile-card{
-      background:rgba(255,255,255,.92);
-      border:1px solid var(--line);
-      border-radius:24px;
-      padding:18px;
-      box-shadow:var(--shadow-md);
-    }
-
-    .mobile-nav{
-      display:flex;
-      flex-direction:column;
-      gap:10px;
-      margin-bottom:14px;
-    }
-
-    .mobile-nav a{
-      padding:14px 14px;
-      border-radius:14px;
-      font-weight:800;
-      color:var(--text);
-      background:var(--surface-soft);
-      border:1px solid var(--line-soft);
-    }
-
-    .mobile-actions{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:10px;
-    }
-
-    .hero{
-      padding:72px 0 54px;
-      overflow:hidden;
-    }
-
-    .hero-grid{
-      display:grid;
-      grid-template-columns:1.06fr .94fr;
-      gap:42px;
-      align-items:center;
-    }
-
-    .hero-copy{
-      position:relative;
-      z-index:2;
-    }
-
-    .hero-badge{
-      display:inline-flex;
-      align-items:center;
-      min-height:38px;
-      padding:0 16px;
-      border-radius:999px;
-      background:rgba(255,255,255,.85);
-      border:1px solid rgba(31,184,201,.16);
-      color:var(--brand-dark);
-      font-size:.96rem;
-      font-weight:900;
-      box-shadow:var(--shadow-sm);
-      margin-bottom:18px;
-    }
-
-    .hero h1{
-      font-size:clamp(2.6rem, 5vw, 4.65rem);
-      line-height:.98;
-      font-weight:900;
-      letter-spacing:-.05em;
-      margin-bottom:18px;
-      max-width:720px;
-    }
-
-    .hero-text{
-      font-size:1.14rem;
-      line-height:1.8;
-      color:var(--muted);
-      font-weight:600;
-      max-width:640px;
-      margin-bottom:28px;
-    }
-
-    .hero-actions{
-      display:flex;
-      flex-wrap:wrap;
-      gap:12px;
-      margin-bottom:22px;
-    }
-
-    .hero-chips{
-      display:flex;
-      flex-wrap:wrap;
-      gap:10px;
-    }
-
-    .hero-chips span{
-      padding:10px 14px;
-      border-radius:999px;
-      background:rgba(255,255,255,.8);
-      border:1px solid var(--line);
-      color:var(--muted);
-      font-weight:800;
-      font-size:.94rem;
-      box-shadow:var(--shadow-sm);
-    }
-
-    .hero-visual{
-      position:relative;
-      min-height:620px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-    }
-
-    .hero-glow{
-      position:absolute;
-      inset:50px 24px 40px;
-      border-radius:40px;
-      background:
-        radial-gradient(circle at 25% 25%, rgba(31,184,201,.24), transparent 34%),
-        radial-gradient(circle at 75% 25%, rgba(31,184,201,.16), transparent 28%),
-        linear-gradient(180deg, rgba(255,255,255,.64), rgba(255,255,255,.18));
-      filter:blur(10px);
-      z-index:0;
-    }
-
-    .hero-mockup{
-      position:relative;
-      z-index:2;
-      width:min(100%, 560px);
-      background:rgba(255,255,255,.86);
-      border:1px solid rgba(255,255,255,.8);
-      border-radius:34px;
-      box-shadow:var(--shadow-lg);
-      padding:20px;
-      backdrop-filter:blur(16px);
-    }
-
-    .mockup-top{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:14px;
-      margin-bottom:16px;
-    }
-
-    .mockup-title{
-      display:flex;
-      align-items:center;
-      gap:12px;
-      min-width:0;
-    }
-
-    .mockup-dot{
-      width:12px;
-      height:12px;
-      border-radius:999px;
-      background:linear-gradient(135deg, var(--brand), var(--brand-dark));
-      box-shadow:0 0 0 5px rgba(31,184,201,.10);
-      flex-shrink:0;
-    }
-
-    .mockup-title-text strong{
-      display:block;
-      font-size:.98rem;
-      font-weight:900;
-    }
-
-    .mockup-title-text span{
-      display:block;
-      color:var(--muted);
-      font-size:.88rem;
-      font-weight:700;
-      margin-top:3px;
-    }
-
-    .mockup-actions{
-      display:flex;
-      gap:8px;
-    }
-
-    .mockup-actions i{
-      width:10px;
-      height:10px;
-      border-radius:999px;
-      background:#d6d9e4;
-      display:block;
-    }
-
-    .mockup-body{
-      display:grid;
-      grid-template-columns:102px 1fr;
-      gap:16px;
-    }
-
-    .mockup-sidebar{
-      background:var(--surface-soft);
-      border:1px solid var(--line-soft);
-      border-radius:24px;
-      padding:12px;
-      display:flex;
-      flex-direction:column;
-      gap:10px;
-    }
-
-    .sidebar-pill{
-      min-height:42px;
-      border-radius:14px;
-      background:#fff;
-      border:1px solid var(--line);
-      display:flex;
-      align-items:center;
-      padding:0 12px;
-      color:var(--muted);
-      font-size:.84rem;
-      font-weight:800;
-      box-shadow:0 8px 18px rgba(31,42,68,.04);
-    }
-
-    .sidebar-pill.active{
-      color:var(--brand-dark);
-      border-color:rgba(31,184,201,.24);
-      background:var(--brand-soft);
-    }
-
-    .mockup-editor{
-      background:#fff;
-      border:1px solid var(--line);
-      border-radius:26px;
-      padding:20px 20px 18px;
-      min-height:420px;
-      position:relative;
-      overflow:hidden;
-    }
-
-    .editor-toolbar{
-      display:flex;
-      align-items:center;
-      gap:8px;
-      margin-bottom:18px;
-      flex-wrap:wrap;
-    }
-
-    .editor-toolbar span{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      min-height:34px;
-      padding:0 12px;
-      border-radius:12px;
-      background:var(--surface-soft);
-      border:1px solid var(--line-soft);
-      color:var(--muted);
-      font-size:.8rem;
-      font-weight:800;
-    }
-
-    .doc-title{
-      width:78%;
-      height:20px;
-      border-radius:999px;
-      background:linear-gradient(90deg, #dfe7f2 0%, #eff3f8 100%);
-      margin-bottom:18px;
-    }
-
-    .doc-line{
-      height:12px;
-      border-radius:999px;
-      background:linear-gradient(90deg, #e4e9f2 0%, #f2f5fa 100%);
-      margin-bottom:12px;
-    }
-
-    .doc-line.short{ width:58%; }
-    .doc-line.med{ width:76%; }
-    .doc-line.long{ width:100%; }
-
-    .floating-card{
-      position:absolute;
-      min-width:180px;
-      background:rgba(255,255,255,.93);
-      border:1px solid rgba(255,255,255,.9);
-      border-radius:22px;
-      padding:14px 16px;
-      box-shadow:var(--shadow-md);
-      backdrop-filter:blur(12px);
-      z-index:3;
-    }
-
-    .floating-card strong{
-      display:block;
-      font-size:.95rem;
-      font-weight:900;
-      margin-bottom:4px;
-      letter-spacing:-.02em;
-    }
-
-    .floating-card p{
-      color:var(--muted);
-      font-size:.84rem;
-      line-height:1.55;
-      font-weight:700;
-    }
-
-    .card-summary{
-      top:28px;
-      right:-20px;
-    }
-
-    .card-quiz{
-      left:-18px;
-      bottom:78px;
-    }
-
-    .card-slides{
-      right:12px;
-      bottom:-18px;
-    }
-
-    .benefits-grid{
-      display:grid;
-      grid-template-columns:repeat(4, 1fr);
-      gap:18px;
-    }
-
-    .benefit-card,
-    .tool-card,
-    .step-card,
-    .audience-card,
-    .testimonial-card,
-    .price-card{
-      background:rgba(255,255,255,.88);
-      border:1px solid var(--line);
-      box-shadow:var(--shadow-sm);
-      border-radius:26px;
-      transition:.22s ease;
-    }
-
-    .benefit-card:hover,
-    .tool-card:hover,
-    .step-card:hover,
-    .audience-card:hover,
-    .testimonial-card:hover,
-    .price-card:hover{
-      transform:translateY(-4px);
-      box-shadow:var(--shadow-md);
-    }
-
-    .benefit-card{
-      padding:24px;
-    }
-
-    .benefit-card h3{
-      font-size:1.12rem;
-      font-weight:900;
-      margin-bottom:10px;
-      letter-spacing:-.02em;
-    }
-
-    .benefit-card p{
-      color:var(--muted);
-      line-height:1.75;
-      font-weight:700;
-      font-size:.98rem;
-    }
-
-    .tools-grid{
-      display:grid;
-      grid-template-columns:repeat(4, 1fr);
-      gap:18px;
-    }
-
-    .tool-card{
-      padding:22px;
-      min-height:228px;
-      display:flex;
-      flex-direction:column;
-    }
-
-    .tool-icon{
-      width:54px;
-      height:54px;
-      border-radius:18px;
-      display:grid;
-      place-items:center;
-      margin-bottom:18px;
-      background:linear-gradient(135deg, rgba(31,184,201,.16) 0%, rgba(31,184,201,.08) 100%);
-      border:1px solid rgba(31,184,201,.14);
-      color:var(--brand-dark);
-      font-size:1rem;
-      font-weight:900;
-      box-shadow:0 12px 22px rgba(31,184,201,.10);
-    }
-
-    .tool-card h3{
-      font-size:1.08rem;
-      font-weight:900;
-      margin-bottom:10px;
-      letter-spacing:-.02em;
-    }
-
-    .tool-card p{
-      color:var(--muted);
-      line-height:1.72;
-      font-weight:700;
-      font-size:.96rem;
-    }
-
-    .como-funciona{
-      background:
-        radial-gradient(circle at 10% 20%, rgba(31,184,201,.08), transparent 24%),
-        linear-gradient(180deg, #fbfdff 0%, #f4f8fc 100%);
-    }
-
-    .steps-grid{
-      display:grid;
-      grid-template-columns:repeat(3, 1fr);
-      gap:18px;
-    }
-
-    .step-card{
-      padding:28px;
-      position:relative;
-      overflow:hidden;
-    }
-
-    .step-number{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      min-width:58px;
-      min-height:38px;
-      padding:0 14px;
-      border-radius:999px;
-      background:var(--brand-soft);
-      color:var(--brand-dark);
-      border:1px solid rgba(31,184,201,.14);
-      font-size:.94rem;
-      font-weight:900;
-      margin-bottom:18px;
-    }
-
-    .step-card h3{
-      font-size:1.2rem;
-      font-weight:900;
-      margin-bottom:12px;
-      letter-spacing:-.02em;
-    }
-
-    .step-card p{
-      color:var(--muted);
-      line-height:1.8;
-      font-weight:700;
-      font-size:1rem;
-    }
-
-    .preview-shell{
-      background:rgba(255,255,255,.9);
-      border:1px solid var(--line);
-      border-radius:34px;
-      box-shadow:var(--shadow-lg);
-      padding:22px;
-      overflow:hidden;
-    }
-
-    .preview-tabs{
-      display:flex;
-      flex-wrap:wrap;
-      gap:10px;
-      margin-bottom:18px;
-    }
-
-    .preview-tab{
-      min-height:44px;
-      padding:0 16px;
-      border-radius:14px;
-      border:1px solid var(--line);
-      background:#fff;
-      color:var(--muted);
-      font-size:.95rem;
-      font-weight:900;
-      transition:.18s ease;
-    }
-
-    .preview-tab.active{
-      border-color:rgba(31,184,201,.24);
-      background:var(--brand-soft);
-      color:var(--brand-dark);
-      box-shadow:0 10px 20px rgba(31,184,201,.08);
-    }
-
-    .preview-body{
-      background:linear-gradient(180deg, #ffffff 0%, #fbfcff 100%);
-      border:1px solid var(--line-soft);
-      border-radius:28px;
-      padding:24px;
-      min-height:420px;
-      position:relative;
-    }
-
-    .preview-panel{
-      display:none;
-      animation:fadeUp .25s ease;
-    }
-
-    .preview-panel.active{
-      display:block;
-    }
-
-    @keyframes fadeUp{
-      from{
-        opacity:0;
-        transform:translateY(8px);
-      }
-      to{
-        opacity:1;
-        transform:translateY(0);
-      }
-    }
-
-    .doc-preview .title{
-      width:48%;
-      height:22px;
-      border-radius:999px;
-      background:#dfe6f1;
-      margin-bottom:18px;
-    }
-
-    .doc-preview .subtitle{
-      width:28%;
-      height:16px;
-      border-radius:999px;
-      background:#e7edf5;
-      margin:12px 0 16px;
-    }
-
-    .doc-preview .line{
-      height:12px;
-      border-radius:999px;
-      background:#edf2f8;
-      margin-bottom:12px;
-    }
-
-    .doc-preview .line.short{ width:62%; }
-    .doc-preview .line.med{ width:80%; }
-    .doc-preview .line.long{ width:100%; }
-
-    .summary-box{
-      display:grid;
-      gap:14px;
-    }
-
-    .summary-item{
-      padding:18px 20px;
-      border-radius:20px;
-      background:var(--surface-soft);
-      border:1px solid var(--line-soft);
-    }
-
-    .summary-item strong{
-      display:block;
-      font-size:1rem;
-      font-weight:900;
-      margin-bottom:8px;
-    }
-
-    .summary-item p{
-      color:var(--muted);
-      line-height:1.75;
-      font-weight:700;
-    }
-
-    .quiz-list{
-      display:grid;
-      gap:16px;
-    }
-
-    .quiz-item{
-      border:1px solid var(--line-soft);
-      background:var(--surface-soft);
-      border-radius:22px;
-      padding:18px 20px;
-    }
-
-    .quiz-item strong{
-      display:block;
-      font-size:1rem;
-      font-weight:900;
-      margin-bottom:14px;
-    }
-
-    .quiz-options{
-      display:grid;
-      gap:10px;
-    }
-
-    .quiz-options span{
-      min-height:44px;
-      display:flex;
-      align-items:center;
-      padding:0 14px;
-      border-radius:14px;
-      background:#fff;
-      border:1px solid var(--line);
-      color:var(--muted);
-      font-weight:800;
-    }
-
-    .slides-grid{
-      display:grid;
-      grid-template-columns:repeat(3, 1fr);
-      gap:16px;
-    }
-
-    .slide-card{
-      border-radius:22px;
-      padding:18px;
-      background:linear-gradient(180deg, #ffffff 0%, #f9fbff 100%);
-      border:1px solid var(--line);
-      min-height:220px;
-      box-shadow:var(--shadow-sm);
-    }
-
-    .slide-thumb{
-      height:110px;
-      border-radius:18px;
-      background:linear-gradient(135deg, rgba(31,184,201,.16), rgba(31,184,201,.04));
-      margin-bottom:14px;
-      border:1px solid rgba(31,184,201,.14);
-    }
-
-    .slide-line{
-      height:12px;
-      border-radius:999px;
-      background:#e9eef6;
-      margin-bottom:10px;
-    }
-
-    .slide-line.short{ width:58%; }
-    .slide-line.med{ width:72%; }
-    .slide-line.long{ width:100%; }
-
-    .audience-grid{
-      display:grid;
-      grid-template-columns:repeat(3, 1fr);
-      gap:18px;
-    }
-
-    .audience-card{
-      padding:28px;
-      position:relative;
-    }
-
-    .audience-card::before{
-      content:"";
-      position:absolute;
-      top:0;
-      left:0;
-      right:0;
-      height:6px;
-      border-radius:26px 26px 0 0;
-      background:linear-gradient(90deg, var(--brand) 0%, rgba(31,184,201,.24) 100%);
-    }
-
-    .audience-card h3{
-      font-size:1.18rem;
-      font-weight:900;
-      margin-bottom:12px;
-      letter-spacing:-.02em;
-    }
-
-    .audience-card p{
-      color:var(--muted);
-      line-height:1.78;
-      font-weight:700;
-      font-size:1rem;
-    }
-
-    .testimonials-grid{
-      display:grid;
-      grid-template-columns:repeat(3, 1fr);
-      gap:18px;
-    }
-
-    .testimonial-card{
-      padding:26px;
-      display:flex;
-      flex-direction:column;
-      justify-content:space-between;
-      min-height:220px;
-    }
-
-    .testimonial-card p{
-      color:var(--text);
-      line-height:1.8;
-      font-weight:700;
-      font-size:1rem;
-      margin-bottom:24px;
-    }
-
-    .testimonial-user{
-      display:flex;
-      flex-direction:column;
-      gap:4px;
-    }
-
-    .testimonial-user strong{
-      font-size:1rem;
-      font-weight:900;
-    }
-
-    .testimonial-user span{
-      color:var(--muted);
-      font-size:.95rem;
-      font-weight:800;
-    }
-
-    .pricing-grid{
-      display:grid;
-      grid-template-columns:repeat(3, 1fr);
-      gap:18px;
-      align-items:stretch;
-    }
-
-    .price-card{
-      padding:28px;
-      position:relative;
-      display:flex;
-      flex-direction:column;
-    }
-
-    .price-card.featured{
-      border-color:rgba(31,184,201,.24);
-      box-shadow:0 24px 56px rgba(31,184,201,.14);
-      transform:translateY(-6px);
-    }
-
-    .price-badge{
-      position:absolute;
-      top:18px;
-      right:18px;
-      min-height:32px;
-      padding:0 12px;
-      border-radius:999px;
-      background:var(--brand-soft);
-      color:var(--brand-dark);
-      border:1px solid rgba(31,184,201,.16);
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      font-size:.82rem;
-      font-weight:900;
-    }
-
-    .price-card h3{
-      font-size:1.25rem;
-      font-weight:900;
-      margin-bottom:14px;
-      letter-spacing:-.02em;
-    }
-
-    .price{
-      font-size:2.6rem;
-      font-weight:900;
-      letter-spacing:-.04em;
-      margin-bottom:10px;
-    }
-
-    .price-sub{
-      color:var(--muted);
-      line-height:1.72;
-      font-weight:700;
-      margin-bottom:24px;
-    }
-
-    .price-features{
-      display:grid;
-      gap:10px;
-      margin-bottom:26px;
-    }
-
-    .price-features span{
-      min-height:40px;
-      display:flex;
-      align-items:center;
-      padding:0 14px;
-      border-radius:14px;
-      background:var(--surface-soft);
-      border:1px solid var(--line-soft);
-      color:var(--muted);
-      font-weight:800;
-      font-size:.95rem;
-    }
-
-    .price-card .btn{
-      margin-top:auto;
-      width:100%;
-    }
-
-    .faq-grid{
-      display:grid;
-      grid-template-columns:.9fr 1.1fr;
-      gap:24px;
-      align-items:start;
-    }
-
-    .faq-copy{
-      background:rgba(255,255,255,.82);
-      border:1px solid var(--line);
-      border-radius:30px;
-      padding:30px;
-      box-shadow:var(--shadow-sm);
-    }
-
-    .faq-copy h2{
-      font-size:clamp(2rem, 2.8vw, 2.8rem);
-      line-height:1.06;
-      font-weight:900;
-      letter-spacing:-.03em;
-      margin:8px 0 14px;
-    }
-
-    .faq-copy p{
-      color:var(--muted);
-      line-height:1.8;
-      font-weight:700;
-      font-size:1rem;
-    }
-
-    .faq-list{
-      display:grid;
-      gap:14px;
-    }
-
-    .faq-list details{
-      background:rgba(255,255,255,.88);
-      border:1px solid var(--line);
-      border-radius:22px;
-      box-shadow:var(--shadow-sm);
-      overflow:hidden;
-    }
-
-    .faq-list summary{
-      list-style:none;
-      padding:20px 22px;
-      font-size:1rem;
-      font-weight:900;
-      cursor:pointer;
-      position:relative;
-      padding-right:58px;
-    }
-
-    .faq-list summary::-webkit-details-marker{
-      display:none;
-    }
-
-    .faq-list summary::after{
-      content:"+";
-      position:absolute;
-      right:20px;
-      top:50%;
-      transform:translateY(-50%);
-      width:28px;
-      height:28px;
-      border-radius:999px;
-      display:grid;
-      place-items:center;
-      color:var(--brand-dark);
-      background:var(--brand-soft);
-      border:1px solid rgba(31,184,201,.16);
-      font-size:1rem;
-      font-weight:900;
-    }
-
-    .faq-list details[open] summary::after{
-      content:"–";
-    }
-
-    .faq-list details p{
-      color:var(--muted);
-      line-height:1.8;
-      font-weight:700;
-      padding:0 22px 20px;
-    }
-
-    .cta-box{
-      position:relative;
-      overflow:hidden;
-      padding:42px;
-      border-radius:34px;
-      background:
-        radial-gradient(circle at 20% 20%, rgba(31,184,201,.20), transparent 32%),
-        linear-gradient(135deg, rgba(233,251,253,.94) 0%, rgba(255,255,255,.94) 100%);
-      border:1px solid rgba(31,184,201,.18);
-      box-shadow:var(--shadow-lg);
-      text-align:center;
-    }
-
-    .cta-box h2{
-      font-size:clamp(2rem, 3vw, 3rem);
-      line-height:1.06;
-      font-weight:900;
-      letter-spacing:-.035em;
-      max-width:840px;
-      margin:0 auto 14px;
-    }
-
-    .cta-box p{
-      color:var(--muted);
-      line-height:1.8;
-      font-weight:700;
-      max-width:720px;
-      margin:0 auto 24px;
-      font-size:1.05rem;
-    }
-
-    .cta-actions{
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      gap:12px;
-      flex-wrap:wrap;
-    }
-
-    .site-footer{
-      padding:30px 0 44px;
-    }
-
-    .footer-inner{
-      border-top:1px solid rgba(236,236,243,.9);
-      padding-top:28px;
-      display:flex;
-      align-items:flex-start;
-      justify-content:space-between;
-      gap:20px;
-      flex-wrap:wrap;
-    }
-
-    .footer-brand strong{
-      display:block;
-      font-size:1.08rem;
-      font-weight:900;
-      margin-bottom:8px;
-    }
-
-    .footer-brand p{
-      color:var(--muted);
-      line-height:1.72;
-      font-weight:700;
-      max-width:460px;
-    }
-
-    .footer-links{
-      display:flex;
-      align-items:center;
-      gap:18px;
-      flex-wrap:wrap;
-    }
-
-    .footer-links a{
-      color:var(--muted);
-      font-weight:800;
-      transition:.18s ease;
-    }
-
-    .footer-links a:hover{
-      color:var(--text);
-    }
-
-    @media (max-width: 1100px){
-      .hero-grid,
-      .faq-grid{
-        grid-template-columns:1fr;
-      }
-
-      .hero-visual{
-        min-height:auto;
-      }
-
-      .hero-mockup{
-        margin:0 auto;
-      }
-
-      .benefits-grid,
-      .tools-grid{
-        grid-template-columns:repeat(2, 1fr);
-      }
-
-      .steps-grid,
-      .audience-grid,
-      .testimonials-grid,
-      .pricing-grid{
-        grid-template-columns:1fr;
-      }
-
-      .slides-grid{
-        grid-template-columns:1fr;
-      }
-    }
-
-    @media (max-width: 860px){
-      .desktop-nav,
-      .header-actions{
-        display:none;
-      }
-
-      .menu-toggle{
-        display:inline-block;
-      }
-
-      .mobile-panel.is-open{
-        display:block;
-      }
-
-      .hero{
-        padding:42px 0 24px;
-      }
-
-      .hero-grid{
-        gap:28px;
-      }
-
-      .hero h1{
-        max-width:none;
-      }
-
-      .floating-card{
-        position:static;
-        margin-top:14px;
-      }
-
-      .hero-mockup{
-        width:100%;
-      }
-
-      .mockup-body{
-        grid-template-columns:1fr;
-      }
-
-      .mockup-sidebar{
-        display:grid;
-        grid-template-columns:repeat(2, 1fr);
-      }
-    }
-
-    @media (max-width: 700px){
-      .section{
-        padding:72px 0;
-      }
-
-      .container{
-        width:min(100% - 20px, 1180px);
-      }
-
-      .hero h1{
-        font-size:clamp(2.2rem, 11vw, 3.2rem);
-      }
-
-      .hero-text{
-        font-size:1rem;
-      }
-
-      .benefits-grid,
-      .tools-grid{
-        grid-template-columns:1fr;
-      }
-
-      .preview-shell{
-        padding:14px;
-        border-radius:24px;
-      }
-
-      .preview-body{
-        padding:16px;
-        border-radius:20px;
-        min-height:auto;
-      }
-
-      .slide-card{
-        min-height:unset;
-      }
-
-      .cta-box{
-        padding:28px 18px;
-        border-radius:26px;
-      }
-
-      .footer-inner{
-        flex-direction:column;
-      }
-
-      .mobile-actions{
-        grid-template-columns:1fr;
-      }
+    :root {
+      --bg:             #f6f7fb;
+      --surface:        #ffffff;
+      --line:           #ececf3;
+      --line-soft:      #f2f3f8;
+      --text:           #20243a;
+      --muted:          #7a8198;
+
+      --brand:          #1fb8c9;
+      --brand-dark:     #1498a8;
+      --brand-soft:     #e9fbfd;
+      --brand-mid:      #cfeef3;
+
+      --shadow:         0 10px 30px rgba(31,42,68,.07);
+      --shadow-md:      0 14px 34px rgba(31,42,68,.10);
+      --shadow-brand:   0 10px 28px rgba(31,184,201,.18);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: "Nunito", system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    button { font: inherit; border: none; background: none; cursor: pointer; }
+    img { display: block; max-width: 100%; }
+
+    /* ── NAVBAR ─────────────────────────────── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      background: rgba(255,255,255,.88);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid rgba(236,236,243,.8);
+      padding: 0 2rem;
+    }
+    .nav-inner {
+      max-width: 1180px; margin: 0 auto;
+      height: 72px;
+      display: flex; align-items: center; justify-content: space-between; gap: 1.5rem;
+    }
+    .brand {
+      display: flex; align-items: center; gap: 12px; flex-shrink: 0;
+    }
+    .brand-badge {
+      width: 42px; height: 42px; border-radius: 14px;
+      background: linear-gradient(180deg, #87e8ef 0%, #1fb8c9 100%);
+      display: grid; place-items: center; color: white;
+      box-shadow: var(--shadow-brand); flex-shrink: 0;
+    }
+    .brand-badge svg { width: 22px; height: 22px; }
+    .brand-name {
+      font-size: 1.8rem; font-weight: 900; letter-spacing: -0.03em; line-height: 1;
+      background: linear-gradient(90deg, #31d2d8 0%, #5f8cff 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .nav-links {
+      display: flex; align-items: center; gap: 0.25rem; list-style: none;
+    }
+    .nav-links a {
+      padding: 0.5rem 1rem; border-radius: 12px;
+      font-size: 0.92rem; font-weight: 700; color: var(--muted);
+      transition: background .18s, color .18s;
+    }
+    .nav-links a:hover { background: var(--bg); color: var(--text); }
+    .nav-ctas { display: flex; align-items: center; gap: 0.75rem; flex-shrink: 0; }
+    .btn-ghost-nav {
+      padding: 0.55rem 1.25rem; border-radius: 14px;
+      border: 1.5px solid var(--line); background: white;
+      font-size: 0.88rem; font-weight: 800; color: #48516b;
+      box-shadow: var(--shadow); transition: transform .18s, box-shadow .18s;
+    }
+    .btn-ghost-nav:hover { transform: translateY(-1px); box-shadow: var(--shadow-md); }
+    .btn-primary-nav {
+      padding: 0.6rem 1.4rem; border-radius: 14px;
+      background: linear-gradient(180deg, #3dd6e2 0%, #1fb8c9 100%);
+      color: white; font-size: 0.88rem; font-weight: 800;
+      box-shadow: var(--shadow-brand); border: none;
+      transition: transform .18s, box-shadow .18s;
+    }
+    .btn-primary-nav:hover { transform: translateY(-1px); box-shadow: 0 14px 32px rgba(31,184,201,.28); }
+
+    /* ── HERO ───────────────────────────────── */
+    .hero {
+      min-height: 100vh; padding: 9rem 2rem 5rem;
+      display: flex; align-items: center;
+      position: relative; overflow: hidden;
+    }
+    /* decorative blobs */
+    .hero::before {
+      content: '';
+      position: absolute; top: -120px; right: -200px;
+      width: 700px; height: 700px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(31,184,201,.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero::after {
+      content: '';
+      position: absolute; bottom: -80px; left: -150px;
+      width: 500px; height: 500px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(95,140,255,.07) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-inner {
+      max-width: 1180px; margin: 0 auto; width: 100%;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center;
+      position: relative; z-index: 1;
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--brand-soft); border: 1px solid var(--brand-mid);
+      color: var(--brand-dark); padding: 0.45rem 1rem; border-radius: 999px;
+      font-size: 0.8rem; font-weight: 800; margin-bottom: 1.5rem;
+      opacity: 0; animation: fadeUp .7s .1s forwards;
+    }
+    .hero-badge-dot {
+      width: 7px; height: 7px; border-radius: 50%; background: var(--brand);
+      animation: blink 1.8s infinite;
+    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+    .hero h1 {
+      font-size: clamp(2.4rem, 4.5vw, 3.8rem);
+      font-weight: 900; line-height: 1.1; letter-spacing: -0.03em;
+      color: #1a1e32; margin-bottom: 1.25rem;
+      opacity: 0; animation: fadeUp .8s .2s forwards;
+    }
+    .hero h1 span {
+      background: linear-gradient(90deg, #1fb8c9 0%, #5f8cff 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .hero-sub {
+      font-size: 1.08rem; font-weight: 600; color: var(--muted);
+      line-height: 1.75; margin-bottom: 2rem; max-width: 480px;
+      opacity: 0; animation: fadeUp .8s .35s forwards;
+    }
+    .hero-actions {
+      display: flex; gap: 0.75rem; flex-wrap: wrap;
+      opacity: 0; animation: fadeUp .8s .5s forwards;
+    }
+    .btn-hero-primary {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 0.9rem 1.8rem; border-radius: 16px;
+      background: linear-gradient(180deg, #3dd6e2 0%, #1fb8c9 100%);
+      color: white; font-size: 1rem; font-weight: 800;
+      box-shadow: var(--shadow-brand);
+      transition: transform .18s, box-shadow .18s;
+    }
+    .btn-hero-primary:hover { transform: translateY(-2px); box-shadow: 0 18px 38px rgba(31,184,201,.28); }
+    .btn-hero-secondary {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 0.9rem 1.8rem; border-radius: 16px;
+      background: white; border: 1.5px solid var(--line);
+      color: #48516b; font-size: 1rem; font-weight: 800;
+      box-shadow: var(--shadow);
+      transition: transform .18s, box-shadow .18s;
+    }
+    .btn-hero-secondary:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+    .hero-stats {
+      display: flex; gap: 2rem; margin-top: 2.5rem; padding-top: 2rem;
+      border-top: 1px solid var(--line);
+      opacity: 0; animation: fadeUp .8s .65s forwards;
+    }
+    .hero-stat p { font-size: 1.65rem; font-weight: 900; color: #1a1e32; letter-spacing: -0.02em; }
+    .hero-stat span { font-size: 0.8rem; font-weight: 700; color: var(--muted); }
+
+    /* ── HERO CARD (right side) ─────────────── */
+    .hero-visual {
+      opacity: 0; animation: fadeRight .9s .3s forwards;
+    }
+    @keyframes fadeRight { from { opacity:0; transform: translateX(30px); } to { opacity:1; transform: translateX(0); } }
+
+    .app-preview {
+      background: white; border: 1px solid var(--line); border-radius: 26px;
+      padding: 1.5rem; box-shadow: 0 20px 60px rgba(31,42,68,.10);
+      position: relative;
+    }
+    .preview-topbar {
+      display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.25rem;
+    }
+    .preview-dot { width: 9px; height: 9px; border-radius: 50%; }
+    .preview-title {
+      font-size: 0.72rem; font-weight: 800; color: var(--muted);
+      margin-left: auto; letter-spacing: .04em;
+    }
+    .preview-input-box {
+      background: var(--bg); border: 1px solid var(--line); border-radius: 16px;
+      padding: 1rem 1.1rem; font-size: 0.9rem; font-weight: 600;
+      color: #48516b; line-height: 1.65; margin-bottom: 0.75rem;
+    }
+    .preview-label {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 0.72rem; font-weight: 800; color: var(--brand-dark);
+      margin-bottom: 0.6rem;
+    }
+    .preview-label-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--brand); }
+    .preview-output-box {
+      background: var(--brand-soft); border: 1px solid var(--brand-mid); border-radius: 16px;
+      padding: 1rem 1.1rem; font-size: 0.9rem; font-weight: 600;
+      color: #1a1e32; line-height: 1.7; margin-bottom: 1rem;
+    }
+    .preview-output-box mark {
+      background: rgba(31,184,201,.2); color: #0d7b8a;
+      padding: 0 3px; border-radius: 4px;
+    }
+    .preview-actions {
+      display: flex; gap: 0.5rem;
+    }
+    .preview-btn {
+      flex: 1; padding: 0.65rem; border-radius: 12px;
+      font-size: 0.82rem; font-weight: 800; border: 1.5px solid var(--line);
+      background: white; color: #48516b; cursor: pointer;
+      transition: background .18s, border-color .18s;
+    }
+    .preview-btn:hover { background: var(--bg); }
+    .preview-btn.primary {
+      background: linear-gradient(180deg, #3dd6e2 0%, #1fb8c9 100%);
+      border-color: transparent; color: white; box-shadow: var(--shadow-brand);
+    }
+    .preview-score-row {
+      display: flex; justify-content: space-between; margin-bottom: 0.75rem;
+    }
+    .preview-score-pill {
+      background: white; border: 1px solid var(--line); border-radius: 999px;
+      padding: 0.3rem 0.75rem; font-size: 0.75rem; font-weight: 800;
+      color: var(--muted); display: flex; align-items: center; gap: 5px;
+      box-shadow: var(--shadow);
+    }
+    .preview-score-pill span { color: var(--brand-dark); }
+
+    /* ── SECTION SHARED ─────────────────────── */
+    .section { padding: 6rem 2rem; }
+    .section-inner { max-width: 1180px; margin: 0 auto; }
+    .section-tag {
+      display: inline-flex; align-items: center; gap: 7px;
+      background: var(--brand-soft); border: 1px solid var(--brand-mid);
+      color: var(--brand-dark); padding: 0.4rem 0.9rem; border-radius: 999px;
+      font-size: 0.78rem; font-weight: 800; margin-bottom: 1rem;
+    }
+    .section-tag svg { width: 13px; height: 13px; }
+    .section-title {
+      font-size: clamp(1.9rem, 3.5vw, 2.8rem);
+      font-weight: 900; line-height: 1.15; letter-spacing: -0.03em;
+      color: #1a1e32; margin-bottom: 0.75rem;
+    }
+    .section-title span {
+      background: linear-gradient(90deg, #1fb8c9 0%, #5f8cff 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .section-sub {
+      font-size: 1.05rem; font-weight: 600; color: var(--muted);
+      line-height: 1.7; max-width: 520px;
+    }
+
+    /* ── FEATURES ───────────────────────────── */
+    .features { background: white; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+    .features-header { text-align: center; margin-bottom: 3.5rem; }
+    .features-header .section-sub { margin: 0 auto; }
+    .features-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
+    }
+    .feat-card {
+      background: var(--bg); border: 1px solid var(--line); border-radius: 24px;
+      padding: 2rem 1.75rem;
+      transition: transform .2s, box-shadow .2s, border-color .2s;
+    }
+    .feat-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 14px 32px rgba(31,42,68,.09);
+      border-color: #dfe3ef;
+      background: white;
+    }
+    .feat-icon-wrap {
+      width: 56px; height: 56px; border-radius: 16px;
+      background: linear-gradient(180deg, #87e8ef 0%, #1fb8c9 100%);
+      display: grid; place-items: center; color: white;
+      box-shadow: var(--shadow-brand); margin-bottom: 1.25rem;
+    }
+    .feat-icon-wrap svg { width: 26px; height: 26px; }
+    .feat-card h3 {
+      font-size: 1.15rem; font-weight: 900; letter-spacing: -0.02em;
+      color: #1a1e32; margin-bottom: 0.6rem;
+    }
+    .feat-card p {
+      font-size: 0.92rem; font-weight: 600; color: var(--muted); line-height: 1.7;
+    }
+    .feat-tag {
+      display: inline-flex; align-items: center; gap: 6px; margin-top: 1.25rem;
+      background: white; border: 1px solid var(--line);
+      padding: 0.35rem 0.8rem; border-radius: 999px;
+      font-size: 0.78rem; font-weight: 800; color: #677089;
+      box-shadow: var(--shadow);
+    }
+    .feat-tag svg { width: 12px; height: 12px; }
+
+    /* ── HOW IT WORKS ───────────────────────── */
+    .how { background: var(--bg); }
+    .how-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: start; }
+    .steps { display: flex; flex-direction: column; gap: 0; }
+    .step {
+      display: flex; gap: 1.25rem;
+      padding: 1.75rem 0; border-bottom: 1px solid var(--line);
+      cursor: default;
+    }
+    .step:first-child { padding-top: 0; }
+    .step:last-child { border-bottom: none; padding-bottom: 0; }
+    .step-circle {
+      width: 42px; height: 42px; border-radius: 50%; flex-shrink: 0;
+      background: white; border: 1.5px solid var(--brand-mid);
+      display: grid; place-items: center;
+      font-size: 0.8rem; font-weight: 900; color: var(--brand-dark);
+      box-shadow: var(--shadow); transition: background .2s, color .2s;
+    }
+    .step:hover .step-circle { background: var(--brand); color: white; border-color: var(--brand); }
+    .step-content h4 { font-size: 1.05rem; font-weight: 900; color: #1a1e32; margin-bottom: 0.4rem; }
+    .step-content p { font-size: 0.9rem; font-weight: 600; color: var(--muted); line-height: 1.7; }
+
+    .how-tools-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
+    }
+    .mini-tool {
+      background: white; border: 1px solid var(--line); border-radius: 20px;
+      padding: 1.25rem 1rem;
+      display: flex; flex-direction: column; gap: 0.5rem;
+      box-shadow: var(--shadow);
+      transition: transform .2s, box-shadow .2s;
+    }
+    .mini-tool:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
+    .mini-tool.featured { background: var(--brand-soft); border-color: var(--brand-mid); }
+    .mini-tool-icon {
+      width: 44px; height: 44px; border-radius: 14px; flex-shrink: 0;
+      background: linear-gradient(180deg, #149fb0 0%, #107b8f 100%);
+      display: grid; place-items: center; color: white;
+      box-shadow: 0 6px 14px rgba(17,125,143,.18);
+      font-size: 0.8rem; font-weight: 900;
+    }
+    .mini-tool h4 { font-size: 0.92rem; font-weight: 900; color: #1a1e32; letter-spacing: -0.01em; }
+    .mini-tool p { font-size: 0.78rem; font-weight: 700; color: var(--muted); line-height: 1.55; }
+    .mini-tool-link {
+      font-size: 0.78rem; font-weight: 900; color: var(--brand-dark); margin-top: 0.25rem;
+    }
+
+    /* ── TESTIMONIALS ───────────────────────── */
+    .testimonials { background: white; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+    .test-header { text-align: center; margin-bottom: 3rem; }
+    .test-header .section-sub { margin: 0 auto; }
+    .test-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+    .test-card {
+      background: var(--bg); border: 1px solid var(--line); border-radius: 22px;
+      padding: 1.75rem;
+      transition: transform .2s, box-shadow .2s;
+    }
+    .test-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
+    .stars { color: var(--brand); font-size: 0.88rem; letter-spacing: 2px; margin-bottom: 1rem; }
+    .test-quote {
+      font-size: 0.95rem; font-weight: 700; line-height: 1.7; color: #2a3150;
+      margin-bottom: 1.25rem;
+    }
+    .test-author { display: flex; align-items: center; gap: 10px; }
+    .test-avatar {
+      width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0;
+      background: linear-gradient(180deg, #dff9fc 0%, #eef5ff 100%);
+      border: 2px solid var(--brand-mid);
+      display: grid; place-items: center;
+      font-size: 0.88rem; font-weight: 900; color: #1a1e32;
+    }
+    .test-name { font-size: 0.88rem; font-weight: 900; color: #1a1e32; }
+    .test-role { font-size: 0.78rem; font-weight: 700; color: var(--muted); margin-top: 2px; }
+
+    /* ── PLANS SECTION ──────────────────────── */
+    .plans { background: var(--bg); }
+    .plans-header { text-align: center; margin-bottom: 3rem; }
+    .plans-header .section-sub { margin: 0 auto; }
+    .plans-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; max-width: 860px; margin: 0 auto; }
+    .plan-card {
+      background: white; border: 1.5px solid var(--line); border-radius: 24px;
+      padding: 2rem 1.75rem;
+      display: flex; flex-direction: column;
+      box-shadow: var(--shadow);
+      transition: transform .2s, box-shadow .2s;
+      position: relative;
+    }
+    .plan-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
+    .plan-card.featured {
+      background: var(--brand-soft); border-color: var(--brand-mid);
+      box-shadow: 0 14px 34px rgba(31,184,201,.14);
+    }
+    .plan-badge {
+      position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+      background: linear-gradient(90deg, #1fb8c9, #5f8cff);
+      color: white; font-size: 0.72rem; font-weight: 900;
+      padding: 0.3rem 1rem; border-radius: 999px;
+      white-space: nowrap;
+    }
+    .plan-name { font-size: 0.85rem; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 0.5rem; }
+    .plan-price { font-size: 2.2rem; font-weight: 900; letter-spacing: -0.03em; color: #1a1e32; margin-bottom: 0.25rem; }
+    .plan-price span { font-size: 0.95rem; font-weight: 700; color: var(--muted); }
+    .plan-desc { font-size: 0.88rem; font-weight: 600; color: var(--muted); margin-bottom: 1.5rem; }
+    .plan-features { list-style: none; display: flex; flex-direction: column; gap: 0.65rem; margin-bottom: 1.75rem; flex: 1; }
+    .plan-features li {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 0.88rem; font-weight: 700; color: #2a3150;
+    }
+    .plan-features li svg { width: 16px; height: 16px; color: var(--brand); flex-shrink: 0; }
+    .plan-btn {
+      display: block; text-align: center;
+      padding: 0.75rem; border-radius: 14px;
+      font-size: 0.92rem; font-weight: 900;
+      border: 1.5px solid var(--line); background: white; color: #48516b;
+      transition: transform .18s, box-shadow .18s;
+    }
+    .plan-card.featured .plan-btn {
+      background: linear-gradient(180deg, #3dd6e2 0%, #1fb8c9 100%);
+      border-color: transparent; color: white;
+      box-shadow: var(--shadow-brand);
+    }
+    .plan-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow); }
+    .plan-card.featured .plan-btn:hover { box-shadow: 0 14px 28px rgba(31,184,201,.3); }
+
+    /* ── CTA ────────────────────────────────── */
+    .cta {
+      background: linear-gradient(135deg, #1fb8c9 0%, #5f8cff 100%);
+      padding: 6rem 2rem; text-align: center; position: relative; overflow: hidden;
+    }
+    .cta::before {
+      content: '';
+      position: absolute; top: -100px; left: 50%; transform: translateX(-50%);
+      width: 800px; height: 400px; border-radius: 50%;
+      background: rgba(255,255,255,.06); pointer-events: none;
+    }
+    .cta-inner { max-width: 680px; margin: 0 auto; position: relative; z-index: 1; }
+    .cta h2 { font-size: clamp(2rem, 4vw, 3rem); font-weight: 900; color: white; letter-spacing: -0.03em; margin-bottom: 1rem; line-height: 1.15; }
+    .cta p { font-size: 1.05rem; font-weight: 600; color: rgba(255,255,255,.8); margin-bottom: 2rem; line-height: 1.65; }
+    .cta-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 1rem 2.4rem; border-radius: 18px;
+      background: white; color: #127f94;
+      font-size: 1rem; font-weight: 900;
+      box-shadow: 0 12px 28px rgba(0,0,0,.15);
+      transition: transform .18s, box-shadow .18s;
+    }
+    .cta-btn:hover { transform: translateY(-2px); box-shadow: 0 18px 38px rgba(0,0,0,.2); }
+    .cta-note { margin-top: 1.25rem; font-size: 0.82rem; font-weight: 700; color: rgba(255,255,255,.7); }
+
+    /* ── FOOTER ─────────────────────────────── */
+    footer {
+      background: white; border-top: 1px solid var(--line);
+      padding: 2.5rem 2rem;
+    }
+    .footer-inner {
+      max-width: 1180px; margin: 0 auto;
+      display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.25rem;
+    }
+    .footer-brand { display: flex; align-items: center; gap: 10px; }
+    .footer-brand-badge {
+      width: 34px; height: 34px; border-radius: 10px;
+      background: linear-gradient(180deg, #87e8ef 0%, #1fb8c9 100%);
+      display: grid; place-items: center; color: white;
+    }
+    .footer-brand-badge svg { width: 16px; height: 16px; }
+    .footer-brand-name {
+      font-size: 1.3rem; font-weight: 900; letter-spacing: -0.02em;
+      background: linear-gradient(90deg, #31d2d8 0%, #5f8cff 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .footer-links { display: flex; gap: 1.75rem; flex-wrap: wrap; }
+    .footer-links a { font-size: 0.88rem; font-weight: 700; color: var(--muted); transition: color .18s; }
+    .footer-links a:hover { color: var(--text); }
+    .footer-copy { font-size: 0.82rem; font-weight: 700; color: var(--muted); }
+
+    /* ── ANIMATIONS ─────────────────────────── */
+    @keyframes fadeUp { from{opacity:0;transform:translateY(22px)} to{opacity:1;transform:translateY(0)} }
+    .reveal { opacity:0; transform:translateY(20px); transition: opacity .65s, transform .65s; }
+    .reveal.in { opacity:1; transform:translateY(0); }
+
+    /* ── RESPONSIVE ─────────────────────────── */
+    @media (max-width: 1080px) {
+      .hero-inner { grid-template-columns: 1fr; gap: 3rem; }
+      .hero-visual { max-width: 480px; }
+      .how-grid { grid-template-columns: 1fr; gap: 3rem; }
+      .features-grid, .test-grid { grid-template-columns: repeat(2, 1fr); }
+      .plans-grid { grid-template-columns: 1fr; max-width: 360px; }
+    }
+    @media (max-width: 720px) {
+      .nav-links { display: none; }
+      .hero { padding: 8rem 1.25rem 4rem; }
+      .features-grid, .test-grid { grid-template-columns: 1fr; }
+      .how-tools-grid { grid-template-columns: 1fr; }
+      .hero-stats { gap: 1.5rem; flex-wrap: wrap; }
+      .section { padding: 4rem 1.25rem; }
+      .hero-inner { gap: 2.5rem; }
     }
   </style>
 </head>
 <body>
 
-  <header class="site-header">
-    <div class="container header-inner">
-      <a href="#" class="logo" aria-label="Eduvia inicio">
-        <div class="logo-mark">E</div>
-        <span>Eduvia</span>
-      </a>
-
-      <nav class="desktop-nav" aria-label="Navegación principal">
-        <a href="#herramientas">Herramientas</a>
-        <a href="#como-funciona">Cómo funciona</a>
-        <a href="#preview">Vista previa</a>
-        <a href="#planes">Planes</a>
-        <a href="#faq">FAQ</a>
-      </nav>
-
-      <div class="header-actions">
-        <a href="login.html" class="btn btn-ghost">Iniciar sesión</a>
-        <a href="crear-clase.html" class="btn btn-primary">Probar Eduvia</a>
+<!-- NAVBAR -->
+<nav>
+  <div class="nav-inner">
+    <div class="brand">
+      <div class="brand-badge">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
       </div>
+      <div class="brand-name">Eduvia</div>
+    </div>
+    <ul class="nav-links">
+      <li><a href="#funciones">Funciones</a></li>
+      <li><a href="#como">Cómo funciona</a></li>
+      <li><a href="#testimonios">Testimonios</a></li>
+      <li><a href="#planes">Planes</a></li>
+    </ul>
+    <div class="nav-ctas">
+      <a href="login.html" class="btn-ghost-nav">Iniciar sesión</a>
+      <a href="register.html" class="btn-primary-nav">Crear cuenta</a>
+    </div>
+  </div>
+</nav>
 
-      <button class="menu-toggle" id="menuToggle" aria-label="Abrir menú" aria-expanded="false" aria-controls="mobilePanel">
-        <span></span>
-        <span></span>
-        <span></span>
-      </button>
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-copy">
+      <div class="hero-badge">
+        <div class="hero-badge-dot"></div>
+        Potenciado con Inteligencia Artificial
+      </div>
+      <h1>Estudiá más inteligente.<br><span>Escribí con claridad.</span></h1>
+      <p class="hero-sub">
+        Eduvia te ayuda a comprender mejor lo que estudiás y a redactar párrafos más claros, precisos y estructurados — todo con el apoyo de la IA.
+      </p>
+      <div class="hero-actions">
+        <a href="register.html" class="btn-hero-primary">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M13 5l7 7-7 7"/><path d="M5 12h14"/></svg>
+          Empezar gratis
+        </a>
+        <a href="#funciones" class="btn-hero-secondary">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          Ver demo
+        </a>
+      </div>
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <p>12 000+</p>
+          <span>Estudiantes activos</span>
+        </div>
+        <div class="hero-stat">
+          <p>15</p>
+          <span>Herramientas de IA</span>
+        </div>
+        <div class="hero-stat">
+          <p>4,9 ★</p>
+          <span>Valoración promedio</span>
+        </div>
+      </div>
     </div>
 
-    <div class="container mobile-panel" id="mobilePanel">
-      <div class="mobile-card">
-        <nav class="mobile-nav" aria-label="Navegación móvil">
-          <a href="#herramientas">Herramientas</a>
-          <a href="#como-funciona">Cómo funciona</a>
-          <a href="#preview">Vista previa</a>
-          <a href="#planes">Planes</a>
-          <a href="#faq">FAQ</a>
-        </nav>
-
-        <div class="mobile-actions">
-          <a href="login.html" class="btn btn-ghost">Iniciar sesión</a>
-          <a href="crear-clase.html" class="btn btn-primary">Probar Eduvia</a>
+    <div class="hero-visual">
+      <div class="app-preview">
+        <div class="preview-topbar">
+          <div class="preview-dot" style="background:#f5a623"></div>
+          <div class="preview-dot" style="background:#7ed321"></div>
+          <div class="preview-dot" style="background:#4a90e2"></div>
+          <span class="preview-title">Mejorador de párrafos · Eduvia</span>
+        </div>
+        <div style="font-size:.72rem;font-weight:800;color:var(--muted);margin-bottom:.5rem;">Tu texto original</div>
+        <div class="preview-input-box">
+          "La fotosíntesis es cuando las plantas toman la luz y hacen su comida. Es muy importante para todos los seres vivos."
+        </div>
+        <div class="preview-label">
+          <div class="preview-label-dot"></div>
+          Versión mejorada por Eduvia IA
+        </div>
+        <div class="preview-output-box">
+          La fotosíntesis es el proceso por el cual las plantas <mark>convierten</mark> la energía lumínica en glucosa, liberando oxígeno como subproducto <mark>esencial</mark> para la vida en la Tierra.
+        </div>
+        <div class="preview-score-row">
+          <div class="preview-score-pill">Claridad <span>↑ 68 → 94</span></div>
+          <div class="preview-score-pill">Precisión <span>↑ 71 → 96</span></div>
+        </div>
+        <div class="preview-actions">
+          <button class="preview-btn">Rechazar</button>
+          <button class="preview-btn">Explicar</button>
+          <button class="preview-btn primary">Aceptar</button>
         </div>
       </div>
     </div>
-  </header>
+  </div>
+</section>
 
-  <main>
-
-    <section class="hero">
-      <div class="container hero-grid">
-        <div class="hero-copy">
-          <span class="hero-badge">IA educativa para estudiar mejor</span>
-
-          <h1>
-            Transformá apuntes, textos y temas de clase
-            en contenido claro, útil y listo para estudiar
-          </h1>
-
-          <p class="hero-text">
-            Eduvia te ayuda a crear resúmenes, explicaciones, documentos de estudio,
-            quizzes, presentaciones y más, todo desde una misma plataforma.
-          </p>
-
-          <div class="hero-actions">
-            <a href="crear-clase.html" class="btn btn-primary">Empezar gratis</a>
-            <a href="#herramientas" class="btn btn-ghost">Ver herramientas</a>
-          </div>
-
-          <div class="hero-chips">
-            <span>Rápido</span>
-            <span>Editable</span>
-            <span>Hecho para estudiar</span>
-            <span>Simple de usar</span>
-          </div>
-        </div>
-
-        <div class="hero-visual">
-          <div class="hero-glow"></div>
-
-          <div class="hero-mockup">
-            <div class="mockup-top">
-              <div class="mockup-title">
-                <div class="mockup-dot"></div>
-                <div class="mockup-title-text">
-                  <strong>Documento de estudio</strong>
-                  <span>Historia · Revolución Francesa</span>
-                </div>
-              </div>
-
-              <div class="mockup-actions" aria-hidden="true">
-                <i></i>
-                <i></i>
-                <i></i>
-              </div>
-            </div>
-
-            <div class="mockup-body">
-              <aside class="mockup-sidebar">
-                <div class="sidebar-pill active">Resumen</div>
-                <div class="sidebar-pill">Quiz</div>
-                <div class="sidebar-pill">Explicación</div>
-                <div class="sidebar-pill">Presentación</div>
-              </aside>
-
-              <div class="mockup-editor">
-                <div class="editor-toolbar">
-                  <span>Título</span>
-                  <span>Ideas clave</span>
-                  <span>Preguntas</span>
-                </div>
-
-                <div class="doc-title"></div>
-                <div class="doc-line long"></div>
-                <div class="doc-line med"></div>
-                <div class="doc-line long"></div>
-                <div class="doc-line short"></div>
-
-                <div class="doc-line med" style="margin-top:22px;"></div>
-                <div class="doc-line long"></div>
-                <div class="doc-line med"></div>
-                <div class="doc-line short"></div>
-
-                <div class="doc-line short" style="margin-top:24px;"></div>
-                <div class="doc-line long"></div>
-                <div class="doc-line med"></div>
-              </div>
-            </div>
-          </div>
-
-          <div class="floating-card card-summary">
-            <strong>Resumen inteligente</strong>
-            <p>Reduce temas largos a ideas principales claras y ordenadas.</p>
-          </div>
-
-          <div class="floating-card card-quiz">
-            <strong>Quiz interactivo</strong>
-            <p>Generá preguntas para practicar y repasar antes de estudiar.</p>
-          </div>
-
-          <div class="floating-card card-slides">
-            <strong>Presentación</strong>
-            <p>Convertí información en una estructura lista para exponer.</p>
-          </div>
-        </div>
+<!-- FEATURES -->
+<section class="section features" id="funciones">
+  <div class="section-inner">
+    <div class="features-header reveal">
+      <div class="section-tag">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.77 5.82 21 7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        Funciones de Eduvia
       </div>
-    </section>
-
-    <section class="section">
-      <div class="container">
-        <div class="benefits-grid">
-          <article class="benefit-card">
-            <h3>Creá material en segundos</h3>
-            <p>Convertí ideas, textos o archivos en contenido útil sin empezar de cero.</p>
-          </article>
-
-          <article class="benefit-card">
-            <h3>Estudiá con más claridad</h3>
-            <p>Obtené explicaciones, resúmenes y formatos que hacen más fácil el repaso.</p>
-          </article>
-
-          <article class="benefit-card">
-            <h3>Todo en un solo lugar</h3>
-            <p>Generá, editá y organizá contenido desde una misma plataforma.</p>
-          </article>
-
-          <article class="benefit-card">
-            <h3>Hecho para alumnos y docentes</h3>
-            <p>Usalo para aprender, explicar mejor o preparar materiales más rápido.</p>
-          </article>
+      <h2 class="section-title">Todo lo que necesitás para <span>aprender mejor</span></h2>
+      <p class="section-sub">15 herramientas de IA diseñadas para estudiantes, organizadas según el tipo de tarea que querés hacer.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feat-card reveal">
+        <div class="feat-icon-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
         </div>
+        <h3>Mejorador de párrafos</h3>
+        <p>Pegá cualquier texto y Eduvia lo reformula para que sea más claro, preciso y bien estructurado. Mantenés tu idea, mejorás la forma.</p>
+        <span class="feat-tag">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.77 5.82 21 7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          Texto
+        </span>
       </div>
-    </section>
-
-    <section id="herramientas" class="section">
-      <div class="container">
-        <div class="section-head">
-          <span class="section-kicker">Herramientas</span>
-          <h2>Todo lo que podés crear con Eduvia</h2>
-          <p>
-            Elegí una herramienta según lo que necesites estudiar, explicar,
-            resumir o preparar para clase.
-          </p>
+      <div class="feat-card reveal" style="transition-delay:.1s">
+        <div class="feat-icon-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
         </div>
-
-        <div class="tools-grid">
-          <article class="tool-card">
-            <div class="tool-icon">01</div>
-            <h3>Documento de estudio</h3>
-            <p>Organizá información en un formato claro, ordenado y editable.</p>
-          </article>
-
-          <article class="tool-card">
-            <div class="tool-icon">02</div>
-            <h3>Resumen inteligente</h3>
-            <p>Reducí textos largos a ideas principales fáciles de repasar.</p>
-          </article>
-
-          <article class="tool-card">
-            <div class="tool-icon">03</div>
-            <h3>Explicación simple</h3>
-            <p>Entendé temas complejos con una versión más clara y directa.</p>
-          </article>
-
-          <article class="tool-card">
-            <div class="tool-icon">04</div>
-            <h3>Análisis de tema</h3>
-            <p>Desarrollá un contenido con mayor profundidad y estructura.</p>
-          </article>
-
-          <article class="tool-card">
-            <div class="tool-icon">05</div>
-            <h3>Quiz interactivo</h3>
-            <p>Practicá con preguntas pensadas para repasar antes de un examen.</p>
-          </article>
-
-          <article class="tool-card">
-            <div class="tool-icon">06</div>
-            <h3>Completar palabras</h3>
-            <p>Generá ejercicios útiles para trabajar conceptos y vocabulario clave.</p>
-          </article>
-
-          <article class="tool-card">
-            <div class="tool-icon">07</div>
-            <h3>Presentación</h3>
-            <p>Transformá un tema en una estructura lista para exponer en clase.</p>
-          </article>
-
-          <article class="tool-card">
-            <div class="tool-icon">08</div>
-            <h3>Mejorador de texto</h3>
-            <p>Reescribí contenido manteniendo la idea, pero con mejor claridad.</p>
-          </article>
-        </div>
+        <h3>Resúmenes y análisis</h3>
+        <p>Subí un tema o peguá un contenido y obtené un resumen claro, análisis profundo o explicación simplificada en segundos.</p>
+        <span class="feat-tag">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.77 5.82 21 7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          Comprensión
+        </span>
       </div>
-    </section>
-
-    <section id="como-funciona" class="section como-funciona">
-      <div class="container">
-        <div class="section-head">
-          <span class="section-kicker">Cómo funciona</span>
-          <h2>Usarlo es simple</h2>
-          <p>
-            Solo necesitás elegir qué querés crear y darle a Eduvia el contexto
-            necesario para generar el resultado.
-          </p>
+      <div class="feat-card reveal" style="transition-delay:.2s">
+        <div class="feat-icon-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
         </div>
-
-        <div class="steps-grid">
-          <article class="step-card">
-            <span class="step-number">01</span>
-            <h3>Elegí una herramienta</h3>
-            <p>Seleccioná el tipo de contenido que querés generar según tu objetivo.</p>
-          </article>
-
-          <article class="step-card">
-            <span class="step-number">02</span>
-            <h3>Escribí o subí tu contenido</h3>
-            <p>Podés usar un tema, un texto, una consigna, un documento o un archivo.</p>
-          </article>
-
-          <article class="step-card">
-            <span class="step-number">03</span>
-            <h3>Obtené el resultado</h3>
-            <p>Eduvia lo transforma en un recurso claro, útil y listo para estudiar o editar.</p>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <section id="preview" class="section">
-      <div class="container">
-        <div class="section-head">
-          <span class="section-kicker">Vista previa</span>
-          <h2>Así se ve Eduvia por dentro</h2>
-          <p>
-            Explorá cómo cambia el resultado según la herramienta que uses.
-          </p>
-        </div>
-
-        <div class="preview-shell">
-          <div class="preview-tabs">
-            <button class="preview-tab active" data-tab="documento">Documento</button>
-            <button class="preview-tab" data-tab="resumen">Resumen</button>
-            <button class="preview-tab" data-tab="quiz">Quiz</button>
-            <button class="preview-tab" data-tab="presentacion">Presentación</button>
-          </div>
-
-          <div class="preview-body">
-            <div class="preview-panel doc-preview active" data-panel="documento">
-              <div class="title"></div>
-              <div class="line long"></div>
-              <div class="line med"></div>
-              <div class="line long"></div>
-              <div class="line short"></div>
-
-              <div class="subtitle"></div>
-              <div class="line med"></div>
-              <div class="line long"></div>
-              <div class="line short"></div>
-
-              <div class="subtitle"></div>
-              <div class="line long"></div>
-              <div class="line med"></div>
-              <div class="line short"></div>
-            </div>
-
-            <div class="preview-panel" data-panel="resumen">
-              <div class="summary-box">
-                <div class="summary-item">
-                  <strong>Idea principal</strong>
-                  <p>La Revolución Francesa transformó el orden político y social de Francia.</p>
-                </div>
-
-                <div class="summary-item">
-                  <strong>Contexto</strong>
-                  <p>La crisis económica, la desigualdad y el descontento social impulsaron el cambio.</p>
-                </div>
-
-                <div class="summary-item">
-                  <strong>Consecuencia</strong>
-                  <p>Se modificó la estructura del poder y se difundieron nuevas ideas políticas.</p>
-                </div>
-              </div>
-            </div>
-
-            <div class="preview-panel" data-panel="quiz">
-              <div class="quiz-list">
-                <div class="quiz-item">
-                  <strong>1. ¿Qué factor contribuyó al inicio de la Revolución Francesa?</strong>
-                  <div class="quiz-options">
-                    <span>A. Estabilidad económica</span>
-                    <span>B. Desigualdad social</span>
-                    <span>C. Ausencia de conflictos</span>
-                    <span>D. Expansión territorial</span>
-                  </div>
-                </div>
-
-                <div class="quiz-item">
-                  <strong>2. ¿Qué cambió a nivel político después del proceso revolucionario?</strong>
-                  <div class="quiz-options">
-                    <span>A. Se reforzó el orden feudal</span>
-                    <span>B. Desapareció la vida política</span>
-                    <span>C. Se transformó la estructura del poder</span>
-                    <span>D. No hubo cambios relevantes</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="preview-panel" data-panel="presentacion">
-              <div class="slides-grid">
-                <div class="slide-card">
-                  <div class="slide-thumb"></div>
-                  <div class="slide-line long"></div>
-                  <div class="slide-line med"></div>
-                  <div class="slide-line short"></div>
-                </div>
-
-                <div class="slide-card">
-                  <div class="slide-thumb"></div>
-                  <div class="slide-line long"></div>
-                  <div class="slide-line med"></div>
-                  <div class="slide-line short"></div>
-                </div>
-
-                <div class="slide-card">
-                  <div class="slide-thumb"></div>
-                  <div class="slide-line long"></div>
-                  <div class="slide-line med"></div>
-                  <div class="slide-line short"></div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="section">
-      <div class="container">
-        <div class="section-head">
-          <span class="section-kicker">Pensado para</span>
-          <h2>Eduvia se adapta a distintas formas de estudiar</h2>
-        </div>
-
-        <div class="audience-grid">
-          <article class="audience-card">
-            <h3>Estudiantes</h3>
-            <p>Resumí temas, prepará exámenes y entendé mejor textos largos con contenido más claro.</p>
-          </article>
-
-          <article class="audience-card">
-            <h3>Docentes</h3>
-            <p>Creá materiales, actividades y recursos de apoyo más rápido para tus clases.</p>
-          </article>
-
-          <article class="audience-card">
-            <h3>Estudio diario</h3>
-            <p>Organizá ideas, generá contenido útil y repasá con más claridad durante la semana.</p>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <section class="section">
-      <div class="container">
-        <div class="section-head">
-          <span class="section-kicker">Opiniones</span>
-          <h2>Primeras experiencias con Eduvia</h2>
-        </div>
-
-        <div class="testimonials-grid">
-          <article class="testimonial-card">
-            <p>“Me ayudó a pasar apuntes largos a algo mucho más claro para estudiar.”</p>
-            <div class="testimonial-user">
-              <strong>Tomás</strong>
-              <span>Estudiante</span>
-            </div>
-          </article>
-
-          <article class="testimonial-card">
-            <p>“La parte de resúmenes y explicaciones me ahorró bastante tiempo.”</p>
-            <div class="testimonial-user">
-              <strong>Agustina</strong>
-              <span>Estudiante</span>
-            </div>
-          </article>
-
-          <article class="testimonial-card">
-            <p>“Está bueno para transformar un tema en material que después podés editar.”</p>
-            <div class="testimonial-user">
-              <strong>Martina</strong>
-              <span>Docente</span>
-            </div>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <section id="planes" class="section">
-      <div class="container">
-        <div class="section-head">
-          <span class="section-kicker">Planes</span>
-          <h2>Elegí cómo querés usar Eduvia</h2>
-          <p>Empezá gratis y escalá según lo que necesites crear.</p>
-        </div>
-
-        <div class="pricing-grid">
-          <article class="price-card">
-            <h3>Gratis</h3>
-            <div class="price">$0</div>
-            <p class="price-sub">Para empezar a probar la plataforma y conocer las herramientas principales.</p>
-
-            <div class="price-features">
-              <span>Uso inicial de herramientas</span>
-              <span>Generación básica de contenido</span>
-              <span>Experiencia simple para empezar</span>
-            </div>
-
-            <a href="crear-clase.html" class="btn btn-ghost">Empezar</a>
-          </article>
-
-          <article class="price-card featured">
-            <span class="price-badge">Más elegido</span>
-            <h3>Pro</h3>
-            <div class="price">$...</div>
-            <p class="price-sub">Para estudiantes que usan Eduvia con frecuencia y quieren más posibilidades.</p>
-
-            <div class="price-features">
-              <span>Más generaciones por mes</span>
-              <span>Más herramientas disponibles</span>
-              <span>Mejor flujo para estudio continuo</span>
-            </div>
-
-            <a href="planes.html" class="btn btn-primary">Ver plan</a>
-          </article>
-
-          <article class="price-card">
-            <h3>Premium</h3>
-            <div class="price">$...</div>
-            <p class="price-sub">Para uso intensivo, más flexibilidad y una experiencia más completa.</p>
-
-            <div class="price-features">
-              <span>Mayor capacidad de uso</span>
-              <span>Funciones más avanzadas</span>
-              <span>Ideal para uso frecuente</span>
-            </div>
-
-            <a href="planes.html" class="btn btn-ghost">Ver plan</a>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <section id="faq" class="section">
-      <div class="container faq-grid">
-        <div class="faq-copy">
-          <span class="section-kicker">FAQ</span>
-          <h2>Preguntas frecuentes</h2>
-          <p>
-            Respuestas rápidas para entender mejor cómo funciona Eduvia
-            y qué podés hacer dentro de la plataforma.
-          </p>
-        </div>
-
-        <div class="faq-list">
-          <details>
-            <summary>¿Puedo usar Eduvia con cualquier materia?</summary>
-            <p>Sí, Eduvia está pensado para adaptarse a distintos temas y formatos de estudio.</p>
-          </details>
-
-          <details>
-            <summary>¿Puedo subir archivos?</summary>
-            <p>Sí, en las herramientas compatibles podés usar archivos como base para generar contenido.</p>
-          </details>
-
-          <details>
-            <summary>¿Lo que genera se puede editar?</summary>
-            <p>Sí, la idea es que puedas usar el resultado como base y después ajustarlo a tu necesidad.</p>
-          </details>
-
-          <details>
-            <summary>¿Sirve también para docentes?</summary>
-            <p>Sí, también puede servir para crear materiales, actividades y recursos de apoyo para clase.</p>
-          </details>
-        </div>
-      </div>
-    </section>
-
-    <section class="section">
-      <div class="container">
-        <div class="cta-box">
-          <span class="section-kicker">Empezá hoy</span>
-          <h2>Estudiá de forma más clara, rápida e inteligente con Eduvia</h2>
-          <p>
-            Probá la plataforma y empezá a crear contenido útil para aprender mejor.
-          </p>
-
-          <div class="cta-actions">
-            <a href="crear-clase.html" class="btn btn-primary">Probar Eduvia ahora</a>
-            <a href="login.html" class="btn btn-ghost">Iniciar sesión</a>
-          </div>
-        </div>
-      </div>
-    </section>
-
-  </main>
-
-  <footer class="site-footer">
-    <div class="container footer-inner">
-      <div class="footer-brand">
-        <strong>Eduvia</strong>
-        <p>Herramientas inteligentes para estudiar, resumir, explicar y crear contenido educativo en un solo lugar.</p>
-      </div>
-
-      <div class="footer-links">
-        <a href="#">Inicio</a>
-        <a href="#herramientas">Herramientas</a>
-        <a href="#planes">Planes</a>
-        <a href="#faq">FAQ</a>
+        <h3>Quiz interactivo</h3>
+        <p>Generá preguntas y respuestas automáticamente a partir de tu propio material. Ideal para preparar exámenes y repasar conceptos.</p>
+        <span class="feat-tag">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.77 5.82 21 7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          Práctica
+        </span>
       </div>
     </div>
-  </footer>
+  </div>
+</section>
 
-  <script>
-    const menuToggle = document.getElementById("menuToggle");
-    const mobilePanel = document.getElementById("mobilePanel");
+<!-- HOW IT WORKS -->
+<section class="section how" id="como">
+  <div class="section-inner">
+    <div class="how-grid">
+      <div>
+        <div class="section-tag reveal">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          Cómo funciona
+        </div>
+        <h2 class="section-title reveal">Simple, rápido<br>y <span>muy efectivo</span></h2>
+        <p class="section-sub reveal" style="margin-bottom:2.5rem">En menos de un minuto pasás de texto crudo a contenido mejorado y listo para usar.</p>
+        <div class="steps">
+          <div class="step reveal">
+            <div class="step-circle">01</div>
+            <div class="step-content">
+              <h4>Escribí o pegá tu texto</h4>
+              <p>Ingresá el párrafo que querés mejorar, el tema que querés entender, o el documento sobre el que querés trabajar.</p>
+            </div>
+          </div>
+          <div class="step reveal" style="transition-delay:.12s">
+            <div class="step-circle">02</div>
+            <div class="step-content">
+              <h4>Elegí la herramienta</h4>
+              <p>Seleccioná entre las 15 herramientas disponibles: mejorar texto, resumir, generar quiz, palabras clave, y mucho más.</p>
+            </div>
+          </div>
+          <div class="step reveal" style="transition-delay:.24s">
+            <div class="step-circle">03</div>
+            <div class="step-content">
+              <h4>La IA procesa en segundos</h4>
+              <p>El modelo analiza tu contenido y genera la respuesta. Podés aceptar, ajustar, o pedir una nueva versión.</p>
+            </div>
+          </div>
+          <div class="step reveal" style="transition-delay:.36s">
+            <div class="step-circle">04</div>
+            <div class="step-content">
+              <h4>Guardá en tu documento</h4>
+              <p>El resultado queda guardado automáticamente en tu biblioteca de clases y documentos para usarlo cuando quieras.</p>
+            </div>
+          </div>
+        </div>
+      </div>
 
-    menuToggle?.addEventListener("click", () => {
-      const isOpen = mobilePanel.classList.toggle("is-open");
-      menuToggle.classList.toggle("is-open", isOpen);
-      menuToggle.setAttribute("aria-expanded", String(isOpen));
-    });
+      <div class="reveal" style="transition-delay:.2s">
+        <p style="font-size:.8rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:1rem;">Algunas herramientas</p>
+        <div class="how-tools-grid">
+          <div class="mini-tool featured">
+            <div class="mini-tool-icon">CL</div>
+            <h4>Clase escolar</h4>
+            <p>Para materias, temas y objetivos.</p>
+            <span class="mini-tool-link">Favorito ★</span>
+          </div>
+          <div class="mini-tool featured">
+            <div class="mini-tool-icon">RS</div>
+            <h4>Resumen / explicación</h4>
+            <p>Para entender temas de forma clara.</p>
+            <span class="mini-tool-link">Favorito ★</span>
+          </div>
+          <div class="mini-tool">
+            <div class="mini-tool-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4z"/></svg>
+            </div>
+            <h4>Mejorador</h4>
+            <p>Optimiza párrafos y textos.</p>
+            <span class="mini-tool-link">Abrir →</span>
+          </div>
+          <div class="mini-tool">
+            <div class="mini-tool-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            </div>
+            <h4>Quiz interactivo</h4>
+            <p>Preguntas desde tu documento.</p>
+            <span class="mini-tool-link">Abrir →</span>
+          </div>
+        </div>
+        <p style="margin-top:1rem;font-size:.82rem;font-weight:800;color:var(--muted);text-align:center;">
+          + 11 herramientas más disponibles dentro de Eduvia
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
 
-    document.querySelectorAll(".mobile-nav a").forEach((link) => {
-      link.addEventListener("click", () => {
-        mobilePanel.classList.remove("is-open");
-        menuToggle.classList.remove("is-open");
-        menuToggle.setAttribute("aria-expanded", "false");
-      });
-    });
+<!-- TESTIMONIALS -->
+<section class="section testimonials" id="testimonios">
+  <div class="section-inner">
+    <div class="test-header reveal">
+      <div class="section-tag">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+        Testimonios
+      </div>
+      <h2 class="section-title">Lo que dicen nuestros <span>estudiantes</span></h2>
+      <p class="section-sub">Miles de estudiantes ya mejoran su forma de aprender y escribir con Eduvia.</p>
+    </div>
+    <div class="test-grid">
+      <div class="test-card reveal">
+        <div class="stars">★★★★★</div>
+        <p class="test-quote">"Eduvia cambió cómo estudio. Antes tardaba horas en redactar mis trabajos. Ahora mejoro mis párrafos en minutos y entiendo mejor lo que copio."</p>
+        <div class="test-author">
+          <div class="test-avatar">LM</div>
+          <div>
+            <div class="test-name">Lucía Moreno</div>
+            <div class="test-role">Estudiante · Derecho, UBA</div>
+          </div>
+        </div>
+      </div>
+      <div class="test-card reveal" style="transition-delay:.1s">
+        <div class="stars">★★★★★</div>
+        <p class="test-quote">"El quiz interactivo es una genialidad. Pego mis apuntes y me genera preguntas para repasar. Es como tener un profe particular gratis."</p>
+        <div class="test-author">
+          <div class="test-avatar">AR</div>
+          <div>
+            <div class="test-name">Andrés Ríos</div>
+            <div class="test-role">Estudiante · Ingeniería, UTN</div>
+          </div>
+        </div>
+      </div>
+      <div class="test-card reveal" style="transition-delay:.2s">
+        <div class="stars">★★★★★</div>
+        <p class="test-quote">"Lo recomiendo a todos mis alumnos. El mejorador de párrafos enseña a pensar mejor la escritura. No solo corrige, explica por qué."</p>
+        <div class="test-author">
+          <div class="test-avatar">VP</div>
+          <div>
+            <div class="test-name">Valeria Ponce</div>
+            <div class="test-role">Docente · Filosofía y Letras</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
-    const previewTabs = document.querySelectorAll(".preview-tab");
-    const previewPanels = document.querySelectorAll(".preview-panel");
+<!-- PLANS -->
+<section class="section plans" id="planes">
+  <div class="section-inner">
+    <div class="plans-header reveal">
+      <div class="section-tag">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+        Planes
+      </div>
+      <h2 class="section-title">Simple y <span>transparente</span></h2>
+      <p class="section-sub">Empezá gratis. Escalá cuando lo necesites.</p>
+    </div>
+    <div class="plans-grid">
+      <div class="plan-card reveal">
+        <p class="plan-name">Gratis</p>
+        <p class="plan-price">$0 <span>/ mes</span></p>
+        <p class="plan-desc">Para empezar a explorar Eduvia</p>
+        <ul class="plan-features">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> 5 usos de IA por día</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> 3 herramientas disponibles</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> 2 documentos guardados</li>
+        </ul>
+        <a href="register.html" class="plan-btn">Empezar gratis</a>
+      </div>
+      <div class="plan-card featured reveal" style="transition-delay:.1s">
+        <div class="plan-badge">⚡ Más popular</div>
+        <p class="plan-name">Pro</p>
+        <p class="plan-price">$4.99 <span>/ mes</span></p>
+        <p class="plan-desc">Para estudiantes que quieren más</p>
+        <ul class="plan-features">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Usos ilimitados de IA</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> 15 herramientas completas</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Documentos ilimitados</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Historial completo</li>
+        </ul>
+        <a href="register.html" class="plan-btn">Comenzar con Pro</a>
+      </div>
+      <div class="plan-card reveal" style="transition-delay:.2s">
+        <p class="plan-name">Anual</p>
+        <p class="plan-price">$3.49 <span>/ mes</span></p>
+        <p class="plan-desc">Todo Pro · Ahorrás 30%</p>
+        <ul class="plan-features">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Todo lo del plan Pro</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Facturado anualmente</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Ahorrás $17.88 al año</li>
+        </ul>
+        <a href="register.html" class="plan-btn">Elegir anual</a>
+      </div>
+    </div>
+  </div>
+</section>
 
-    previewTabs.forEach((tab) => {
-      tab.addEventListener("click", () => {
-        const target = tab.dataset.tab;
+<!-- CTA -->
+<section class="cta">
+  <div class="cta-inner">
+    <h2>Tu mejor versión como estudiante empieza acá</h2>
+    <p>Más de 12 000 estudiantes ya usan Eduvia para escribir mejor y aprender más rápido. Crear una cuenta es gratis y tarda 30 segundos.</p>
+    <a href="register.html" class="cta-btn">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M13 5l7 7-7 7"/><path d="M5 12h14"/></svg>
+      Crear cuenta gratis
+    </a>
+    <p class="cta-note">✓ Sin tarjeta de crédito &nbsp;·&nbsp; ✓ Sin anuncios &nbsp;·&nbsp; ✓ Datos privados</p>
+  </div>
+</section>
 
-        previewTabs.forEach((btn) => btn.classList.remove("active"));
-        previewPanels.forEach((panel) => panel.classList.remove("active"));
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <div class="footer-brand-badge">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+      </div>
+      <div class="footer-brand-name">Eduvia</div>
+    </div>
+    <div class="footer-links">
+      <a href="#">Privacidad</a>
+      <a href="#">Términos</a>
+      <a href="#">Contacto</a>
+      <a href="#">Blog</a>
+    </div>
+    <span class="footer-copy">© 2025 Eduvia · Todos los derechos reservados</span>
+  </div>
+</footer>
 
-        tab.classList.add("active");
-        document.querySelector(`.preview-panel[data-panel="${target}"]`)?.classList.add("active");
-      });
-    });
-  </script>
+<script>
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); });
+}, { threshold: 0.1 });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+document.querySelectorAll('.preview-btn').forEach(btn => {
+  btn.addEventListener('click', function() {
+    this.style.opacity = '0.65';
+    setTimeout(() => { this.style.opacity = ''; }, 300);
+  });
+});
+</script>
 </body>
 </html>
