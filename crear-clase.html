@@ -2014,80 +2014,98 @@ https://www.britannica.com/event/French-Revolution"
       </div>
     `,
 
-    documento: `
-      <div class="field full">
-        <label for="documento_titulo">Título del documento</label>
-        <input id="documento_titulo" placeholder="Ejemplo: Apunte sobre arquitectura romana" />
-        <span class="helper">Nombre del contenido.</span>
-      </div>
+documento: `
+  <div class="field full">
+    <label for="documento_titulo">Título del documento</label>
+    <input id="documento_titulo" placeholder="Ejemplo: Apunte sobre arquitectura romana" />
+    <span class="helper">Nombre del contenido.</span>
+  </div>
 
-      <div class="field">
-        <label for="documento_tema">Tema central</label>
-        <input id="documento_tema" placeholder="Ejemplo: Arquitectura de Roma" />
-        <span class="helper">Tema base del documento.</span>
-      </div>
+  <div class="field">
+    <label for="documento_tema">Tema central</label>
+    <input id="documento_tema" placeholder="Ejemplo: Arquitectura de Roma" />
+    <span class="helper">Tema base del documento.</span>
+  </div>
 
-      <div class="field">
-        <label for="documento_publico">Público</label>
-        <select id="documento_publico">
-          <option value="Secundaria">Secundaria</option>
-          <option value="Universidad">Universidad</option>
-          <option value="General">General</option>
-        </select>
-        <span class="helper">Define complejidad y estilo.</span>
-      </div>
+  <div class="field">
+    <label for="documento_publico">Público</label>
+    <select id="documento_publico">
+      <option value="Secundaria">Secundaria</option>
+      <option value="Universidad">Universidad</option>
+      <option value="General">General</option>
+    </select>
+    <span class="helper">Define complejidad y estilo.</span>
+  </div>
 
-      <div class="field">
-        <label for="documento_estructura">Estructura</label>
-        <select id="documento_estructura">
-          <option value="Apunte">Apunte</option>
-          <option value="Resumen largo">Resumen largo</option>
-          <option value="Esquema">Esquema</option>
-          <option value="Desarrollo completo">Desarrollo completo</option>
-        </select>
-        <span class="helper">Organiza cómo se presenta.</span>
-      </div>
+  <div class="field">
+    <label for="documento_estructura">Estructura</label>
+    <select id="documento_estructura">
+      <option value="Apunte">Apunte</option>
+      <option value="Resumen largo">Resumen largo</option>
+      <option value="Esquema">Esquema</option>
+      <option value="Desarrollo completo">Desarrollo completo</option>
+    </select>
+    <span class="helper">Organiza cómo se presenta.</span>
+  </div>
 
-      ${sharedLengthFields}
+  ${sharedLengthFields}
 
-      <div class="field full">
-        <label for="documento_incluir">Qué querés incluir</label>
-        <textarea id="documento_incluir" placeholder="Ejemplo: Introducción, características, ejemplos de edificios y conclusión."></textarea>
-        <span class="helper">Indicá los bloques importantes.</span>
-      </div>
-    `,
+  <div class="field">
+    <label for="documento_estilo">Estilo de redacción</label>
+    <select id="documento_estilo">
+      <option value="Claro y natural" selected>Claro y natural</option>
+      <option value="Académico">Académico</option>
+      <option value="Formal">Formal</option>
+      <option value="Explicativo">Explicativo</option>
+      <option value="Simple">Simple</option>
+    </select>
+    <span class="helper">Cómo querés que suene el texto.</span>
+  </div>
 
-    investigacion: `
-      <div class="field full">
-        <label for="investigacion_pregunta">Pregunta o tema</label>
-        <input id="investigacion_pregunta" placeholder="Ejemplo: ¿Cómo influyó la arquitectura romana en la arquitectura occidental?" />
-        <span class="helper">Puede ser una pregunta o un tema general.</span>
-      </div>
+  <div class="field">
+    <label for="documento_humanidad">Nivel de naturalidad</label>
+    <select id="documento_humanidad">
+      <option value="Alta" selected>Alta</option>
+      <option value="Media">Media</option>
+      <option value="Baja">Baja</option>
+    </select>
+    <span class="helper">Hace el texto más humano y menos robótico.</span>
+  </div>
 
-      <div class="field">
-        <label for="investigacion_objetivo">Objetivo</label>
-        <input id="investigacion_objetivo" placeholder="Ejemplo: Encontrar ideas clave y organizar la información" />
-        <span class="helper">Qué querés lograr con la investigación.</span>
-      </div>
+  <div class="field">
+    <label for="documento_profundidad_info">Profundidad informativa</label>
+    <select id="documento_profundidad_info">
+      <option value="Equilibrada" selected>Equilibrada</option>
+      <option value="Alta">Alta</option>
+      <option value="Muy alta">Muy alta</option>
+      <option value="Básica">Básica</option>
+    </select>
+    <span class="helper">Cuánto detalle real querés en el contenido.</span>
+  </div>
 
-      <div class="field">
-        <label for="investigacion_profundidad">Profundidad</label>
-        <select id="investigacion_profundidad">
-          <option value="Rápido">Rápido</option>
-          <option value="Intermedio">Intermedio</option>
-          <option value="Completo">Completo</option>
-        </select>
-        <span class="helper">Define cuánto querés investigar.</span>
-      </div>
+  <div class="field">
+    <label for="documento_prioridad">Prioridad principal</label>
+    <select id="documento_prioridad">
+      <option value="Claridad" selected>Claridad</option>
+      <option value="Precisión">Precisión</option>
+      <option value="Comprensión fácil">Comprensión fácil</option>
+      <option value="Rigor académico">Rigor académico</option>
+    </select>
+    <span class="helper">Qué querés que priorice la IA al redactar.</span>
+  </div>
 
-      ${sharedLengthFields}
+  <div class="field full">
+    <label for="documento_incluir">Qué querés incluir</label>
+    <textarea id="documento_incluir" placeholder="Ejemplo: Introducción, características, ejemplos de edificios y conclusión."></textarea>
+    <span class="helper">Indicá los bloques importantes.</span>
+  </div>
 
-      <div class="field full">
-        <label for="investigacion_resultado">Resultado esperado</label>
-        <textarea id="investigacion_resultado" placeholder="Ejemplo: Un texto ordenado con hallazgos principales, ejemplos y conclusión breve."></textarea>
-        <span class="helper">Esto guía el formato final.</span>
-      </div>
-    `
+  <div class="field full">
+    <label for="documento_redaccion_extra">Indicaciones extra de redacción</label>
+    <textarea id="documento_redaccion_extra" placeholder="Ejemplo: Quiero un texto natural, fluido, con conectores claros, ejemplos concretos y sin sonar robótico."></textarea>
+    <span class="helper">Acá definís cómo querés que se escriba.</span>
+  </div>
+`,
   };
 
   const toolTemplates = {
@@ -2537,24 +2555,43 @@ if (selectedTool === "paragraphs") {
     return;
   }
 
-  if (selected === "documento") {
-    const titulo = valueOf("documento_titulo");
-    const tema = valueOf("documento_tema");
-    const publico = document.getElementById("documento_publico")?.value || "General";
-    const estructura = document.getElementById("documento_estructura")?.value || "Apunte";
-    const incluir = valueOf("documento_incluir");
+if (selected === "documento") {
+  const titulo = valueOf("documento_titulo");
+  const tema = valueOf("documento_tema");
+  const publico = document.getElementById("documento_publico")?.value || "General";
+  const estructura = document.getElementById("documento_estructura")?.value || "Apunte";
+  const incluir = valueOf("documento_incluir");
 
-    legacyMateria.value = "Documento de estudio";
-    legacyTema.value = tema || titulo;
-    legacyNivel.value = publico;
-    legacyDuracion.value = estructura;
-    legacyObjetivo.value =
-      `Tipo de contenido: Documento de estudio.\n` +
-      `Título sugerido: ${titulo || "Sin título"}.\n` +
-      `Estructura deseada: ${estructura}.\n` +
-      `Qué incluir: ${incluir || "No especificado"}.`;
-    return;
-  }
+  const estilo = document.getElementById("documento_estilo")?.value || "Claro y natural";
+  const humanidad = document.getElementById("documento_humanidad")?.value || "Alta";
+  const profundidadInfo =
+    document.getElementById("documento_profundidad_info")?.value || "Equilibrada";
+  const prioridad = document.getElementById("documento_prioridad")?.value || "Claridad";
+  const redaccionExtra = valueOf("documento_redaccion_extra");
+
+  const palabrasMin = valueOf("contenido_palabras_min");
+  const palabrasMax = valueOf("contenido_palabras_max");
+
+  legacyMateria.value = "Documento de estudio";
+  legacyTema.value = tema || titulo;
+  legacyNivel.value = publico;
+  legacyDuracion.value = estructura;
+
+  legacyObjetivo.value =
+    `Tipo de contenido: Documento de estudio.\n` +
+    `Título sugerido: ${titulo || "Sin título"}.\n` +
+    `Estructura deseada: ${estructura}.\n` +
+    `Qué incluir: ${incluir || "No especificado"}.\n` +
+    `Estilo de redacción: ${estilo}.\n` +
+    `Nivel de naturalidad: ${humanidad}.\n` +
+    `Profundidad informativa: ${profundidadInfo}.\n` +
+    `Prioridad principal: ${prioridad}.\n` +
+    `Mínimo de palabras: ${palabrasMin || "No especificado"}.\n` +
+    `Máximo de palabras: ${palabrasMax || "No especificado"}.\n` +
+    `Indicaciones extra de redacción: ${redaccionExtra || "Ninguna"}.`;
+
+  return;
+}
 
   if (selected === "investigacion") {
     const pregunta = valueOf("investigacion_pregunta");
