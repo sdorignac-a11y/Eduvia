@@ -3076,7 +3076,7 @@
       const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
 
       const documentApp = $("document-app");
-      const editableAreas = $$(".doc-editable");
+      let editableAreas = [];
       const editor = $("doc-content");
 
       const formatBlock = $("format-block");
@@ -3113,6 +3113,128 @@ const docTabsState = [
   { id: "tab-documento", title: "Documento", type: "documento", locked: true }
 ];
 let activeDocTabId = "tab-documento";
+      const DOC_STORAGE_KEY = (() => {
+  const params = new URLSearchParams(window.location.search);
+  const docId =
+    params.get("docId") ||
+    params.get("id") ||
+    params.get("slug") ||
+    "default";
+
+  return `eduvia-document-tabs:${docId}`;
+})();
+
+function debounce(fn, wait = 300) {
+  let timer = null;
+  return (...args) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => fn(...args), wait);
+  };
+}
+
+function getPanelHtml(panelId) {
+  return document.getElementById(panelId)?.innerHTML || "";
+}
+
+function saveDocTabsToStorage() {
+  try {
+    const payload = {
+      activeDocTabId,
+      tabs: docTabsState.map((tab) => ({
+        id: tab.id,
+        title: tab.title,
+        type: tab.type,
+        locked: !!tab.locked,
+        html: getPanelHtml(tab.id)
+      }))
+    };
+
+    localStorage.setItem(DOC_STORAGE_KEY, JSON.stringify(payload));
+  } catch (error) {
+    console.error("No se pudieron guardar las pestañas:", error);
+  }
+}
+
+const scheduleDocTabsSave = debounce(saveDocTabsToStorage, 250);
+
+function bindEditableArea(area) {
+  if (!area || area.dataset.boundEditable === "true") return;
+  area.dataset.boundEditable = "true";
+
+  area.addEventListener("focus", () => {
+    activeEditable = area;
+    saveSelection();
+    refreshToolbarState();
+  });
+
+  area.addEventListener("mouseup", () => {
+    saveSelection();
+    refreshToolbarState();
+  });
+
+  area.addEventListener("keyup", () => {
+    saveSelection();
+    refreshToolbarState();
+  });
+
+  area.addEventListener("input", () => {
+    saveSelection();
+    scheduleDocTabsSave();
+  });
+}
+
+function refreshEditableAreas(root = document) {
+  editableAreas = $$(".doc-editable", root);
+  editableAreas.forEach(bindEditableArea);
+}
+
+function restoreDocTabsFromStorage() {
+  try {
+    const raw = localStorage.getItem(DOC_STORAGE_KEY);
+    if (!raw) return;
+
+    const parsed = JSON.parse(raw);
+    if (!parsed || !Array.isArray(parsed.tabs) || !parsed.tabs.length) return;
+
+    if (!docTabsList || !docTabPanels) return;
+
+    docTabsList.innerHTML = "";
+    docTabPanels.innerHTML = "";
+    docTabsState.length = 0;
+
+    parsed.tabs.forEach((tab, index) => {
+      const tabId = tab.id || `tab-restored-${index + 1}`;
+      const title = tab.title || `Pestaña ${index + 1}`;
+      const type = tab.type || slugifyTab(title);
+      const locked = type === "documento" || !!tab.locked;
+
+      const btn = createDocTabButton(tabId, title);
+      const panel = createDocTabPanel(tabId, tab.html || "");
+
+      docTabsList.appendChild(btn);
+      docTabPanels.appendChild(panel);
+
+      docTabsState.push({
+        id: tabId,
+        title,
+        type,
+        locked
+      });
+    });
+
+    refreshEditableAreas(document);
+
+    const tabToActivate =
+      parsed.activeDocTabId &&
+      document.getElementById(parsed.activeDocTabId)
+        ? parsed.activeDocTabId
+        : docTabsState[0]?.id || "tab-documento";
+
+    activateDocTab(tabToActivate);
+  } catch (error) {
+    console.error("No se pudieron restaurar las pestañas:", error);
+  }
+}
       
       const openShareBtn = $("open-share-btn");
       const closeShareBtn = $("close-share-btn");
@@ -3210,6 +3332,8 @@ function activateDocTab(tabId) {
   document.querySelectorAll(".doc-panel").forEach((panel) => {
     panel.classList.toggle("is-active", panel.id === tabId);
   });
+
+  scheduleDocTabsSave();
 }
 
 function createDocTabButton(tabId, title) {
@@ -3247,8 +3371,10 @@ function ensureDocTab(title, type, html = "") {
     const panel = document.getElementById(existing.id);
     if (panel && !existing.locked) {
       panel.innerHTML = html;
+      refreshEditableAreas(panel);
     }
     activateDocTab(existing.id);
+    scheduleDocTabsSave();
     return existing.id;
   }
 
@@ -3268,7 +3394,11 @@ function ensureDocTab(title, type, html = "") {
     locked: false
   });
 
+  refreshEditableAreas(panel);
+  bindDocTabsUi();
   activateDocTab(tabId);
+  scheduleDocTabsSave();
+
   return tabId;
 }
 
@@ -3293,8 +3423,10 @@ function createEmptyDocTab() {
       </div>
     `
   );
-}
 
+  scheduleDocTabsSave();
+}
+      
 function bindDocTabsUi() {
   document.querySelectorAll(".doc-side-tab").forEach((tab) => {
     if (tab.dataset.bound === "true") return;
@@ -3989,26 +4121,6 @@ function closeChat() {
         }
       }
 
-      editableAreas.forEach((area) => {
-        area.addEventListener("focus", () => {
-          activeEditable = area;
-          saveSelection();
-          refreshToolbarState();
-        });
-
-        area.addEventListener("mouseup", () => {
-          saveSelection();
-          refreshToolbarState();
-        });
-
-        area.addEventListener("keyup", () => {
-          saveSelection();
-          refreshToolbarState();
-        });
-
-        area.addEventListener("input", saveSelection);
-      });
-
       document.addEventListener("selectionchange", () => {
         saveSelection();
         refreshToolbarState();
@@ -4247,8 +4359,14 @@ function closeChat() {
       }
 
       setTimeout(runToolFromQuery, 300);
-      bindDocTabsUi();
-activateDocTab("tab-documento");
+      restoreDocTabsFromStorage();
+bindDocTabsUi();
+
+if (!docTabsState.length) {
+  activateDocTab("tab-documento");
+}
+
+refreshEditableAreas(document);
 
       toolDockButtons.forEach((btn) => {
         btn.addEventListener("click", () => {
@@ -4511,8 +4629,10 @@ chatToolbarToggle?.addEventListener("click", () => {
       });
 
       syncDocumentLayout();
-      setReferenceView("simple");
-      refreshToolbarState();
+setReferenceView("simple");
+refreshEditableAreas(document);
+refreshToolbarState();
+scheduleDocTabsSave();
     })();
   </script>
 
